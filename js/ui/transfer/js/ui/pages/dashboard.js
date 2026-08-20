@@ -348,7 +348,8 @@ lazy(T.ui, 'dashboardLayout', () => {
         },
 
         renderListitem(n, cn) {
-            const {ac, ct, ts, e, xh, xrf, size: [bytes, files]} = n;
+            const {ac, ct, ts, e, xh, xrf, size} = n;
+            const [bytes = 0, files = 0] = size || [];
             const date = ct || ts;
 
             const item = ce('div', cn, {
@@ -424,10 +425,18 @@ lazy(T.ui, 'dashboardLayout', () => {
 
             // Expires
             col = ce('div', item, { class: 'col' });
-            const ed = e && ~~((e - Date.now() / 1e3) / 86400);
-            ce('div', col, {class: `expires-label${ed < 0 ? ' negative' : ''}`})
-                .textContent = ed < 0 ? l[8657] : ed > 0 ?
-                    mega.icu.format(l.transferit_expires_in_x_days, ed) : l.transferit_never_expires;
+            const now = Date.now() / 1e3;
+            const diff = e ? (e - now) / 86400 : 0;
+            const isExpired = e && diff < 0;
+            const ed = e ? Math.floor(diff) : 0;
+
+            const label = isExpired ? l[8657]
+                : ed > 0 ? mega.icu.format(l.transferit_expires_in_x_days, ed)
+                    : e ? l.transferit_expires_less_one_day : l.transferit_never_expires;
+
+            ce('div', col, {
+                class: `expires-label${isExpired ? ' negative' : ''}`
+            }).textContent = label;
 
             // Contextmenu button
             col = ce('div', item, { class: 'col' });
@@ -515,41 +524,58 @@ lazy(T.ui, 'dashboardLayout', () => {
             const {details, selected} = this.data;
             const {xrf, pw, e} = selected;
             const {menu} = this.listSection;
-            const shedItem = menu.querySelector('.js-tr-change-schedule');
-            const passItem = menu.querySelector('.js-tr-change-password');
-            const remPassItem = menu.querySelector('.js-tr-remove-password');
-            const expiryItem = menu.querySelector('.js-tr-change-exp-date');
 
-            const dynItems = [
-                'js-tr-details-section',
-                'js-tr-copy-link',
-                'js-tr-edit-link-title'
-            ];
+            const isActive = !(e && e < Date.now() / 1e3);
+            const hasSchedule = isActive && xrf && xrf.length;
+            const hasPassword = isActive && pw;
 
-            expiryItem.querySelector('span').textContent =
+            const items = {
+                detailsSection: menu.querySelector('.js-tr-details-section'),
+                open: menu.querySelector('.js-tr-open'),
+                details: menu.querySelector('.js-tr-details'),
+                copyLink: menu.querySelector('.js-tr-copy-link'),
+                shareQr: menu.querySelector('.js-share-qr'),
+                editTitle: menu.querySelector('.js-tr-edit-link-title'),
+                password: menu.querySelector('.js-tr-change-password'),
+                removePassword: menu.querySelector('.js-tr-remove-password'),
+                expDate: menu.querySelector('.js-tr-change-exp-date'),
+                schedule: menu.querySelector('.js-tr-change-schedule'),
+                delete: menu.querySelector('.js-tr-delete-transfer')
+            };
+
+            const visibility = new Map([
+                [items.detailsSection, !details],
+
+                [items.open, isActive],
+                [items.copyLink, isActive && details],
+                [items.shareQr, isActive],
+                [items.editTitle, isActive && details],
+
+                [items.password, isActive],
+                [items.removePassword, hasPassword],
+                [items.expDate, isActive],
+                [items.schedule, hasSchedule],
+
+                [items.details, true],
+                [items.delete, true]
+            ]);
+
+            for (const [item, visible] of visibility) {
+                if (item) {
+                    item.classList.toggle('hidden', !visible);
+                }
+            }
+
+            items.expDate.querySelector('span').textContent =
                 e ? l.transferit_change_exp_date : l.transferit_add_exp_date;
 
-            if (xrf && xrf.length) {
-                shedItem.classList.remove('hidden');
-                shedItem.querySelector('span').textContent =
-                    xrf[0].s ? l.transferit_change_schedule : l.transferit_add_schedule;
-            }
-            else {
-                shedItem.classList.add('hidden');
-            }
+            items.schedule.querySelector('span').textContent =
+                hasSchedule && xrf[0].s
+                    ? l.transferit_change_schedule
+                    : l.transferit_add_schedule;
 
-            if (pw) {
-                passItem.querySelector('span').textContent = l[23262];
-                remPassItem.classList.remove('hidden');
-            }
-            else {
-                passItem.querySelector('span').textContent =  l.transferit_add_pass;
-                remPassItem.classList.add('hidden');
-            }
-
-            for (const item of dynItems) {
-                menu.querySelector(`.${item}`).classList[details ? 'add' : 'remove']('hidden');
-            }
+            items.password.querySelector('span').textContent =
+                hasPassword ? l[23262] : l.transferit_add_pass;
         },
 
         bindActionItemEvts() {
@@ -731,10 +757,22 @@ lazy(T.ui, 'dashboardLayout', () => {
             }
 
             let { cn } = this.detailsSection;
-            const {xh, name, ac, ct, ts, xrf = false, size: [bytes, files]} = this.data.selected;
+            const {xh, name, ac, ct, ts, e, xrf = false, size} = this.data.selected;
+            const [bytes = 0, files = 0] = size || [];
             const date = ct || ts;
             const nameWrap = cn.querySelector('.js-name');
             const info = cn.querySelector('.js-transfer-info');
+            const buttons = cn.querySelector('.js-details-buttons');
+            const delButton = buttons.querySelector('.js-tr-delete-transfer');
+            const isActive = !(e && e < Date.now() / 1e3);
+
+            // Update buttons for purged transfers
+            for (const button of buttons.querySelectorAll('.it-button')) {
+                button.classList.toggle(
+                    'hidden',
+                    isActive ? button === delButton : button !== delButton
+                );
+            }
 
             this.showSubSection(cn);
 

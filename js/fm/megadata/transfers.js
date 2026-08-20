@@ -946,6 +946,12 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
         console.time('makeDirPromise-' + uuid);
     }
 
+    if (__ul_id < 8001) {
+        queueMicrotask(() => {
+            mega.wsuploadmgr.poolmgr.refreshpools().catch(dump);
+        });
+    }
+
     var dequeue = function(name) {
         var files = queue[name] || false;
 
@@ -1353,8 +1359,8 @@ MegaData.prototype.ulfinalize = function(ul, status, h) {
 
     delay('tfscomplete', function() {
         M.resetUploadDownload();
-        $.tresizer();
-    });
+        // $.tresizer();
+    }, 4e3);
 };
 
 MegaData.prototype.ulstart = function(ul) {
@@ -1368,7 +1374,7 @@ MegaData.prototype.ulstart = function(ul) {
         $.transferprogress = Object.create(null);
     }
 
-    ul.starttime = new Date().getTime();
+    ul.starttime = Date.now();
     this.ulprogress(ul, 0, 0, 0);
     mBroadcaster.sendMessage('trk:event', 'upload', 'started');
 };

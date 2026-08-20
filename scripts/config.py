@@ -44,7 +44,8 @@ JSCPD_RULES = '-l 13 -r console'
 HTMLHINT_RULES = '--config ./.htmlhintrc'
 ESLINT_CASCADING_RULES = ['no-const-assign', 'no-shadow', 'no-undef', 'no-unreachable', 'no-unused-vars',
                           'no-dupe-keys']
-VALIDATOR_IGNORE_FILES = ['js/chat/bundle.js', 'nacl-fast.js', 'sqlite3.js', 'pdf.worker.js']
+VALIDATOR_IGNORE_FILES = ['js/chat/bundle.js', 'js/utils/aws.js', 'nacl-fast.js', 'sqlite3.js', 'pdf.worker.js',
+                          'webpack.config.js']
 VALIDATOR_IGNORE_UTF8 = [
     'secureboot', 'test', 'emoji', 'dont-deploy', 'sqlite3.js', 'pdf.worker', 'images' + os.path.sep
 ]

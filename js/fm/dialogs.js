@@ -2426,7 +2426,7 @@
         const string = mega.icu.format(
             l[`toast_${type || 'copy'}_${itemType}${type === 'import' ? '' : 's'}`],
             res.length
-        ).replace(/%s/g, `<span class="long-title-truncate">${targetName}</span>`);
+        ).replace(/%s/g, `<span class="long-title-truncate">${escapeHTML(targetName)}</span>`);
 
         if (viewItems) {
             mega.ui.toast.show(

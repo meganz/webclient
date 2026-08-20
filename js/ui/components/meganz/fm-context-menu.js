@@ -555,8 +555,8 @@
                                     for (let i = 0; i < addedNodes.length; i++) {
                                         mega.ui.toast.show(
                                             parseHTML(
-                                                l[addedNodes[i].t ? 'folder_added' : 'file_added']
-                                                    .replace('%1', addedNodes[i].name)
+                                                escapeHTML(addedNodes[i].t ? l.folder_added : l.file_added)
+                                                    .replace('%1', escapeHTML(addedNodes[i].name))
                                             )
                                         );
                                     }
@@ -1094,6 +1094,7 @@
                             text: l.s4_access_dig_header,
                             icon: 'sprite-fm-mono icon-globe-gear-thin-outline',
                             onClick() {
+                                eventlog(501379);
                                 return s4.ui.showDialog(s4.objects.dialogs.access, mega.ui.contextMenu.firstNode);
                             }
                         },
@@ -1515,6 +1516,7 @@
                 text: l[823],
                 icon: 'sprite-fm-mono icon-settings-thin-outline',
                 onClick() {
+                    eventlog(501387);
                     return s4.ui.showDialog(s4.buckets.dialogs.settings, mega.ui.contextMenu.firstNode);
                 }
             },

@@ -684,7 +684,7 @@
                 });
             };
 
-            this._ready = new Promise((resolve, reject) => {
+            this._ready = tSleep.race(15, new Promise((resolve, reject) => {
 
                 navigator.locks.request('fmdb-sqlite-active', {mode: 'exclusive'}, async() => {
                     await new Promise(this._initWorker);
@@ -699,7 +699,7 @@
                     });
                     resolve();
                 }).catch(reject);
-            });
+            })).then(res => assert(!res, 'SQLite worker bootstrap timeout', res));
 
             mBroadcaster.addListener('crossTab:owner', () => {
                 if (this._isMaster) {

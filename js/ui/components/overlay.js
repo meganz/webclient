@@ -135,6 +135,10 @@ class MegaOverlay extends MegaComponent {
 
             this.name = options.name || '';
 
+            if (options.banner) {
+                this.addBanner(options.banner);
+            }
+
             if (options.videoHeader) {
                 this.addVideoHeader(options.videoHeader);
             }
@@ -255,6 +259,7 @@ class MegaOverlay extends MegaComponent {
 
     clear() {
         this.clearBackBtn();
+        this.clearBanner();
         this.clearHeader();
         this.clearTitle();
         this.clearSubTitle();
@@ -330,6 +335,13 @@ class MegaOverlay extends MegaComponent {
         this.rebind('back', () => btn.trigger('click.dialogBack'));
     }
 
+    clearBanner() {
+        if (this.bannerNode) {
+            this.bannerNode.remove();
+            this.bannerNode = null;
+        }
+    }
+
     clearBackBtn() {
         const btn = this.headerTitleNode.querySelector('button.back-btn');
 
@@ -391,6 +403,18 @@ class MegaOverlay extends MegaComponent {
         const elem = document.createElement('i');
         elem.className = icon ? `icon ${imageClass}` : imageClass;
         this.headerTitleNode.appendChild(elem);
+    }
+
+    addBanner(content) {
+        this.clearBanner();
+
+        if (!(content instanceof Node)) {
+            return;
+        }
+
+        this.bannerNode = content;
+        this.domNode.prepend(content);
+        this.updateScrollbar();
     }
 
     addContent(content, clear) {

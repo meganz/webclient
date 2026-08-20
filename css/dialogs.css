@@ -2497,6 +2497,7 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
 
     .mega-sheet.export-links-dialog .link-access-text {
         color: var(--mobile-text-info);
+        margin: 12px 0 28px;
     }
 
     .mega-sheet.export-links-settings-dialog .learn-more-text {
@@ -2611,6 +2612,104 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
     .mega-sheet.export-links-dialog .link-stat-tip {
         color: var(--mobile-text-secondary);
         font: var(--mobile-font-caption-small-regular);
+    }
+
+    .mega-sheet.export-links-dialog .stats-init-tip {
+        align-items: flex-start;
+        background: var(--mobile-background-inverse);
+        border-radius: var(--mobile-border-radius-medium);
+        box-sizing: border-box;
+        display: flex;
+        opacity: 0;
+        padding: 16px;
+        position: fixed;
+        transition: var(--transition-opacity), var(--transition-visibility);
+        transition-delay: .4s;
+        visibility: hidden;
+        width: 270px;
+    }
+
+    .mega-sheet.export-links-dialog .stats-init-tip.visible {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .mega-sheet.export-links-dialog .stats-init-tip button.close-tip {
+        --mask-color: var(--mobile-text-inverse-secondary);
+        margin: 0;
+        margin-inline-start: 8px;
+        padding: 0;
+    }
+
+    .mega-sheet.export-links-dialog .stats-init-tip .tooltip-arrow {
+        --icon-size: 24px;
+        --mask-color: var(--mobile-background-inverse);
+        left: -16px;
+        position: absolute;
+        top: 50%;
+        transform: rotate(90deg) translateX(-50%);
+    }
+
+    .rtl .mega-sheet.export-links-dialog .stats-init-tip .tooltip-arrow {
+        left: auto;
+        right: -16px;
+        transform: rotate(-90deg) translateX(50%);
+    }
+
+    .mega-sheet.export-links-dialog .stats-init-tip.tooltip-bottom .tooltip-arrow {
+        left: 50%;
+        right: auto;
+        top: -16px;
+        transform: rotate(180deg) translateX(50%);
+    }
+
+    .mega-sheet.export-links-dialog .stats-init-tip .body {
+        flex: 1 1 auto;
+    }
+
+    .mega-sheet.export-links-dialog .stats-init-tip .header {
+        color: var(--mobile-text-inverse);
+        font: var(--mobile-font-copy-semibold);
+        margin: 0 0 8px;
+        padding: 0;
+    }
+
+    .mega-sheet.export-links-dialog .stats-init-tip p {
+        color: var(--mobile-text-inverse-secondary);
+        font: var(--mobile-font-caption-large-regular);
+        padding: 0;
+        margin: 0;
+    }
+
+    .mega-sheet.export-links-dialog .stats-init-tip hr {
+        background: var(--mobile-icon-secondary);
+        border: 0;
+        height: 0.5px;
+        padding: 0;
+        margin: 12px 0;
+    }
+
+    .mega-sheet.export-links-dialog .stats-init-tip a {
+        background: none;
+        display: inline-flex;
+        height: auto;
+        padding: 0;
+    }
+
+    .mega-sheet.export-links-dialog .stats-init-tip a.link span {
+        color: var(--mobile-text-inverse-secondary);
+        font: var(--mobile-font-caption-large-semibold);
+    }
+
+    .mega-sheet.export-links-dialog .stats-init-tip a::after {
+        color: var(--mobile-text-inverse-secondary);
+        content: "\2192";
+        font: var(--mobile-font-caption-large-semibold);
+        margin-inline-start: 4px;
+    }
+
+    .rtl .mega-sheet.export-links-dialog .stats-init-tip a::after {
+        content: "\2190";
     }
 
     .export-links-settings-dialog input.set-date {
@@ -10834,9 +10933,29 @@ body.web-desktop .mega-dialog.s4-setup-dialog {
 .mega-sheet.discount-offer .promo-banner {
     background: url("../images/mega/promo/discount-banner.webp");
 }
-
+.mega-sheet.discount-offer.discount-offer-multi .promo-banner {
+    background: url("../images/mega/promo/discount-banner@2x.webp");
+}
+.mega-sheet.discount-offer.discount-offer-multi .main {
+    padding: 0 22px;
+}
+.mega-sheet.discount-offer.discount-offer-multi .content.ps {
+    padding-inline: 22px;
+    margin-left: -22px;
+    margin-right: -22px;
+}
 .theme-dark .mega-sheet.discount-offer .close {
     color: var(--mobile-button-primary-pressed);
+}
+.mega-sheet.discount-offer .discount-carousel .carousel-page {
+    display: block;
+    border: var(--mobile-border-subtle) 1px solid;
+    border-radius: 12px;
+    padding: 24px;
+    box-sizing: border-box;
+}
+.mega-sheet.discount-offer.discount-offer-multi .sheet {
+    max-width: 1000px;
 }
 
 /* Quota dialogs */

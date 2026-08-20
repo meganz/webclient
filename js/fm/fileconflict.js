@@ -357,6 +357,18 @@
                 return action;
             };
             const newCopy = Object.create(null);
+            const moveSubtree = (node, target) => {
+                const stack = [node];
+                delete nodeMap[node.h].p;
+                while (stack.length) {
+                    const next = stack.pop();
+                    target.push(nodeMap[next.h]);
+                    delete nodeMap[next.h];
+                    if (decrNodes[next.h]) {
+                        stack.push(...decrNodes[next.h]);
+                    }
+                }
+            };
             const processFolderMerge = async(stack) => {
                 while (stack.length) {
                     const { exist, node } = stack.pop();
@@ -377,15 +389,11 @@
                                     return [];
                                 }
                                 if (res !== ns.DONTCOPY) {
-                                    delete nodeMap[next.h].p;
-                                    newCopy[exist.h].push(nodeMap[next.h]);
-                                    delete nodeMap[next.h];
+                                    moveSubtree(next, newCopy[exist.h]);
                                 }
                             }
                             else {
-                                delete nodeMap[next.h].p;
-                                newCopy[exist.h].push(nodeMap[next.h]);
-                                delete nodeMap[next.h];
+                                moveSubtree(next, newCopy[exist.h]);
                             }
                         }
                     }

@@ -399,8 +399,11 @@ lazy(mega.ui, 'linkAccess', () => {
                     const link = 'https://www.stopitnow.org.uk/concerned-about-your-own-thoughts-or-behaviour/' +
                         'concerned-about-use-of-the-internet/self-help/understanding-the-behaviour/?utm_source=mega' +
                         '&utm_medium=banner&utm_campaign=mega_warning';
+
+                    const tag = type.toUpperCase();
                     const info = l.etd_link_removed_body +
-                        `<a class="clickurl" href="${link}" target="_blank" data-eventid="500245">` +
+                        `<a class="clickurl" href="${link}" target="_blank" data-eventid="500245" ` +
+                        `data-eventmsg="${tag}">` +
                         l.etd_link_removed_button +
                         `</a>`;
 
@@ -408,7 +411,7 @@ lazy(mega.ui, 'linkAccess', () => {
                         `${info.replace(/(<strong>[\S\s]*?<\/strong>[\S\s]*)/, '<em>$1</em>')}</span>`;
                     title = l.etd_link_removed_title;
 
-                    eventlog(500243);
+                    eventlog(500243, tag);
                 }
                 /*
                  * Was this link removed due to (gross) violation?

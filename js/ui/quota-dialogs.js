@@ -425,14 +425,12 @@ lazy(mega.ui, 'quotaDialogs', () => {
         return entry;
     }
 
-    let quotaCache = Object.create(null);
+    const quotaCache = Object.create(null);
 
     async function getQuota(isBandwidth) {
-        const key = isBandwidth ? 't' : 's';
-        if (!quotaCache[key]) {
-            quotaCache[key] = isBandwidth ? await M.getTransferQuota() : await M.getStorageQuota();
-        }
-        return quotaCache[key];
+        const quotaRes = isBandwidth ? await M.getTransferQuota() : await M.getStorageQuota();
+        quotaCache[isBandwidth ? 't' : 's'] = quotaRes;
+        return quotaRes;
     }
 
     function quotaUsed(quotaRes, isBandwidth) {
@@ -633,6 +631,7 @@ lazy(mega.ui, 'quotaDialogs', () => {
             type: 'modal',
             showClose: true,
             contents: [body],
+            preventBgClosing: true,
             onShow() {
                 tabs.positionSlider();
                 clickURLs();
@@ -731,7 +730,6 @@ lazy(mega.ui, 'quotaDialogs', () => {
     }
 
     async function prepare(isBandwidth) {
-        quotaCache = Object.create(null);
         tabGroupWrap.classList.add('hidden');
         const [mode, quotaRes] = await Promise.all([getViewMode(isBandwidth), getQuota(isBandwidth)]);
         return { mode, quotaRes, planPageIds: renderSkeletons(mode, isBandwidth) };

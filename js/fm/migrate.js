@@ -200,6 +200,7 @@ lazy(mega, 'migrate', () => {
         contentClassname: 'mega-journey migrate',
         showClose: true,
         dialogName: 'migrate-dialog',
+        preventBgClosing: false,
         steps: [
             // Step 1: Select Provider (Migrate your files step)
             {
@@ -432,7 +433,7 @@ lazy(mega, 'migrate', () => {
                     description.appendChild(note);
 
                     const elm = document.createElement('p');
-                    elm.append(parseHTML(l.mig_find_import.replace('%1', targetFolderName)));
+                    elm.append(parseHTML(escapeHTML(l.mig_find_import).replace('%1', escapeHTML(targetFolderName))));
                     description.appendChild(elm);
 
                     container.appendChild(description);

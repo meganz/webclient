@@ -97,7 +97,7 @@ export default class ScheduleMetaChange extends ConversationMessageMixin {
         }
     }
 
-    static getTitleText(meta, chatRoom) {
+    static getTitleText(meta, chatRoom, plain) {
         const { mode, recurring, occurrence, converted, prevTiming, topic } = meta;
         const { MODE } = ScheduleMetaChange;
 
@@ -129,9 +129,12 @@ export default class ScheduleMetaChange extends ConversationMessageMixin {
                 break;
             }
         }
-        return megaChat.html(title.replace('%1', topic || chatRoom.topic))
-            .replaceAll('[B]', '<b>')
-            .replaceAll('[/B]', '</b>');
+        title = title.replace('%1', topic || chatRoom.topic);
+        return plain
+            ? title.replaceAll('[B]', '').replaceAll('[/B]', '')
+            : megaChat.html(title)
+                .replaceAll('[B]', '<b>')
+                .replaceAll('[/B]', '</b>');
     }
 
     renderTimingBlock() {

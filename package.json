@@ -46,7 +46,10 @@
       "serialize-javascript": "7.0.5"
     },
     "minimatch@3.1.5": {
-      "brace-expansion": "1.1.15"
+      "brace-expansion": "1.1.18"
+    },
+    "minimatch@10.2.5": {
+      "brace-expansion": ">=5.0.8"
     },
     "grunt": {
       "js-yaml": "npm:empty-npm-package@1.0.0"
@@ -70,17 +73,17 @@
     "babel-plugin-minify-constant-folding": "0.5.0",
     "babel-plugin-minify-dead-code-elimination": "0.5.2",
     "babel-plugin-minify-guarded-expressions": "0.4.4",
-    "cssnano": "8.0.2",
-    "grunt": "1.6.2",
+    "cssnano": "8.0.5",
+    "grunt": "1.6.3",
     "grunt-contrib-concat": "2.1.0",
     "grunt-posthtml": "0.5.2",
-    "htmlnano": "3.3.2",
-    "postcss": "8.5.16",
+    "htmlnano": "3.4.0",
+    "postcss": "8.5.26",
     "postcss-url": "10.1.4",
     "posthtml": "0.16.7",
     "posthtml-urls": "1.0.0",
-    "webpack": "5.108.1",
-    "webpack-cli": "7.1.0"
+    "webpack": "5.109.2",
+    "webpack-cli": "7.2.2"
   },
   "devDependencies": {
     "@babel/eslint-parser": "7.29.7",
@@ -105,14 +108,14 @@
     "karma-junit-reporter": "2.0",
     "karma-mocha": "2.0.1",
     "karma-sinon": "1.0.5",
-    "mocha": "11.7.6",
+    "mocha": "11.8.0",
     "react-hot-loader": "4.13.1",
-    "sass": "1.101.0",
+    "sass": "1.102.0",
     "sass-loader": "17.0.0",
     "sinon": "15.0.3",
     "stylelint": "16.26.1",
     "stylelint-config-standard": "39.0.1",
     "stylelint-no-unsupported-browser-features": "8.1.1",
-    "webpack-dev-server": "5.2.5"
+    "webpack-dev-server": "6.0.0"
   }
 }

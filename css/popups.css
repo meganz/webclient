@@ -602,6 +602,7 @@ body.tl .dropdown.body.popup.contacts-search {
 
 .dark-direct-tooltip.simpletip-tooltip.compound {
     box-sizing: border-box;
+    box-shadow: var(--mobile-shadow-strong-inverted);
 }
 
 .dark-direct-tooltip.simpletip-tooltip.compound span {

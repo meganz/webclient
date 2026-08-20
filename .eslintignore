@@ -26,6 +26,7 @@ js/transfers/meths/firefox-extension.js
 contrib/Electron/main.js
 *.sh
 *.xml
+js/utils/aws.js
 js/chat/emojidata/emojis.json
 eslint-local-rules.js
 Gruntfile.js

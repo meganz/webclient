@@ -394,10 +394,12 @@ mobile.settings.account.twofactorSettings = Object.create(mobile.settingsHelper,
                 mega.ui.sheet.clear();
                 mega.ui.sheet.showClose = true;
                 mega.ui.sheet.addTitle(l.two_fa_apps_header);
-                mega.ui.sheet.addContents([
-                    l[19566],
-                    this.createAppButtons()
-                ]);
+                mega.ui.sheet.addContent(
+                    mCreateElement('div', {'class': 'mob-px-6'}, [
+                        document.createTextNode(l[19566]),
+                        this.createAppButtons()
+                    ])
+                );
 
                 // Add OK action button
                 new MegaButton({

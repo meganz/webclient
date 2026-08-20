@@ -1126,7 +1126,7 @@ function avatarDialog(close) {
                 // Update mega.io about the new avatar change
                 initMegaIoIframe(true);
 
-                avatarDialog(1);
+                onIdle(() => avatarDialog(1));
             }
         });
     });
@@ -1431,8 +1431,13 @@ function openContactInfoLink(contactLink) {
 
             avatar = `<div class="avatar-wrapper small-rounded-avatar"><img src="${avatars[em].url}"></div>`;
         }
+        else if (ctHandle in M.u) {
+            avatar = useravatar.contact(ctHandle, 'small-rounded-avatar square', 'div', false);
+        }
         else {
-            avatar = useravatar.contact(em, 'small-rounded-avatar square');
+            const avatarH = useravatar.generateContactAvatarMeta(ctHandle);
+            avatar = useravatar.contact(fullname, 'small-rounded-avatar square', 'div', false)
+                .replace(/\bcolor\d+\b/g, `color${avatarH.avatar.colorIndex}`);
         }
         $('.avatar-container-qr-contact', $dialog).safeHTML(avatar);
 
@@ -1475,6 +1480,7 @@ function openContactInfoLink(contactLink) {
             $('#qr-ctn-add', $dialog).rebind('click', function () {
                 closeDialog();
                 var page = 'fm/chat/contacts';
+                localStorage.clinkh = JSON.stringify({h: contactLink, t: Date.now()});
                 mBroadcaster.once('fm:initialized', function () {
                     openContactInfoLink(contactLink);
                 });
@@ -1857,7 +1863,7 @@ function closeDialog(ev) {
         }
         delete $.cftarget;
     }
-    else if ($.dialog !== 'terms') {
+    else if ($.dialog !== 'terms' && $.dialog !== 'Mega-Onboarding') {
         delete $.mcImport;
     }
 

@@ -105,6 +105,9 @@ Unless otherwise noted, they were released under a [MIT License].
 [jquery.qrcode.js] & [qrcode.js]: jQuery plugin for a pure browser QR code generation.
 
 ---
+[jszip.js]: Create, read and edit .zip files with Javascript
+
+---
 [mediainfo.js]: extract metadata about video and audio files.
 
 > **This is a fork**, [Compare the changes](https://github.com/buzz/mediainfo.js/compare/master...meganz:master)
@@ -228,6 +231,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [jquery.fullscreen.js]: <https://github.com/meganz/jquery-fullscreen-plugin>
 [jquery.mousewheel.js]: <https://github.com/meganz/jquery-mousewheel>
 [jquery.qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/jquery.qrcode.js>
+[jszip.js]: <https://github.com/Stuk/jszip/blob/643714aa770afd8fe1df6cfc7e2bde945bb0ef64/dist/jszip.min.js#L13>
 [mediainfo.js]: <https://github.com/meganz/mediainfo.js>
 [megaLogger.js]: <https://github.com/meganz/megalogger>
 [megapix.js]: <https://github.com/meganz/ios-imagefile-megapixel>

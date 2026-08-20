@@ -28,14 +28,11 @@
 */
 "use strict";
 importScripts('sqlite3.js');
-sqlite3InitModule().then(sqlite3 => {
-  sqlite3.installOpfsSAHPoolVfs({
+sqlite3InitModule().then(sqlite3 => sqlite3.installOpfsSAHPoolVfs({
     vfsName: 'opfs-sahpool',
     initialCapacity: 6,
     clearOnInit: false,
     directory: 'sqlite-sahpool-dir'
-  }).catch(ex => {
-    postMessage({type: 'worker-init-failed', error: ex.message});
   }).then(poolutil => {
 
     postMessage({type: 'worker-init-success'});
@@ -341,5 +338,7 @@ sqlite3InitModule().then(sqlite3 => {
         };
         return ext;
       });
-  });
-});
+  })).catch(ex => {
+    postMessage({type: 'worker-init-failed', error: ex && ex.message || String(ex)});
+  }
+);

@@ -980,7 +980,7 @@ var exportExpiry = {
  */
 function logExportEvt(evtId, data) {
     'use strict';
-    eventlog(evtId, JSON.stringify(data));
+    eventlog(evtId, data && tryCatch(() => JSON.stringify(data))() || null);
 }
 
 
@@ -1057,13 +1057,15 @@ function logExportEvt(evtId, data) {
         return values.join('\n');
     }
 
-    /*
+    /**
      * Gets link stats
      * @param {String} h The node handle.
      * @returns {Promise<Object|false>} Viewed, downloaded: {v, d}
      * @private
      */
     async function getLinkStats(h) {
+        'use strict';
+
         const {ph} = M.getNodeByHandle(h);
 
         if (!ph) {
@@ -1082,6 +1084,103 @@ function logExportEvt(evtId, data) {
     }
 
     /**
+     * Positions onboarding tooltip with Link stats introduction
+     * @returns {Boolean}
+     * @private
+     */
+    function positionTooltip() {
+        'use strict';
+
+        const {sheet} = mega.ui;
+        const tooltip = sheet && sheet.contentNode.querySelector('.stats-init-tip');
+
+        if (!tooltip) {
+            return false;
+        }
+
+        const target = tooltip.parentNode;
+        const dialog = sheet.domNode.querySelector('.sheet');
+        const containerRect = dialog.getBoundingClientRect();
+        const rect = target.getBoundingClientRect();
+        const tipRect = tooltip.getBoundingClientRect();
+        const rtl = document.body.classList.contains('rtl');
+
+        const OFFSET = {
+            side: 62,
+            bottom: 30
+        };
+
+        const fitsHorizontal = rtl
+            ? rect.left >= tipRect.width + OFFSET.side
+            : window.innerWidth - rect.right >= tipRect.width + OFFSET.side;
+
+        // Flip arrow
+        tooltip.classList.toggle('tooltip-bottom', !fitsHorizontal);
+
+        let left;
+        let top;
+
+        if (fitsHorizontal) {
+            left = rtl
+                ? rect.left - tipRect.width - OFFSET.side
+                : rect.right + OFFSET.side;
+
+            top = rect.top + (rect.height - tipRect.height) / 2;
+        }
+        else {
+            left = rect.left + (rect.width - tipRect.width) / 2;
+
+            top = rect.bottom + OFFSET.bottom;
+        }
+
+        // Convert viewport coordinates to transform container coordinates
+        tooltip.style.left = `${left - containerRect.left}px`;
+        tooltip.style.top = `${top - containerRect.top}px`;
+
+        tooltip.classList.add('visible');
+
+        return true;
+    }
+
+    /**
+     * Renders onboarding tooltip with Link stats introduction
+     * @param {Element} target - Target DOM element
+     * @returns {Element}
+     * @private
+     */
+    function renderOnboardingTooltip(target) {
+        'use strict';
+
+        const ce = (n, t, a) => mCreateElement(n, a, t);
+        const tipNode = ce('div', target, {class: 'stats-init-tip'});
+        const tipBody = ce('div', tipNode, {class: 'body'});
+
+        ce('div', tipBody, {class: 'header'}).textContent = l.link_activity;
+        ce('p', tipBody).textContent = l.link_stats_obd_tip;
+        ce('hr', tipBody);
+
+        MegaLink.factory({
+            parentNode: tipBody,
+            href: 'https://help.mega.io/files-folders/sharing/how-do-i-use-link-analytics',
+            target: '_blank',
+            text: l[8742],
+            eventLog: 501375
+        });
+
+        MegaButton.factory({
+            parentNode: tipNode,
+            type: 'icon',
+            componentClassname: 'text-icon close-tip',
+            icon: `${mega.ui.sprites.mono} icon-dialog-close`,
+            iconSize: 24
+        }).on('click.closeTip', () => tipNode.remove());
+
+        ce('i', tipNode, {class: 'sprite-fm-mono icon-tooltip-arrow tooltip-arrow'});
+
+        return tipNode;
+    }
+
+    /**
      * Renders link stats (viewing, iteractions).
      * @param {String} h The node handle.
      * @param {Element} linkData - DOM element to create stats elems
@@ -1093,36 +1192,23 @@ function logExportEvt(evtId, data) {
 
         const ce = (n, t, a) => mCreateElement(n, a, t);
         const pro = self.u_attr && u_attr.p;
+        const isPublic = folderlink || dlid;
+
+        const wrapper = ce('div', linkData, {
+            class: `wrapper${pro ? '' : ' free-usr'}${isPublic ? ' hidden' : ''}`
+        });
 
         // Create separator
-        ce('hr', linkData);
+        ce('hr', wrapper);
 
-        const row = ce('div', linkData, {class: `row${pro ? '' : ' free-usr'}`});
+        const row = ce('div', wrapper, {class: 'row'});
         const info = ce('div', row, { class: 'flex-1' });
         const name = ce('div', info, {class: 'flex items-center'});
         let node = null;
 
         ce('span', name).textContent = l.link_activity;
 
-        if (pro) {
-            /*
-            * Temporarily hide the information icon
-            * until UX designers find a good solution
-            node = ce('a', name, {
-                class: 'clickurl link-stats-info',
-                href: 'https://help.mega.io/files-folders/sharing/how-do-i-use-link-analytics',
-                target: '_blank'
-            });
-            ce('i', node, {
-                class: 'sprite-fm-mono icon-info-thin-outline simpletip',
-                'data-simpletip': l[8742],
-                'data-simpletipoffset': 4,
-                'data-simpletipposition': 'bottom',
-                'data-simpletipwrapper': 'body'
-            });
-            */
-        }
-        else {
+        if (!pro) {
             const loadPro = () => {
                 mega.ui.sheet.hide();
                 loadSubPage('pro');
@@ -1134,17 +1220,6 @@ function logExportEvt(evtId, data) {
                 type: 'button',
                 eventLog: 501162
             }).on('click.pro', loadPro);
-
-            node = ce('div', info, {class: 'link-stat-tip'});
-            node.append(parseHTML(l.na_link_activity_info));
-
-            if ((node = node.querySelector('a'))) {
-                node.addEventListener('click', (ev) => {
-                    ev.preventDefault();
-                    eventlog(501161);
-                    loadPro();
-                });
-            }
         }
 
         const statsNode = ce('div', row, {class: `flex link-stats${pro ? ' loading' : ''}`});
@@ -1159,7 +1234,7 @@ function logExportEvt(evtId, data) {
         });
 
         ce('i', node, {class: 'sprite-fm-mono icon-eye-reveal1'});
-        const viewed = ce('span', node, {class: ''});
+        const viewed = ce('span', node);
 
         node = ce('div', statsNode, {
             class: 'link-stat simpletip',
@@ -1171,18 +1246,82 @@ function logExportEvt(evtId, data) {
         });
 
         ce('i', node, {class: 'sprite-fm-mono icon-bar-chart-square'});
-        const interacted = ce('span', node, {class: ''});
+        const interacted = ce('span', node);
 
         if (pro) {
             ce('i', statsNode, {class: 'sprite-fm-mono icon-loader-grad-small-regular-outline loader'});
             getLinkStats(h)
-                .then(({v = 0, d = 0}) => {
-                    viewed.textContent = v;
-                    interacted.textContent = d;
+                .then((res) => {
+                    if (res) {
+                        wrapper.classList.remove('hidden');
+                    }
+
+                    // Render Links activity onboarding tip first time
+                    if (!isPublic && !fmconfig.explnkv) {
+                        renderOnboardingTooltip(statsNode);
+                        fmconfig.explnkv = 1;
+
+                        requestAnimationFrame(() => {
+                            positionTooltip();
+                        });
+
+                        window.addEventListener('resize', positionTooltip, {passive: true});
+                    }
+
+                    viewed.textContent = res.v || 0;
+                    interacted.textContent = res.d || 0;
                 })
                 .catch(dump)
                 .finally(() => statsNode.classList.remove('loading'));
         }
+    }
+
+    /**
+     * Creates sheet banner node
+     * @returns {Element|false}
+     * @private
+     */
+    function statsBannerNode() {
+        'use strict';
+
+        if (self.u_attr && u_attr.p || dlid || folderlink) {
+            return false;
+        }
+
+        const ce = (n, t, a) => mCreateElement(n, a, t);
+        const node = ce('div', null, {class: 'banner'});
+        let subNode = ce('div', node);
+
+        ce('img', subNode, {
+            alt: l.link_activity,
+            src: `${staticpath}images/mega/icons-3d/icon-stats-3d.png`
+        });
+
+        subNode = ce('div', node, {class: 'info'});
+        ce('h4', subNode).textContent = l.link_stats_unlock_hdr;
+        ce('p', subNode).textContent = l.link_stats_unlock_info;
+        MegaLink.factory({
+            parentNode: subNode,
+            href: 'https://help.mega.io/files-folders/sharing/how-do-i-use-link-analytics',
+            target: '_blank',
+            text: l[8742],
+            eventLog: 501376
+        });
+
+        subNode = ce('div', node);
+
+        MegaButton.factory({
+            parentNode: subNode,
+            text: l[433],
+            componentClassname: 'slim promo-button',
+            type: 'button',
+            eventLog: 501374
+        }).on('click.pro', () => {
+            mega.ui.sheet.hide();
+            loadSubPage('pro');
+        });
+
+        return node;
     }
 
     /**
@@ -1488,7 +1627,7 @@ function logExportEvt(evtId, data) {
         let i = $.itemExport.length;
 
         while (--i >= 0) {
-            counts[M.getNodeByHandle($.itemExport[i]).t]++;
+            counts[M.getNodeByHandle($.itemExport[i]).t | 0]++;
         }
 
         logExportEvt(500767, counts);
@@ -1511,6 +1650,10 @@ function logExportEvt(evtId, data) {
                 evt.preventDefault();
 
                 const texts = sheet.contentNode.querySelectorAll('.select-text');
+                if (!(texts && texts.length)) {
+                    console.warn('.select-text gave nothing...');
+                    return false;
+                }
 
                 const selection = window.getSelection();
                 selection.removeAllRanges();
@@ -1548,15 +1691,13 @@ function logExportEvt(evtId, data) {
                 logExportEvt(500760);
             });
 
-            const footerElements = [
-                mCreateElement('div', { class: 'link-access-text mb-10 text-left' }),
-                mCreateElement('div', { class: 'flex flex-row-reverse' })
-            ];
+            const linkTip = mCreateElement('div', { class: 'link-access-text text-left' });
+            const footerElement = mCreateElement('div', { class: 'flex flex-row-reverse' });
 
             const explainer = (dialogOpts.pwd)
                 ? (count === 1 ? l.password_link_access_explainer : l.password_link_access_explainer_multiple)
                 : mega.icu.format(l.link_access_explainer, count);
-            footerElements[0].textContent = explainer;
+            linkTip.textContent = explainer;
 
             const counts = [0, 0];
             let i = count;
@@ -1566,7 +1707,7 @@ function logExportEvt(evtId, data) {
             }
 
             MegaButton.factory({
-                parentNode: footerElements[1],
+                parentNode: footerElement,
                 text: (count === 1) ? l.copy_link : l[23625],
                 componentClassname: 'slim',
                 type: 'button'
@@ -1578,7 +1719,7 @@ function logExportEvt(evtId, data) {
 
             if (dialogOpts.dec && !dialogOpts.pwd) {
                 MegaButton.factory({
-                    parentNode: footerElements[1],
+                    parentNode: footerElement,
                     text: (count === 1) ? l[17386] : l[23624],
                     componentClassname: 'secondary mx-2 slim',
                     type: 'normal'
@@ -1619,10 +1760,11 @@ function logExportEvt(evtId, data) {
 
             const options = {
                 name,
-                contents: [mCreateElement('div', { class: 'relative' }, itemExportLink(dialogOpts))],
+                contents: [mCreateElement('div', { class: 'relative' }, itemExportLink(dialogOpts)), linkTip],
                 showClose: true,
+                banner: count === 1 && statsBannerNode(),
                 footer: {
-                    slot: footerElements
+                    slot: [footerElement]
                 },
                 header: mega.icu.format(l.share_link, count),
                 onShow: () => {
@@ -1658,7 +1800,6 @@ function logExportEvt(evtId, data) {
                         });
                     }
 
-
                     if (createdCount !== undefined) {
                         toast.show(mega.icu.format(l.links_created, count), 4);
                     }
@@ -1675,6 +1816,8 @@ function logExportEvt(evtId, data) {
                 },
                 onClose: () => {
                     document.removeEventListener('keydown', onKeyDown, true);
+                    window.removeEventListener('resize', positionTooltip);
+
                     sheet.removeClass(name);
 
                     for (let i = $.itemExport.length; i--;) {
@@ -1693,6 +1836,7 @@ function logExportEvt(evtId, data) {
             show,
             hide: () => {
                 document.removeEventListener('keydown', onKeyDown, true);
+                window.removeEventListener('resize', positionTooltip);
                 hideDialog(name);
             }
         };

@@ -399,7 +399,7 @@ function getCleanSitePath(path) {
             }
             // Google Ads click: capture gclid/wbraid/gbraid/ts from the URL.
             var gAds = {};
-            var gAKeys = ['gclid', 'wbraid', 'gbraid', 'gclts'];
+            var gAKeys = ['gclid', 'wbraid', 'gbraid', 'gclts', 'gap'];
             for (var i = 0; i < gAKeys.length; i++) {
                 if (path[gAKeys[i]]) {
                     gAds[gAKeys[i]] = path[gAKeys[i]];
@@ -1856,6 +1856,9 @@ else if (!browserUpdate) {
     Object.defineProperty(self, 'buildOlderThan10Days', {
         value: !((is_extension || !nocontentcheck) && (buildVersion.timestamp + 10 * 86400) * 1000 > Date.now())
     });
+    Object.defineProperty(self, 'buildOlderThan30Days', {
+        value: !((is_extension || !nocontentcheck) && (buildVersion.timestamp + 30 * 86400) * 1000 > Date.now())
+    });
 
     if (!self.buildOlderThan10Days) {
         var __cdumps = [], __cd_t;
@@ -2161,6 +2164,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/cookiepolicy.css', n: 'cookiepolicy_css', j:2,w:5});
     jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
     jsl.push({f:'js/ui/registerDialog.js', n: 'registerdialog_js', j:1,w:1});
+    jsl.push({f:'js/fm/s4/endpoints.js', n: 'fm_s4_endpoints_js', j: 1, w: 1});
 
     if (!is_mobile) {
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
@@ -2478,7 +2482,6 @@ else if (!browserUpdate) {
         jsl.push({f:'html/fm.html', n: 'fm', j:0, w:3});
         jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
-        jsl.push({f:'html/contact-avatar.svg', n: 'contact_avatar', j:0});
         jsl.push({f:'html/rewind.html', n: 'rewind', j:0});
         jsl.push({f:'html/device-centre-shimmer.html', n: 'device_centre_shimmer_html', j:0});
         jsl.push({f:'html/notification-shimmer.html', n: 'notification_shimmer_html', j:0});
@@ -2970,6 +2973,7 @@ else if (!browserUpdate) {
         'time_checker_js': {f:'js/time_checker.js', n:'time_checker_js', j:1},
         'filerequest_js': {f:'js/filerequest.js', n: 'filerequest_js', j:1 },
         'filerequest_upload_js': {f:'js/filerequest_upload.js', n: 'filerequest_upload_js', j:1 },
+        'jszip_js': {f:'js/vendor/jszip.js', n: 'jszip_js', j:4},
         'docxpreview_js': {f:'js/vendor/docx-preview.js', n: 'docxpreview_js', j:4},
         'docxviewer_js': {f:'js/ui/docx.viewer.js', n: 'docxviewer_js', j:4},
         'docxviewer': {f:'html/docx.viewer.html', n: 'docxviewer', j:0},

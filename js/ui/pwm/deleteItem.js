@@ -9,7 +9,7 @@
                     return;
                 }
 
-                const title = mega.ui.pm.list.passwordItem.item.name;
+                const title = escapeHTML(mega.ui.pm.list.passwordItem.item.name);
 
                 const footerElements = mCreateElement('div', { class: 'flex flex-row-reverse' });
 

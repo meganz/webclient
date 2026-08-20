@@ -154,7 +154,8 @@
     width: 64px;
     height: 64px;
 }
-.bus-reg-info-block .bus-addition-storage-block {
+.bus-reg-info-block .bus-addition-storage-block,
+.bus-reg-info-block .bus-addition-transfer-block {
     margin-top: 6px;
     height: 109px;
     margin-left: 3px;
@@ -165,7 +166,8 @@
     line-height: 20px;
     font-size: 13px;
 }
-.bus-reg-info-block .bus-add-storage-body {
+.bus-reg-info-block .bus-add-storage-body,
+.bus-reg-info-block .bus-add-transfer-body {
     margin-bottom: 10px;
     font-size: 14px;
     line-height: 24px;
@@ -177,7 +179,8 @@
     --icon-size: 24px;
     margin-right: 8px;
 }
-.bus-reg-info-block .bus-add-storage-foot {
+.bus-reg-info-block .bus-add-storage-foot,
+.bus-reg-info-block .bus-add-transfer-foot {
     font-size: 12px;
     line-height: 15px;
     height: 15px;

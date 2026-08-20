@@ -178,6 +178,7 @@ lazy(s4, 'buckets', () => {
         bindEvents() {
             this.$tabs.rebind('click.s4dlg', e => {
                 const $clickedTab = $(e.target);
+                const target = $clickedTab.data('target');
 
                 if ($clickedTab.hasClass('active')) {
                     return;
@@ -196,6 +197,13 @@ lazy(s4, 'buckets', () => {
                     this.$dialogCancel.removeClass('hidden');
                 }
                 this.policiesTab.codeEditor.refresh();
+
+                const eventId = {
+                    'bucket-access': 501382,
+                    'bucket-policies': 501383
+                }[target] || 501384;
+
+                eventlog(eventId);
             });
 
             this.$radioInputs = $('input[name=bucket-access]', this.$dialogContainer);
@@ -233,9 +241,11 @@ lazy(s4, 'buckets', () => {
                     else {
                         promises.push(s4.kernel.policies.putBucketPolicy(this.bucket.h, policyDoc));
                     }
+                    eventlog(501385);
                 }
 
                 if (typeof this.publicAccess === 'number' && this.origAccess !== this.publicAccess) {
+                    eventlog(501386);
                     promises.push(s4.kernel.bucket.publicURLAccess(this.bucket.h, this.publicAccess));
                 }
 

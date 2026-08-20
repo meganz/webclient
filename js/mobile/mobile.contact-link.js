@@ -47,7 +47,16 @@ MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo(
         }
         else {
             $('.avatar-wrapper.avatar img', $mobileContactInfoDlg).addClass('hidden');
-            var curAvatar = useravatar.contact(email);
+            let curAvatar;
+            if (handle in M.u) {
+                curAvatar = useravatar.contact(handle);
+            }
+            else {
+                const avatarH = useravatar.generateContactAvatarMeta(handle);
+                curAvatar = useravatar.contact(name)
+                    .replace(/\bcolor\d+\b/g, `color${avatarH.avatar.colorIndex}`);
+            }
+
             $('.mobile.main-avatar', $mobileContactInfoDlg).html(curAvatar);
         }
         var isContactHtml = '<div class="mobile contact-verification"> <i class="" > </i> </div>';
@@ -80,6 +89,11 @@ MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo(
                 var megaApp = 'mega://C!' + ct;
                 location.replace(megaApp);
                 var appNotHere = function () {
+                    if (!u_type) {
+                        // Stored in case the user comes back to register on web.
+                        localStorage.clinkh = JSON.stringify({ h: ct, t: Date.now() });
+                    }
+
                     if (is_ios) {
                         var appleStore = 'https://itunes.apple.com/app/mega/id706857885';
                         location.replace(appleStore);

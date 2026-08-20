@@ -142,7 +142,7 @@
         ],
         xb2: [
             // do NOT change the order, add new entries at the tail UP TO 31, and 8 per row.
-            'mnzw', 'uiw'
+            'mnzw', 'uiw', 'explnkv'
         ]
     });
     shrink.zero = new Set([...Object.keys(shrink.bitdef), 'xs1', 'xs2', 'xs3', 'xs4', 'xs5']);

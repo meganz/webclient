@@ -1136,6 +1136,9 @@ BusinessAccount.prototype.getListOfPaymentGateways = function (forceUpdate) {
                 var res2 = [];
                 for (var h = 0; h < res.length; h++) {
                     if (res[h].supportsBusinessPlans) {
+                        if (d && localStorage.useDevOptions) {
+                            res[h].displayName = pro.getPaymentGatewayName(res[h].gatewayId, res[h]).displayName;
+                        }
                         res2.push(res[h]);
                     }
                 }
@@ -1455,8 +1458,11 @@ BusinessAccount.prototype.doPaymentWithAPI = async function(payDetails, business
         pbq: 0,
         num: [businessPlan.totalUsers | 0, 0, 0]        // number of users
     };
-    if (businessPlan.quota) {
-        request.num[1] = businessPlan.quota;
+    if (businessPlan.storageQuota) {
+        request.num[1] = businessPlan.storageQuota;
+    }
+    if (businessPlan.transferQuota) {
+        request.num[2] = businessPlan.transferQuota;
     }
 
     if (mega.uaoref) {

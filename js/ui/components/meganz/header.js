@@ -399,8 +399,8 @@ class MegaHeader extends MegaMobileHeader {
         navActions.prepend(this.loader);
 
         if (u_attr && u_attr.mkt && (u_attr.mkt.dc || []).length) {
-            pro.getTargetedDiscountInfo().then((dci) => {
-                this.showTargetedDiscountButton(dci);
+            pro.getTargetedDiscountInfo().then((dcis) => {
+                this.showTargetedDiscountButton(dcis);
             });
         }
 
@@ -415,14 +415,14 @@ class MegaHeader extends MegaMobileHeader {
         this.resetBottomBlock = nop;
     }
 
-    showTargetedDiscountButton(dci) {
+    showTargetedDiscountButton(dcis) {
         const navActions = this.domNode.querySelector('.top-block .nav-actions');
         if (!navActions) {
             return;
         }
 
         const currentButton = navActions.querySelector('.promo-button');
-        if (!dci) {
+        if (!dcis || !dcis.length) {
             if (currentButton) {
                 currentButton.remove();
             }
@@ -433,24 +433,43 @@ class MegaHeader extends MegaMobileHeader {
             return;
         }
 
-        const {al, pd, m} = dci;
-        pro.loadMembershipPlans().then(() => {
-            const matchedPlanObj = pro.getPlanObj(al, m);
-            if (!matchedPlanObj) {
+        const hasMultiple = dcis.length > 1;
+
+        Promise.all(
+            dcis.map(({al, m}) => pro.propay.getDiscountedPlanInfo(al, m))
+        ).then((plans) => {
+            let best = null;
+            for (let i = dcis.length; i--;) {
+                const {al, pd} = dcis[i];
+                const matchedPlanObj = pro.getPlanObj(plans[i]);
+                if (matchedPlanObj) {
+                    const percentageDiscount = pro.calculateSavings(
+                        [pd, matchedPlanObj.hasYearlyDiscount ? pro.yearlyDiscountPercentage : 0]
+                    );
+
+                    if (!best || percentageDiscount > best.percentageDiscount) {
+                        best = {al, percentageDiscount};
+                    }
+                }
+            }
+
+            if (!best) {
                 return;
             }
 
-            const percentageDiscount = pro.calculateSavings(
-                [pd, matchedPlanObj.hasYearlyDiscount ? pro.yearlyDiscountPercentage : 0]);
+            const text = hasMultiple
+                ? l.discount_off_multi.replace('[X]', formatPercentage(best.percentageDiscount))
+                : l.discount_off
+                    .replace('%1', formatPercentage(best.percentageDiscount))
+                    .replace('%2', pro.getProPlanName(best.al));
 
             const btn = new MegaButton({
                 parentNode: navActions,
-                text: l.discount_off
-                    .replace('%1', formatPercentage(percentageDiscount)).replace('%2', pro.getProPlanName(al)),
+                text,
                 icon: 'sprite-fm-mono icon-label-thin-outline',
                 componentClassname: 'promo-button'
             }).on('click.headerPromo', () => {
-                pro.propay.showDiscountOffer(dci, true);
+                pro.propay.showDiscountOffer(dcis, true);
             });
 
             navActions.prepend(btn.domNode);

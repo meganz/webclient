@@ -8,6 +8,8 @@ arcp="${root}/build/package"
 
 declare -a root_files=(
   "cmaps"
+  "sjcl.js"
+  "rsaasm.js"
   "aesasm.js"
   "worklet.js"
   "nodedec.js"

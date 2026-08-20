@@ -212,7 +212,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     u_attr.mkt = res.mkt;
                     if (Array.isArray(u_attr.mkt.dc) && u_attr.mkt.dc.length) {
                         delay('ShowDiscountOffer', () => {
-                            pro.getTargetedDiscountInfo().then(pro.propay.showDiscountOffer);
+                            pro.getTargetedDiscountInfo().then((dcis) => pro.propay.showDiscountOffer(dcis));
                         }, 7e3);
                     }
                 }

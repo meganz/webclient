@@ -556,6 +556,8 @@ def reduce_validator(file_line_mapping, **extra):
     # Analise newly added files
     kebab_pattern = r"^[a-z0-9]+(-[a-z0-9]+)*([.-][0-9]+(\.[0-9]+)*)?$"
     for file in NEW_FILES:
+        if file in config.VALIDATOR_IGNORE_FILES:
+            continue
         name, ext = os.path.splitext(file)
         if ext in ['.html', '.css', '.js', '.jsx'] and not re.match(kebab_pattern, name):
             fatal += 1

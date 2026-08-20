@@ -1861,7 +1861,7 @@ MegaData.prototype.revertRubbishNodes = mutex('restore-nodes', function(resolve,
                 targets[target] = [h];
             }
         }
-        assert($.len(targets), 'Invalid invocation, nothing to restore.', handles);
+        assert($.len(targets), 'Invalid invocation, nothing to restore.');
 
         let selTarget;
         const promises = [];
@@ -4941,13 +4941,11 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
                 .then(resolve)
                 .then(() => {
                     if (srcNode && !targetNode) {
+                        const name = escapeHTML(M.getNameByHandle(target));
                         mega.ui.toast.show(
                             parseHTML(
-                                mega.icu.format(l.toast_import_file, 1)
-                                    .replace(
-                                        /%s/g,
-                                        `<span class="long-title-truncate">${M.getNameByHandle(target)}</span>`
-                                    )
+                                escapeHTML(mega.icu.format(l.toast_import_file, 1))
+                                    .replace(/%s/g, `<span class="long-title-truncate">${name}</span>`)
                             ),
                             6,
                             l[16797],

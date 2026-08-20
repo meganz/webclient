@@ -319,7 +319,7 @@ mega.tpw = new function TransferProgressWidget() {
                     delete this._lastDone;
                 }
                 if (this._lastDone !== doneBytes) {
-                    this.text.textContent = this._baseText.replace('%1', bytesToSize(doneBytes));
+                    this.text.textContent = this._baseText.replace('%1', bytesToSize(doneBytes, 2));
                 }
             }
 
@@ -500,7 +500,7 @@ mega.tpw = new function TransferProgressWidget() {
      * @param {Number} specifiedSize    to tell the size of download entry
      */
     this.addDownloadUpload = function(type, entry, specifiedSize) {
-        'use strict';
+
         if (!this.domReady || typeof type === 'undefined' || !entry) {
             return;
         }
@@ -569,7 +569,9 @@ mega.tpw = new function TransferProgressWidget() {
             else {
                 $tempRows[tempRowPos++] = rowData;
             }
-            this.logger.log('Add:', transferId, rowData.size);
+            if (this.d) {
+                this.logger.log('Add:', transferId, rowData.size);
+            }
         }
 
         // for a concurrent batch of adding, we will postpone final calculations to the end.
@@ -591,13 +593,9 @@ mega.tpw = new function TransferProgressWidget() {
     };
 
     this.updateDownloadUpload = function(type, id, perc, bytesLoaded, bytesTotal, kbps, queue_num, startTime) {
-        'use strict';
+
         if (!this.domReady || typeof type === 'undefined' || !id) {
             return;
-        }
-
-        if (type === this.DOWNLOAD) {
-            kbps *= 1024;
         }
 
         const transferId = id;
@@ -614,10 +612,6 @@ mega.tpw = new function TransferProgressWidget() {
             monitors[transferId].then(() => delete monitors[transferId]).then(() => this.freezeDOMRow(transferId));
         }
 
-        var timeSpent = (new Date().getTime() - startTime) / 1000;
-        var realSpeed = bytesLoaded / timeSpent; // byte per sec
-
-        var speed = (kbps) ? Math.min(realSpeed, kbps) : realSpeed;
         if (typeof progress[transferId] === 'number') {
             const delta = bytesLoaded - progress[transferId];
             progress[transferId] = bytesLoaded;
@@ -649,17 +643,23 @@ mega.tpw = new function TransferProgressWidget() {
             lastTime = Date.now();
         }
 
+        if (type === this.DOWNLOAD) {
+            kbps *= 1024;
+        }
+
         this.updateDOMRow(transferId, {
             status: 'progress',
             progress: perc,
             statusText: type === this.DOWNLOAD ? l[1156] : l[1155],
             running: true,
             transferProgress: bytesLoaded,
-            transferSpeed: bytesToSpeed(speed),
-            timeRemainSecs: speed ? (bytesTotal - bytesLoaded) / speed : -1,
+            transferSpeed: bytesToSpeed(kbps),
+            timeRemainSecs: kbps ? (bytesTotal - bytesLoaded) / kbps : -1,
         });
         this.updateHeaderAndContent();
-        this.logger.log('Update:', transferId, bytesLoaded);
+        if (this.d) {
+            this.logger.log('Update:', transferId, bytesLoaded);
+        }
     };
 
     this.finishDownloadUpload = function(transferId, entry, handle) {
@@ -706,7 +706,9 @@ mega.tpw = new function TransferProgressWidget() {
             progress._dlTransferred += Math.max(transProg, finalSize);
         }
         progress[transferId] = Math.max(transProg, finalSize);
-        this.logger.log('Complete:', transferId, transProg, finalSize);
+        if (this.d) {
+            this.logger.log('Complete:', transferId, transProg, finalSize);
+        }
     };
 
     this.errorDownloadUpload = function(transferId, errorStr, isOverQuota) {
@@ -739,7 +741,9 @@ mega.tpw = new function TransferProgressWidget() {
 
         this.updateDOMRow(transferId, update);
         this.updateHeaderAndContent();
-        this.logger.debug('Error:', transferId, isOverQuota, errorStr);
+        if (this.d) {
+            this.logger.debug('Error:', transferId, isOverQuota, errorStr);
+        }
     };
 
     this.resumeDownloadUpload = function(transferId) {
@@ -763,7 +767,9 @@ mega.tpw = new function TransferProgressWidget() {
             status: 'inqueue',
             statusText: l.tfw_status_queued,
         });
-        this.logger.debug('Resume:', transferId);
+        if (this.d) {
+            this.logger.debug('Resume:', transferId);
+        }
         // for a concurrent batch of resumes, we will postpone final calculations to the end.
         delay('tpw:resumeTimer', finalizeUpdates, 1500);
     };
@@ -790,7 +796,9 @@ mega.tpw = new function TransferProgressWidget() {
             timeRemainSecs: -1,
             transferSpeed: '',
         });
-        this.logger.debug('Pause:', transferId);
+        if (this.d) {
+            this.logger.debug('Pause:', transferId);
+        }
         delay('tpw:pauseTimer', finalizeUpdates, 1500);
     };
 
@@ -1467,6 +1475,16 @@ mega.tpw = new function TransferProgressWidget() {
                 this.progressBar.classList.add('hidden');
                 delete this._transferStr;
                 this.size.textContent = bytesToSize(this._size);
+                if (this.el.classList.contains('sprite-fm-mono')) {
+                    this.el.classList.add('simpletip');
+                }
+                this.el.dataset.simpletip = this.statusText;
+                this.el.dataset.simpletipposition = 'top';
+            }
+            else {
+                delete this.el.dataset.simpletip;
+                delete this.el.dataset.simpletipposition;
+                this.el.classList.remove('simpletip');
             }
         }
 
@@ -1516,6 +1534,7 @@ mega.tpw = new function TransferProgressWidget() {
                 else if (!this.overquota && !this.errored && !this.paused) {
                     this.statusText = this.type === scope.DOWNLOAD ? l[1156] : l[1155];
                 }
+                this.el.classList.remove('simpletip');
             }
             else {
                 this.el.classList.add('sprite-fm-mono');
@@ -1526,6 +1545,9 @@ mega.tpw = new function TransferProgressWidget() {
                 this.itemType.classList.add('hidden');
                 if (this._transferStr) {
                     this.statusText = this._status === 'inqueue' ? l.tfw_status_queued : this._transferStr;
+                }
+                if (this.errored) {
+                    this.el.classList.add('simpletip');
                 }
             }
         }

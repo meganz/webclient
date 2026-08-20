@@ -205,7 +205,7 @@ lazy(FS, 'Secureboot', () => {
                     eval(capture.join('\n'));
 
                     for (const k in jsl2) {
-                        if (!/^(?:dc|pdf|tiff|vid|med|doc)/.test(k)) {
+                        if (!/^(?:dc|pdf|tiff|vid|med|doc|xlsx|jszip)/.test(k)) {
                             delete jsl2[k];
                         }
                     }
@@ -1211,6 +1211,7 @@ module.exports = function(grunt) {
                     require('htmlnano')({
                         removeEmptyAttributes: false,
                         sortAttributesWithLists: false,
+                        minifyCharacterReferences: false,
                         removeComments(comments) {
                             const clean = comments.replace(/<!--[\S\s]*?-->/, '').trim();
                             if (clean) {

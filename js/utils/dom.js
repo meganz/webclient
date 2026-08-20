@@ -33,15 +33,20 @@ function parseHTML(markup) {
     markup = String(markup).replace(/<!--[\S\s]*?-->/g, '');
 
     const dumb = {
+        'BASE': 1,
+        'BLINK': 1,
+        'EMBED': 1,
+        'FRAME': 1,
+        'FRAMESET': 1,
+        'IFRAME': 1,
+        'LINK': 1,
+        'MARQUEE': 1,
+        'META': 1,
+        'OBJECT': 1,
         'SCRIPT': 1,
         'STYLE': 1,
         'SVG': 1,
-        'XML': 1,
-        'OBJECT': 1,
-        'IFRAME': 1,
-        'EMBED': 1,
-        'MARQUEE': 1,
-        'META': 1
+        'XML': 1
     };
 
     $.parseHTML(markup, doc)
@@ -49,17 +54,18 @@ function parseHTML(markup) {
             // console.debug(node.nodeName, node.outerHTML, node.data, [node]);
 
             var content = String(node.outerHTML).replace(/[\s\x00-\x19]+/g, '');
-            var invalid = /<[^>]+script:/i.test(content);
+            let invalid = /<[^>]+script:|data[%:]|(?:id|name)=["']*(?:child|node|attr|shadow|content)/i.test(content);
 
             if (!invalid) {
                 invalid = domNodeForEach(node, (n) => {
                     // console.warn('domNodeForEach(%s)', n.nodeName, [n]);
 
-                    var nn = n.nodeName.substr(n.nodeName.indexOf(':') + 1);
+                    const nn = n.nodeName.slice(n.nodeName.indexOf(':') + 1).toUpperCase();
                     return dumb[nn] || domAttributeForEach(n, ({name}) => {
                         // console.warn('domAttrForEach(%s:%s)', a.name, a.value, [a], [n]);
 
                         return name[0] === 'o' && name[1] === 'n'
+                            || nn !== 'A' && name[1] === 'r' && name[2] === 'e' && name[3] === 'f'
                             || nn !== 'IMG' && name[0] === 's' && name[1] === 'r' && name[2] === 'c';
                     });
                 });
@@ -67,6 +73,7 @@ function parseHTML(markup) {
 
             if (invalid) {
                 console.warn('Filtered out invalid content passed to parseHTML...', [node]);
+                eventlog(99642, JSON.stringify([1, escapeHTML(content.slice(0, 256))]), true);
             }
             else {
                 fragment.appendChild(node);
@@ -197,8 +204,8 @@ function removeHTML(str, escape) {
  */
 function domNodeForEach(node, callback, irn) {
     'use strict';
+    const {childNodes, shadowRoot, content} = node;
 
-    const {childNodes} = node;
     let len = childNodes && childNodes.length;
     while (len--) {
         const n = childNodes[len];
@@ -207,9 +214,18 @@ function domNodeForEach(node, callback, irn) {
             return true;
         }
 
-        if (n.hasChildNodes() && domNodeForEach(n, callback, 1)) {
+        const deep = n.content || n.shadowRoot || n.hasChildNodes();
+        if (deep && domNodeForEach(n, callback, 1)) {
             return true;
         }
+    }
+
+    if (shadowRoot && domNodeForEach(shadowRoot, callback, 1)) {
+        return true;
+    }
+
+    if (content && domNodeForEach(content, callback, 1)) {
+        return true;
     }
 
     return irn ? false : callback(node, true);

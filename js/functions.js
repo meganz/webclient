@@ -16,7 +16,8 @@ function clickURLs() {
             if (eventid) {
                 eventid = parseInt(eventid);
                 if (!isNaN(eventid)) {
-                    delay(`clickurlevlog${eventid}`, () => eventlog(eventid));
+                    const eventmsg = $this.attr('data-eventmsg') || undefined;
+                    delay(`clickurlevlog${eventid}`, () => eventlog(eventid, eventmsg));
                 }
             }
 

@@ -208,7 +208,6 @@
             if (login) {
                 Soon(() => {
                     showToast('megasync', l[8745]);
-                    $('.fm-avatar img').attr('src', useravatar.mine());
                 });
             }
             onIdle(topmenuUI);

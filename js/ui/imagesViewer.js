@@ -721,7 +721,8 @@ var slideshowid;
             delay.cancel(MOUSE_IDLE_TID);
             $document.off(`${idleAction}.idle`);
             $controls.off('mousemove.idle');
-            if (!mega.slideshow.settings.playVid.getValue() || !is_video(n)) {
+            const {playVid} = mega.slideshow.settings;
+            if (!(playVid && playVid.getValue()) || !is_video(n)) {
                 return;
             }
         }
@@ -1167,10 +1168,13 @@ var slideshowid;
         }
 
         // Clear previousy set data
+        const {caption} = mega.slideshow.settings;
         switchedSides = false;
         $('header .file-name', $overlay).text(n.name);
         $('header .file-size', $overlay).text(bytesToSize(n.s || 0));
-        mega.slideshow.settings.caption.draw(n);
+        if (caption && caption.draw) {
+            caption.draw(n);
+        }
         $('.viewer-error, #pdfpreviewdiv1, #docxpreviewdiv1, #xlsxpreviewdiv1', $overlay).addClass('hidden');
         $('.viewer-progress', $overlay).addClass('vo-hidden');
 
@@ -1251,6 +1255,9 @@ var slideshowid;
 
             // Bind keydown events
             $document.rebind('keydown.slideshow', function(e) {
+                if ($.dialog === 'quota-dialog') {
+                    return false;
+                }
                 const isDownloadPage = page === 'download';
 
                 if (e.keyCode === 37 && slideshowid && !e.altKey && !e.ctrlKey && !isDownloadPage) {
@@ -2155,10 +2162,6 @@ var slideshowid;
 
         if ($.autoplay === id) {
             queueMicrotask(() => {
-                // Autoplay with audio is blocked by browsers
-                if (!$(document).fullScreen()) {
-                    $video.prop('muted', true);
-                }
                 $playVideoButton.trigger('click');
             });
             delete $.autoplay;
@@ -2215,6 +2218,7 @@ var slideshowid;
                 ['../build/pdf.js', 'pdfjs2']
             ]),
             docxviewer: new Map([
+                ['jszip.js', 'jszip_js'],
                 ['docx.js', 'docxviewer_js'],
                 ['viewer.css', 'docxviewercss'],
                 ['docx-preview.js', 'docxpreview_js']
@@ -2297,7 +2301,7 @@ var slideshowid;
             return;
         }
 
-        require('docxviewer', ['docxpreview_js', 'docxviewer_js'], 'docxviewercss').then((myPage) => {
+        require('docxviewer', ['jszip_js', 'docxpreview_js', 'docxviewer_js'], 'docxviewercss').then((myPage) => {
             const id = 'docxpreviewdiv1';
             const iframe = document.getElementById(id);
             const newIframe = document.createElement('iframe');

@@ -117,8 +117,13 @@ BusinessRegister.prototype.initPage = function(
         $pageContainer.find('#business-nbusrs').focus();
         loadingDialog.hide();
     };
+    let applyDebugNewPrice = false;
     if (d && localStorage.debugNewPrice) {
-        mySelf.usedGB = 7420;
+        const parsed = tryCatch(() => JSON.parse(localStorage.debugNewPrice), false)() || {};
+
+        applyDebugNewPrice = true;
+        mySelf.usedGB = parsed.usedGB || 9000;
+        mySelf.usedTransferGB = parsed.usedTransferGB || 9000; // > usedGB, to exercise excess-transfer-at-signup
     }
 
     // check if this is logged in user
@@ -146,7 +151,11 @@ BusinessRegister.prototype.initPage = function(
             ));
             return false;
         }
-        mySelf.usedGB = M.account.space_used / 1073741824;
+        mySelf.usedGB = (applyDebugNewPrice && mySelf.usedGB)
+            || M.account.space_used / 1073741824;
+
+        mySelf.usedTransferGB = (applyDebugNewPrice && mySelf.usedTransferGB)
+            || (M.account.tfsq && M.account.tfsq.used || 0) / pro.BYTES_PER_GB;
 
         $emailInput.val(u_attr['email']);
         $emailInput.prop('disabled', true);
@@ -265,9 +274,12 @@ BusinessRegister.prototype.initPage = function(
         return mySelf.planInfo.l && mySelf.planInfo.l.lcs && mySelf.planInfo.l.lc;
     };
 
+    // business charges the greater of the two overages, at the storage fare
+    const extraQuota = () => Math.max(mySelf.extraStorage | 0, mySelf.extraTransfer | 0);
+
     const updateBreakdown = (users, quota, usrFare, quotaFare) => {
         users = Math.max(users || 0, mySelf.minUsers);
-        quota = quota || mySelf.extraStorage;
+        quota = quota || extraQuota();
 
         const mIntl = mega.intl;
         const intl = mIntl.number;
@@ -281,12 +293,12 @@ BusinessRegister.prototype.initPage = function(
         let totalQuota = -1;
         let total = 0;
 
-        const localUserPrice = mySelf.planInfo.bd.us.lpn || mySelf.planInfo.bd.us.lp;
         const euroUserPrice = (mySelf.planInfo.bd && (mySelf.planInfo.bd.us.pn || mySelf.planInfo.bd.us.p))
             || (mySelf.planInfo.pn || mySelf.planInfo.p);
+        const localUserPrice = mySelf.planInfo.bd.us.lpn || mySelf.planInfo.bd.us.lp || euroUserPrice;
 
-        const localQuotaPrice = quotaFare || mySelf.planInfo.bd.sto.lpn || mySelf.planInfo.bd.sto.lp;
         const euroQuotaPrice = quotaFare || mySelf.planInfo.bd.sto.pn || mySelf.planInfo.bd.sto.p;
+        const localQuotaPrice = quotaFare || mySelf.planInfo.bd.sto.lpn || mySelf.planInfo.bd.sto.lp || euroQuotaPrice;
 
         if (mySelf.localPricesMode) {
             usrFare = usrFare || mySelf.planInfo.bd.us.lp;
@@ -411,14 +423,35 @@ BusinessRegister.prototype.initPage = function(
             const neededQuota = mySelf.usedGB - extraFares.storageBase;
             if (neededQuota > 0) {
                 mySelf.extraStorage = Math.ceil(neededQuota / 1024);
-                const $extraStroage = $('.bus-addition-storage-block', $pageContainer).removeClass('hidden');
-                $('.bus-add-storage-body', $extraStroage)
-                    .text(l.additional_storage.replace('%1', mySelf.extraStorage));
-                $('.bus-add-storage-foot', $extraStroage)
-                    .text(l.additional_storage_desc.replace('%1', extraFares.storageBase / 1024));
-                quota = mySelf.extraStorage;
+            }
 
+            const neededTransfer = mySelf.usedTransferGB - extraFares.transBase;
+            if (neededTransfer > 0) {
+                mySelf.extraTransfer = Math.ceil(neededTransfer / 1024);
+            }
+
+            const $extraStorage = $('.bus-addition-storage-block', $pageContainer).addClass('hidden');
+            const $extraTransfer = $('.bus-addition-transfer-block', $pageContainer).addClass('hidden');
+
+            // only surface the block for whichever overage is higher
+            if (mySelf.extraStorage || mySelf.extraTransfer) {
+                quota = extraQuota();
                 mySelf.planInfo.quotaFare = mySelf.planInfo.bd.sto.p;
+
+                if ((mySelf.extraTransfer | 0) > (mySelf.extraStorage | 0)) {
+                    $extraTransfer.removeClass('hidden');
+                    $('.bus-add-transfer-body', $extraTransfer)
+                        .text(l.additional_transfer.replace('%1', mySelf.extraTransfer));
+                    $('.bus-add-transfer-foot', $extraTransfer)
+                        .text(l.additional_transfer_desc.replace('%1', extraFares.transBase / 1024));
+                }
+                else {
+                    $extraStorage.removeClass('hidden');
+                    $('.bus-add-storage-body', $extraStorage)
+                        .text(l.additional_storage.replace('%1', mySelf.extraStorage));
+                    $('.bus-add-storage-foot', $extraStorage)
+                        .text(l.additional_storage_desc.replace('%1', extraFares.storageBase / 1024));
+                }
             }
 
             $perUse.removeClass('hidden');
@@ -485,8 +518,13 @@ BusinessRegister.prototype.initPage = function(
         if (mySelf.isLoggedIn === false) {
             if (!$element || $element.is($passInput) || $element.is($rPassInput)) {
 
+                const password = $passInput.val();
+                const confirmPassword = $rPassInput.val();
+
                 // Check if the entered passwords are valid or strong enough
-                var passwordValidationResult = security.isValidPassword($passInput.val(), $rPassInput.val());
+                var passwordValidationResult = (password && confirmPassword)
+                    ? security.isValidPassword(password, confirmPassword)
+                    : l[9066];
 
                 // If bad result
                 if (passwordValidationResult !== true) {
@@ -717,7 +755,8 @@ BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, t
                 nbOfUsers: nbusers,
                 pMethod: pMethod,
                 isUpgrade: isUpgrade,
-                quota: mySelf.extraStorage
+                transferQuota: mySelf.extraTransfer,
+                storageQuota: mySelf.extraStorage,
             };
             if (pMethod !== 'voucher') {
                 mySelf.planInfo.usedGatewayId = $paymentMethod.attr('prov-id');

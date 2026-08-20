@@ -152,25 +152,31 @@ var pro = {
     async getTargetedDiscountInfo() {
         'use strict';
 
+        const dcis = [];
+
         if (!u_attr || !u_attr.mkt || !u_attr.mkt.dc) {
-            return false;
+            return dcis;
         }
 
-        let discountCode = u_attr.mkt.dc[0].dc;
+        const codes = u_attr.mkt.dc;
+        const requests = [];
 
-        if (pro.usedDiscountCode === discountCode) {
-            const unusedDiscount = u_attr.mkt.dc.find(d => d.dc !== pro.usedDiscountCode);
-            if (!unusedDiscount) {
-                return false;
+        for (let i = codes.length; i--;) {
+            if (codes[i].dc !== pro.usedDiscountCode) {
+                requests.push(api.send({a: 'dci', v: 2, dc: codes[i].dc, extra: 1}).catch(nop));
             }
-            discountCode = unusedDiscount.dc;
         }
 
-        const res = await api.send({a: 'dci', v: 2, dc: discountCode, extra: 1}).catch(nop);
+        const responses = await Promise.all(requests);
+        const now = Date.now() / 1000;
 
-        return (res && res.ex > Date.now() / 1000)
-            ? res
-            : false;
+        for (let i = responses.length; i--;) {
+            if (responses[i] && responses[i].ex > now) {
+                dcis.push(responses[i]);
+            }
+        }
+
+        return dcis;
     },
 
     /**
@@ -1214,10 +1220,24 @@ var pro = {
                         plan = thisPlan;
                     }
 
-                    const price = plan.price * months;
-                    const priceEuro = plan.priceEuro * months;
-                    const taxedPrice = plan.taxInfo ? plan.taxInfo.taxedPrice * months : price;
-                    const taxedPriceEuro = plan.taxInfo ? plan.taxInfo.taxedPriceEuro * months : priceEuro;
+                    // The API bills a duration over a year that is not a whole number of years as one
+                    // yearly plan per full 12 months plus a monthly plan per leftover month, so match that.
+                    const remainingMonths = months % 12;
+                    const yearlyPlan = (remainingMonths && months > 12 && thisPlan.yearlyPlan) || false;
+                    const years = (months - remainingMonths) / 12;
+
+                    const combine = (get) => yearlyPlan
+                        ? get(yearlyPlan) * years + get(plan) * remainingMonths
+                        : get(plan) * months;
+
+                    const price = combine((p) => p.price);
+                    const priceEuro = combine((p) => p.priceEuro);
+                    const taxedPrice = plan.taxInfo
+                        ? combine((p) => (p.taxInfo ? p.taxInfo.taxedPrice : p.price))
+                        : price;
+                    const taxedPriceEuro = plan.taxInfo
+                        ? combine((p) => (p.taxInfo ? p.taxInfo.taxedPriceEuro : p.priceEuro))
+                        : priceEuro;
 
                     return {
                         price,
@@ -1315,7 +1335,7 @@ var pro = {
                 taxInfo,
                 trial: false,
                 trialStrings: false,
-                featureStrings: false,
+                featureStrings: pro.featureInfo[pro.ACCOUNT_LEVEL_BUSINESS],
                 insdis: false,
                 minUsers: minu,
             };
@@ -1902,7 +1922,7 @@ lazy(pro, 'filter', () => {
             // generalStringPlans: 11, 12, 13, 4, 1, 2, 3 - plans that use the general strings for plan information
             generalStringPlans:
                 new Set([
-                    pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL, pro.ACCOUNT_LEVEL_STARTER,
+                    pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL, // pro.ACCOUNT_LEVEL_STARTER,
                     pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
                     pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI
                 ]),
@@ -1912,7 +1932,13 @@ lazy(pro, 'filter', () => {
                 new Set([
                     pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL, pro.ACCOUNT_LEVEL_PRO_LITE,
                     pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II, pro.ACCOUNT_LEVEL_PRO_III,
-                    pro.ACCOUNT_LEVEL_PRO_FLEXI,
+                    pro.ACCOUNT_LEVEL_PRO_FLEXI
+                ]),
+
+            s4Support:
+                new Set([
+                    pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I,
+                    pro.ACCOUNT_LEVEL_PRO_FLEXI, pro.ACCOUNT_LEVEL_BUSINESS
                 ]),
 
             variableStorage:
@@ -2037,20 +2063,28 @@ lazy(pro, 'featureInfo', () => {
 
     'use strict';
 
-    const general = [
-        {
+    const feature = {
+        vpn: {
             icon: 'sprite-fm-mono icon-shield-thin-outline',
             text: l.mega_vpn
         },
-        {
+        pwm: {
             icon: 'sprite-fm-mono icon-lock-thin-outline',
             text: l.mega_pwm
         },
-        {
+        s4: {
+            icon: 'sprite-fm-mono icon-bucket-triangle-thin-outline',
+            text: l.obj_storage
+        },
+        meeting: {
+            icon: 'sprite-fm-mono icon-video-thin-outline',
+            text: l.pr_no_meet_time_limits
+        },
+        participants: {
             icon: 'sprite-fm-mono icon-users-thin-outline',
             text: l.pr_unlimited_participants
         }
-    ];
+    };
 
     const strings = {
         '100000-trial': [
@@ -2112,10 +2146,35 @@ lazy(pro, 'featureInfo', () => {
                 text: l.sync_log_across_devices
             },
         ],
+        // Business
+        '100': [
+            feature.s4,
+            feature.meeting,
+            feature.participants
+        ],
+        // Starter
+        '11': [
+            feature.vpn,
+            feature.meeting,
+            feature.participants
+        ]
     };
 
     for (const plan of pro.filter.simple.generalStringPlans) {
-        strings[plan] = general;
+        strings[plan] = pro.filter.simple.s4Support.has(plan)
+            ? [
+                feature.vpn,
+                feature.pwm,
+                feature.s4,
+                feature.meeting,
+                feature.participants
+            ]
+            : [
+                feature.vpn,
+                feature.pwm,
+                feature.meeting,
+                feature.participants
+            ];
     }
 
     return strings;

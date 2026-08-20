@@ -273,43 +273,19 @@
 
 })(self);
 
-/**
- * Retrieve object/array values
- * @param {Object|Array} obj The input object
- * @returns {Array}
- */
-var obj_values = function obj_values(obj) {
-    "use strict";
-
-    var vals = [];
-    Object.keys(obj).forEach(function(memb) {
-        if (typeof obj.hasOwnProperty !== 'function' || obj.hasOwnProperty(memb)) {
-            vals.push(obj[memb]);
-        }
-    });
-
-    return vals;
-};
-
-if (typeof Object.values === 'function') {
-    obj_values = Object.values;
-}
-else {
-    Object.values = obj_values;
-}
 
 function oDestroy(obj) {
     'use strict';
 
-    if (d && Object.isFrozen(obj)) {
+    if (self.d > 1 && Object.isFrozen(obj)) {
         console.warn('Object already frozen...', obj);
     }
 
-    Object.keys(obj).forEach(function(memb) {
+    for (const memb in obj) {
         if (obj.hasOwnProperty(memb)) {
             delete obj[memb];
         }
-    });
+    }
 
     if (!oIsFrozen(obj) && Object.isExtensible(obj)) {
         Object.defineProperty(obj, ":$:frozen:", {
@@ -318,7 +294,7 @@ function oDestroy(obj) {
         });
     }
 
-    if (d) {
+    if (self.d > 1) {
         Object.freeze(obj);
     }
 }

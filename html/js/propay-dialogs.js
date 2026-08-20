@@ -1678,12 +1678,16 @@ var addressDialog = {
                 proPrice = proPrice.toFixed(2);
             }
             else {
+                // either quota may be unset (no overage); | 0 coerces that to 0 extra blocks
+                const quotaBlocks = Math.max(this.userInfo.storageQuota | 0, this.userInfo.transferQuota | 0);
+                // quotaFare is only set when there is overage, so skip the term when there are no blocks
                 proPrice = (this.userInfo.nbOfUsers * this.businessPlan.userFare
-                    + (this.userInfo.quota ? this.userInfo.quota * this.businessPlan.quotaFare : 0)).toFixed(2);
+                    + (quotaBlocks ? quotaBlocks * this.businessPlan.quotaFare : 0)).toFixed(2);
             }
             this.businessPlan.totalPrice = proPrice;
             this.businessPlan.totalUsers = this.userInfo.nbOfUsers;
-            this.businessPlan.quota = this.userInfo.quota;
+            this.businessPlan.transferQuota = this.userInfo.transferQuota;
+            this.businessPlan.storageQuota = this.userInfo.storageQuota;
             numOfMonths = this.businessPlan.m;
             this.numOfMonths = numOfMonths;
 
@@ -2782,14 +2786,16 @@ var addressDialog = {
      * Redirect to the site
      * @param {String} utcResult containing the url to redirect to
      */
-    redirectToSite: function(utcResult) {
+    redirectToSite: function(utcResult, isStripe) {
+        'use strict';
 
         var url = utcResult.EUR['url'];
-        if (pro.propay.currentGateway && pro.propay.currentGateway.gatewayId === 16) {
-            window.location = url;
+        // Only ECP (16) and Stripe (19) reach here; Stripe always needs lang, ECP never does
+        if (isStripe) {
+            window.location = url + '?lang=' + lang;
         }
         else {
-            window.location = url + '?lang=' + lang;
+            window.location = url;
         }
     },
 
@@ -2915,8 +2921,8 @@ var addressDialog = {
         }
 
         if (fminitialized) {
-            pro.getTargetedDiscountInfo().then((dci) => {
-                mega.ui.header.showTargetedDiscountButton(dci);
+            pro.getTargetedDiscountInfo().then((dcis) => {
+                mega.ui.header.showTargetedDiscountButton(dcis);
             });
         }
 
@@ -3379,6 +3385,9 @@ var addressDialog = {
                 || (event.data === 'paymentCancelled')
                 || (event.data === 'validInput')) {
 
+                // Iframe now controls the overlay; drop any debounced show queued on continue click
+                delay.cancel('propay.stripeOverlay');
+
                 if (event.data === 'showLoading') {
                     pro.propay.showLoadingOverlay('processing');
                 }
@@ -3642,10 +3651,7 @@ var addressDialog = {
 
                 if (!addressDialog.iframePageChangeHandler) {
                     addressDialog.iframePageChangeHandler = mBroadcaster.addListener('pagechange', () => {
-                        $('iframe#stripe-widget').remove();
-                        closeStripeDialog(false, true);
-                        mBroadcaster.removeListener(addressDialog.iframePageChangeHandler);
-                        delete addressDialog.iframePageChangeHandler;
+                        addressDialog.closeStripeWidget();
                     });
                 }
 
@@ -3672,11 +3678,28 @@ var addressDialog = {
         }
         else {
             if (utcResult.EUR.url) {
-                return this.redirectToSite(utcResult);
+                return this.redirectToSite(utcResult, isStripe);
             }
             // Hide the loading animation and show the error
             pro.propay.hideLoadingOverlay();
             this.showError(utcResult);
+        }
+    },
+
+    /**
+     * Tears down the Stripe payment widget: removes the iframe, closes the dialog and clears the
+     * pagechange listener. Safe to call from anywhere, whether or not the widget is currently shown.
+     * @returns {void}
+     */
+    closeStripeWidget() {
+        'use strict';
+
+        $('iframe#stripe-widget').remove();
+        closeStripeDialog(false, true);
+
+        if (addressDialog.iframePageChangeHandler) {
+            mBroadcaster.removeListener(addressDialog.iframePageChangeHandler);
+            delete addressDialog.iframePageChangeHandler;
         }
     },
 

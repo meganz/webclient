@@ -135,6 +135,7 @@ html .theme-light-forced {
         --mobile-shadow-subtle: 0px 2px 4px rgba(0, 0, 0, 0.1);
         --mobile-shadow-medium: 0px 4px 8px rgba(0, 0, 0, 0.1);
         --mobile-shadow-strong: 0px 8px 16px rgba(0, 0, 0, 0.15);
+        --mobile-shadow-strong-inverted: 0px 8px 16px rgba(0, 0, 0, 0.7);
 
 
     /* node icons */
@@ -156,6 +157,7 @@ html .theme-dark-forced {
         --mobile-shadow-subtle: 0px 2px 4px rgba(0, 0, 0, 0.7);
         --mobile-shadow-medium: 0px 4px 8px rgba(0, 0, 0, 0.7);
         --mobile-shadow-strong: 0px 8px 16px rgba(0, 0, 0, 0.7);
+        --mobile-shadow-strong-inverted: 0px 8px 16px rgba(0, 0, 0, 0.15);
 
 
     /* node icons */

@@ -133,13 +133,6 @@ body.mobile .mega-sheet.normal .sheet .main {
     margin-left: auto;
 }
 
-.export-links-dialog .sheet,
-.export-links-settings-dialog .sheet,
-.link-embed-dialog .sheet {
-    background: var(--mobile-page-background);
-    border: 1px var(--mobile-border-subtle) solid;
-}
-
 .export-links-dialog .sheet .overlay-footer {
     margin-top: 0;
 }
@@ -243,4 +236,86 @@ body.mobile .mega-sheet .sheet .content .qrcode {
 }
 body.mobile .mega-sheet .sheet .content .qrcode canvas {
     display: block;
+}
+
+
+/*
+ * Banner displayed above the sheet
+ *
+ * Used in desktop Export link dialog for now,
+ * but probably will be used in more places
+*/
+
+body.web-desktop .mega-sheet > .banner {
+    align-items: center;
+    background: var(--mobile-surface-1);
+    border-radius: var(--mobile-border-radius-extra-large);
+    box-sizing: border-box;
+    color: var(--mobile-text-primary);
+    display: flex;
+    margin: 16px auto auto;
+    max-width: 640px;
+    order: 2;
+    padding: 24px;
+}
+
+body.rtl .mega-sheet > .banner {
+    direction: rtl;
+}
+
+body.web-desktop .mega-sheet > .banner + .sheet {
+    margin-bottom: 0;
+    min-height: 0;
+}
+
+body.web-desktop .mega-sheet > .banner > div ~ div {
+    margin-inline-start: 16px;
+}
+
+body.web-desktop .mega-sheet > .banner > .info {
+    flex: 1 1 auto;
+}
+
+body.web-desktop .mega-sheet > .banner img {
+    display: block;
+    max-width: 96px;
+}
+
+body.web-desktop .mega-sheet > .banner h4 {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-bold);
+    margin: 0;
+    padding: 0;
+}
+
+body.web-desktop .mega-sheet > .banner p {
+    margin: 0;
+    padding: 8px 0;
+}
+
+body.web-desktop .mega-sheet > .banner a.link {
+    background: none;
+    color: var(--mobile-text-primary);
+    display: inline-flex;
+    height: auto;
+    padding: 0;
+    text-decoration: underline;
+}
+
+body.web-desktop .mega-sheet > .banner a.link span {
+    font: var(--mobile-font-caption-large-bold);
+}
+
+body.web-desktop .mega-sheet > .banner button {
+    height: auto;
+    margin-inline-start: 8px;
+    min-height: 36px;
+}
+
+@media (hover: hover) {
+
+    body.web-desktop .mega-sheet > .banner a.link:hover {
+        text-decoration: none;
+    }
+
 }

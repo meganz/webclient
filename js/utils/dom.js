@@ -54,7 +54,8 @@ function parseHTML(markup) {
             // console.debug(node.nodeName, node.outerHTML, node.data, [node]);
 
             var content = String(node.outerHTML).replace(/[\s\x00-\x19]+/g, '');
-            let invalid = /<[^>]+script:|data[%:]|(?:id|name)=["']*(?:child|node|attr|shadow|content)/i.test(content);
+            let invalid =
+                /<[^>]+(?:script:|data[%:]|(?:id|name)=["']*(?:child|node|attr|shadow|content))/i.test(content);
 
             if (!invalid) {
                 invalid = domNodeForEach(node, (n) => {
@@ -180,7 +181,7 @@ function htmlentities(value) {
     if (!value) {
         return '';
     }
-    return $('<div/>').text(value).html();
+    return escapeHTML(value);
 }
 
 /**

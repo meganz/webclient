@@ -168,7 +168,7 @@ describe("chat.rtf_filter unit test", function() {
             [
                 '<img src="#" width=300 height=300 />',
                 '<img src="#" width=300 height=300 />',
-                '&lt;img src="#" width=300 height=300 /&gt;',
+                '&lt;img src=&quot;#&quot; width=300 height=300 /&gt;',
             ],
             [
                 '`a`',

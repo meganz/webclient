@@ -1266,21 +1266,16 @@ var unionPay = {
      * @param {Object} utcResult
      */
     redirectToSite: function(utcResult) {
+        'use strict';
 
         // DynamicPay
-        // We need to redirect to their site via a post, so we are building a form :\
-        var form = $("<form name='pay_form' action='" + utcResult.EUR['url'] + "' method='post'></form>");
+        // We need to redirect to their site via a post, so we are building a form
+        const form = mCreateElement('form', {name: 'pay_form', action: utcResult.EUR.url, method: 'post'}, 'body');
 
-        for (var key in utcResult.EUR['postdata']) {
-            if (utcResult.EUR['postdata'].hasOwnProperty(key)) {
-
-                var input = $("<input type='hidden' name='" + key + "' value='"
-                          + utcResult.EUR['postdata'][key] + "' />");
-
-                form.append(input);
-            }
+        for (const [name, value] of Object.entries(utcResult.EUR.postdata)) {
+            mCreateElement('input', {type: 'hidden', name, value}, form);
         }
-        $('body').append(form);
+
         form.submit();
     }
 };
@@ -1297,21 +1292,19 @@ var sabadell = {
      * @param {Object} utcResult
      */
     redirectToSite: function(utcResult) {
+        'use strict';
 
         // We need to redirect to their site via a post, so we are building a form
-        var url = utcResult.EUR['url'];
-        var form = $("<form id='pay_form' name='pay_form' action='" + url + "' method='post'></form>");
+        const form = mCreateElement(
+            'form',
+            {id: 'pay_form', name: 'pay_form', action: utcResult.EUR.url, method: 'post'},
+            'body'
+        );
 
-        for (var key in utcResult.EUR['postdata']) {
-            if (utcResult.EUR['postdata'].hasOwnProperty(key)) {
-
-                var input = $("<input type='hidden' name='" + key + "' value='"
-                          + utcResult.EUR['postdata'][key] + "' />");
-
-                form.append(input);
-            }
+        for (const [name, value] of Object.entries(utcResult.EUR.postdata)) {
+            mCreateElement('input', {type: 'hidden', name, value}, form);
         }
-        $('body').append(form);
+
         form.submit();
     },
 

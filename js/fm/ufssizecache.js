@@ -192,6 +192,27 @@ UFSSizeCache.prototype.addToDB = function(n) {
     'use strict';
 
     if (fmdb) {
+
+        if (n.t > 128) {
+
+            if (self.d) {
+                console.error(`Caught invalid node-type value for node ${n.h} from ${n.u}`, n.t, [{...n}]);
+            }
+
+            if (Array.isArray(n.k) && n.k.length > 0) {
+
+                n.t = n.k.length < 8 ? 1 : 0;
+            }
+            else if (self.d) {
+                console.warn(`Could not normalize borked 't'-value...`, n.k);
+            }
+            queueMicrotask(() => {
+                eventlog(99647, JSON.stringify([
+                    1, 1, n.t, n.h, n.p, !!n.shares | 0, n.u, n.u === u_handle | 0, typeof n.k, n.k && n.k.length, n.s
+                ]), true);
+            });
+        }
+
         fmdb.add('f', {
             h: n.h,
             p: n.p,

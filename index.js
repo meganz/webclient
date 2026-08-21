@@ -3384,15 +3384,6 @@ window.addEventListener('beforeunload', (ev) => {
     }
     mBroadcaster.crossTab.leave();
 
-}, {capture: true});
-
-window.addEventListener('unload', () => {
-    'use strict';
-    if (window.doUnloadLogOut) {
-        u_logout();
-    }
-    mBroadcaster.crossTab.leave();
-
     if (typeof dlpage_ph === 'string') {
         // Clear the download activity flag navigating away on the downloads page.
         dlmanager.dlClearActiveTransfer(dlpage_ph);

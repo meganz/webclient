@@ -1032,7 +1032,10 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
         || iconClass === 'image' && is_image2(action[0])
         || iconClass === 'video' && is_video(action[0])
     ) {
-        $icon.addClass('thumb').safeHTML(`<img src="${emptyPixel}" class="shimmer" />`);
+        const img = document.createElement('img');
+        img.src = emptyPixel;
+        img.classList.add('shimmer');
+        $icon.addClass('thumb').get(0).appendChild(img);
         $('img', $icon).rebind('load.recentThumb', ({ target }) => {
             if (target.src !== emptyPixel) {
                 target.classList.remove('shimmer');

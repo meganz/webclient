@@ -5,6 +5,7 @@ function BusinessRegister() {
     this.planPrice = 9.99; // initial value
     this.minUsers = 3; // minimum number of users
     this.maxUsers = 300; // maximum number of users
+    this.isBusinessUse = true; // Purchase is for business use by default
     this.isLoggedIn = false;
     this.hasAppleOrGooglePay = false;
     if (mega) {
@@ -21,7 +22,9 @@ BusinessRegister.prototype.initPage = function(
     preSetNb, preSetName, preSetTel, preSetFname, preSetLname, preSetEmail, extra) {
     "use strict";
 
-    loadingDialog.show();
+    // Distinct subject so accountData's finally-hide of the default 'common' subject can't
+    // clear the spinner while our gateway list + initial utqa promises are still in flight.
+    loadingDialog.show('registerb-init');
     extra = extra || Object.create(null);
 
     var $pageContainer = $('.bus-reg-body');
@@ -115,7 +118,7 @@ BusinessRegister.prototype.initPage = function(
         $('.bus-confirm-body.confirm').addClass('hidden'); // hiding confirmation part
         $('.bus-confirm-body.verfication').addClass('hidden'); // hiding verification part
         $pageContainer.find('#business-nbusrs').focus();
-        loadingDialog.hide();
+        loadingDialog.hide('registerb-init');
     };
     let applyDebugNewPrice = false;
     if (d && localStorage.debugNewPrice) {
@@ -219,6 +222,8 @@ BusinessRegister.prototype.initPage = function(
             return failureExit(l[20431]);
         }
 
+        mySelf.paymentGateways = list;
+
         if (!window.businessVoucher) {
             var paymentGatewayToAdd = '';
             for (var k = 0; k < list.length; k++) {
@@ -251,8 +256,7 @@ BusinessRegister.prototype.initPage = function(
                 $me.removeClass('radioOff').addClass('radioOn');
             });
 
-        // view the page
-        unhidePage();
+        mySelf.initUseTypeTabs($pageContainer);
     };
 
     const isValidBillingData = () => {
@@ -677,15 +681,157 @@ BusinessRegister.prototype.initPage = function(
     M.require('businessAcc_js').done(function afterLoadingBusinessClass() {
         var business = new BusinessAccount();
 
-        business.getListOfPaymentGateways(false).always(fillPaymentGateways);
-        business.getBusinessPlanInfo(false).then((info) => {
+        const gatewaysReady = new Promise((resolve, reject) => {
+            business.getListOfPaymentGateways(false).always((status, list) => {
+                // fillPaymentGateways shows its own msgDialog + loadSubPage('start') on failure;
+                // reject with {handled: true} so the outer .catch below skips a duplicate dialog.
+                tryCatch(() => {
+                    fillPaymentGateways(status, list);
+                    if (status && list && list.length) {
+                        resolve();
+                    }
+                    else {
+                        reject({handled: true});
+                    }
+                }, reject)();
+            });
+        });
+
+        const initialTaxNumber = pro.propay.billing.getTaxNumberForApiReq();
+        addressDialog.lastBusUtqaTaxNum = initialTaxNumber || addressDialog.lastBusUtqaTaxNum || '';
+
+        const planReady = Promise.all([
+            pro.propay.billing.getInitialCountry(),
+            pro.propay.billing.getTngrRes(),
+            pro.propay.billing.initAttempts(true),
+        ]).then(([country]) => {
+            mySelf.lastPricedCountry = country;
+            pro.propay.billing.country = country;
+            return business.getBusinessPlanInfo(
+                !!country, false, country || undefined, initialTaxNumber,
+                pro.propay.billing.getStateForApiReq(country)
+            );
+        }).then((info) => {
             mySelf.planPrice = Number.parseFloat(info.p);
             mySelf.planInfo = info;
+            // Drop the cached plan built with the previous page's tax context (e.g. HK from
+            // /pricing) so createBusinessPlanObject rebuilds using the fresh utqa's taxInfo.
+            if (pro.planObjects && pro.planObjects.planKeys) {
+                delete pro.planObjects.planKeys[info.id + info.it];
+            }
             mySelf.planObj = pro.planObjects.createBusinessPlanObject(info);
             mySelf.minUsers = info.minu || 3;
             updatePriceGadget($nbUsersInput.val() || mySelf.minUsers);
+            pro.propay.billing.applyExhaustedLockout();
         });
+
+        // Reveal the form only once BOTH prerequisites have landed. Either rejection leaves the
+        // loading dialog up until msgDialog + loadSubPage('start') navigates away.
+        Promise.all([gatewaysReady, planReady]).then(unhidePage).catch((ex) => {
+            dump(ex);
+            if (ex && ex.handled) {
+                return;
+            }
+            msgDialog('warninga', '', l[19342], '', () => loadSubPage('start'));
+        });
+
+        mySelf.getCountry = () => {
+            const $dialogCountry = addressDialog && addressDialog.$dialog
+                && $('.countries .option[data-state="active"]', addressDialog.$dialog);
+            const dialogCountry = $dialogCountry && $dialogCountry.attr('data-value');
+            return dialogCountry
+                || pro.propay.billing.country
+                || u_attr && (u_attr.country || u_attr.ipcc)
+                || pro.propay.billing.defaultCountry
+                || '';
+        };
+
+        mySelf.refreshPricing = (countryCode, taxNumber, state) => {
+            const last = mySelf.lastUtqa;
+            if (last && last.country === countryCode && last.taxNumber === taxNumber && last.state === state) {
+                return Promise.resolve();
+            }
+            mySelf.lastUtqa = {country: countryCode, taxNumber, state};
+            addressDialog.lastBusUtqaTaxNum = taxNumber || '';
+
+            return business.getBusinessPlanInfo(true, false, countryCode, taxNumber, state).then((info) => {
+                mySelf.lastPricedCountry = countryCode || '';
+                mySelf.planPrice = Number.parseFloat(info.p);
+                if (mySelf.planInfo) {
+                    Object.assign(mySelf.planInfo, info);
+                }
+                else {
+                    mySelf.planInfo = info;
+                }
+                // createBusinessPlanObject caches by `id + it`; drop the cached entry so the
+                // rebuilt planObj reflects the new taxInfo.
+                if (pro.planObjects && pro.planObjects.planKeys) {
+                    delete pro.planObjects.planKeys[mySelf.planInfo.id + mySelf.planInfo.it];
+                }
+                mySelf.planObj = pro.planObjects.createBusinessPlanObject(mySelf.planInfo);
+                updatePriceGadget($nbUsersInput.val() || mySelf.minUsers);
+                if (addressDialog && addressDialog.businessRegPage === mySelf
+                    && typeof addressDialog.updateBusinessPrice === 'function') {
+                    addressDialog.updateBusinessPrice();
+                }
+            }).catch(dump);
+        };
+
+        // applyPersonalUse's refresh must target this initPage's live $pageContainer.
+        addressDialog.businessRegPage = mySelf;
     });
+};
+
+/**
+ * Mount the personal / business use tabs on the registerb page (aligned with propay billing).
+ * @param {jQuery} $pageContainer - The registerb page root element to search for the tab mount
+ * @returns {void}
+ */
+BusinessRegister.prototype.initUseTypeTabs = function($pageContainer) {
+    "use strict";
+    const mount = $pageContainer && $pageContainer.length && $pageContainer[0]
+        .querySelector('.bus-reg-use-type-tab-mount');
+
+    if (!mount || mount.dataset.busRegUseTabsInit === '1' || typeof MegaTabGroup === 'undefined') {
+        return;
+    }
+
+    mount.dataset.busRegUseTabsInit = '1';
+    mount.textContent = '';
+
+    const tabGroupWrap = document.createElement('div');
+    tabGroupWrap.className = 'mega-component tab-group bus-reg-use-type-tab-group';
+    mount.appendChild(tabGroupWrap);
+
+    const lastSelected = sessionStorage.getItem('pro.purchaseBusinessUse');
+    const businessSelected = lastSelected
+        ? lastSelected === 'true'
+        : true;
+
+    pro.propay.billing.isBusinessUse = businessSelected;
+
+    this.useTypeTabGroup = new MegaTabGroup({
+        tabs: [
+            {
+                parentNode: tabGroupWrap,
+                text: l.personal_use,
+                tabid: 'personal',
+                selected: !businessSelected,
+                onClick: () => pro.propay.billing.applyPersonalUse(),
+            },
+            {
+                parentNode: tabGroupWrap,
+                text: l.business_use,
+                tabid: 'business',
+                selected: businessSelected,
+                onClick: () => pro.propay.billing.applyBusinessUse(),
+            },
+        ],
+    });
+
+    // Share the tab group with pro.propay.billing so switchToPersonalUse (triggered from the
+    // tax-validation tooltip when the user runs out of attempts) can flip the selected tab.
+    pro.propay.billing.useTypeTabGroup = this.useTypeTabGroup;
 };
 
 /**
@@ -799,6 +945,14 @@ BusinessRegister.prototype.goToPayment = function(userInfo) {
 
 };
 
+BusinessRegister.prototype.getSelectedGateway = function() {
+    "use strict";
+    if (!this.paymentGateways || !this.planInfo) {
+        return null;
+    }
+    return this.paymentGateways.find(gateway => gateway.gatewayName === this.planInfo.usedGateName) || null;
+};
+
 /**
  * Process the payment
  * @param {Object} payDetails       payment collected details from payment dialog
@@ -808,9 +962,6 @@ BusinessRegister.prototype.processPayment = function(payDetails, businessPlan) {
     "use strict";
     loadingDialog.show();
     const ba = new BusinessAccount();
-    if (payDetails.taxCode) {
-        ba.updateBusinessAttrs([{ key: '%taxnum', val: payDetails.taxCode }]).catch(dump);
-    }
 
     ba.doPaymentWithAPI(payDetails, businessPlan).then(({result, saleId}) => {
 

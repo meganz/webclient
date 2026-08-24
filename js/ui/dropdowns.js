@@ -400,7 +400,8 @@ function createDropdown($container, options) {
         let $selectedOption  = null;
 
         for (const option in optionList) {
-            if (!optionList.hasOwnProperty(option)) {
+
+            if (!Object.hasOwn(optionList, option)) {
                 continue;
             }
 

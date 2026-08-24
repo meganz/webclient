@@ -2816,10 +2816,10 @@
                     </div>
                     <div class="compound-inputs">
                         <div class="mega-input box-style">
-                            <input class="first-name" type="text" value="" placeholder="[$1096]">
+                            <input class="firstname" type="text" value="" placeholder="[$1096]">
                         </div>
                         <div class="mega-input box-style">
-                            <input class="last-name" type="text" value="" placeholder="[$1097]">
+                            <input class="lastname" type="text" value="" placeholder="[$1097]">
                         </div>
                     </div>
                     <div class="mega-input box-style">
@@ -2975,7 +2975,7 @@
             </div>
             <div class="content-block address-block">
                 <div class="payment-half-block first">
-                    <input class="first-name underlinedText" type="text" value="" placeholder="[$1096]" tabindex="2">
+                    <input class="firstname underlinedText" type="text" value="" placeholder="[$1096]" tabindex="2">
                     <input class="address1 underlinedText" type="text" value="" placeholder="[$561] 1" tabindex="4">
                     <input class="city underlinedText" type="text" value="" placeholder="[$565]" tabindex="6">
                     <input class="postcode underlinedText" type="text" value="" placeholder="[$10659]" tabindex="8">
@@ -2983,7 +2983,7 @@
                     <div class="clear"></div>
                 </div>
                 <div class="payment-half-block second">
-                    <input class="last-name underlinedText" type="text" value="" placeholder="[$1097]" tabindex="3">
+                    <input class="lastname underlinedText" type="text" value="" placeholder="[$1097]" tabindex="3">
                     <input class="address2 underlinedText" type="text" value="" placeholder="[$561] 2 ([$2028])" tabindex="5">
                     <div id="address-dialog-states" class="states mega-input dropdown-input underlinedText" tabindex="-1" disabled>
                         <span>[$7192]</span>
@@ -2994,8 +2994,21 @@
                             </div>
                         </div>
                     </div>
-                    <input class="taxcode underlinedText" type="text" value="" placeholder="[$7347]" tabindex="9">
-                    <div class="taxcode-invoice-note"><span></span></div>
+                    <div class="state-message-container">[$select_state]</div>
+                    <div class="taxcode-input-wrapper">
+                        <div class="taxcode-container"></div>
+                    </div>
+                    <div class="taxcode-invoice-note">
+                        <i class="sprite-fm-mono icon-info-thin-outline"></i>
+                        <span></span>
+                        <div class="tax-validation-popover hidden">
+                            <i class="sprite-fm-mono icon-dialog-close tax-validation-popover-close"></i>
+                            <div class="tax-validation-popover-arrow"></div>
+                            <div class="tax-validation-popover-title">[$validation_failed_title]</div>
+                            <div class="tax-validation-popover-message"></div>
+                            <a class="tax-validation-popover-action"></a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="error-message hidden">[$10633]</div>
@@ -3433,62 +3446,6 @@
                 <button class="mega-button positive voucher-buy-now">
                     <span>[$6190]</span>
                 </button>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Dialog: astropay-dialog -->
-    <div class="mega-dialog dialog-template-main astropay-dialog hidden"
-         role="dialog"
-         aria-labelledby="astropay-dialog-title"
-         aria-modal="true">
-
-        <button class="close js-close" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
-        </button>
-
-        <header>
-            <h2 id="astropay-dialog-title">[$7985]</h2>
-        </header>
-
-        <section class="content">
-            <div class="content-block">
-                <div class="astropay-information">[$7991] [$7986]</div>
-                <label class="astropay-label" for="astropay-name-field">[$7987]:</label>
-                <div class="mega-input box-style">
-                    <input id="astropay-name-field" class="astropay-name-field" type="text" placeholder="[$7988]">
-                </div>
-
-                <label class="astropay-label address" for="astropay-address-field">[$561]:</label>
-                <div class="mega-input box-style">
-                    <input id="astropay-address-field" class="astropay-address-field" type="text" placeholder="[$561]">
-                </div>
-
-                <label class="astropay-label city" for="astropay-city-field">[$565]:</label>
-                <div class="mega-input box-style">
-                    <input id="astropay-city-field" class="astropay-city-field" type="text" placeholder="[$565]">
-                </div>
-
-                <label class="astropay-label tax" for="astropay-tax-field">[$7989]:</label>
-                <div class="mega-input box-style">
-                    <input id="astropay-tax-field" class="astropay-tax-field" type="text" placeholder="[$7990]">
-                </div>
-            </div>
-        </section>
-
-        <footer>
-            <div class="footer-container space-between">
-                <a class="powered-by-astropay" href="https://www.astropay.com/" target="_blank" rel="noopener noreferrer">
-                    <i class="sprite-fm-uni icon-astropay"></i>
-                </a>
-                <div>
-                    <button class="mega-button cancel">
-                        <span>[$msg_dlg_cancel]</span>
-                    </button>
-                    <button class="mega-button positive accept">
-                        <span>[$870]</span>
-                    </button>
-                </div>
             </div>
         </footer>
     </div>

@@ -9567,6 +9567,23 @@ div.camera-bottom-txt {
     margin-top: -12px;
     text-align: start;
 }
+/* Temporarily invalidated for the first step of invoicing-changes.
+   To revert later once api support added. */
+.user-management-account-settings .profile .mega-input.disabled input,
+.user-management-account-settings .profile .mega-input.disabled input::placeholder,
+.user-management-account-settings .profile .mega-input.disabled .mega-input-title,
+.user-management-account-settings .profile .mega-input.disabled > span {
+    color: var(--mobile-text-disabled);
+    cursor: default;
+}
+.user-management-account-settings .profile .mega-input.disabled:hover > span ~ i,
+.user-management-account-settings .profile .mega-input.disabled:hover > input ~ i {
+    --mask-color: var(--icon-inactive);
+}
+.user-management-account-settings .profile .mega-input.disabled::before {
+    border-color: var(--mobile-text-disabled);
+    display: block;
+}
 
 .user-management-account-settings .setting-block {
     background: var(--mobile-surface-1);

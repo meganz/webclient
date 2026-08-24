@@ -820,15 +820,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="mobile orange-notification body with-btn argentina-only hidden">
-                                <div class="orange-notification">
-                                    <i class="icons-sprite fvnotice"></i>
-                                </div>
-                                <div class="orange-notification cell text-cell">
-                                    <div class="versioning-body-text">[$23132]</div>
-                                </div>
-                            </div>
-
                             <div class="renewal-option hidden">
                                 <div class="membership-st2-head choose-renewal">
                                     <span class="option-question renewal">[$10638]</span>
@@ -883,46 +874,6 @@
                         *[$18770]
                     </div>
                     <div class="mobile external-payment-options">[$7156]</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- AstroPay dialog -->
-<div class="mobile fm-block full-page-scrollable astropay-dialog hidden">
-    <div class="mobile fm-row">
-        <div class="mobile fm-content">
-            <div class="mobile fm-scrolling">
-                <div class="mobile content-row first">
-                    <div class="mobile content-cell">
-                        <div class="mobile fm-dialog-close"></div>
-                        <div class="astropay-dialog-body">
-                            <div class="main-title">[$6963]</div>
-                            <div class="astropay-information">[$7991]</div>
-                            <div class="astropay-instructions">[$7986]</div>
-                        </div>
-                        <div class="grey-container-box">
-                            <div class="white-container-box">
-                                <div class="container-box-title">[$7985]</div>
-                                <div class="mobile signin-input">
-                                    <input id="astropay-name-field" class="astropay-name-field" type="text" placeholder="[$7987]">
-                                </div>
-                                <div class="mobile signin-input">
-                                    <input id="astropay-address-field" class="astropay-address-field" type="text" placeholder="[$561]">
-                                </div>
-                                <div class="mobile signin-input">
-                                    <input id="astropay-city-field" class="astropay-city-field" type="text" placeholder="[$565]">
-                                </div>
-                                <div class="mobile signin-input">
-                                    <input id="astropay-tax-field" class="astropay-tax-field" type="text" placeholder="[$7989]">
-                                </div>
-                                <div class="accept"><span>[$6190]</span></div>
-                                <a class="pricing-sprite powered-by-astropay" href="https://www.astropay.com/" target="_blank" rel="noopener noreferrer"></a>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1010,22 +961,35 @@
                                 <div class="container-box-title">[$10632]</div>
 
                                 <div class="container-box-block">
-                                    <input class="first-name underlinedText" type="text" value="" placeholder="[$1096]" tabindex="1">
-                                    <input class="last-name underlinedText" type="text" value="" placeholder="[$1097]" tabindex="2">
-                                    <input class="address1 underlinedText" type="text" value="" placeholder="[$561] 1" tabindex="3">
-                                    <input class="address2 underlinedText" type="text" value="" placeholder="[$561] 2 ([$2028])" tabindex="4">
-                                    <input class="city underlinedText" type="text" value="" placeholder="[$565]" tabindex="5">
-                                    <input class="postcode underlinedText" type="text" value="" placeholder="[$10659]" tabindex="7">
-
-                                    <select class="countries default-select sprite-fm-mono icon-arrow-down address-dialog-countries" tabindex="6">
+                                    <select class="countries default-select sprite-fm-mono icon-arrow-down address-dialog-countries" tabindex="1">
                                         <option value="">[$481]</option>
                                     </select>
+                                    <input class="firstname underlinedText" type="text" value="" placeholder="[$1096]" tabindex="2">
+                                    <input class="lastname underlinedText" type="text" value="" placeholder="[$1097]" tabindex="3">
+                                    <input class="address1 underlinedText" type="text" value="" placeholder="[$561] 1" tabindex="4">
+                                    <input class="address2 underlinedText" type="text" value="" placeholder="[$561] 2 ([$2028])" tabindex="5">
+                                    <input class="city underlinedText" type="text" value="" placeholder="[$565]" tabindex="6">
+                                    <input class="postcode underlinedText" type="text" value="" placeholder="[$10659]" tabindex="7">
+
                                     <select class="states default-select sprite-fm-mono icon-arrow-down address-dialog-states" tabindex="8" disabled>
                                         <option value="">[$7192]</option>
                                     </select>
+                                    <div class="state-message-container">[$select_state]</div>
 
-                                    <input class="taxcode underlinedText" type="text" value="" placeholder="[$7347]" tabindex="9">
-                                    <div class="taxcode-invoice-note"><span></span></div>
+                                    <div class="taxcode-input-wrapper">
+                                        <div class="taxcode-container"></div>
+                                    </div>
+                                    <div class="taxcode-invoice-note">
+                                        <i class="sprite-fm-mono icon-info-thin-outline"></i>
+                                        <span></span>
+                                        <div class="tax-validation-popover hidden">
+                                            <i class="sprite-fm-mono icon-dialog-close tax-validation-popover-close"></i>
+                                            <div class="tax-validation-popover-arrow"></div>
+                                            <div class="tax-validation-popover-title">[$validation_failed_title]</div>
+                                            <div class="tax-validation-popover-message"></div>
+                                            <a class="tax-validation-popover-action"></a>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="mobile remember-billing-info-wrapper">
@@ -2060,7 +2024,7 @@
 
                     <!-- Video player Ad controls !-->
                     <div class="viewer-vad-control lato hidden"></div>
-                    
+
                     <!-- Video player nav bar !-->
                     <nav class="viewer-bars video-controls hidden" data-state="hidden">
                         <ul class="bar">

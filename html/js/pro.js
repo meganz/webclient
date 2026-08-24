@@ -76,6 +76,8 @@ var pro = {
     // Ignore discounts of less that 2%
     minimumAcknowledgedDiscount: 2,
 
+    membershipPlansCacheStale: false,
+
     /**
      * Determines if a Business or Pro Flexi account is expired or in grace period
      * @param {Number} accountStatus The account status e.g. from u_attr.b.s (Business) or u_attr.pf.s (Pro Flexi)
@@ -136,8 +138,6 @@ var pro = {
             return obj;
         }
 
-        obj.dividedBy100 = true;
-
         excl = excl || [];
 
         for (const key of Object.keys(obj)) {
@@ -145,6 +145,8 @@ var pro = {
                 obj[key] /= 100;
             }
         }
+
+        obj.dividedBy100 = true;
 
         return obj;
     },
@@ -183,19 +185,32 @@ var pro = {
      * Load pricing plan information from the API. The data will be loaded into 'pro.membershipPlans'.
      * @param {Function} loadedCallback The function to call when the data is loaded
      */
-    loadMembershipPlans: async function(loadedCallback, force) {
+    async loadMembershipPlans(loadedCallback, force, countryCode, taxNumber, state) {
         "use strict";
 
         // Set default
         loadedCallback = loadedCallback || function() { };
 
-        // If this data has already been fetched, re-use it and run the callback function
-        if (!force && pro.membershipPlans.length > 0 && !(!pro.lastLoginStatus && u_type > 0)) {
+        // membershipPlansCacheStale: an out-of-band utqa (business) has flipped pro.taxInfo
+        // since the last full fetch, so the cached plan arrays no longer match.
+        if (!force && !pro.membershipPlansCacheStale && pro.membershipPlans.length > 0
+            && !(!pro.lastLoginStatus && u_type > 0)) {
             loadedCallback();
         }
         else {
+            pro.membershipPlansCacheStale = false;
             // Get the membership plans.
             const payload = {a: 'utqa', nf: (d && localStorage.utqav) || +mega.utqav, p: 1, ft: 1};
+
+            if (countryCode) {
+                payload.cc = countryCode;
+            }
+            if (taxNumber !== undefined) {
+                payload.tn = taxNumber;
+            }
+            if (state) {
+                payload.state = state;
+            }
 
             await api.req({a: 'uq', pro: 1, gc: 1})
                 .then(({result: {balance}}) => {
@@ -224,7 +239,7 @@ var pro = {
                     pro.blockPlans = d && localStorage.blockPlans
                         && new Set(localStorage.blockPlans.split(',').map(n => +n));
 
-                    const {txn, tx, txva, l, txe} = results[0];
+                    const {txn, tx, txva, l, txe, txcc} = results[0];
 
                     const conversionRate = l.lc === "EUR" ? 1 : l.exch;
 
@@ -232,6 +247,7 @@ var pro = {
                         taxName: txn,
                         taxPercent: tx / 100,
                         variant: txva,
+                        taxCountry: txcc,
                     };
 
                     pro.taxInfo = taxInfo;
@@ -398,13 +414,14 @@ var pro = {
                         pro.applyDevSettings();
                     }
 
-                    if (localStorage.ignoreTrial) {
+                    // Re-apply across every utqa reload; ignoreTrial is cleared on full reload.
+                    if (pro.propay.ignoreTrial.size) {
                         for (let i = 0; i < pro.membershipPlans.length; i++) {
-                            pro.membershipPlans[i][pro.UTQA_RES_INDEX_EXTRAS].trial = false;
+                            if (pro.propay.ignoreTrial.has(
+                                pro.membershipPlans[i][pro.UTQA_RES_INDEX_ACCOUNTLEVEL])) {
+                                pro.membershipPlans[i][pro.UTQA_RES_INDEX_EXTRAS].trial = false;
+                            }
                         }
-
-                        pro.propay.ignoreTrial = true;
-                        delete localStorage.ignoreTrial;
                     }
 
                     pro.lastLoginStatus = u_type;
@@ -417,6 +434,7 @@ var pro = {
 
                     // Initialize the filtered plans
                     pro.initFilteredPlans();
+
                     // Run the callback function
                     loadedCallback();
                 });
@@ -984,11 +1002,12 @@ var pro = {
                 const {bd} = planFromApi || false;
                 const {ba, sto, trns, us} = bd || false;
 
+                // Clone so callers on the same deduped api response don't share divides.
                 type1info = {
-                    trns: pro.divideAllBy100(trns),
-                    ba: pro.divideAllBy100(ba),
-                    us: pro.divideAllBy100(us),
-                    sto: pro.divideAllBy100(sto),
+                    trns: pro.divideAllBy100(trns && {...trns}),
+                    ba: pro.divideAllBy100(ba && {...ba}),
+                    us: pro.divideAllBy100(us && {...us}),
+                    sto: pro.divideAllBy100(sto && {...sto}),
                 };
             }
 
@@ -1035,6 +1054,12 @@ var pro = {
                 lazy(thisPlan, 'featureBits', () => thisPlan.features && pro.getStandaloneBits(thisPlan.features));
                 lazy(thisPlan, 'taxInfo', () => {
                     return pro.getStandardisedTaxInfo(taxInfo, thisPlan.level === pro.ACCOUNT_LEVEL_BUSINESS);
+                });
+                lazy(thisPlan, 'taxedPriceEuro', () => {
+                    return thisPlan.taxInfo ? thisPlan.taxInfo.taxedPriceEuro : thisPlan.priceEuro;
+                });
+                lazy(thisPlan, 'taxedPrice', () => {
+                    return thisPlan.taxInfo ? thisPlan.taxInfo.taxedPrice : thisPlan.price;
                 });
                 lazy(thisPlan, 'instantDiscount', () => {
                     const planDiscountInfo = plan[pro.UTQA_RES_INDEX_EXTRAS].insdis;
@@ -1204,6 +1229,27 @@ var pro = {
                     };
                 });
 
+                // Compose undiscounted pricing for a given duration: each full 12 months at the
+                // yearly plan's price, the remainder at the monthly plan's price. Falls back to
+                // months x monthly when no yearly plan exists, or when `ignoreYearlyBundle` is
+                // set (used when the yearly-vs-monthly savings should surface as a discount).
+                thisPlan.getComposedPricing = (months, ignoreYearlyBundle) => {
+                    const monthly = thisPlan.monthlyPlan || thisPlan;
+                    const yearly = !ignoreYearlyBundle && months >= 12
+                        ? thisPlan.yearlyPlan
+                        : false;
+                    const years = yearly ? Math.floor(months / 12) : 0;
+                    const extra = months - years * 12;
+                    const compose = (prop) => ((yearly && yearly[prop]) || 0) * years
+                        + monthly[prop] * extra;
+                    return {
+                        price: compose('price'),
+                        priceEuro: compose('priceEuro'),
+                        taxedPrice: compose('taxedPrice'),
+                        taxedPriceEuro: compose('taxedPriceEuro'),
+                    };
+                };
+
                 thisPlan.getPricing = (useMonthlyPrice, months) => {
                     let plan;
                     if (useMonthlyPrice === undefined) {
@@ -1247,21 +1293,43 @@ var pro = {
                     };
                 };
 
-                thisPlan.getInstantDiscountInfo = async() => {
-                    if (thisPlan.fullDiscountInfo !== undefined) {
-                        return thisPlan.fullDiscountInfo;
-                    }
-
+                thisPlan.getInstantDiscountInfo = async(countryCode, taxNumber, currencyCountry, state) => {
                     if (!thisPlan.instantDiscount) {
                         thisPlan.fullDiscountInfo = false;
                         return false;
                     }
 
+                    // Key by params so a Personal <-> Business tab switch (different tax context)
+                    // refetches instead of reusing the previous context's discount amounts.
+                    const cacheKey = `${countryCode || ''}:${taxNumber || ''}:${state || ''}:${currencyCountry || ''}`;
+                    if (thisPlan.fullDiscountInfoKey === cacheKey && thisPlan.fullDiscountInfo !== undefined) {
+                        return thisPlan.fullDiscountInfo;
+                    }
+
                     const discountInfo = thisPlan.instantDiscount;
 
-                    const result = await api.req({a: 'dci', dc: discountInfo.code, extra: true, v: 2}).catch(dump);
+                    // `cc` = user's selected billing country, `curcc` = IP currency country.
+                    // Server falls back to IP when curcc is omitted. `state` accompanies `tn` for
+                    // tax validation checks in state-scoped countries (US/CA).
+                    const payload = {a: 'dci', dc: discountInfo.code, extra: true, v: 2};
+                    if (countryCode) {
+                        payload.cc = countryCode;
+                    }
+                    if (currencyCountry) {
+                        payload.curcc = currencyCountry;
+                    }
+                    if (taxNumber !== undefined) {
+                        payload.tn = taxNumber;
+                    }
+                    if (state) {
+                        payload.state = state;
+                    }
+                    const result = await api.req(payload).catch(dump);
+
+                    thisPlan.fullDiscountInfoKey = cacheKey;
 
                     if (!result || (result < 0)) {
+                        thisPlan.fullDiscountInfo = false;
                         return false;
                     }
 
@@ -1577,31 +1645,22 @@ var pro = {
 
         // {"p": 574, "pn": 499, "mbp": 574, "mbpn": 499, "lp": 1088, "lpn": 946};
         else {
-            const {p, pn, lp, lpn} = planTaxInfo;
+            // divideAllBy100 is idempotent via its dividedBy100 flag, so repeated calls on the
+            // same planTaxInfo scale exactly once.
+            const {p, pn, lp, lpn} = type === 0 ? pro.divideAllBy100(planTaxInfo) : planTaxInfo;
 
             if (pn && p) {
-
                 const taxedPriceEuro = p;
                 const taxAmountEuro = taxedPriceEuro - pn;
                 const taxedPrice = lp || taxedPriceEuro;
                 const taxAmount = (lp - lpn) || taxAmountEuro;
 
-                if (type === 0) {
-                    taxInfoObj = pro.divideAllBy100({
-                        taxAmount,
-                        taxedPrice,
-                        taxAmountEuro,
-                        taxedPriceEuro,
-                    });
-                }
-                else {
-                    taxInfoObj = {
-                        taxAmount,
-                        taxedPrice,
-                        taxAmountEuro,
-                        taxedPriceEuro,
-                    };
-                }
+                taxInfoObj = {
+                    taxAmount,
+                    taxedPrice,
+                    taxAmountEuro,
+                    taxedPriceEuro,
+                };
             }
         }
 
@@ -1944,6 +2003,12 @@ lazy(pro, 'filter', () => {
             variableStorage:
                 new Set([
                     pro.ACCOUNT_LEVEL_PRO_FLEXI, pro.ACCOUNT_LEVEL_BUSINESS
+                ]),
+
+            // Plans that default to the Business use tab on propay when no prior selection.
+            defaultToBusinessUse:
+                new Set([
+                    pro.ACCOUNT_LEVEL_BUSINESS
                 ]),
 
             obqDialog:

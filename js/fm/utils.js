@@ -2297,63 +2297,46 @@ MegaUtils.prototype.getPersistentDataEntries = promisify(async function(resolve,
  * Will return Null if the requested countrycode does not exist.
  * @param {String} countryCode The countrycode of the country to get the name of
  * @returns {Null|String}.
+ * @deprecated
  */
 MegaUtils.prototype.getCountryName = function(countryCode) {
     'use strict';
 
-    if (!this._countries) {
-        this.getCountries();
-    }
-
-    // Get the stringid for the country code specified.
-    if (this._countries.hasOwnProperty(countryCode)) {
-        return this._countries[countryCode];
-    } else {
-        if (d) {
-            console.error('Error - getCountryName: unrecognizable country code: ' + countryCode);
-        }
-        return null;
-    }
+    return RegionsCollection.countries[countryCode] || '';
 };
 
 /**
  * Returns an object with all countryCodes:countryNames in the user set language.
  * @returns Object
+ * @deprecated
  */
 MegaUtils.prototype.getCountries = function() {
     'use strict';
 
-    if (!this._countries) {
-        this._countries = (new RegionsCollection()).countries;
-    }
-    return this._countries;
+    return RegionsCollection.countries;
 };
 
 /**
  * Returns an object with all the stateCodes:stateNames.
  * @returns Object
+ * @deprecated
  */
 MegaUtils.prototype.getStates = function() {
     'use strict';
 
-    if (!this._states) {
-        this._states = (new RegionsCollection()).states;
-    }
-    return this._states;
+    return RegionsCollection.states;
 };
 
 /**
  * Return a country call code for a given country
  * @param {String} isoCountryCode A two letter ISO country code e.g. NZ, AU
  * @returns {String} Returns the country international call code e.g. 64, 61
+ * @deprecated
  */
 MegaUtils.prototype.getCountryCallCode = function(isoCountryCode) {
     'use strict';
 
-    if (!this._countryCallCodes) {
-        this._countryCallCodes = (new RegionsCollection()).countryCallCodes;
-    }
-    return this._countryCallCodes[isoCountryCode];
+    return RegionsCollection.countryCallCodes[isoCountryCode];
 };
 
 /**
@@ -2367,16 +2350,9 @@ MegaUtils.prototype.getCountryCallCode = function(isoCountryCode) {
 MegaUtils.prototype.getNumberTrunkCode = function(countryCallCode, phoneNumber) {
     'use strict';
 
-    if (!this._countryTrunkCodes) {
-        this._countryTrunkCodes = new RegionsCollection().countryTrunkCodes;
-    }
-
-    let trunkCodes;
-    if (this._countryTrunkCodes.hasOwnProperty(countryCallCode)) {
-        trunkCodes = this._countryTrunkCodes[countryCallCode];
-        if (typeof trunkCodes === 'function') {
-            trunkCodes = trunkCodes(phoneNumber);
-        }
+    let trunkCodes = RegionsCollection.countryTrunkCodes[countryCallCode];
+    if (typeof trunkCodes === 'function') {
+        trunkCodes = trunkCodes(phoneNumber);
     }
 
     for (let trunkCode in trunkCodes) {

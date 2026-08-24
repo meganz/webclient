@@ -28,6 +28,29 @@
     margin-left: 10px;
 }
 
+.bus-reg-body .bus-reg-use-type-tab-mount {
+    margin-left: 10px;
+    margin-top: 24px;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--stroke-mid-grey);
+}
+.bus-reg-body .bus-reg-use-type-tab-mount .bus-reg-use-type-tab-group {
+    width: fit-content;
+    max-width: 100%;
+    background: transparent;
+}
+.bus-reg-body .bus-reg-use-type-tab-mount .bus-reg-use-type-tab-group .mega-tab-option {
+    flex: 0 1 auto;
+    white-space: normal;
+    text-align: center;
+    background: transparent;
+}
+.bus-reg-body .mobile .bus-reg-use-type-tab-mount .bus-reg-use-type-tab-group .mega-tab-option {
+    background: transparent;
+}
+.bus-reg-body .bus-reg-use-type-tab-mount .bus-reg-use-type-tab-group .mega-tab-option:hover {
+    background: transparent;
+}
 .bus-reg-info-block {
     width: 400px;
     margin-left: 10px;
@@ -466,6 +489,19 @@
 
     .bus-reg-featureBlock {
         width:100%;
+    }
+    .bus-reg-body .bus-reg-use-type-tab-mount {
+        margin-left: 0;
+        padding: 0;
+    }
+    .bus-reg-body .bus-reg-use-type-tab-mount .bus-reg-use-type-tab-group .mega-tab-option.mega-component {
+        padding: 12px;
+    }
+}
+
+@media only screen and (max-width: 450px) {
+    .bus-reg-body .bus-reg-use-type-tab-mount .bus-reg-use-type-tab-group .mega-tab-option.mega-component span.primary-text {
+        font-size: 13px;
     }
 }
 /* For business over due payment page */

@@ -84,15 +84,20 @@ RepayPage.prototype.initPage = function() {
     // If necessary attributes are not loaded, load them then comeback.
     if (!u_attr.pf && (!u_attr['%name'] || !u_attr['%email'])) {
 
+        // u_attr.taxnum arrives plain-text from ug; only decode when the value came from
+        // mega.attr.get (base64-encoded).
+        const hadTaxnum = !!(u_attr && u_attr.taxnum);
         Promise.allSettled([
             u_attr['%name'] || mega.attr.get(u_attr.b.bu, '%name', -1),
             u_attr['%email'] || mega.attr.get(u_attr.b.bu, '%email', -1),
-            u_attr['%taxnum'] || mega.attr.get(u_attr.b.bu, '%taxnum', -1),
+            u_attr.taxnum || mega.attr.get(u_attr.b.bu, '%taxnum', -1),
         ]).then(([{value: name}, {value: email}, {value: taxnum}]) => {
 
             name = u_attr['%name'] = name && from8(base64urldecode(name) || name) || '';
             email = u_attr['%email'] = email && from8(base64urldecode(email) || email) || u_attr.email;
-            u_attr['%taxnum'] = taxnum && from8(base64urldecode(taxnum) || taxnum) || '';
+            if (!hadTaxnum) {
+                u_attr.taxnum = taxnum && from8(base64urldecode(taxnum) || taxnum) || '';
+            }
 
             assert(name && email, `Invalid account state (${name}:${email})`);
 
@@ -144,7 +149,11 @@ RepayPage.prototype.initPage = function() {
         mySelf.planInfo.usedGatewayId = $selectedProvider.attr('prov-id');
         mySelf.planInfo.usedGateName = $selectedProvider.attr('gate-n');
 
-        addressDialog.init(mySelf.planInfo, mySelf.userInfo, new BusinessRegister());
+        const newBusinessRegister = new BusinessRegister();
+        newBusinessRegister.paymentGateways = mySelf.paymentGateways;
+        newBusinessRegister.planInfo = mySelf.planInfo;
+
+        addressDialog.init(mySelf.planInfo, mySelf.userInfo, newBusinessRegister);
         return false;
     });
 
@@ -222,6 +231,8 @@ RepayPage.prototype.initPage = function() {
             }
             return failureExit(l.no_payment_providers);
         }
+
+        mySelf.paymentGateways = list;
 
         let paymentGatewayToAdd = '';
         for (let k = 0; k < list.length; k++) {
@@ -525,6 +536,7 @@ RepayPage.prototype.initPage = function() {
                     mySelf.planInfo = plan;
                     mySelf.planInfo.pastInvoice = res.inv[0];
                     mySelf.planInfo.currInvoice = {et: res.et || 0, t: res.t};
+                    mySelf.planInfo.txcc = res.txcc || '';
                     mySelf.userInfo = {
                         fname: '',
                         lname: '',

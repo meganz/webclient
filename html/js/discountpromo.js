@@ -114,12 +114,27 @@ class DiscountPromo {
         mega.discountCode = mega.discountCode || res.dc;
     }
 
-    static async refreshDiscountInfo() {
+    static async refreshDiscountInfo(countryCode, taxNumber, currencyCountry, state) {
         const dc = mega.discountCode || mega.discountInfo && mega.discountInfo.dc;
         if (!mega.discountInfo || !dc) {
             return false;
         }
-        const { result } = await api.req({a: 'dci', v: 2, dc, su: mega.shortUrl, extra: true}).catch(dump) || {};
+        // `cc` = user's selected billing country, `curcc` = IP currency country. Server falls
+        // back to IP when curcc is omitted. `state` accompanies `tn` for tax validation checks.
+        const payload = {a: 'dci', v: 2, dc, su: mega.shortUrl, extra: true};
+        if (countryCode) {
+            payload.cc = countryCode;
+        }
+        if (currencyCountry) {
+            payload.curcc = currencyCountry;
+        }
+        if (taxNumber !== undefined) {
+            payload.tn = taxNumber;
+        }
+        if (state) {
+            payload.state = state;
+        }
+        const { result } = await api.req(payload).catch(dump) || {};
         if (result && result.al && result.pd) {
             DiscountPromo.storeDiscountInfo(result);
             if (!pro.propay.isNewAccount && mega.discountInfo && pro.propay.discountInfo) {

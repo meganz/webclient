@@ -2241,8 +2241,10 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/proplan.js', n: 'proplan_js', j:1});
     jsl.push({f:'html/js/planpricing.js', n: 'planpricing_js', j:1});
     jsl.push({f:'html/js/propay.js', n: 'propay_js', j:1});
+    jsl.push({f:'html/js/propay-utils.js', n: 'propay_utils_js', j:1});
     jsl.push({f:'html/js/propay-signup.js', n: 'propay_signup_js', j:1});
     jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
+    jsl.push({f:'html/js/propay-billing.js', n: 'propay_billing_js', j:1});
     jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
 
     // Plan pages for features
@@ -2346,6 +2348,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/checkbox-group.js', n: 'checkbox_select_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/radial.js', n: 'radial_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/tooltip.js', n: 'tooltip_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/tabgroup.js', n: 'tabgroup_js', j: 1, w: 1});
+    jsl.push({f:'css/components/tabgroup.css', n: 'tabgroup_css', j: 2, w: 5});
 
     jsl.push({f:'js/vendor/megaDynamicList.js', n: 'mega_dynamic_list_js', j:1, w:5});
 
@@ -2499,8 +2503,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/components/meganz/top-menu.css', n:'top_menu_css', j:2, w:1});
         jsl.push({f:'js/ui/components/flyoutMenu.js', n: 'flyoutmenu_js', j: 1, w:1});
         jsl.push({f:'css/components/flyoutMenu.css', n: 'flyoutmenu_css', j:2,w:5});
-        jsl.push({f:'js/ui/components/tabgroup.js', n: 'tabgroup_js', j: 1, w:1});
-        jsl.push({f:'css/components/tabgroup.css', n: 'tabgroup_css', j:2,w:5});
         jsl.push({f:'js/ui/components/chatitem.js', n: 'chatitem_js', j: 1, w:1});
         jsl.push({f:'css/components/chatitem.css', n: 'chatitem_css', j:2,w:5});
         jsl.push({f:'css/components/meganz/fm-context-menu.css', n: 'fm_context_menu_css', j:2,w:5});

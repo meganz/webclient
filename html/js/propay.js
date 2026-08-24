@@ -3,6 +3,7 @@ pro.propay = {
     DEFAULT_DURATION: 12,
 
     BITCOIN_GATE_ID: 4,
+    ASTROPAY_GATE_ID: 11,
 
     $page: null,
     $continueButton: null,
@@ -12,6 +13,7 @@ pro.propay = {
     planObj: null,
     proBalance: 0,
     selectedProPackage: null,
+    pageInitialised: false,
 
     paymentGateways: {
         primary: null,
@@ -20,6 +22,11 @@ pro.propay = {
     },
 
     gateSupportsTrial: false,
+
+    // Set true when the user clicks Continue while the selected gateway's `countries`
+    // list excludes the billing country. Escalates the warning to an error and disables
+    // the Continue button; cleared when the user changes country or gateway.
+    countryMismatchAttempted: false,
 
     pageInfo: {
         'initialized': false,
@@ -34,13 +41,14 @@ pro.propay = {
 
     loadingPage: false,
 
-    cachedGateways: Object.create(null),
-
     switchers: Object.create(null),
 
     savedCard: false,
 
     paymentButtons: new Set(['stripeGP', 'stripeAP']),
+
+    // Account levels the user accepted "no trial" on this session; cleared on full reload.
+    ignoreTrial: new Set(),
 
     paymentButton: false,
 
@@ -51,7 +59,9 @@ pro.propay = {
     trial: 1,
 
     usingBalance: false,    // User has not entered into voucher flow, only sees balance
+    balanceWasSufficient: false,  // Sticky: true if useBalance() ever held this session.
     balanceStringForDropdown: false,    // Dropdown filled out with the string balance instead of voucher
+    userOnPropayPage: null,
 
     paymentType: null,
 
@@ -69,7 +79,6 @@ pro.propay = {
     gatewayElmsByName: {
         'stripe': '.payment-stripe-dialog',
         'bitcoin': '.bitcoin-invoice-dialog',
-        'astropay': '.astropay-dialog',
     },
 
     getGatewayElement(currentGatewayName) {
@@ -107,7 +116,6 @@ pro.propay = {
         return this.currentGateway && this.currentGateway.gatewayId === 0;
     },
 
-
     // TODO: This value should be dynamic once fully implemented in API
     requiresBillingAddress: {
         19: true,
@@ -128,7 +136,17 @@ pro.propay = {
 
     onPropayPage() {
         'use strict';
-        return page.includes('propay');
+        if (pro.propay.userOnPropayPage !== null) {
+            return pro.propay.userOnPropayPage;
+        }
+
+        pro.propay.userOnPropayPage = page.includes('propay');
+
+        mBroadcaster.once('pagechange', () => {
+            pro.propay.userOnPropayPage = null;
+        });
+
+        return pro.propay.userOnPropayPage;
     },
 
     initSwitchers() {
@@ -176,6 +194,7 @@ pro.propay = {
 
         reasons = reasons || this.blockFlow();
         $('.error', this.$page).removeClass('error');
+        pro.propay.billing.showErrors();
 
         if (reasons === true) {
             return false;
@@ -245,28 +264,6 @@ pro.propay = {
 
         const currentGateway = this.currentGateway && this.currentGateway.gatewayId;
 
-        if (this.requiresBilling()) {
-            if (!addressDialog.validInputs || !addressDialog.mostRecentValidInput) {
-                addressDialog.validateAndPay(false, true);
-            }
-            if (addressDialog.validInputs === null) {
-                reasons.addressNeeded = 1;
-            }
-            else if (addressDialog.validInputs === false) {
-                reasons.addressInvalid = 1;
-            }
-            else if (currentGateway === this.BITCOIN_GATE_ID && addressDialog.validDob === false) {
-                reasons.dobNeeded = 1;
-            }
-
-            if (this.currentGateway
-                && this.currentGateway.gatewayId === this.BITCOIN_GATE_ID
-                && !addressDialog.validDob) {
-
-                reasons.addressInvalid = 1;
-            }
-        }
-
         if (window.s4ac && this.s4Active && !this.s4TosAccepted) {
             reasons.s4TosNeeded = 1;
         }
@@ -289,38 +286,6 @@ pro.propay = {
         }
 
         return Object.keys(reasons).length && reasons;
-    },
-
-    getTempGate() {
-        'use strict';
-
-        const key = this.planObj.id + '_' + this.currentGatewayName;
-        const gateways = localStorage.cachedGateways
-            ? JSON.parse(localStorage.cachedGateways)
-            : {};
-
-        if (gateways[key]) {
-            return gateways[key];
-        }
-        return false;
-    },
-
-    setTempGate(data) {
-        'use strict';
-
-        if (this.getTempGate()) {
-            return this.getTempGate();
-        }
-
-
-        const key = this.planObj.id + '_' + this.currentGatewayName;
-        const gateways = localStorage.cachedGateways
-            ? JSON.parse(localStorage.cachedGateways)
-            : {};
-
-        gateways[key] = data;
-        localStorage.cachedGateways = JSON.stringify(gateways);
-        return gateways[key];
     },
 
     getPageType() {
@@ -415,19 +380,6 @@ pro.propay = {
         return selectedPeriod;
     },
 
-    requiresBilling() {
-        'use strict';
-
-        if (!this.currentGateway) {
-            return false;
-        }
-        if (!this.requiresBillingAddress[this.currentGateway.gatewayId]) {
-            return false;
-        }
-
-        return this.currentGateway.requireBilling !== false;
-    },
-
     updatePageInfo() {
         'use strict';
 
@@ -436,9 +388,9 @@ pro.propay = {
         const gatewayId = this.currentGateway && this.currentGateway.gatewayId;
 
         this.paymentButton = this.currentGateway
+            && pro.propay.billing.canProceedToPayment
             && this.paymentButtons.has(this.currentGateway.gatewayName)
             && this.currentGateway.gatewayName;
-
 
         const state = this.shouldShowTrial()
             ? 'trial'
@@ -446,11 +398,27 @@ pro.propay = {
 
         this.switchers.recurring.showElement(state);
 
+        // Legal text shows only when the Continue button actually completes / redirects payment
+        // (Subscribe, Buy with Apple Pay, ecp/astropay/bitcoin redirect, voucher) - not during
+        // the Stripe "Continue to payment" intermediate step.
+        const concurrentBilling = this.currentGateway
+            && pro.propay.billing.showsBillingConcurrently(this.currentGateway.gatewayName);
+        const intermediateStep = this.currentGateway
+            && !this.paymentButton
+            && pro.propay.billing.requiresSecondaryStage(this.currentGateway.gatewayId)
+            && !pro.propay.billing.canProceedToPayment
+            && !concurrentBilling;
+        $('footer .subscription-info', this.$page)
+            .toggleClass('hidden', !this.currentGateway)
+            .toggleClass('legal-hidden', !!intermediateStep);
+        $('.billing-section', this.$page).toggleClass('no-border-bottom', !this.currentGateway);
+
         const $oneTimeInfo = $('footer div.one-time', this.$page);
         const $recurringInfo = $('footer div.recurring', this.$page);
         const $trialInfo = $('footer div.trial', this.$page);
-
-        $('.billing-address', this.$page).toggleClass('hidden', !this.requiresBilling());
+        // pro_for_duration message now renders at the bottom of the plan card instead of
+        // the left-block footer; the footer .one-time wrapper stays empty for the switcher.
+        const $proForDuration = $('.right-block .pro-for-duration', this.$page);
 
         if (state === 'trial') {
             $('span.trial-duration', $trialInfo)
@@ -466,6 +434,13 @@ pro.propay = {
         else {
             $('span.plan-name', $oneTimeInfo).text(this.planObj.name);
             $('span.plan-duration', $oneTimeInfo)
+                .text(this.getNumOfMonthsWording((this.discountInfo && this.discountInfo.m) || this.planObj.months));
+        }
+
+        $proForDuration.toggleClass('hidden', state !== 'one-time');
+        if (state === 'one-time') {
+            $('span.plan-name', $proForDuration).text(this.planObj.name);
+            $('span.plan-duration', $proForDuration)
                 .text(this.getNumOfMonthsWording((this.discountInfo && this.discountInfo.m) || this.planObj.months));
         }
 
@@ -491,10 +466,12 @@ pro.propay = {
             this.trial = this.shouldShowTrial();
         }
 
-        this.updateS4Continue();
+        this.updateContinueDisabled();
 
         const hideWarning = (!!this.shouldShowTrial() === !!this.planObj.trial) || !!pro.propay.discountInfo;
         $('.free-trial-unsupported', this.$page).toggleClass('hidden', hideWarning);
+
+        this.updateCountryMismatchWarning();
 
         this.renderLocaleInfo(this.isVoucherBalance());
     },
@@ -508,6 +485,8 @@ pro.propay = {
         'use strict';
 
         this.sca = utcResult.sca ? {utcResult, saleId} : false;
+
+        pro.propay.billing.attempts = null;
 
         const welDlgAttr =
             parseInt(await Promise.resolve(mega.attr.get(u_handle, 'welDlg', -2, true)).catch(nop)) | 0;
@@ -535,6 +514,7 @@ pro.propay = {
             case bitcoinDialog.gatewayId:
                 if (typeof utcResult.EUR === 'object' && utcResult.EUR.url) {
                     bitcoinDialog.storeUtcResult(utcResult);
+                    bitcoinDialog.redirectToSite();
                 }
                 else {
                     bitcoinDialog.processUtcResult(utcResult);
@@ -587,50 +567,6 @@ pro.propay = {
                 }
                 break;
         }
-    },
-
-    isUtcCached() {
-        'use strict';
-
-        return false;
-
-        const key = this.planObj.id + '_' + this.currentGatewayName;
-        const gateways = localStorage.cachedUtc
-            ? JSON.parse(localStorage.cachedUtc)
-            : {};
-
-        if (gateways[key]) {
-            return gateways[key];
-        }
-        return false;
-    },
-
-    getCachedUtcRequest() {
-        'use strict';
-
-        if (this.isUtcCached()) {
-            return this.isUtcCached();
-        }
-    },
-
-    setCachedUtcRequest(data) {
-        'use strict';
-
-        const key = this.planObj.id + '_' + this.currentGatewayName;
-
-        if (this.currentGatewayName.toLowerCase() === 'bitcoin') {
-            setTimeout(() => {
-                delete localStorage.cachedUtc[key];
-            }, 1000 * 60 * 10);
-        }
-
-        const gateways = localStorage.cachedUtc
-            ? JSON.parse(localStorage.cachedUtc)
-            : {};
-
-        gateways[key] = data;
-        localStorage.cachedUtc = JSON.stringify(gateways);
-        return gateways[key];
     },
 
     sendPurchaseToApi(paymentTypeId) {
@@ -715,8 +651,20 @@ pro.propay = {
             p: price,
             c: currency,
             bq: fromBandwidthDialog,
-            pbq: fromPreWarnBandwidthDialog
+            pbq: fromPreWarnBandwidthDialog,
+            b2b: pro.propay.billing.isBusinessUse ? 1 : 0,
+            tn: pro.propay.billing.getTaxNumberForApiReq(),
+            iso: pro.propay.billing.country,
+            cc: pro.propay.billing.country,
+            inv: ['business', 'invoice'].includes(pro.propay.billing.getBillingType()) ? 1 : 0,
         };
+
+        // State is stored as `${country}-${state}` (e.g. "US-CA") - send just the state code,
+        // matching the format used in the `utc` extra payload.
+        const billingState = pro.propay.billing.state;
+        if (billingState) {
+            utsRequest.state = billingState.split('-')[1] || billingState;
+        }
 
         if (mega.uaoref) {
             utsRequest.uao = escapeHTML(mega.uaoref);
@@ -745,6 +693,11 @@ pro.propay = {
 
         const setValues = (extra, saleId) => {
 
+            const enteredBillingInfo = pro.propay.billing.getEnteredBillingInfo();
+
+            // Baseline for every gateway; gateway-specific overrides below still win.
+            Object.assign(extra, pro.propay.billing.getExtraForApi());
+
             if (this.proPaymentMethod === 'voucher' || this.proPaymentMethod === 'pro_prepaid') {
                 pro.lastPaymentProviderId = 0;
             }
@@ -753,6 +706,7 @@ pro.propay = {
                 Object.assign(extra, addressDialog.extraDetails);
                 extra.pm = this.currentGateway.gatewayName;
                 extra.recurring = false;
+                extra.dob = enteredBillingInfo.dateOfBirth;
             }
             else if (this.proPaymentMethod === 'perfunctio') {
                 pro.lastPaymentProviderId = 8;
@@ -791,10 +745,7 @@ pro.propay = {
                 extra.city = astroPayDialog.city;
                 extra.cpf = astroPayDialog.taxNumber;
                 extra.phone = astroPayDialog.phoneNumber;
-                // India PIN code (6 digits) - only collected when country is India
-                if (astroPayDialog.postcode) {
-                    extra.postcode = astroPayDialog.postcode;
-                }
+                extra.country = pro.propay.billing.country;
             }
 
             // If Ecomprocessing, send extra details
@@ -825,20 +776,8 @@ pro.propay = {
             return true;
         };
 
-        const temp = this.getTempGate();
-
-        if (this.getCachedUtcRequest() && temp) {
-            console.error('Cached UTC request found.');
-            setValues({}, temp.result);
-            this.processUtcResults(this.getCachedUtcRequest(), temp.result);
-            return;
-        }
-
         // Setup the 'uts' API request
-        (temp
-            ? Promise.resolve({result: temp})
-            : api.screq(utsRequest)
-        )
+        api.screq(utsRequest)
             .then(({result: saleId}) => {
 
                 if (!this.currentGateway || (this.currentGateway.gatewayId !== paymentTypeId)) {
@@ -848,7 +787,6 @@ pro.propay = {
                     return;
                 }
 
-                // this.setTempGate({result: saleId});
                 if (saleId.result) {
                     saleId = saleId.result;
                 }
@@ -863,18 +801,39 @@ pro.propay = {
                 // If saleId is already an array of sale IDs use that, otherwise add to an array
                 const saleIdArray = Array.isArray(saleId) ? saleId : [saleId];
 
+                extra.taxCode = pro.propay.billing.getTaxNumberForApiReq();
+
+                // Server reads taxCode/country/state from extra; top-level cc/state stays for back-compat.
+                const {country: billingCountry, state: rawState} = pro.propay.billing;
+                if (billingCountry) {
+                    extra.country = billingCountry;
+                }
+                const strippedState = typeof rawState === 'string' && rawState.split('-')[1];
+                const {countriesWithStates} = RegionsCollection;
+                const stateValid = strippedState && countriesWithStates
+                    && countriesWithStates[billingCountry]
+                    && countriesWithStates[billingCountry].includes(strippedState);
+                if (stateValid) {
+                    extra.state = strippedState;
+                }
+
                 // Complete the transaction
                 const utcReqObj = {
                     a: 'utc',                       // User Transaction Complete
                     s: saleIdArray,                 // Array of Sale IDs
                     m: pro.lastPaymentProviderId,   // Gateway number
                     bq: fromBandwidthDialog,        // Log for bandwidth quota triggered
-                    extra                           // Extra information for the specific gateway
+                    extra,                           // Extra information for the specific gateway
+                    cc: billingCountry,
                 };
 
                 const discountInfo = pro.propay.getDiscount();
                 if (discountInfo && discountInfo.dc) {
                     utcReqObj.dc = discountInfo.dc;
+                }
+
+                if (stateValid) {
+                    utcReqObj.state = strippedState;
                 }
 
                 return api.screq(utcReqObj).then(({result}) => {
@@ -891,7 +850,6 @@ pro.propay = {
                         addressDialog.closeStripeWidget();
                         return;
                     }
-                    this.setCachedUtcRequest(result);
                     this.processUtcResults(result, saleId).then(() => {
                         const shouldEndLoading = [
                             bitcoinDialog.gatewayId,
@@ -1027,7 +985,7 @@ pro.propay = {
 
         const trialExpected = !sessionStorage[`noTrial${pro.propay.planNum}`] && !pro.propay.discountInfo;
 
-        return !pro.propay.ignoreTrial
+        return !pro.propay.ignoreTrial.has(pro.propay.planNum)
             && !pro.filter.simple.validPurchases.has(pro.propay.planNum)
             && (!pro.propay.trial && trialExpected)
             && !blockerText
@@ -1630,8 +1588,14 @@ pro.propay = {
         return this.planObj && (this.planObj.months === 1 ? this.planObj : pro.getPlanObj(this.planObj.level, 1));
     },
 
-    renderPlanInfo() {
+    renderPlanInfo(reloadedPlans) {
         'use strict';
+
+        if (reloadedPlans) {
+            this.planObj = reloadedPlans === true
+                ? pro.getPlanObj(this.planObj.level, this.planObj.months)
+                : reloadedPlans;
+        }
 
         const isEuro = (this.planObj.currency === 'EUR') || this.isVoucherBalance();
 
@@ -1640,8 +1604,16 @@ pro.propay = {
 
         let $trialSection;
 
-        this.pageInfo.$planCard = (planCardInitialized && this.pageInfo.$planCard)
-            || mega.templates.getTemplate('propay-page-plan-card-tmplt', false, this.pageInfo.$templates);
+        this.pageInfo.$planCard = planCardInitialized && this.pageInfo.$planCard
+        || mega.templates.getTemplate('propay-page-plan-card-tmplt', false, this.pageInfo.$templates);
+
+        if (!planCardInitialized) {
+            $('.plan-card', this.pageInfo.$rightBlock).remove(); // In case there is a card present from another session
+            this.pageInfo.$rightBlock.safeAppend(this.pageInfo.$planCard.prop('outerHTML'));
+            this.pageInfo.$planCard = $('.plan-card', this.pageInfo.$rightBlock);
+        }
+
+        this.renderDurations();
 
         this.pageInfo.$planCard.addClass('fixed');
 
@@ -1797,8 +1769,7 @@ pro.propay = {
 
         const isRecurring = !this.currentGateway || !!this.currentGateway.supportsRecurring;
 
-        $('.pricing-element .duration-type', $planCard)
-            .text(this.getNumOfMonthsWording(this.planObj.months, true));
+        const $durationPricingElement = $('.pricing-element.duration', $planCard).addClass('hidden');
 
         $('.pricing-element .price', $planCard).safeHTML(priceText);
 
@@ -1817,34 +1788,34 @@ pro.propay = {
         let monthlyPlan = this.getMonthlyPlan();
         const {months} = this.planObj;
 
+        let discountInfoForBase = this.getDiscount();
+        if (!discountInfoForBase && this.anyPlanOfLevelDiscounted) {
+            discountInfoForBase = this.planObj.yearlyDiscountInfo;
+        }
+        const baseDuration = discountInfoForBase
+            && (discountInfoForBase.m || discountInfoForBase.md || this.planObj.months)
+            || months;
+        const yearlyPlanForBase = this.planObj.yearlyPlan;
+        // Surface yearly-vs-monthly savings as part of the discount when the promo doesn't already
+        // represent it (e.g. instant discount on 12m plan) - base off monthly * months.
+        const useYearlyDiscount = !!discountInfoForBase
+            && baseDuration % 12 === 0
+            && !discountInfoForBase.isYearlyDiscount
+            && yearlyPlanForBase && yearlyPlanForBase.hasYearlyDiscount;
+
         if (this.planObj.taxInfo) {
             if (!monthlyPlan || !monthlyPlan.taxInfo) {
                 monthlyPlan = false;
             }
 
             let localTaxAmount;
-
-            const {price, priceEuro, taxedPrice, taxedPriceEuro} = this.planObj.getPricing(true, 1);
             let localNet = forceEuro ? this.planObj.priceEuro : this.planObj.price;
             let localTotal = forceEuro ? this.planObj.taxedPriceEuro : this.planObj.taxedPrice;
 
-            if (this.anyPlanOfLevelDiscounted) {
-                localNet = forceEuro ? priceEuro : price * months;
-                localTotal = forceEuro ? taxedPriceEuro : taxedPrice * months;
-                if (monthlyPlan) {
-                    const {taxAmount, taxAmountEur} = monthlyPlan.taxInfo;
-                    localTaxAmount = ((!forceEuro && taxAmount) || taxAmountEur) * months;
-                }
-                else {
-                    const {taxAmount, taxAmountEur} = this.planObj.taxInfo;
-                    localTaxAmount = ((!forceEuro && taxAmount) || taxAmountEur);
-                }
-            }
-            else if (this.discountInfo) {
-                const discountDuration = this.discountInfo.m || this.planObj.months;
-                const basePricing = this.planObj.getPricing(true, discountDuration);
-                localNet = forceEuro ? basePricing.priceEuro : basePricing.price;
-                localTotal = forceEuro ? basePricing.taxedPriceEuro : basePricing.taxedPrice;
+            if (this.anyPlanOfLevelDiscounted || discountInfoForBase) {
+                const composed = this.planObj.getComposedPricing(baseDuration, useYearlyDiscount);
+                localNet = forceEuro ? composed.priceEuro : composed.price;
+                localTotal = forceEuro ? composed.taxedPriceEuro : composed.taxedPrice;
                 localTaxAmount = localTotal - localNet;
             }
 
@@ -1860,7 +1831,7 @@ pro.propay = {
 
             $('.tax-amount-descr', $taxInfo)
                 .text(l.tax_name_percentage
-                    .replace('%1', pro.taxInfo.taxName)
+                    .replace('%1', getTaxName(pro.propay.billing.country))
                     .replace('%2', formatPercentage(pro.taxInfo.taxPercent)));
 
             $('.tax-amount-value', $taxInfo).text(taxAmountText + getCurrencyText(!forceEuro && this.planObj.currency));
@@ -1888,20 +1859,18 @@ pro.propay = {
             let {lda, eda} = discountInfo;
             const {ldtp, edtp} = discountInfo;
 
-            if (monthlyPlan) {
-                const basePricing = this.planObj.getPricing(true, discountDuration);
+            const base = monthlyPlan
+                ? this.planObj.getComposedPricing(discountDuration, useYearlyDiscount)
+                : false;
 
-                if (monthlyPlan.taxInfo) {
-                    lda = basePricing.taxedPrice - ldtp;
-                    eda = basePricing.taxedPriceEuro - edtp;
-                }
-                else {
-                    lda = basePricing.price - ldtp;
-                    eda = basePricing.priceEuro - edtp;
-                }
+            if (base) {
+                // Follow monthlyPlan's tax context (matches develop's monthlyPlan.taxInfo gate).
+                const hasTax = !!(monthlyPlan && monthlyPlan.taxInfo);
+                lda = (hasTax ? base.taxedPrice : base.price) - ldtp;
+                eda = (hasTax ? base.taxedPriceEuro : base.priceEuro) - edtp;
             }
 
-            $('.pricing-element .duration-type', $planCard)
+            $('.duration-type', $durationPricingElement.removeClass('hidden'))
                 .text(this.getNumOfMonthsWording(discountDuration, true));
 
             $('.plan-info .transfer', $planCard)
@@ -1912,13 +1881,6 @@ pro.propay = {
             const $discountAmount = $('.discount-amount', $planCard).toggleClass('hidden', !localDiscountAmount);
 
             if (localDiscountAmount) {
-
-                // If the discount is for a yearly discount already, do not apply it again
-                const useYearlyDiscount =
-                    discountDuration % 12 === 0
-                    && !discountInfo.isYearlyDiscount
-                    && this.planObj.yearlyPlan.hasYearlyDiscount;
-
                 $('.discount-amount-descr', $discountAmount)
                     .text(l.discount_save_amount.replace('%1', formatPercentage(pro.calculateSavings([
                         discountInfo.pd,
@@ -1930,12 +1892,12 @@ pro.propay = {
                         + getCurrencyText(!forceEuro && this.planObj.currency));
             }
 
-            if (!this.planObj.taxInfo) {
+            if (!this.planObj.taxInfo && base) {
                 $preDiscount.removeClass('hidden');
 
-                const basePricing = this.planObj.getPricing(true, discountDuration);
+                const basePrice = forceEuro ? base.priceEuro : base.price;
                 const preTaxPrice = formatCurrency(
-                    forceEuro ? basePricing.priceEuro : basePricing.price,
+                    basePrice,
                     forceEuro ? 'EUR' : this.planObj.currency,
                     'narrowSymbol'
                 );
@@ -1981,7 +1943,8 @@ pro.propay = {
 
             const months = this.discountInfo.m || this.planObj.months;
 
-            let {price, priceEuro, taxedPrice, taxedPriceEuro} = this.planObj.getPricing(true, months);
+            let {price, priceEuro, taxedPrice, taxedPriceEuro} =
+                this.planObj.getComposedPricing(months, useYearlyDiscount);
 
             if (!showTaxInfo) {
                 ldtpn = ldtp;
@@ -2073,12 +2036,39 @@ pro.propay = {
             $('.discount', $planCard).addClass('hidden');
         }
 
-        if (!planCardInitialized) {
-            $('.plan-card', this.pageInfo.$rightBlock).remove(); // In case there is a card present from another session
-            this.pageInfo.$rightBlock.safeAppend($planCard.prop('outerHTML'));
-            this.pageInfo.$planCard = $('.plan-card', this.pageInfo.$rightBlock);
-        }
+        // Multi-discount recurring offers renew at the non-promo price; surface that to the
+        // user as an info banner under the Payment method dropdown.
+        const $promoEndsInfo = $('.promo-ends-info', this.pageInfo.$leftBlock);
+        const showPromoEnds = this.discountInfo
+            && this.discountInfo.md
+            && this.discountInfo.pd
+            && isRecurring;
+        if (showPromoEnds) {
+            const discountMonths = this.discountInfo.m;
+            const discountRenewalDuration = discountMonths % 12 === 0 ? 12 : 1;
 
+            const renewDate = new Date();
+            renewDate.setMonth(renewDate.getMonth() + discountMonths);
+
+            // Either signal indicates the user's country has tax; plan-level can be unset early.
+            const taxSuffix = (this.planObj.taxInfo || pro.taxInfo) ? '_tma' : '';
+            const showEuro = this.planObj.currency === 'EUR' || this.isVoucherBalance();
+
+            const text = (discountRenewalDuration === 12
+                ? l[`discounted_price_years${taxSuffix}`]
+                : l[`discounted_price_months${taxSuffix}`])
+                .replace('%1', renewDate.toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                }))
+                .replace('%2', pro.getPlanObj(this.discountInfo.al, discountRenewalDuration)
+                    .getFormattedPrice('narrowSymbol', showEuro, false) + (showEuro ? '' : '*'))
+                .replace('%3', (pro.taxInfo || Object.create(null)).taxName);
+
+            $('.promo-info-txt', $promoEndsInfo).text(text);
+        }
+        $promoEndsInfo.toggleClass('hidden', !showPromoEnds);
     },
 
     /**
@@ -2103,254 +2093,193 @@ pro.propay = {
     renderDurations() {
         'use strict';
 
-        const $containedRadioTemplate = mega.templates
-            .getTemplate('propay-contained-radio', false, this.pageInfo.$templates);
+        const $planCard = $('.plan-card', this.pageInfo.$rightBlock);
 
-        const isRecurring = !this.currentGateway || !!this.currentGateway.supportsRecurring;
-
-        this.pageInfo.$durationOptionsWrapper.empty();
-
-        let discountMonths;
-        let discountRenewalDuration;
-
-        delete this.blockedByMinAmount;
-        delete this.blockedByYearlyOnly;
-        delete this.blockedByMonthlyOnly;
-
-        let warning;
-
-        const $promoEndsInfo = $('.promo-ends-info', this.pageInfo.$leftBlock);
-        if (this.discountInfo && this.discountInfo.md && this.discountInfo.pd) {
-            discountMonths = this.discountInfo.m;
-            discountRenewalDuration = discountMonths % 12 === 0 ? 12 : 1;
-
-            const date = new Date();
-            date.setMonth(date.getMonth() + discountMonths);
-
-            const planTaxInfo = this.planObj.taxInfo;
-            const stringSelectorAddition = planTaxInfo ? '_tma' : '';
-
-            const showEuro = this.planObj.currency === 'EUR' || this.isVoucherBalance();
-
-            const text = (discountRenewalDuration === 12
-                ? l['discounted_price_years' + stringSelectorAddition]
-                : l['discounted_price_months' + stringSelectorAddition])
-                .replace('%1', date.toLocaleDateString(undefined, {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                }))
-                .replace('%2', pro.getPlanObj(this.discountInfo.al, discountRenewalDuration)
-                    .getFormattedPrice('narrowSymbol', showEuro, false) + (showEuro ? '' : '*'))
-                .replace('%3', (pro.taxInfo || Object.create(null)).taxName);
-
-            $('.promo-info-txt', $promoEndsInfo).text(text);
+        if (!$planCard || !$planCard.length) {
+            console.error('Plan card not found');
+            return;
         }
 
-        /**
-         * Indicating the best option to save money on
-         */
-        const biggestSaveOption = [0, 0];
-        let {durationOptions} = this.planObj;
+        const $durationOptionsWrapper = $('.duration-options-wrapper', $planCard).addClass('hidden');
 
-        durationOptions = durationOptions.filter(([,,,,months]) => months >= this.initialDuration);
+        if (this.discountInfo || this.anyPlanOfLevelDiscounted) {
+            return false;
+        }
 
-        const appendDurationOption = ([,al,,,months]) => {
-            if (discountMonths === months) {
-                return; // No need to render, it's taken care of in Discount section
+        $('.duration-option:not(.template)', $durationOptionsWrapper).remove();
+
+        const REASON = pro.propay.bfDurationWarning;
+
+        const validateDuration = (planObj) => {
+            const gateway = this.currentGateway;
+            const duration = planObj.months;
+            const allowWarning = REASON.ONE_OFF; // Show warning but still allow duration to be selected
+            if (!gateway) {
+                return {isValid: true, reason: allowWarning};
             }
 
-            const perMonth = months === 1;
-            const plan = pro.getPlanObj(al, months);
+            const strings = pro.propay.warningStrings;
+            let warning = '';
+            let reason = allowWarning;
 
-            const $radio = $containedRadioTemplate.clone()
-                .removeClass('hidden template')
-                .addClass('duration-option')
-                .attr('duration', months);
-
-            $('.duration-head .duration-type', $radio)
-                .text(isRecurring
-                    ? this.getRecurringDurationWording(months)
-                    : this.getNumOfMonthsWording(months));
-
-            if (!perMonth && isRecurring) {
-                $('.monthly-price', $radio).text(pro.propay.getTxtString(plan, 1, l.per_month)).removeClass('hidden');
+            if (!gateway.supportsMonthlyPayment && duration === 1) {
+                warning = strings.yearlyOnly;
+                reason |= REASON.YEARLY_ONLY;
+            }
+            else if (!gateway.supportsAnnualPayment && duration === 12) {
+                warning = strings.monthlyOnly;
+                reason |= REASON.MONTHLY_ONLY;
+            }
+            else if (gateway.minimumEURAmountSupported > planObj.priceEuro) {
+                warning = strings.minAmount;
+                reason |= REASON.MIN_AMOUNT;
             }
 
-            if (discountRenewalDuration) {
-                $radio.addClass('disabled');
-            }
-            else if (months === this.selectedPeriod) {
-                $('.radio-item', $radio).removeClass('radioOff').addClass('radioOn');
-                $radio.addClass('selected');
-            }
-
-            if (!perMonth && !this.blockedByMonthlyOnly) {
-                const monthPlan = pro.getPlanObj(plan.level, 1);
-
-                const getSavings = () => {
-                    let amount;
-                    let label;
-
-                    if (isRecurring) {
-                        if (plan.saveUpTo > 0 && monthPlan.price * 12 > plan.price) {
-                            amount = plan.saveUpTo;
-                            label = l.yearly_plan_saving.replace('%1', amount);
-                        }
-                    }
-                    else if (this.isVoucherBalance()) {
-                        amount = monthPlan.priceEuro * months - plan.priceEuro;
-                        label = l[16649]
-                            .replace('10.00', formatCurrency(amount, 'EUR'));
-                    }
-                    else {
-                        amount = monthPlan.price * months - plan.price;
-                        label = l[16649]
-                            .replace('10.00', formatCurrency(amount, plan.currency));
-                    }
-
-                    if (amount > biggestSaveOption[0]) {
-                        biggestSaveOption[0] = amount;
-                        biggestSaveOption[1] = months;
-                    }
-
-                    return label;
+            if (!gateway.supportsRecurring && !warning) {
+                if (gateway.gatewayId === 0) {
+                    warning = this.usingBalance ? strings.balance : strings.voucher;
                 }
-
-                const savingsAmount = getSavings();
-
-                if (savingsAmount) {
-                    $('.duration-head .duration-savings', $radio)
-                        .safeAppend(savingsAmount)
-                        .removeClass('hidden');
+                else {
+                    warning = strings.oneOffGeneric.replace('%1', gateway.displayName || gateway.gatewayName);
                 }
+                reason |= REASON.ONE_OFF;
             }
 
-            $('.yearly-price', $radio)
-                .text(pro.propay.getTxtString(plan, months, isRecurring ? false : '%1'))
-                .removeClass('hidden');
-
-            if (this.currentGateway) {
-                let newDuration;
-
-                const runDurationChecks = () => {
-                    if (this.currentGateway.minimumEURAmountSupported > plan.priceEuro) {
-                        $radio.addClass('disabled');
-                        this.blockedByMinAmount = true;
-
-                        if (!this.newDuration) {
-                            newDuration = durationOptions.find(
-                                ([,,,,,euroPrice]) => euroPrice >= this.currentGateway.minimumEURAmountSupported
-                            )[pro.UTQA_RES_INDEX_MONTHS];
-                        }
-                    }
-                    else if (perMonth && !this.currentGateway.supportsMonthlyPayment) {
-                        this.blockedByYearlyOnly = true;
-                        $radio.addClass('disabled');
-
-                        if (!this.newDuration) {
-                            newDuration = durationOptions.find(([,,,,m]) => m >= 12)[pro.UTQA_RES_INDEX_MONTHS];
-                        }
-                    }
-                    else if (!perMonth && !this.currentGateway.supportsAnnualPayment) {
-                        this.blockedByMonthlyOnly = true;
-                        $radio.addClass('disabled');
-
-                        if (!this.newDuration) {
-                            newDuration = 1;
-                        }
-                    }
-                };
-
-                runDurationChecks();
-
-                if (newDuration) {
-                    this.planObj = pro.getPlanObj(al, newDuration);
-                    this.selectedProPackage = this.planObj.planArray;
-
-                    this.selectedPeriod = this.newDuration = newDuration;
-
-                    this.renderPlanInfo();
-                    this.updatePayment();
-                    return false;
-                }
-            }
-
-            this.pageInfo.$durationOptionsWrapper.safeAppend($radio.prop('outerHTML'));
-            return true;
+            return {isValid: !(reason & ~allowWarning), warning, reason};
         };
 
-        $promoEndsInfo.toggleClass('hidden', !discountMonths || !isRecurring);
+        const {durationOptions} = this.planObj;
 
-        if (durationOptions.length > 1 && !discountRenewalDuration && !this.anyPlanOfLevelDiscounted) {
-            let i = -1;
+        const $durationOptionTemplate = $('.duration-option.template', $planCard);
 
-            while (++i < durationOptions.length) {
-                if (!appendDurationOption(durationOptions[i])) {
-                    return; // No need to render further, it's going to be re-rendered with new conditions
+        let warningText = '';
+        let warningReason = 0;
+
+        const validDurationOptions = durationOptions.map((plan) => {
+            plan = pro.getPlanObj(plan);
+            const validationResult = validateDuration(plan);
+            // Highest reason bit wins across durations.
+            if (validationResult.warning && validationResult.reason > warningReason) {
+                warningText = validationResult.warning;
+                warningReason = validationResult.reason;
+            }
+            return validationResult.isValid && plan.months;
+        }).filter(Boolean);
+
+        let selectedDuration = validDurationOptions.includes(this.planObj.months) && this.planObj.months;
+        if (!selectedDuration) {
+            // Saved selection isn't valid for this gateway - fall through with a corrected selection
+            // so the options still render (with the new duration marked selected).
+            selectedDuration = validDurationOptions[0];
+            this.planObj = pro.getPlanObj(this.planObj.level, selectedDuration);
+            this.selectedPeriod = selectedDuration;
+            sessionStorage['pro.period'] = this.selectedPeriod;
+        }
+
+        // Recurring gateways show savings as a percentage; one-off gateways show a fixed amount.
+        const isRecurring = !this.currentGateway || !!this.currentGateway.supportsRecurring;
+        // "Best value" badge replaces the savings text on the longest duration when there are 3+.
+        const useColumnLayout = durationOptions.length >= 3;
+        const longestDurationMonths = useColumnLayout
+            ? durationOptions.reduce((maxMonths, planArr) => {
+                const {months} = pro.getPlanObj(planArr);
+                return Math.max(months, maxMonths);
+            }, 0)
+            : 0;
+
+        $durationOptionsWrapper.toggleClass('column-style', useColumnLayout);
+
+        const appendDurationOptions = (planObj, showDiscounts) => {
+            const $option = $durationOptionTemplate.clone()
+                .removeClass('hidden template')
+                .addClass('duration-option')
+                .attr('duration', planObj.months);
+
+            const durationWording = this.getRecurringDurationWording(planObj.months);
+            // data-text feeds the invisible bold pseudo-element that reserves width, so the option
+            // doesn't shift when its label switches between regular and bold on selection.
+            $('.duration', $option).text(durationWording).attr('data-text', durationWording);
+
+            if (planObj.months === this.selectedPeriod) {
+                $option.addClass('selected');
+            }
+
+            const $savings = $('.savings', $option).addClass('hidden').text('');
+            const $bestValue = $('.best-value', $option).addClass('hidden');
+            const {monthlyPlan, months, saveUpTo, saveUpToPrecise, priceEuro, currency} = planObj;
+            const isLongest = useColumnLayout && months === longestDurationMonths;
+            const hasDiscount = monthlyPlan
+                && months > 1
+                && saveUpToPrecise
+                && saveUpToPrecise >= pro.minimumAcknowledgedDiscount;
+
+            if (!showDiscounts) {
+                $option.addClass('not-clickable');
+            }
+            else if (isLongest) {
+                $bestValue.removeClass('hidden');
+            }
+            else if (hasDiscount) {
+                if (isRecurring) {
+                    $savings.safeHTML(l.save_percent);
+                    $('span', $savings).text(formatPercentage(saveUpTo / 100));
+                    $savings.removeClass('hidden');
+                }
+                else {
+                    const discountAmount = monthlyPlan.priceEuro * months - priceEuro;
+                    if (discountAmount > 0) {
+                        $savings.safeHTML(l.save_percent);
+                        $('span', $savings).text(formatCurrency(discountAmount, currency, 'narrowSymbol'));
+                        $savings.removeClass('hidden');
+                    }
                 }
             }
 
-            delete this.newDuration;
+            $option.toggleClass('disabled', !(validDurationOptions.includes(months)));
 
-            if (biggestSaveOption[0] > 0) {
-                $(`[duration="${biggestSaveOption[1]}"] .duration-head .duration-savings`,
-                  this.pageInfo.$durationOptionsWrapper).addClass('popular');
+            $durationOptionsWrapper.safeAppend($option.prop('outerHTML'));
+        };
+
+        const showDiscounts = durationOptions.length > 1;
+
+        $durationOptionsWrapper.removeClass('hidden');
+
+        for (const plan of durationOptions) {
+            const planObj = pro.getPlanObj(plan);
+            appendDurationOptions(planObj, showDiscounts);
+        }
+
+        const $warning = $('.duration-warning', $planCard).addClass('hidden');
+        if (warningText) {
+            $('.duration-warning-text', $warning).text(warningText);
+            $warning.removeClass('hidden');
+        }
+
+        $('.duration-option:not(.template)', $durationOptionsWrapper).rebind('click.durationOption', (e) => {
+            const $this = $(e.currentTarget);
+            const duration = +$this.attr('duration');
+
+            if (duration === this.selectedPeriod || $this.hasClass('disabled') || $this.hasClass('not-clickable')) {
+                return;
             }
 
-            if (this.currentGateway) {
-                if (this.currentGateway.gatewayId === 0) {
-                    warning = this.usingBalance ? this.warningStrings.balance : this.warningStrings.voucher;
-                }
-                else if (this.currentGateway.gatewayId === 11) {
-                    warning = this.warningStrings.astropayOneOff.replace('%1', this.currentGateway.displayName);
-                }
-                else if (this.blockedByYearlyOnly) {
-                    warning = this.warningStrings.yearlyOnly;
-                }
-                else if (this.blockedByMonthlyOnly) {
-                    warning = this.warningStrings.monthlyOnly;
-                }
-                else if (this.blockedByMinAmount) {
-                    warning = this.warningStrings.minAmount;
-                }
+            $('.selected', $durationOptionsWrapper).removeClass('selected');
+            $this.addClass('selected');
+
+            this.selectedPeriod = duration;
+            sessionStorage['pro.period'] = this.selectedPeriod;
+            this.planObj = pro.getPlanObj(this.planNum, this.selectedPeriod);
+            this.selectedProPackage = this.planObj.planArray;
+
+            // Balance gateway (id 0) flips to the voucher path once the new duration's price
+            // exceeds the user's balance. Recompute now so updatePayment sees the right state.
+            if (this.currentGateway && this.currentGateway.gatewayId === 0) {
+                this.usingBalance = this.usingBalance && pro.propay.useBalance();
             }
 
-            $('.duration', this.pageInfo.$leftBlock).removeClass('hidden');
-        }
-        else {
-            $('.duration', this.pageInfo.$leftBlock).addClass('hidden');
-        }
-
-        const $warning = $('.one-off-payment-info', this.pageInfo.$leftBlock).toggleClass('hidden', !warning);
-        if (warning) {
-            $('.warning-txt', $warning).text(warning);
-        }
-
-        if (!discountRenewalDuration) {
-            $('.duration-option', this.pageInfo.$durationOptionsWrapper).rebind('click.durationOption', (e) => {
-                const $this = $(e.currentTarget);
-                const duration = +$this.attr('duration');
-
-                if ((this.selectedPeriod === duration) || $this.hasClass('disabled')) {
-                    return;
-                }
-
-                this.selectedPeriod = duration;
-                sessionStorage['pro.period'] = this.selectedPeriod;
-                this.planObj = pro.getPlanObj(this.planNum, this.selectedPeriod);
-                this.selectedProPackage = this.planObj.planArray;
-
-                if (this.currentGateway && this.currentGateway.gatewayId === 0) {
-                    this.usingBalance = this.usingBalance && pro.propay.useBalance();
-                }
-
-                this.renderPlanInfo();
-                this.updatePayment();
-
-                eventlog(500937, JSON.stringify({ a: this.planNum, m: duration, t: this.shouldShowTrial() | 0 }));
-            });
-        }
+            this.renderPlanInfo();
+            this.updatePayment();
+        });
     },
 
     getPaymentType(gateway) {
@@ -2522,23 +2451,48 @@ pro.propay = {
             this.selectedProPackage = this.planObj.planArray;
         }
 
+        const previousGatewayName = this.currentGateway && this.currentGateway.gatewayName;
         this.currentGateway = this.gatewaysByName[this.currentGatewayName];
         this.gateSupportsTrial = this.currentGateway && this.currentGateway.supportsTrial;
 
-        this.renderDurations();
+        if (this.currentGateway
+            && previousGatewayName !== this.currentGateway.gatewayName) {
+            pro.propay.billing.resetAcceptedBillingInfo();
+            pro.propay.billing.revalidateTaxOnGatewayChange();
+            // Prior attempt was for the previous gateway; astropay revalidates on switch.
+            pro.propay.billing.hasAttemptedSubmit = false;
+            this.countryMismatchAttempted = false;
+        }
+
         this.updatePageInfo();
         this.setContinuebuttonText();
 
         addressDialog.closeDialog();
-        astroPayDialog.hideDialog(true);
 
         if (!this.currentGateway) {
             $('.specific-payment-info', this.$page).addClass('hidden');
             return;
         }
 
+        this.proPaymentMethod = this.currentGateway.gatewayName;
+
         if (u_type === false && !fromSignup) {
             this.signup.attemptAccountCreation();
+            return;
+        }
+
+        const showsBillingConcurrently =
+            pro.propay.billing.showsBillingConcurrently(this.currentGateway.gatewayName);
+
+        $('.balance:not(.option)', this.$page).addClass('hidden');
+
+        if (!pro.propay.billing.canProceedToPayment
+            && !showsBillingConcurrently
+            && pro.propay.billing.requiresSecondaryStage(this.currentGateway.gatewayId)) {
+
+            addressDialog.closeDialog();
+            $('.specific-payment-info', this.$page).addClass('hidden');
+            $('.stripe-button', this.$page).addClass('hidden');
             return;
         }
 
@@ -2588,7 +2542,8 @@ pro.propay = {
             && !isAstropay
             && !usingBalanceOnVoucher
             && !shouldBlockFlow
-            && !isBitcoin;
+            && !isBitcoin
+            && (pro.propay.billing.canProceedToPayment || showsBillingConcurrently);
 
         const showPaymentButton = this.paymentButton && !blockFlowReasons;
 
@@ -2601,12 +2556,7 @@ pro.propay = {
 
         const paymentType = this.getPaymentType(this.currentGateway);
 
-        this.proPaymentMethod = this.currentGateway.gatewayName;
-
-
         // check all required fields are filled
-
-        $('.balance:not(.option)', this.$page).addClass('hidden');
 
         const requiresAccount = this.signup.checkPaymentType();
 
@@ -2615,15 +2565,9 @@ pro.propay = {
         }
 
 
-        if (this.isNewAccount) {
-            if (this.skItems.astropay && currentGatewayId === astroPayDialog.gatewayId) {
-                pro.propay.skItems.astropay.startLoad('initAstropay');
-            }
-
-            if (!pro.propay.signup.accountCreationFinished && requiresAccount === 1) {
-                this.signup.continueAccountCreation();
-                return;
-            }
+        if (this.isNewAccount && !pro.propay.signup.accountCreationFinished && requiresAccount === 1) {
+            this.signup.continueAccountCreation();
+            return;
         }
 
         // TODO: Refactor the below options to be more readable and make more sense. Temp fix to reduce risk of breaking
@@ -2882,8 +2826,6 @@ pro.propay = {
 
             const $target = $(e.currentTarget);
 
-            // debugger
-
             if (!$target.length || $target.is('i.tooltip')) {
                 return;
             }
@@ -2924,10 +2866,17 @@ pro.propay = {
             logProviderClick(this.gatewaysByName[this.currentGatewayName]);
 
             this.setPreviousProvider(this.currentGatewayName);
-
             this.updatePayment();
             this.renderPlanInfo();
+            this.updatePageInfo();
+            pro.propay.billing.updateRequiredFields();
 
+            // AstroPay's country-specific rules may reject values another gateway accepted.
+            if (this.currentGateway && this.currentGateway.gatewayId === pro.propay.ASTROPAY_GATE_ID) {
+                pro.propay.billing.validateBillingInfo(0).then(() => {
+                    pro.propay.billing.showErrors();
+                }).catch(dump);
+            }
         };
 
         const renderSecondaryOptions = () => {
@@ -3047,6 +2996,7 @@ pro.propay = {
                             if (pro.propay.useBalance(gateway)) {
                                 extraClasses += ' balance';
                                 this.usingBalance = true;
+                                this.balanceWasSufficient = true;
                                 this.balanceStringForDropdown = true;
                                 text = `${l[7108]}: ${formatCurrency(pro.propay.proBalance)}`;
                                 tooltip = l.balance_limited_one_off;
@@ -3176,6 +3126,10 @@ pro.propay = {
     toggleContinueButtonLoading(showLoading, loadingReason) {
         'use strict';
 
+        if (!pro.propay.onPropayPage()) {
+            return;
+        }
+
         const reasons = pro.propay.continueButtonLoadingReasons;
 
         loadingReason = loadingReason || 'unknown';
@@ -3208,84 +3162,128 @@ pro.propay = {
 
         pro.propay.$continueButton.rebind('click.propay', () => {
 
-            if (pro.propay.$continueButton.hasClass('loading')) {
+            if (pro.propay.$continueButton.hasClass('loading')
+                || pro.propay.$continueButton.hasClass('disabled')) {
                 return;
             }
 
-            const reasons = this.blockFlow();
-            const paymentType = this.getPaymentType(this.currentGateway);
-            const gatewayId = this.currentGateway && this.currentGateway.gatewayId;
-            pro.propay.paymentType = gatewayId;
-
-            this.showErrors(reasons);
-            if (reasons) {
+            if (this.hasGatewayCountryMismatch()) {
+                this.countryMismatchAttempted = true;
+                this.updateCountryMismatchWarning();
+                this.updateContinueDisabled();
                 return;
             }
 
-            this.userSubsGatewayId =
-                M.account.sgwids && M.account.sgwids.length > 0 ? M.account.sgwids[0] : null;
+            pro.propay.skItems.continueBtn.startLoad();
 
-            delay('subscribe.plan', eventlog.bind(null, 99788));
+            pro.propay.billing.hasAttemptedSubmit = true;
+            pro.propay.billing.validateBillingInfo(2).then((isValid) => {
 
-            if (this.isNewAccount) {
-                const requiresAccount = this.signup.checkPaymentType();
-
-                if (requiresAccount === 1
-                    && pro.propay.signup.accountCreationFinished
-                    && this.currentGateway.gatewayId === this.BITCOIN_GATE_ID) {
-
-                    sessionStorage.setItem('acc_creation_bitcoin', '1');
-                    window.location.reload();
+                if (!isValid) {
+                    pro.propay.showErrors();
+                    pro.propay.skItems.continueBtn.endLoad();
                     return;
                 }
 
-                if ((requiresAccount === 2 || this.paymentButton
-                        || this.currentGateway.gatewayId === this.BITCOIN_GATE_ID)
-                    && !pro.propay.signup.accountCreationFinished) {
+                const reasons = this.blockFlow();
+                const paymentType = this.getPaymentType(this.currentGateway);
+                const gatewayId = this.currentGateway && this.currentGateway.gatewayId;
+                pro.propay.paymentType = gatewayId;
 
-                    pro.propay.toggleContinueButtonLoading(true, 'accountCreation');
-                    this.signup.continueAccountCreation();
+                this.showErrors(reasons);
+                if (reasons) {
                     return;
                 }
-            }
 
-            if (u_type === false) {
+                if (pro.propay.billing.canProceedToPayment
+                    && !pro.propay.billing.showingPaymentSection
+                    && pro.propay.billing.requiresSecondaryStage(this.currentGateway.gatewayId)
+                    && !pro.propay.billing.showsBillingConcurrently(this.currentGateway.gatewayName)) {
+                    pro.propay.billing.showPaymentSection();
+                    return;
+                }
 
-                u_storage = init_storage(localStorage);
+                if (pro.propay.billing.canProceedToPayment
+                    && this.currentGateway.gatewayId === pro.propay.BITCOIN_GATE_ID) {
+                    addressDialog.validateAndPay(pro.propay.initBillingInfo, false, true);
+                    return;
+                }
 
-                u_checklogin({
-                    checkloginresult() {
-                        pro.propay.proceedPayment(paymentType, gatewayId);
+                this.userSubsGatewayId =
+                    M.account.sgwids && M.account.sgwids.length > 0 ? M.account.sgwids[0] : null;
 
+                delay('subscribe.plan', eventlog.bind(null, 99788));
+
+                if (this.isNewAccount) {
+                    const requiresAccount = this.signup.checkPaymentType();
+
+                    if (requiresAccount === 1
+                        && pro.propay.signup.accountCreationFinished
+                        && this.currentGateway.gatewayId === this.BITCOIN_GATE_ID) {
+
+                        sessionStorage.setItem('acc_creation_bitcoin', '1');
+                        window.location.reload();
+                        return;
                     }
-                }, true);
-            }
-            else {
-                // Store the gateway name for later
-                console.assert(pro.propay.proPaymentMethod, 'check this...invalid gateway');
 
-                if (String(pro.propay.proPaymentMethod).indexOf('ecp') === 0
-                    || String(pro.propay.proPaymentMethod).toLowerCase().indexOf('stripe') === 0) {
+                    if ((requiresAccount === 2 || this.paymentButton
+                            || this.currentGateway.gatewayId === this.BITCOIN_GATE_ID)
+                        && !pro.propay.signup.accountCreationFinished && pro.propay.billing.canProceedToPayment) {
 
-                    if (pro.propay.userSubsGatewayId === 2 || pro.propay.userSubsGatewayId === 3) {
-                        // Detect the user has subscribed to a Pro plan with Google Play or Apple store
-                        // pop up the warning dialog but let the user proceed with an upgrade
-                        msgDialog('warninga', '', l.warning_has_subs_with_3p, '', () => {
+                        pro.propay.toggleContinueButtonLoading(true, 'accountCreation');
+                        this.signup.continueAccountCreation();
+                        return;
+                    }
+
+                    if (requiresAccount === 3) {
+                        addressDialog.proceedToPay(pro.propay.initBillingInfo, false, true);
+                        return;
+                    }
+                }
+
+                if (u_type === false) {
+
+                    u_storage = init_storage(localStorage);
+
+                    u_checklogin({
+                        checkloginresult() {
                             pro.propay.proceedPayment(paymentType, gatewayId);
-                        });
-                    }
-                    else {
-                        pro.propay.proceedPayment(paymentType, gatewayId);
-                    }
+
+                        }
+                    }, true);
                 }
                 else {
-                    // For other methods we do a uts and utc call to get the provider details first
-                    pro.propay.proceedPayment(paymentType, gatewayId);
-                }
-            }
-        });
+                    // Store the gateway name for later
+                    console.assert(pro.propay.proPaymentMethod, 'check this...invalid gateway');
 
-        this.setContinuebuttonText();
+                    if (String(pro.propay.proPaymentMethod).indexOf('ecp') === 0
+                        || String(pro.propay.proPaymentMethod).toLowerCase().indexOf('stripe') === 0) {
+
+                        if (pro.propay.userSubsGatewayId === 2 || pro.propay.userSubsGatewayId === 3) {
+                            // Detect the user has subscribed to a Pro plan with Google Play or Apple store
+                            // pop up the warning dialog but let the user proceed with an upgrade
+                            msgDialog('warninga', '', l.warning_has_subs_with_3p, '', () => {
+                                pro.propay.proceedPayment(paymentType, gatewayId);
+                            });
+                        }
+                        else {
+                            pro.propay.proceedPayment(paymentType, gatewayId);
+                        }
+                    }
+                    else {
+                        // For other methods we do a uts and utc call to get the provider details first
+                        pro.propay.proceedPayment(paymentType, gatewayId);
+                    }
+                }
+            }).catch((ex) => {
+                pro.propay.showErrors();
+                console.error(ex);
+            }).finally(() => {
+                pro.propay.skItems.continueBtn.endLoad();
+            });
+
+            this.setContinuebuttonText();
+        });
     },
 
     setContinuebuttonText(hide) {
@@ -3293,9 +3291,9 @@ pro.propay = {
         const recurringEnabled = this.currentGateway && this.currentGateway.supportsRecurring;
         const gatewayId = this.currentGateway && this.currentGateway.gatewayId;
 
-
         const $continueButton = $('.continue', this.$page)
-            .toggleClass('hidden', !!this.paymentButton || !!hide);
+            .toggleClass('hidden', !!this.paymentButton || !!hide || !this.currentGateway)
+            .removeClass('continue-to-payment');
 
         if (hide) {
             return;
@@ -3305,13 +3303,22 @@ pro.propay = {
             this.showErrors();
         }
 
-        if (this.paymentButton) {
+        if (this.paymentButton || !this.currentGateway) {
             return;
         }
 
         let label = this.isNewAccount ? l.agree_continue : l.continue_to_payment;
 
-        if (this.shouldShowTrial()) {
+        const concurrentBilling = this.currentGateway
+            && pro.propay.billing.showsBillingConcurrently(this.currentGateway.gatewayName);
+
+        if (pro.propay.billing.requiresSecondaryStage(this.currentGateway.gatewayId)
+            && !pro.propay.billing.showingPaymentSection
+            && !concurrentBilling) {
+            $continueButton.addClass('continue-to-payment');
+            label = l.continue_to_payment;
+        }
+        else if (this.shouldShowTrial()) {
             label = !this.isNewAccount ? l.start_free_trial : l.agree_continue;
         }
         else if (gatewayId === 16) {
@@ -3399,6 +3406,7 @@ pro.propay = {
         }
 
         pro.propay.fillBillingInfo(decodedInfo);
+        pro.propay.billing.prefillInfo();
     },
 
     renderLocaleInfo(forceEuro) {
@@ -3434,7 +3442,6 @@ pro.propay = {
         addressDialog.init(false, false, false, true).then(() => {
             this.renderGateways();
             this.selectPreSelectedGateway();
-            this.renderDurations();
             this.initBillingInfo();
             this.renderPlanInfo();
             this.initContinueButton();
@@ -3654,9 +3661,35 @@ pro.propay = {
         });
     },
 
-    updateS4Continue() {
+    updateContinueDisabled() {
         'use strict';
-        $('.continue', this.$page).toggleClass('disabled', !!(window.s4ac && this.blockFlow()));
+        const s4Blocked = !!(window.s4ac && this.blockFlow());
+        const countryBlocked = this.countryMismatchAttempted && this.hasGatewayCountryMismatch();
+        $('.continue', this.$page).toggleClass('disabled', s4Blocked || countryBlocked);
+    },
+
+    hasGatewayCountryMismatch() {
+        'use strict';
+        const gw = this.currentGateway;
+        const country = pro.propay.billing && pro.propay.billing.country;
+        if (!gw || !Array.isArray(gw.countries) || !gw.countries.length || !country) {
+            return false;
+        }
+        return !gw.countries.includes(country);
+    },
+
+    updateCountryMismatchWarning() {
+        'use strict';
+        if (!this.$page) {
+            return;
+        }
+        const mismatch = this.hasGatewayCountryMismatch();
+        if (!mismatch) {
+            this.countryMismatchAttempted = false;
+        }
+        $('.gateway-country-unsupported', this.$page)
+            .toggleClass('hidden', !mismatch)
+            .toggleClass('error', mismatch && this.countryMismatchAttempted);
     },
 
     initSkItems() {
@@ -3689,9 +3722,9 @@ pro.propay = {
             return pro.propay.sk.initSk(billingAddress);
         });
 
-        lazy(this.skItems, 'astropay', () => {
-            const astropay = page.querySelector('.left-block-wrapper .astropay-dialog');
-            return pro.propay.sk.initSk(astropay, 4);
+        lazy(this.skItems, 'priceInfo', () => {
+            const priceInfo = page.querySelector('.right-block .plan-card .content .pricing');
+            return pro.propay.sk.initSk(priceInfo);
         });
     },
 
@@ -3702,6 +3735,13 @@ pro.propay = {
             pro.propay.ignoreDropdownContainerClick = true;
             $('.bitcoin-dropdown-item', this.$page).click();
         }
+    },
+
+    finishInit() {
+        'use strict';
+        this.setContinuebuttonText();
+        this.pageInitialised = true;
+        this.sk.endLoadAll();
     },
 
     init() {
@@ -3821,6 +3861,8 @@ pro.propay = {
             if (!pro.propay.onPropayPage()) {
                 pro.propay.hideLoadingOverlay();
                 delete window.s4ac;
+                // Reset country so a return visit picks up IP-detected again, not the prior pick.
+                pro.propay.billing.initialCountry = undefined;
                 mBroadcaster.removeListener(pro.propay.pageChangeHandler);
                 delete pro.propay.pageChangeHandler;
             }
@@ -3854,8 +3896,9 @@ pro.propay = {
                 .toggleClass('euro', this.planObj.currency === 'EUR')
                 .toggleClass('flexi', isFlexi)
                 .toggleClass('mobile-device', !!is_mobile)
-                .toggleClass('ar', mega.ipcc === 'AR')
                 .toggleClass('s4', !!(window.s4ac && isFlexi));
+            // AR class is driven by the user-selected billing country - refreshed after
+            // billing.init resolves and on every country-dropdown change.
 
             this.trial = this.planObj.trial;
 
@@ -3865,6 +3908,7 @@ pro.propay = {
                 this.loadPaymentGatewayOptions(),
                 this.getSavedCard(),
                 this.planObj.getInstantDiscountInfo(),
+                pro.propay.billing.init(),
             ];
 
             this.anyPlanOfLevelDiscounted = !this.fromURL
@@ -3930,7 +3974,7 @@ pro.propay = {
                             pro.propay.preSelect = false;
                         }
                     }
-                    this.sk.endLoadAll();
+                    this.finishInit();
                 };
 
                 // If payment requires billing info, wait for it to be loaded before proceeding
@@ -4020,6 +4064,10 @@ pro.propay = {
 
         const extra = Object.assign({}, addressDialog.extraDetails);
 
+        extra.taxCode = pro.propay.billing.getTaxNumberForApiReq();
+        extra.b2b = pro.propay.billing.isBusinessUse ? 1 : 0;
+        extra.inv = ['business', 'invoice'].includes(pro.propay.billing.getBillingType()) ? 1 : 0;
+
         if (this.useSavedCard && this.savedCard.id && !this.paymentButton) {
             extra.pmid = this.savedCard.id;
         }
@@ -4029,12 +4077,18 @@ pro.propay = {
             it: pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_ITEMNUM],
             id: pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_ID],
             gw: addressDialog.gatewayId_stripe,
+            country: pro.propay.billing.country,
             extra,
         };
 
         return api.screq(rftRequest).then(({result}) => {
             if (this.currentGateway.gatewayId !== addressDialog.gatewayId_stripe) {
                 console.warn('Payment type changed during loading');
+                return;
+            }
+            // EEXIST inside url means trial already used; on utc/uts it means discount already redeemed.
+            if (result.url && typeof result.url === 'object' && result.url.error === EEXIST) {
+                addressDialog.showTrialAlreadyUsedDialog();
                 return;
             }
             pro.propay.trial.trialId = result.id;
@@ -4154,6 +4208,7 @@ pro.propay = {
         }
 
         $('.price', $template).text(priceText);
+
         const $taxInfo = $('.tax-info', $template);
         if (this.planObj.taxInfo) {
             $taxInfo.text(l.t_may_appy.replace('%1', pro.taxInfo.taxName)).removeClass('hidden');
@@ -4788,6 +4843,13 @@ lazy(pro.propay, 'warningStrings', () => {
         voucher: l.voucher_only_one_off,
         monthlyOnly: l.payment_monthly_only,
         yearlyOnly: l.payment_yearly_only,
-        astropayOneOff: l.astropay_one_off,
+        oneOffGeneric: l.astropay_one_off,
     };
+});
+
+/** @property pro.propay.bfDurationWarning */
+lazy(pro.propay, 'bfDurationWarning', () => {
+    'use strict';
+    // Order is priority: higher value (further right) wins in the cross-duration warning accumulator.
+    return freeze(makeEnum(['ONE_OFF', 'YEARLY_ONLY', 'MONTHLY_ONLY', 'MIN_AMOUNT']));
 });

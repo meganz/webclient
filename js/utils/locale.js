@@ -1117,6 +1117,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         'desktop': "https://mega.io/desktop",
         's4Endpoints': "https://help.mega.io/megas4/setup-guides/mega-s4-endpoint-urls",
         's4Setup': "https://help.mega.io/megas4/setup-guides",
+        'b/b-s/tax-id-vf': "https://help.mega.io/business/business-subscription/tax-id-verification-failed",
     };
 
     const mega_io_hyperlinks = Object.create(null);
@@ -1236,7 +1237,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a class="clickurl" target="_blank" href="/support">').replace('[/A]', '</a>');
 
     l[16649] = escapeHTML(l[16649]).replace('%1', '<span class="amount">10.00</span>');
-    l.save_percent = escapeHTML(l.save_percent).replace('%1', '<span class="amount">10%</span>');
+    l.save_percent = escapeHTML(l.save_percent).replace('%1', '<span class="amount"></span>');
     l.double_billing_sub_cancel = escapeHTML(l.double_billing_sub_cancel)
         .replace(
             '[A]',
@@ -1725,6 +1726,9 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[S3]', '<span>')
         .replace(/\[\/S\d]/g, '</span>');
 
+    l.view_help_article = escapeHTML(l.view_help_article)
+        .replace('[A]', mega_io_hyperlinks['b/b-s/tax-id-vf'])
+        .replace('[/A]', '</a>');
     l.dl_vals_file_error = escapeHTML(l.dl_vals_file_error)
         .replace('[A]', mega_io_hyperlinks.terms)
         .replace('[/A]', '</a>');

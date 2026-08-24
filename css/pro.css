@@ -1789,9 +1789,6 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     font-size: 13px;
     line-height: 18px;
 }
-.argentina-only .orange-notification.cell {
-    padding: 6px;
-}
 .orange-notification.cell.text {
     padding: 5px 0;
 }

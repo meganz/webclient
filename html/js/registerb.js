@@ -697,16 +697,17 @@ BusinessRegister.prototype.initPage = function(
             });
         });
 
-        const initialTaxNumber = pro.propay.billing.getTaxNumberForApiReq();
-        addressDialog.lastBusUtqaTaxNum = initialTaxNumber || addressDialog.lastBusUtqaTaxNum || '';
-
         const planReady = Promise.all([
             pro.propay.billing.getInitialCountry(),
             pro.propay.billing.getTngrRes(),
             pro.propay.billing.initAttempts(true),
         ]).then(([country]) => {
             mySelf.lastPricedCountry = country;
+            // Assign country before reading the tax number so getTaxNumberForApiReq's stale-context
+            // guard returns '' when the singleton's tn was validated for a different country.
             pro.propay.billing.country = country;
+            const initialTaxNumber = pro.propay.billing.getTaxNumberForApiReq();
+            addressDialog.lastBusUtqaTaxNum = initialTaxNumber || addressDialog.lastBusUtqaTaxNum || '';
             return business.getBusinessPlanInfo(
                 !!country, false, country || undefined, initialTaxNumber,
                 pro.propay.billing.getStateForApiReq(country)

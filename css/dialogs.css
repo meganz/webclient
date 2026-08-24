@@ -4868,6 +4868,20 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
         font: var(--mobile-font-caption-large-regular);
         margin-top: -10px;
     }
+    .mega-dialog.payment-address-dialog .taxcode-invoice-note.error {
+        color: var(--banner-text-error);
+        padding: 2px 16px;
+        border-radius: 4px;
+        background: var(--banner-background-error);
+        font: var(--text-body2);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid var(--banner-border-error);
+    }
+    .mega-dialog.payment-address-dialog .taxcode-invoice-note.error i {
+        display: none;
+    }
     .mega-dialog.payment-address-dialog .footer-container {
         flex-direction: column;
         align-items: flex-end;
@@ -4906,7 +4920,8 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
     .mega-dialog.payment-address-dialog .default-dropdown-item.template {
         display: none;
     }
-    .mega-dialog.payment-address-dialog .states.disabled {
+    .mega-dialog.payment-address-dialog .states.disabled,
+    .mega-dialog.payment-address-dialog .countries.disabled {
         cursor: default;
         opacity: 0.5;
     }
@@ -6201,53 +6216,6 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
     }
 
 /* end invitation-dialog */
-
-/* astropay-dialog */
-
-    .mega-dialog.astropay-dialog {
-        max-height: 100%;
-    }
-    .mega-dialog.astropay-dialog .astropay-label {
-        display: block;
-        margin: 16px 0 8px;
-    }
-    .mega-dialog.astropay-dialog .fm-account-input {
-        margin-top: 5px;
-    }
-    .mega-dialog.astropay-dialog .astropay-information {
-        margin-bottom: 20px;
-    }
-    .mega-dialog.astropay-dialog .provider-name {
-        color: var(--text-color-high);
-    }
-    .mega-dialog.astropay-dialog .provider-icon {
-        margin: 0 2px;
-    }
-    .mega-dialog.astropay-dialog .powered-by-astropay {
-        height: 36px;
-        width: 80px;
-        background: #fff;
-        display: block;
-        border-radius: 4px;
-    }
-    .mega-dialog.astropay-dialog .powered-by-astropay i {
-        width: 96px;
-        height: 96px;
-        --icon-size: 96px;
-        position: absolute;
-        bottom: 17px;
-        left: 39px;
-        pointer-events: none;
-    }
-    .mega-dialog.astropay-dialog section {
-        flex-shrink: unset;
-    }
-    .rtl .mega-dialog.astropay-dialog .powered-by-astropay i {
-        left: auto;
-        right: 32px;
-    }
-
-/* end astropay-dialog */
 
 /* storage-dialog */
 

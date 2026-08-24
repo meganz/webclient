@@ -1163,10 +1163,14 @@ BusinessAccount.prototype.getListOfPaymentGateways = function (forceUpdate) {
  * @param {Boolean} [flexI]             Get the Pro Flexi plan.
  * @returns {Promise}                   resolves when we get the answer
  */
-BusinessAccount.prototype.getBusinessPlanInfo = async function(forceUpdate, flexI) {
+BusinessAccount.prototype.getBusinessPlanInfo = async function(forceUpdate, flexI, countryCode, taxNumber, state) {
     "use strict";
 
-    if (!forceUpdate && !flexI) {
+    // Tax-aware fetches (cc / tn) skip the cache because the cached plan reflects whatever
+    // tax context it was originally fetched under.
+    const requestedSpecificTaxContext = countryCode || taxNumber !== undefined;
+
+    if (!forceUpdate && !flexI && !requestedSpecificTaxContext) {
         const {cachedBusinessPlan: {timestamp} = false} = mega.buinsessAccount || !1;
 
         if (Date.now() - timestamp < this.invoiceListUpdateFreq) {
@@ -1185,16 +1189,33 @@ BusinessAccount.prototype.getBusinessPlanInfo = async function(forceUpdate, flex
         request.p = 1;
     }
 
+    if (countryCode) {
+        request.cc = countryCode;
+    }
+
+    if (taxNumber !== undefined) {
+        request.tn = taxNumber;
+    }
+
+    if (state) {
+        request.state = state;
+    }
+
     return api.req(request)
         .then(({result}) => {
 
-            const {txn, tx, txva} = result[0];
+            const {txn, tx, txva, txcc, txe} = result[0];
 
-            pro.taxInfo = !!(txn && tx) && (txva !== undefined) && {
+            pro.taxInfo = !!(txn && (tx !== undefined)) && (txva !== undefined) && !txe && {
                 taxName: txn,
                 taxPercent: tx / 100,
                 variant: txva,
+                taxCountry: txcc,
             };
+
+            // This utqa's tax context can differ from what pro.membershipPlans was built with;
+            // force the next pro.loadMembershipPlans to refetch instead of reusing the cache.
+            pro.membershipPlansCacheStale = true;
 
             for (let h = 0; h < result.length; h++) {
                 const {it, al} = result[h];
@@ -1209,7 +1230,8 @@ BusinessAccount.prototype.getBusinessPlanInfo = async function(forceUpdate, flex
                     plan.c = result[0].l.c;
                     plan.timestamp = Date.now();
 
-                    if (!flexI) {
+                    // Don't cache tax-context fetches; the cached plan is the baseline.
+                    if (!flexI && !requestedSpecificTaxContext) {
                         mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
                         mega.buinsessAccount.cachedBusinessPlan = plan;
                     }
@@ -1456,8 +1478,20 @@ BusinessAccount.prototype.doPaymentWithAPI = async function(payDetails, business
         m: m,
         bq: 0,
         pbq: 0,
-        num: [businessPlan.totalUsers | 0, 0, 0]        // number of users
+        num: [businessPlan.totalUsers | 0, 0, 0],        // number of users
+        b2b: pro.propay.billing.isBusinessUse ? 1 : 0,
+        iso: payDetails.country,
+        cc: payDetails.country,
+        inv: 1,
     };
+
+    if (page !== 'repay') {
+        request.tn = pro.propay.billing.getTaxNumberForApiReq();
+    }
+
+    if (payDetails.state) {
+        request.state = payDetails.state;
+    }
     if (businessPlan.storageQuota) {
         request.num[1] = businessPlan.storageQuota;
     }
@@ -1491,8 +1525,17 @@ BusinessAccount.prototype.doPaymentWithAPI = async function(payDetails, business
         s: salesIDs,                // Sale ID
         m: usedGatewayId || addressDialog.gatewayId, // Gateway number
         bq: 0,                      // Log for bandwidth quota triggered
-        extra: payDetails           // Extra information for the specific gateway
+        extra: payDetails,          // Extra information for the specific gateway
+        inv: 1,
+        iso: payDetails.country,
+        cc: payDetails.country,
     };
+    if (page !== 'repay') {
+        utcRequest.tn = pro.propay.billing.getTaxNumberForApiReq();
+    }
+    if (payDetails.state) {
+        utcRequest.state = payDetails.state;
+    }
 
     const {result} = await api.screq(utcRequest);
 

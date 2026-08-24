@@ -115,7 +115,7 @@ function u_checklogin3a(res, ctx) {
 
         const exclude = new Set([
             'aav', 'aas', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup', 'mkt',
-            'name', 'p', 'pf', 'privk', 'pubk', 'pwmh', 's', 'since', 'smsv', 'ts', 'u', 'ut', 'uspw'
+            'name', 'p', 'pf', 'privk', 'pubk', 'pwmh', 's', 'since', 'smsv', 'taxnum', 'ts', 'u', 'ut', 'uspw'
         ]);
 
         for (var n in u_attr) {

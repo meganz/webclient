@@ -167,7 +167,9 @@ twofactor.loginDialog = {
         this.dialogComponent.show(showOptions);
         if (is_mobile && this.pageBound) {
             placeLangBtnToLogin(this.dialogComponent);
-            mega.ui.header.update();
+            if (mega.ui.header) {
+                mega.ui.header.update();
+            }
         }
     },
 

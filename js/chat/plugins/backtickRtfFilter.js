@@ -85,11 +85,9 @@ BacktickRtfFilter.prototype.escapeAndProcessMessage = function(e, eventData, pro
 
         messageContents = messageContents ? messageContents.trim() : "";
 
-        /*jshint -W049 */
         if (prop === "messageHtml") {
             messageContents = messageContents.replace(/\<br\/\>/gi, '\n');
         }
-        /*jshint +W049 */
 
         // performance cheat/trick
         if (messageContents.indexOf("`") !== -1) {
@@ -285,11 +283,9 @@ BacktickRtfFilter.prototype.unescapeAndProcessMessage = function(e, eventData, p
 
         messageContents = messageContents ? messageContents.trim() : "";
 
-        /*jshint -W049 */
         if (prop === "messageHtml") {
             messageContents = messageContents.replace(/\<br\/\>/gi, '\n');
         }
-        /*jshint +W049 */
 
         messageContents = messageContents.replace(
             new RegExp(BacktickRtfFilter.UNESCAPE_REGEXP, "gi"),

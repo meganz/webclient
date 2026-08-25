@@ -72,6 +72,8 @@ var pro = {
 
     taxInfo: null,
 
+    taxCountry: null,
+
     anyDiscount: false,
 
     usedDiscountCode: null,
@@ -301,7 +303,7 @@ var pro = {
 
                     const conversionRate = l.lc === "EUR" ? 1 : l.exch;
 
-                    const taxInfo = !!(txn && (tx !== undefined)) && (txva !== undefined) && !txe && {
+                    const taxInfo = !!(txn && +tx) && (txva !== undefined) && !txe && {
                         taxName: txn,
                         taxPercent: tx / 100,
                         variant: txva,
@@ -309,6 +311,9 @@ var pro = {
                     };
 
                     pro.taxInfo = taxInfo;
+
+                    // Country the plans were priced for, set even at 0% tax where taxInfo is false.
+                    pro.taxCountry = txcc || false;
 
                     for (var i = 1; i < results.length; i++) {
 

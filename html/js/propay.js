@@ -4342,13 +4342,14 @@ pro.propay = {
             // etpn,  // Current net price (Eur)
             pd,       // Discount value
             ex,       // Expiration time
+            tx,       // Tax value
             txe,      // Tax excempt
             txn       // Tax label
         } = dci;
         // Both sides are quoted, so follow the displayed currency and fall back where there is no local
         const isEuro = pro.displayEuro || !lcc || lcc === 'EUR';
         const currency = isEuro && 'EUR' || lcc;
-        const isBeforeTax = txe === 2;
+        const isBeforeTax = txe === 2 && +tx;
         const newPrice = isEuro ? (isBeforeTax ? edtpn : edtp) : (isBeforeTax ? ldtpn : ldtp);
         const prevPrice = matchedPlanObj.getPricing(true, m)[isEuro ? 'priceEuro' : 'price'];
 

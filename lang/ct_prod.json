@@ -4893,7 +4893,7 @@
     "recur_freq_offset_third_wed": "[A]\u7b2c\u4e09\u500b[/A][B]\u661f\u671f\u4e09[/B]",
     "recur_rate_monthly": "{count, plural, other {\u6bcf[S][/S]\u500b\u6708\u4e00\u6b21}}",
     "recur_rate_weekly": "{count, plural, other {\u6bcf[S][/S]\u9031\u4e00\u6b21}}",
-    "recurring_2_yearly": "2\u5e74\u671f",
+    "recurring_2_yearly": "\u6bcf\u5169\u5e74",
     "recurring_daily": "\u6bcf\u65e5",
     "recurring_ends": "\u7d50\u675f\uff1a",
     "recurring_frequency_day": "\u5929",

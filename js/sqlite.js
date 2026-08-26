@@ -673,8 +673,10 @@
                         else if (ev.data.type === 'worker-init-success') {
 
                             this._ready = sqlite3Worker1Promiser.v2({worker}).then(p => {
-                                this._promiser = p;
-                                resolve(p);
+
+                                this._promiser = (request, caller = new Error('promiser')) =>
+                                    p(request).catch(ex => this.sqliteErrorHandler(ex, request, caller));
+                                resolve(this._promiser);
                             }).catch((ex) => {
                                 this.logger.error('Promiser init failed:', ex);
                                 reject(ex);
@@ -717,6 +719,34 @@
             this._tables = Object.create(null);
 
             window.addEventListener('pagehide', this.close.bind(this));
+        }
+
+        // SQLite worker error handler
+        sqliteErrorHandler(ex, request, caller) {
+
+            const {result} = Object(ex);
+
+            if (!result) {
+                throw ex;
+            }
+
+            const input = Object(result.input);
+            const query = input.sql || Object(input.args).sql;
+            const operation = result.operation || Object(request).type;
+            const reason = String(result.message || 'unknown error').split('\n')[0];
+            const detail = query ? `, query: ${String(query).replace(/\s+/g, ' ')}` : '';
+            const error = new Error(`${operation || 'operation'} failed, ${reason}${detail}`);
+            const stack = Array.isArray(result.stack) ? result.stack.join(' | ') : result.stack;
+
+            error.name = 'SQLiteError';
+
+            error.stack = [
+                `${error.name}: ${error.message}`,
+                stack && `worker: ${stack}`,
+                String(caller.stack || '').split('\n').slice(1).join('\n')
+            ].filter(Boolean).join('\n');
+
+            throw error;
         }
 
         async setup() {

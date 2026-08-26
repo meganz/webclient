@@ -73,8 +73,10 @@ function parseHTML(markup) {
             }
 
             if (invalid) {
+                if (!self.buildOlderThan10Days) {
+                    eventlog(99642, JSON.stringify([2, escapeHTML(content.slice(0, 256))]), true);
+                }
                 console.warn('Filtered out invalid content passed to parseHTML...', [node]);
-                eventlog(99642, JSON.stringify([1, escapeHTML(content.slice(0, 256))]), true);
             }
             else {
                 fragment.appendChild(node);

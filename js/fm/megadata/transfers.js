@@ -1047,7 +1047,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
 
                             if (repeat) {
                                 while ((entry = conflicts.pop())) {
-                                    const renamed = fileconflict.findNewName(entry[0].name, target);
+                                    const renamed = fileconflict.findNewName(entry[0].name, target, true);
                                     renameFolder(entry[0].name, renamed);
                                 }
                             }

@@ -745,6 +745,7 @@ function sc_node(n) {
 // inter-actionpacket state, gets reset in getsc()
 var scsharesuiupd;
 var scpubliclinksuiupd;
+var scfullreload;
 var scContactsSharesUIUpdate;
 var loadavatars = [];
 var scinshare = Object.create(null);
@@ -1845,7 +1846,7 @@ scparser.$add('ssc', process_businessAccountSubUsers_SC);
 scparser.$add('ub', function() {
     "use strict";
     if (!folderlink && !addressDialog.paymentInProcess) {
-        fm_fullreload(null, 'ub-business').catch(dump);
+        scfullreload = 'ub-business';
     }
 });
 
@@ -1853,7 +1854,7 @@ scparser.$add('ub', function() {
 scparser.$add('upf', () => {
     "use strict";
     if (!folderlink && !addressDialog.paymentInProcess) {
-        fm_fullreload(null, 'upf-proflexi').catch(dump);
+        scfullreload = 'upf-proflexi';
     }
 });
 
@@ -1979,6 +1980,11 @@ scparser.$finalize = async() => {
         }).bind(null, scContactsSharesUIUpdate));
 
         scContactsSharesUIUpdate = false;
+    }
+
+    if (scfullreload) {
+        onIdle(() => fm_fullreload(null, scfullreload).catch(dump));
+        scfullreload = false;
     }
 
     sccount = 0;

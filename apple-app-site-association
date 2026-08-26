@@ -3,7 +3,10 @@
         "apps": [],
         "details": [
             {
-                "appID": "T9RH74Y7L9.mega.ios",
+                "appIDs": [
+                    "T9RH74Y7L9.mega.ios",
+                    "YX2CTZGGSK.mega.ios"
+                ],
                 "paths": [
                     "/fm/ipc/*",
                     "/fm/chat/*",
@@ -19,7 +22,10 @@
                 ]
             },
             {
-                "appID": "T9RH74Y7L9.mega.ios.dev",
+                "appIDs": [
+                    "T9RH74Y7L9.mega.ios.dev",
+                    "YX2CTZGGSK.mega.ios.dev"
+                ],
                 "paths": [
                     "/fm/ipc/*",
                     "/fm/chat/*",
@@ -37,7 +43,10 @@
                 ]
             },
             {
-                "appID": "T9RH74Y7L9.mega.ios.qa",
+                "appIDs": [
+                    "T9RH74Y7L9.mega.ios.qa",
+                    "YX2CTZGGSK.mega.ios.qa"
+                ],
                 "paths": [
                     "/fm/ipc/*",
                     "/fm/chat/*",

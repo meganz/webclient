@@ -9493,15 +9493,13 @@ globalThis.sqlite3ApiBootstrap.initializers.push(function(sqlite3){
       let isBlob = false;
 
       switch (declaredType) {
+        case 'real':
         case 'integer':
-          atype = Int32Array;
+          atype = Float64Array;
           break;
         case 'blob':
           atype = Array;
           isBlob = true;
-          break;
-        case 'real':
-          atype = Float64Array;
           break;
       }
 

@@ -611,7 +611,7 @@ mBroadcaster.once('boot_done', tryCatch(() => {
             logger[rem < 0 ? 'debug' : rem < 5 ? 'warn' : 'info'](`${tasks.length} ICTask(s) handled...`, elapsed, rem);
         }
 
-        if (elapsed > IDLE_THRESHOLD) {
+        if (elapsed > IDLE_THRESHOLD << 1) {
             logger.warn('Caught unreliable idleCallback() dispatcher...', lax, elapsed, document.hidden);
 
             if (!document.hidden && ++lax < 2 && self.buildOlderThan10Days === false) {

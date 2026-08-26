@@ -525,7 +525,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
     }
 
     // exit loop if we ran out of pending writes or have crashed
-    if (this.inflight || ch < 0 || this.crashed || this.writing) {
+    if (this.inflight || ch < 0 || this.crashed || this.writing || !this.db) {
         return;
     }
 
@@ -1429,7 +1429,7 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
     }
     else if (options.query) {
         // Perform custom user-provided query
-        t = options.query(t);
+        t = t && options.query(t);
     }
     else if (where) {
         for (let k = where.length; k--;) {

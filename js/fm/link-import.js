@@ -909,7 +909,7 @@ lazy(mega, 'linkImport', () => {
                         let tFolderName = l.url_import_folder_prefix.replace('$1', time2date(Date.now() / 1000, 8));
 
                         if (duplicated(tFolderName, importTarget)) {
-                            tFolderName = fileconflict.findNewName(tFolderName, importTarget);
+                            tFolderName = fileconflict.findNewName(tFolderName, importTarget, true);
                         }
 
                         const h = await M.createFolder(importTarget, tFolderName).catch(tell);

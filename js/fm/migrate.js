@@ -339,7 +339,8 @@ lazy(mega, 'migrate', () => {
                                 M.RootID : M.currentdirid;
 
                             while (duplicated(targetFolderName, targetFolderParent)) {
-                                targetFolderName = fileconflict.findNewName(targetFolderName, targetFolderParent);
+                                targetFolderName =
+                                    fileconflict.findNewName(targetFolderName, targetFolderParent, true);
                             }
 
                             navigate.goToStep(2, true);

@@ -2668,6 +2668,11 @@ MegaUtils.prototype.fmEventLog = function(eid) {
 MegaUtils.prototype.sqliteCheck = async function() {
     'use strict';
 
+    // Folderlink, lets skip the check
+    if (pfid) {
+        return;
+    }
+
     if (this.pendingSQLiteCheck) {
         return this.pendingSQLiteCheck;
     }
@@ -2684,9 +2689,9 @@ MegaUtils.prototype.sqliteCheck = async function() {
     await WebAssembly.compile(Uint8Array.of(0, 97, 115, 109, 1, 0, 0, 0));
 
     if (!opfsready) {
-        this.pendingSQLiteCheck = tSleep.race(7, new Promise((resolve) => {
+        this.pendingSQLiteCheck = new Promise((resolve) => {
             const blob = URL.createObjectURL(new Blob([
-                'onmessage = async() => {' +
+                'onmessage = () => {(async() => {' +
                 'const root = await navigator.storage.getDirectory();' +
                 'const fh   = await root.getFileHandle("_p_.bin", { create: true });' +
                 'const sah  = await fh.createSyncAccessHandle();' +
@@ -2694,7 +2699,7 @@ MegaUtils.prototype.sqliteCheck = async function() {
                 'sah.close();' +
                 'await root.removeEntry("_p_.bin");' +
                 'postMessage(size);' +
-                '};'
+                '})().catch(ex => postMessage(ex));};'
             ]));
             const worker = new Worker(blob);
 
@@ -2704,13 +2709,13 @@ MegaUtils.prototype.sqliteCheck = async function() {
                 URL.revokeObjectURL(blob);
             };
             worker.postMessage({});
-        })).then(size => {
+        }).then(size => {
             assert(size === 0, 'SQLite OPFS probe failed', size);
             localStorage.opfsready = 1;
         });
     }
 
-    this.pendingSQLiteCheck = tSleep.race(15, Promise.resolve(this.pendingSQLiteCheck).then(() => M.require('sqlite')))
+    this.pendingSQLiteCheck = tSleep.race(7, Promise.resolve(this.pendingSQLiteCheck).then(() => M.require('sqlite')))
         .then((res) => {
             assert(!res && self.sqlite3Worker1Promiser.defaultConfig.worker, 'SQLite runtime failure', res);
         })

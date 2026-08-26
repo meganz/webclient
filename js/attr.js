@@ -462,7 +462,7 @@
 
                         // Pick the cached entry as long it has no expiry or it hasn't expired
                         if (!exp || exp > (unixtime() - ATTRIB_CACHE_NON_CONTACT_EXP_TIME)) {
-                            if (res[0].av) {
+                            if (Object(res[0]).hasOwnProperty('av')) {
                                 result = res[0].av;
                                 if (res[0].v) {
                                     self._versions[cacheKey] = res[0].v;

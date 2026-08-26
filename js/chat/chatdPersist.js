@@ -182,6 +182,13 @@
             }).catch(dump);
         });
 
+        megaChat.rebind('onDestroy.chatdPersist', () => {
+            const keys = Object.keys(this._msgActionsQueuePerChat);
+            for (let i = keys.length; i--;) {
+                this._expungeMessageActionsQueue(keys[i]);
+            }
+        });
+
     };
 
     ChatdPersist.prototype.transaction = promisify(function(resolve, reject, dispatcher) {
@@ -279,6 +286,7 @@
         self.chatd.off('onMessagesHistoryDone.chatdPersist');
         self.chatd.off('onMessagesHistoryRequest.chatdPersist');
         self.chatd.megaChat.off('onRoomDestroy.chatdPersist');
+        this.chatd.megaChat.off('onDestroy.chatdPersist');
         delete self.chatd.chatdPersist;
     };
 
@@ -755,7 +763,7 @@
 
         if (!ChatdPersist.isMasterTab()) {
             // don't do anything if this is not the master tab!
-            return reject(EACCESS);
+            return Promise.reject(EACCESS);
         }
 
         var msgId = typeof msgIdOrObj === "object" ? msgIdOrObj.messageId : msgIdOrObj;

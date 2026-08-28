@@ -259,8 +259,18 @@ function resetSensitives() {
             // We need this cache only over the current event loop to avoid iterating same parents multiple times
             if (!sensitiveStatusCache) {
                 sensitiveStatusCache = Object.create(null);
-                sensitiveStatusCache.shares = array.to.object(M.getTreeHandles('shares'), true);
-                sensitiveStatusCache.backups = array.to.object(M.getTreeHandles(M.BackupsId), true);
+                sensitiveStatusCache.shares = Object.create(null);
+                sensitiveStatusCache.backups = Object.create(null);
+
+                tryCatch(() => {
+                    sensitiveStatusCache.shares = array.to.object(M.getTreeHandles('shares'), true);
+                })();
+
+                if (M.BackupsId) {
+                    tryCatch(() => {
+                        sensitiveStatusCache.backups = array.to.object(M.getTreeHandles(M.BackupsId), true);
+                    })();
+                }
 
                 onIdle(() => {
                     sensitiveStatusCache = null;

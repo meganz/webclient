@@ -72,11 +72,10 @@ class MobileSelectionRender extends MobileMegaRender {
              * l.toast_import_file
              * l.toast_import_folder
              */
-            const text = escapeHTML(
-                type === 'import'
-                    ? l[`toast_import_${sn.t ? 'folder' : 'file'}`]
-                    : l[`mobile_${sn.t ? 'folder' : 'file'}_${type}_to_folder`]
-            );
+            // These mobile_* strings are esacpeHTML'd already.
+            const text = type === 'import'
+                ? escapeHTML(l[`toast_import_${sn.t ? 'folder' : 'file'}`])
+                : l[`mobile_${sn.t ? 'folder' : 'file'}_${type}_to_folder`];
             return parseHTML(
                 mega.icu.format(text, 1)
                     .replace('%1', escapeHTML(M.getNameByHandle(th)))

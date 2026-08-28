@@ -417,10 +417,10 @@
 
             const genActionHtml = (version, i, versionList) => {
                 if (i < versionList.length - 1 && version.name !== versionList[i + 1].name) {
-                    return l[17156].replace('%1', `<span>${versionList[i + 1].name}</span>`);
+                    return escapeHTML(l[17156]).replace('%1', `<span>${escapeHTML(versionList[i + 1].name)}</span>`);
                 }
-                return version.u === u_handle ? l[16480]
-                    : l[16476].replace('%1', M.getNameByHandle(version.u) || l[7381]);
+                return escapeHTML(version.u === u_handle ? l[16480]
+                    : l[16476].replace('%1', M.getNameByHandle(version.u) || l[7381]));
             };
 
             const fillVersionList = (handle, versionList) => {

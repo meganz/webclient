@@ -236,11 +236,7 @@ export class ContactButton extends ContactAwareComponent {
                                     return msgDialog(
                                         'info',
                                         '',
-                                        // `%1 is using an ephemeral session.`
-                                        l.ephemeral_title
-                                            ? l.ephemeral_title.replace('%1', name)
-                                            : `${name} is using an ephemeral session.`,
-                                        /* `Please add them to your contact list once they register their account.` */
+                                        escapeHTML(l.ephemeral_title).replace('%1', escapeHTML(name)),
                                         l.ephemeral_info
                                     );
                                 })

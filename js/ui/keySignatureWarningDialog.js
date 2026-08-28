@@ -72,21 +72,19 @@
     KeySignatureWarningDialog.prototype._renderDetails = function() {
 
         // Change wording to seen or verified
-        var infoFirstLine = l[7585];
+        let infoFirstLine = escapeHTML(l[7585]);
         var contactEmail = KeySignatureWarningDialog.contactHandle;
         if (M.u[KeySignatureWarningDialog.contactHandle]) {
             contactEmail = M.u[KeySignatureWarningDialog.contactHandle].m;
         }
+        const emailStr = `<span class="emailAddress">${escapeHTML(contactEmail)}</span>`;
         infoFirstLine = infoFirstLine.replace('%1', KeySignatureWarningDialog.keyType);
-        infoFirstLine = infoFirstLine.replace('%2', '<span class="emailAddress">'
-                      + contactEmail + '</span>');
+        infoFirstLine = infoFirstLine.replace('%2', emailStr);
 
         const $dialog = $('.key-signature-warning-dialog');
-        $dialog.find('.information .firstLine').html(infoFirstLine);
+        $('.information .firstLine', $dialog).safeHTML(infoFirstLine);
 
-        $('.information .description', $dialog).safeHTML(
-            l[8436].replace('%1', `<span class="emailAddress">${contactEmail}</span>`)
-        );
+        $('.information .description', $dialog).safeHTML(l[8436].replace('%1', emailStr));
 
         // If the avatar exists, show it
         if (typeof avatars[KeySignatureWarningDialog.contactHandle] !== 'undefined') {

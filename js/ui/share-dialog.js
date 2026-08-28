@@ -1426,7 +1426,7 @@ lazy(mega.ui, 'mShareDialog', () => {
                         ${av2}
                     </div>
                     <div class="access-node-username simpletip" data-simpletip="${emails}" data-simpletipposition="top">
-                    ${mega.utils.trans.listToString(names, '%s others', false, 3)}
+                    ${escapeHTML(mega.utils.trans.listToString(names, '%s others', false, 3))}
                     </div>
                 </div>
                 <i class="sprite-fm-mono icon-dropdown more"></i>

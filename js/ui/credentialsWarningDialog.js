@@ -95,12 +95,13 @@
 
         // Change wording to seen or verified
         var infoFirstLine = (CredentialsWarningDialog.seenOrVerified === 'seen') ? l[6881] : l[6882];
-            infoFirstLine = infoFirstLine.replace('%1', '<span class="emailAddress">' + CredentialsWarningDialog.contactEmail + '</span>');
+        infoFirstLine = escapeHTML(infoFirstLine)
+            .replace('%1', `<span class="emailAddress">${escapeHTML(CredentialsWarningDialog.contactEmail)}</span>`);
         var title = (CredentialsWarningDialog.seenOrVerified === 'seen') ? l[6883] : l[6884];
 
         var $dialog = $('.credentials-warning-dialog');
-        $dialog.find('.information .firstLine').html(infoFirstLine);
-        $dialog.find('.previousCredentials .title').html(title);
+        $('.information .firstLine', $dialog).safeHTML(infoFirstLine);
+        $('.previousCredentials .title', $dialog).safeHTML(escapeHTML(title));
 
         // If the avatar exists, show it
         if (typeof avatars[CredentialsWarningDialog.contactHandle] !== 'undefined') {
@@ -137,9 +138,9 @@
             $dialog.find('.postResetCredentials').show();
             $dialog.find('.verifyCredentials').show();
 
-            // Copy the new credentials to the section to be shown after reset
-            var $newCredentials = $dialog.find('.newCredentials .fingerprint').clone().removeClass('mismatch');
-            $dialog.find('.postResetCredentials .fingerprint').html($newCredentials.html());
+            // Rebuild the new credentials for the section shown after reset
+            const newCredentials = CredentialsWarningDialog.newFingerprint.replace(/.{4}/g, '<span>$&</span>');
+            $('.postResetCredentials .fingerprint', $dialog).safeHTML(newCredentials);
 
             // Hide the current Reset button and show the Verify contact one
             $(this).addClass('hidden');
@@ -203,8 +204,8 @@
 
         // Render new fingerprints
         var $dialog = $('.credentials-warning-dialog');
-        $dialog.find('.previousCredentials .fingerprint').html(previousFingerprintHtml);
-        $dialog.find('.newCredentials .fingerprint').html(newFingerprintHtml);
+        $('.previousCredentials .fingerprint', $dialog).safeHTML(previousFingerprintHtml);
+        $('.newCredentials .fingerprint', $dialog).safeHTML(newFingerprintHtml);
     };
 
     /**

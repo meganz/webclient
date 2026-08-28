@@ -1237,7 +1237,7 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree, extra) {
                                     const message = `${l[6949]}, ${this.getNamedPath(cn[i])}: ${reason}`;
 
                                     console.error(message);
-                                    showToast('warning', message);
+                                    showToast('warning', escapeHTML(message));
                                 }
                             }
                             dump(res);

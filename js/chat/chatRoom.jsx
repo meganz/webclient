@@ -1041,12 +1041,12 @@ ChatRoom.prototype.getParticipantsTruncated = function(maxMembers = 5, maxLength
         }
 
         truncatedParticipantNames.push(
-            name.length > maxLength ? name.substr(0, maxLength) + '...' : name
+            name.length > maxLength ? name.substr(0, maxLength) + '\u2026' : name
         );
     }
 
     if (truncatedParticipantNames.length === maxMembers) {
-        truncatedParticipantNames.push('...');
+        truncatedParticipantNames.push('\u2026');
     }
 
     return truncatedParticipantNames.join(', ');

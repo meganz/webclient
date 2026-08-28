@@ -19764,7 +19764,6 @@ const ui_contactSelectorDialog = ContactSelectorDialog;
 
 
 
-
 const VIEWS = {
   CHATS: 0x00,
   MEETINGS: 0x01,
@@ -20149,8 +20148,6 @@ class ConversationsApp extends mixins.w9 {
     }), rightPane);
   }
 }
-if (false) // removed by dead control flow
-{}
 const conversations = {
   ConversationsApp
 };

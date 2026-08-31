@@ -27,6 +27,9 @@ BusinessRegister.prototype.initPage = function(
     loadingDialog.show('registerb-init');
     extra = extra || Object.create(null);
 
+    // Carried over from the pricing page, and dropped once the user leaves these pages
+    pro.watchDisplayCurrency();
+
     var $pageContainer = $('.bus-reg-body');
     var mySelf = this;
 

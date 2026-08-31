@@ -81,6 +81,36 @@ var pro = {
 
     membershipPlansCacheStale: false,
 
+    // Set while the plans are scanned, see setLocalCurrency; false when EUR is all that is quoted
+    localCurrency: false,
+
+    // Resolved on first read, see the displayEuro accessors below
+    _displayEuro: null,
+
+    /**
+     * Off by default so prices stay local; held in sessionStorage so propay inherits the choice.
+     * @returns {Boolean} True while euro prices are on display.
+     */
+    get displayEuro() {
+        'use strict';
+
+        if (this._displayEuro === null) {
+            this._displayEuro = sessionStorage.getItem('pro.displayEuro') === '1';
+        }
+
+        return this._displayEuro;
+    },
+
+    /**
+     * @param {Boolean} euro Whether to display euro prices rather than local ones.
+     */
+    set displayEuro(euro) {
+        'use strict';
+
+        this._displayEuro = !!euro;
+        sessionStorage.setItem('pro.displayEuro', this._displayEuro ? '1' : '0');
+    },
+
     /**
      * Determines if a Business or Pro Flexi account is expired or in grace period
      * @param {Number} accountStatus The account status e.g. from u_attr.b.s (Business) or u_attr.pf.s (Pro Flexi)
@@ -101,6 +131,10 @@ var pro = {
         const blockFreeTrial = localStorage.blockFreeTrial
             && new Set(localStorage.blockFreeTrial.split(',').map(n => +n));
         const blockSpecificPlans = localStorage.blockSpecificPlans && JSON.parse(localStorage.blockSpecificPlans);
+
+        if (!allowLocal) {
+            pro.localCurrency = false;
+        }
 
         pro.membershipPlans = pro.membershipPlans.map((plan) => {
             if (!allowLocal) {
@@ -127,8 +161,29 @@ var pro = {
         }).filter(p => p);
     },
 
+    /**
+     * Records the currency a plan is quoted in alongside EUR, so the pricing page does not rescan.
+     * A local currency of EUR is the same offer twice over, so there is still no choice.
+     *
+     * @param {Array} plan Plan as stored in pro.membershipPlans.
+     * @returns {void}
+     */
+    setLocalCurrency(plan) {
+        'use strict';
+
+        const currency = plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
+
+        if (!pro.localCurrency && currency && currency !== 'EUR'
+            && plan[pro.UTQA_RES_INDEX_PRICE]
+            && plan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+
+            pro.localCurrency = currency;
+        }
+    },
+
     resetCaching() {
         'use strict';
+        pro.localCurrency = false;
         pro.singleDurationPlans = Object.create(null);
         pro.planSearch.reset();
         pro.anyDiscount = false;
@@ -396,6 +451,7 @@ var pro = {
                         }
                         if (!pro.blockPlans || !pro.blockPlans.has(results[i].al)) {
                             const currentPlan = plans[plans.length - 1];
+                            pro.setLocalCurrency(currentPlan);
                             pro.planObjects.createPlanObject(currentPlan, results[i]);
                             pro.planSearch.addPlanToSearch(currentPlan);
                             if (results[i].m === 1 && results[i].it !== 1) {
@@ -990,8 +1046,27 @@ var pro = {
             pro.planObjects.planTypes = Object.create(null);
         },
 
+        /**
+         * A live getter rather than lazy(), as the displayed currency changes without a reload.
+         *
+         * @param {Object} target Plan object to define the property on.
+         * @param {String} name Name of the displayed property.
+         * @param {String} localKey Property holding the local variant.
+         * @param {String} euroKey Property holding the euro variant.
+         * @returns {void}
+         */
+        defineDisplayed(target, name, localKey, euroKey) {
+            'use strict';
+
+            Object.defineProperty(target, name, {
+                get: () => target[pro.displayEuro ? euroKey : localKey],
+                configurable: true,
+            });
+        },
+
         createPlanObject(plan, planFromApi) {
             'use strict';
+            const {defineDisplayed} = pro.planObjects;
             const key = plan[pro.UTQA_RES_INDEX_ID] + plan[pro.UTQA_RES_INDEX_ITEMNUM];
 
             const taxInfo = (pro.taxInfo || plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === pro.ACCOUNT_LEVEL_BUSINESS)
@@ -1024,6 +1099,22 @@ var pro = {
                     _durationOptions: null,     // Stores the duration options available in the plan
                     _maxCorrPriceEur: null,
                     planArray: plan,
+                    id: plan[pro.UTQA_RES_INDEX_ID],
+                    itemNum: plan[pro.UTQA_RES_INDEX_ITEMNUM],
+                    level: plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL],
+                    months: plan[pro.UTQA_RES_INDEX_MONTHS],
+                    storage: plan[pro.UTQA_RES_INDEX_STORAGE] * pro.BYTES_PER_GB,
+                    transfer: plan[pro.UTQA_RES_INDEX_TRANSFER] * pro.BYTES_PER_GB,
+                    priceEuro: plan[pro.UTQA_RES_INDEX_PRICE],
+                    currencyEuro: plan[pro.UTQA_RES_INDEX_CURRENCY],
+
+                    // Local prices fall back to euro for plans the API did not quote locally
+                    priceLocal: plan[pro.UTQA_RES_INDEX_LOCALPRICE] || plan[pro.UTQA_RES_INDEX_PRICE],
+                    currencyLocal: plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]
+                        || plan[pro.UTQA_RES_INDEX_CURRENCY],
+                    save: plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCYSAVE] || false,
+                    monthlyBasePrice: plan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] || false,
+                    hasLocal: !!plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY],
                     features: plan[pro.UTQA_RES_INDEX_EXTRAS].f,
                     trial: plan[pro.UTQA_RES_INDEX_EXTRAS].trial,
                     featureStrings: pro.featureInfo[plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]],
@@ -1037,33 +1128,33 @@ var pro = {
                     minUsers: plan[pro.UTQA_RES_INDEX_EXTRAS].minUsers || false,
                 };
 
-                lazy(thisPlan, 'id', () => plan[pro.UTQA_RES_INDEX_ID]);
-                lazy(thisPlan, 'itemNum', () => plan[pro.UTQA_RES_INDEX_ITEMNUM]);
-                lazy(thisPlan, 'level', () => plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]);
-                lazy(thisPlan, 'name', () => pro.getProPlanName(plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]));
-                lazy(thisPlan, 'storage', () => plan[pro.UTQA_RES_INDEX_STORAGE] * pro.BYTES_PER_GB);
-                lazy(thisPlan, 'transfer', () => plan[pro.UTQA_RES_INDEX_TRANSFER] * pro.BYTES_PER_GB);
-                lazy(thisPlan, 'months', () => plan[pro.UTQA_RES_INDEX_MONTHS]);
-                lazy(thisPlan, 'price', () => plan[pro.UTQA_RES_INDEX_LOCALPRICE] || plan[pro.UTQA_RES_INDEX_PRICE]);
-                lazy(thisPlan, 'currency', () => {
-                    return plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY] || plan[pro.UTQA_RES_INDEX_CURRENCY];
-                });
-                lazy(thisPlan, 'priceEuro', () => plan[pro.UTQA_RES_INDEX_PRICE]);
-                lazy(thisPlan, 'currencyEuro', () => plan[pro.UTQA_RES_INDEX_CURRENCY]);
-                lazy(thisPlan, 'save', () => plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCYSAVE] || false);
-                lazy(thisPlan, 'monthlyBasePrice', () => plan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] || false);
-                lazy(thisPlan, 'hasLocal', () => !!plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
+                lazy(thisPlan, 'name', () => pro.getProPlanName(thisPlan.level));
                 lazy(thisPlan, 'trialStrings', () => thisPlan.trial && pro.featureInfo[thisPlan.level + '-trial']);
                 lazy(thisPlan, 'featureBits', () => thisPlan.features && pro.getStandaloneBits(thisPlan.features));
-                lazy(thisPlan, 'taxInfo', () => {
+                lazy(thisPlan, 'taxInfoLocal', () => {
                     return pro.getStandardisedTaxInfo(taxInfo, thisPlan.level === pro.ACCOUNT_LEVEL_BUSINESS);
                 });
+
+                // Built once rather than per read, as tax info is read on every price render
+                lazy(thisPlan, 'taxInfoEuro', () => {
+                    const info = thisPlan.taxInfoLocal;
+
+                    return info && {
+                        taxAmount: info.taxAmountEuro,
+                        taxedPrice: info.taxedPriceEuro,
+                        taxAmountEuro: info.taxAmountEuro,
+                        taxedPriceEuro: info.taxedPriceEuro,
+                    };
+                });
+
+                // Local rather than displayed, so lazy() cannot cache these past a currency change
                 lazy(thisPlan, 'taxedPriceEuro', () => {
-                    return thisPlan.taxInfo ? thisPlan.taxInfo.taxedPriceEuro : thisPlan.priceEuro;
+                    return thisPlan.taxInfoLocal ? thisPlan.taxInfoLocal.taxedPriceEuro : thisPlan.priceEuro;
                 });
-                lazy(thisPlan, 'taxedPrice', () => {
-                    return thisPlan.taxInfo ? thisPlan.taxInfo.taxedPrice : thisPlan.price;
+                lazy(thisPlan, 'taxedPriceLocal', () => {
+                    return thisPlan.taxInfoLocal ? thisPlan.taxInfoLocal.taxedPrice : thisPlan.priceLocal;
                 });
+
                 lazy(thisPlan, 'instantDiscount', () => {
                     const planDiscountInfo = plan[pro.UTQA_RES_INDEX_EXTRAS].insdis;
 
@@ -1163,6 +1254,7 @@ var pro = {
                     return thisPlan._maxCorrPriceEur;
                 });
 
+                // Local, to agree with thisPlan.save and to keep lazy() from caching a displayed price
                 lazy(thisPlan, 'yearlyDiscount', () => {
                     if (thisPlan.save) {
                         return thisPlan.save;
@@ -1170,10 +1262,10 @@ var pro = {
                     if ((thisPlan.months === 1) || !thisPlan.correlatedPlan) {
                         return false;
                     }
-                    const baseYearly = thisPlan.correlatedPlan.price * 12;
+                    const baseYearly = thisPlan.correlatedPlan.priceLocal * 12;
 
                     // Multiply by 100 and then divide by 100 to avoid floating point issues as JS hates decimals
-                    return (baseYearly * 100 - thisPlan.price * 100) / 100;
+                    return (baseYearly * 100 - thisPlan.priceLocal * 100) / 100;
                 });
 
                 lazy(thisPlan, 'yearlyDiscountInfo', () => {
@@ -1190,20 +1282,21 @@ var pro = {
                     let mPriceEuro;
                     let yPriceEuro;
 
-                    const mPriceN = monthlyPlan.price;
-                    const yPriceN = thisPlan.price;
+                    // The l* and e* fields mean local and euro, so read from those sides directly
+                    const mPriceN = monthlyPlan.priceLocal;
+                    const yPriceN = thisPlan.priceLocal;
                     const mPriceEuroN = monthlyPlan.priceEuro;
                     const yPriceEuroN = thisPlan.priceEuro;
 
-                    if (thisPlan.taxInfo && monthlyPlan.taxInfo) {
-                        mPrice = monthlyPlan.taxInfo.taxedPrice;
-                        yPrice = thisPlan.taxInfo.taxedPrice;
-                        mPriceEuro = monthlyPlan.taxInfo.taxedPriceEuro;
-                        yPriceEuro = thisPlan.taxInfo.taxedPriceEuro;
+                    if (thisPlan.taxInfoLocal && monthlyPlan.taxInfoLocal) {
+                        mPrice = monthlyPlan.taxInfoLocal.taxedPrice;
+                        yPrice = thisPlan.taxInfoLocal.taxedPrice;
+                        mPriceEuro = monthlyPlan.taxInfoLocal.taxedPriceEuro;
+                        yPriceEuro = thisPlan.taxInfoLocal.taxedPriceEuro;
                     }
                     else {
-                        mPrice = monthlyPlan.price;
-                        yPrice = thisPlan.price;
+                        mPrice = monthlyPlan.priceLocal;
+                        yPrice = thisPlan.priceLocal;
                         mPriceEuro = monthlyPlan.priceEuro;
                         yPriceEuro = thisPlan.priceEuro;
                     }
@@ -1232,6 +1325,12 @@ var pro = {
                     };
                 });
 
+                // The shown half of each local/euro pair above, see pro.displayEuro
+                defineDisplayed(thisPlan, 'price', 'priceLocal', 'priceEuro');
+                defineDisplayed(thisPlan, 'currency', 'currencyLocal', 'currencyEuro');
+                defineDisplayed(thisPlan, 'taxInfo', 'taxInfoLocal', 'taxInfoEuro');
+                defineDisplayed(thisPlan, 'taxedPrice', 'taxedPriceLocal', 'taxedPriceEuro');
+
                 // Compose undiscounted pricing for a given duration: each full 12 months at the
                 // yearly plan's price, the remainder at the monthly plan's price. Falls back to
                 // months x monthly when no yearly plan exists, or when `ignoreYearlyBundle` is
@@ -1250,9 +1349,18 @@ var pro = {
                         priceEuro: compose('priceEuro'),
                         taxedPrice: compose('taxedPrice'),
                         taxedPriceEuro: compose('taxedPriceEuro'),
+
+                        // The local side as the API quoted it, for combining with its l* amounts
+                        priceLocal: compose('priceLocal'),
+                        taxedPriceLocal: compose('taxedPriceLocal'),
                     };
                 };
 
+                /**
+                 * @param {Boolean} useMonthlyPrice Whether to price the plan duration monthly.
+                 * @param {Number} months Number of months to price.
+                 * @returns {Object} price and taxedPrice in the displayed currency, plus both in euro.
+                 */
                 thisPlan.getPricing = (useMonthlyPrice, months) => {
                     let plan;
                     if (useMonthlyPrice === undefined) {
@@ -1284,8 +1392,8 @@ var pro = {
                     const taxedPrice = plan.taxInfo
                         ? combine((p) => (p.taxInfo ? p.taxInfo.taxedPrice : p.price))
                         : price;
-                    const taxedPriceEuro = plan.taxInfo
-                        ? combine((p) => (p.taxInfo ? p.taxInfo.taxedPriceEuro : p.priceEuro))
+                    const taxedPriceEuro = plan.taxInfoLocal
+                        ? combine((p) => (p.taxInfoLocal ? p.taxInfoLocal.taxedPriceEuro : p.priceEuro))
                         : priceEuro;
 
                     return {
@@ -2146,11 +2254,7 @@ lazy(pro, 'featureInfo', () => {
         },
         meeting: {
             icon: 'sprite-fm-mono icon-video-thin-outline',
-            text: l.pr_no_meet_time_limits
-        },
-        participants: {
-            icon: 'sprite-fm-mono icon-users-thin-outline',
-            text: l.pr_unlimited_participants
+            text: l.pr_unrestricted_chat_meetings
         }
     };
 
@@ -2217,14 +2321,12 @@ lazy(pro, 'featureInfo', () => {
         // Business
         '100': [
             feature.s4,
-            feature.meeting,
-            feature.participants
+            feature.meeting
         ],
         // Starter
         '11': [
             feature.vpn,
-            feature.meeting,
-            feature.participants
+            feature.meeting
         ]
     };
 
@@ -2234,14 +2336,12 @@ lazy(pro, 'featureInfo', () => {
                 feature.vpn,
                 feature.pwm,
                 feature.s4,
-                feature.meeting,
-                feature.participants
+                feature.meeting
             ]
             : [
                 feature.vpn,
                 feature.pwm,
-                feature.meeting,
-                feature.participants
+                feature.meeting
             ];
     }
 
@@ -2279,3 +2379,75 @@ lazy(pro, 'yearlyDiscount', () => {
         minYearlyDiscount
     };
 });
+
+/**
+ * Pages that pick and pay for a plan, and so honour the pricing page currency selector.
+ *
+ * @param {String} [name] Page to test, defaults to the page being shown.
+ * @returns {Boolean} True on the pricing, propay and business registration pages.
+ */
+pro.onPurchaseFlowPage = (name) => {
+    'use strict';
+
+    name = name || page || '';
+
+    return name === 'pro' || name === 'registerb' || name.includes('propay');
+};
+
+/**
+ * Apply a currency from the propay path (/propay_3/curr=eur), ignoring one the API did not quote.
+ *
+ * @returns {void}
+ */
+pro.applyUrlCurrency = () => {
+    'use strict';
+
+    const requested = sessionStorage.getItem('pro.urlCurrency');
+
+    if (!requested) {
+        return;
+    }
+
+    // Consumed, so a later visit without the parameter is not still bound by it
+    sessionStorage.removeItem('pro.urlCurrency');
+
+    const wanted = String(requested).toUpperCase();
+    const offered = new Set(['EUR']);
+
+    for (const plan of pro.membershipPlans) {
+        if (plan[pro.UTQA_RES_INDEX_LOCALPRICE] && plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]) {
+            offered.add(plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
+        }
+    }
+
+    if (!offered.has(wanted)) {
+        pro.log(`applyUrlCurrency: ${wanted} is not offered, falling back to the default`);
+        return;
+    }
+
+    pro.displayEuro = wanted === 'EUR';
+};
+
+/**
+ * Drop a euro selection, and this listener, once the user leaves the purchase flow.
+ *
+ * @returns {void}
+ */
+pro.watchDisplayCurrency = () => {
+    'use strict';
+
+    if (pro.displayCurrencyListener) {
+        return;
+    }
+
+    pro.displayCurrencyListener = mBroadcaster.addListener('pagechange', () => {
+        if (pro.onPurchaseFlowPage()) {
+            return;
+        }
+
+        pro.displayEuro = false;
+
+        mBroadcaster.removeListener(pro.displayCurrencyListener);
+        delete pro.displayCurrencyListener;
+    });
+};

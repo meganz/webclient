@@ -337,9 +337,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     if (!Object.keys(currSubAccounts).length) { // no subs
         return this.viewLandingPage();
     }
-    this.business.hasSubs = true;
-
-    loadingDialog.pshow();
 
     // API doesn't send the "Admin" user, i assume that this because the current admin is the caller.
     // if later, when we get multiple admins the same thing happened for other admins, then we can't rely
@@ -349,6 +346,16 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             currSubAccounts[this.currAdmin.u] = this.currAdmin;
         }
     }
+
+    const subUserHandles = Object.keys(currSubAccounts);
+
+    // Lone master slipped in via action packets or such. Show landing.
+    if (subUserHandles.length === 1 && this.currAdmin && subUserHandles[0] === this.currAdmin.u) {
+        return this.viewLandingPage();
+    }
+    this.business.hasSubs = true;
+
+    loadingDialog.pshow();
 
     currSubAccounts = mySelf.sortSubusers(currSubAccounts);
 

@@ -710,10 +710,23 @@
                 });
 
             const isFolder = selections.handles.length === 1 && M.d[selections.handles[0]].t;
-            const promises = isFolder ?
-                [fileversioning.getSubVersions(selections.handles[0])]
-                : selections.handles.map(h => fileversioning.getAllVersions(h));
-            Promise.allSettled(promises)
+
+            // Public links may view an older version. Grab the top version instead to show the full history
+            const topmost = selections.handles.some(h => M.d[h].fv)
+                ? dbfetch.geta([...selections.handles])
+                    .catch(dump)
+                    .then(() => {
+                        const handles = selections.handles.map(h => fileversioning.getTopNodeSync(h));
+                        selections.handles = [...new Set(handles)];
+                    })
+                : Promise.resolve();
+
+            topmost
+                .then(() => Promise.allSettled(
+                    isFolder
+                        ? [fileversioning.getSubVersions(selections.handles[0])]
+                        : selections.handles.map(h => fileversioning.getAllVersions(h))
+                ))
                 .then((res) => {
                     const blocks = [];
                     if (isFolder && res[0].status === 'fulfilled') {

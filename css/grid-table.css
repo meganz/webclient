@@ -767,6 +767,32 @@ table.grid-table tbody .versioning-indicator i.icon-clock-rotate {
     display: block;
 }
 
+.public-links-view table.grid-table tbody tr.is-old-version td.own-data .versioning-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 35px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+}
+.rtl .public-links-view table.grid-table tbody tr.is-old-version td.own-data .versioning-indicator {
+    left: auto;
+    right: 35px;
+}
+.public-links-view table.grid-table tbody tr.is-old-version:hover td.own-data .versioning-indicator,
+.public-links-view table.grid-table tbody tr.is-old-version.ui-selected td.own-data .versioning-indicator {
+    opacity: 0;
+}
+.public-links-view table.grid-table tbody tr.is-old-version td.own-data .versioning-indicator i {
+    --icon-size: 16px;
+}
+.public-links-view table.grid-table tbody tr.is-old-version .ver-col-container .ver-nb {
+    display: none;
+}
+
 table.grid-table tbody tr:not(.linked) td.own-data .icon-link-thin-outline,
 table.grid-table tbody tr.taken-down td.own-data .icon-link-thin-outline {
     display: none;

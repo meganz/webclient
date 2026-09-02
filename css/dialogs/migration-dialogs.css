@@ -51,6 +51,7 @@
     border: 0;
     display: flex;
     flex-wrap: wrap;
+    gap: 16px;
     margin: 0;
     padding: 24px 48px;
 }

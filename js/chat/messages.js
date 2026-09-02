@@ -221,15 +221,7 @@ Message._getTextContentsForDialogType = function(message) {
             textMessage = textMessage.replace("%s", contactName);
         }
 
-
-        if (textMessage) {
-            return textMessage
-                .replace(/\[\[/g, "")
-                .replace(/\]\]/g, "");
-        }
-        else {
-            return false;
-        }
+        return textMessage && escapeHTML(textMessage).replace(/\[\[|]]/g, "");
     }
 };
 
@@ -2919,8 +2911,8 @@ MessagesBuff.prototype.getExportContent = function(media) {
         attachNodes: [],
     };
 
-    const nameList = handles => handles.map(h => M.getNameByHandle(h));
-    const emojiString = l[24069].replace(/\[G]/g, '').replace(/\[\/G]/g, '');
+    const nameList = handles => handles.map(h => M.getSafeName(M.getNameByHandle(h)));
+    const emojiString = escapeHTML(l[24069]).replace(/\[\/?G]/g, '');
     this.messages.forEach(msg => {
         const content = [time2date(msg.delay), this.getRenderableSummary(msg, 0xBADF)];
         if (media && msg.hasAttachments()) {

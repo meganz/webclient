@@ -3134,7 +3134,9 @@
                     mega.keyMgr.setShareSnapshot(target)
                         .then(() => doShare(target, [user]))
                         .then(() => {
-                            mega.ui.toast.show(l.share_folder_toast.replace('%1', M.getNameByHandle(target)));
+                            mega.ui.toast.show(
+                                escapeHTML(l.share_folder_toast).replace('%1', M.getNameByHandle(target))
+                            );
                         })
                         .catch(tell);
                 }

@@ -876,7 +876,8 @@ var ulmanager = {
             }
 
             if (ulmanager.ulXferPut) {
-                const options = {channel: 7, apipath: 'https://bt7.api.mega.co.nz/'};
+                const {core: {apipath} = false} = window.T || !1;
+                const options = {channel: 7, apipath: apipath || 'https://bt7.api.mega.co.nz/'};
 
                 api.yield(options.channel)
                     .then(() => {

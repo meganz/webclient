@@ -654,3 +654,9 @@ body:not(.no-lbl-colour) .folder .item-type-icon.icon-rubbish-folder-24 {
     border-radius: 8px;
     z-index: 900;
 }
+
+/* Public links */
+
+.public-links-view .mega-node.is-old-version .icon-version {
+    display: block;
+}

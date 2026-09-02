@@ -936,7 +936,7 @@ class MegaFlyoutMenu extends MegaComponent {
         showContactFlyout(contactHandle) {
             flyoutState.clearListeners();
             const name = `contact-${contactHandle}`;
-            const uName = M.getNameByHandle(contactHandle);
+            const uName = escapeHTML(M.getNameByHandle(contactHandle));
             const actions = [
                 {
                     icon: 'sprite-fm-mono icon-message-chat-circle-thin',
@@ -1084,7 +1084,7 @@ class MegaFlyoutMenu extends MegaComponent {
                     }
                     const sortFn = M.getSortByNameFn2(1);
                     this.flyoutMenu.list = keys.sort((a, b) => sortFn(M.d[a], M.d[b])).map(h => {
-                        
+
                         const item = {
                             nodeHandle: h,
                             itemComp: 'node',

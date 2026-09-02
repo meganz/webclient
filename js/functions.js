@@ -314,6 +314,7 @@ function numOfBytes(bytes, precision, isSpd) {
  *                           - 2: "1.5<span>MB</span>" with span around unit
  *                           - 3: "1.5" (number only)
  *                           - 4: "1.5" (number only, removes trailing zeros)
+ *                           - & 8: "0 GB" (if zero bytes, return "0 GB"). Then &= ~8 to allow second formatting option
  *                           - negative: Caps maximum unit to MB
  * @returns {string} Formatted size string with appropriate unit
  */
@@ -362,9 +363,14 @@ function bytesToSize(bytes, precision, format) {
         capToMB = true;
     }
 
+    // Flag 8: render "0 GB" instead of "0 B" when bytes is zero. Strip the flag so the
+    // remaining format bits decide the formatting (plain text vs <span>-wrapped) below.
+    const zeroAsGB = format & 8;
+    format &= ~8;
+
     if (!bytes) {
         resultSize = 0;
-        resultUnit = s_b;
+        resultUnit = zeroAsGB ? s_gb : s_b;
     }
     else if ((bytes >= 0) && (bytes < kilobyte)) {
         resultSize = parseInt(bytes);

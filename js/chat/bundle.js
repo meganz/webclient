@@ -4320,10 +4320,10 @@ ChatRoom.prototype.getParticipantsTruncated = function (maxMembers = 5, maxLengt
     if (i > maxMembers) {
       break;
     }
-    truncatedParticipantNames.push(name.length > maxLength ? `${name.substr(0, maxLength)  }...` : name);
+    truncatedParticipantNames.push(name.length > maxLength ? `${name.substr(0, maxLength)  }\u2026` : name);
   }
   if (truncatedParticipantNames.length === maxMembers) {
-    truncatedParticipantNames.push('...');
+    truncatedParticipantNames.push('\u2026');
   }
   return truncatedParticipantNames.join(', ');
 };
@@ -7254,7 +7254,7 @@ class ContactButton extends _mixins2__.u9 {
                 return mBroadcaster.sendMessage('meetings:ephemeralAdd', userHandle);
               }
               const name = M.getNameByHandle(userHandle);
-              return msgDialog('info', '', l.ephemeral_title ? l.ephemeral_title.replace('%1', name) : `${name} is using an ephemeral session.`, l.ephemeral_info);
+              return msgDialog('info', '', escapeHTML(l.ephemeral_title).replace('%1', escapeHTML(name)), l.ephemeral_info);
             }).finally(() => loadingDialog.hide());
           }
         }
@@ -19764,7 +19764,6 @@ const ui_contactSelectorDialog = ContactSelectorDialog;
 
 
 
-
 const VIEWS = {
   CHATS: 0x00,
   MEETINGS: 0x01,
@@ -20149,8 +20148,6 @@ class ConversationsApp extends mixins.w9 {
     }), rightPane);
   }
 }
-if (false) // removed by dead control flow
-{}
 const conversations = {
   ConversationsApp
 };
@@ -23307,7 +23304,7 @@ const inProgressAlert = (isJoin, chatRoom) => {
         const {
           chatRoom: activeCallRoom
         } = megaChat.activeCall;
-        const peers = activeCallRoom ? activeCallRoom.getParticipantsExceptMe(activeCallRoom.getCallParticipants()).map(h => M.getNameByHandle(h)) : [];
+        const peers = activeCallRoom ? activeCallRoom.getParticipantsExceptMe(activeCallRoom.getCallParticipants()).map(h => escapeHTML(M.getNameByHandle(h))) : [];
         let body = isJoin ? l.cancel_to_join : l.cancel_to_start;
         if (peers.length) {
           body = mega.utils.trans.listToString(peers, isJoin ? l.cancel_with_to_join : l.cancel_with_to_start);
@@ -30992,7 +30989,7 @@ class MetaRichpreviewMegaLinks extends mixin.M {
               const {
                 chatRoom: callRoom
               } = megaChat.activeCall;
-              const peers = callRoom ? callRoom.getParticipantsExceptMe(callRoom.getCallParticipants()).map(h => M.getNameByHandle(h)) : [];
+              const peers = callRoom ? callRoom.getParticipantsExceptMe(callRoom.getCallParticipants()).map(h => escapeHTML(M.getNameByHandle(h))) : [];
               const body = peers.length ? mega.utils.trans.listToString(peers, l.cancel_with_to_join) : l.cancel_to_join;
               return msgDialog('confirmation', undefined, l.call_in_progress, body, e => e && window.open(url, '_blank', 'noopener,noreferrer'));
             }

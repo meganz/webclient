@@ -43,13 +43,14 @@
                         <i class="sprite-it-x24-mono icon-settings"></i>
                     </button>
                 </div>
-                <form>
-                    <div class="desktop-scroll-area js-inputs-body">
+
+                <div class="desktop-scroll-area js-inputs-body">
+                    <form>
                         <div class="js-default-inputs">
                             <div class="it-input fl-label xl-size hidden">
                                 <div class="input-box">
                                     <div class="input-field">
-                                        <input type="text" placeholder="[$transferit_email_to]" name="recipients" id="glb-recipients-input" value="" required />
+                                        <input type="text" placeholder="[$transferit_email_to]" name="recipients" id="glb-recipients-input" value="" required autocomplete="email" />
                                         <label for="glb-recipients-input">[$transferit_email_to]</label>
                                     </div>
                                 </div>
@@ -59,7 +60,7 @@
                             <div class="it-input fl-label xl-size">
                                 <div class="input-box">
                                     <div class="input-field">
-                                        <input type="text" placeholder="[$transferit_your_email]" name="glb-email-input" id="glb-email-input" value="" required />
+                                        <input type="text" placeholder="[$transferit_your_email]" name="glb-email-input" id="glb-email-input" value="" required autocomplete="email" />
                                         <label for="glb-email-input">[$transferit_your_email_opt]</label>
                                     </div>
                                 </div>
@@ -86,7 +87,9 @@
                                  <div class="error-text"></div>
                             </div>
                         </div>
+                    </form>
 
+                    <form autocomplete="off">
                         <div class="settings-body js-settings-body hidden">
                             <div class="section">
                                 <div class="caption">[$transferit_add_pass]</div>
@@ -94,10 +97,10 @@
                                 <div class="it-input fl-label xl-size it-input-password">
                                     <div class="input-box">
                                         <div class="input-field">
-                                            <input type="password" placeholder="[$17454]" name="glb-password-input"
-                                                   id="glb-password-input" value="" required
+                                            <input type="password" placeholder="[$17454]" name="it-set-link-password"
+                                                   id="it-set-link-password" value="" required
                                                    autocomplete="new-password"/>
-                                            <label for="glb-password-input">[$909]</label>
+                                            <label for="it-set-link-password">[$909]</label>
                                         </div>
                                     </div>
                                     <div class="error-text"></div>
@@ -194,28 +197,28 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </form>
+                </div>
 
-                    <div class="it-checkbox-label">
-                        <div class="it-checkbox">
-                            <input type="checkbox" name="glb-terms-and-privacy" class="" checked>
-                            <div class="box">
-                                <i class="sprite-it-x16-mono icon-check"></i>
-                            </div>
+                <div class="it-checkbox-label">
+                    <div class="it-checkbox">
+                        <input type="checkbox" name="glb-terms-and-privacy" class="" checked>
+                        <div class="box">
+                            <i class="sprite-it-x16-mono icon-check"></i>
                         </div>
-                        <span>[$transferit_agree_tos]</span>
                     </div>
+                    <span>[$transferit_agree_tos]</span>
+                </div>
 
-                    <div class="box-error-msg js-invalid-error hidden">
-                        <i class="sprite-it-x24-mono icon-warning-triangle"></i>
-                        <span>[$transferit_share_uploaded_error]</span>
-                    </div>
+                <div class="box-error-msg js-invalid-error hidden">
+                    <i class="sprite-it-x24-mono icon-warning-triangle"></i>
+                    <span>[$transferit_share_uploaded_error]</span>
+                </div>
 
-                    <button class="it-button xl-size f-w js-get-link-button disabled">
-                        <span>[$transferit_transfer_btn]</span>
-                    </button>
+                <button class="it-button xl-size f-w js-get-link-button disabled">
+                    <span>[$transferit_transfer_btn]</span>
+                </button>
 
-                </form>
             </div>
         </div>
     </section>

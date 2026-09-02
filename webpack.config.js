@@ -36,7 +36,7 @@ var webpackConfigs = {
     dev: {
         devServer: {
             port: 8089,
-            hot: true,
+            hot: 'only',
             static: __dirname,
             liveReload: false,
             webSocketServer: 'ws',
@@ -47,11 +47,7 @@ var webpackConfigs = {
         },
         mode: 'development',
         entry: {
-            app: [
-                'webpack-dev-server/client?http://localhost:8089', // WebpackDevServer host and port
-                'webpack/hot/only-dev-server', // "only" prevents reload on syntax errors
-                'react-hot-loader/patch'
-            ].concat(entryPoints)
+            app: entryPoints
         },
         output: {
             path: __dirname + "/.",
@@ -81,7 +77,6 @@ var webpackConfigs = {
                     test: /\.(js|jsx)$/,
                     exclude: /(node_modules|bower_components)/,
                     use: [
-                        'react-hot-loader/webpack',
                         {
                             loader: 'babel-loader',
                             options: BABEL_LOADER_OPTIONS

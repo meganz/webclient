@@ -60,6 +60,9 @@ var pro = {
     BYTES_PER_GB: 1024 * 1024 * 1024,
     BYTES_PER_TB: 1024 * 1024 * 1024 * 1024,
 
+    // If storage amount cannot be found for an achivement, fall back to using 5 GB
+    ACH_FALLBACK_GB: 5,
+
     // Plans that have a single duration. {key: planAccountLevel, value: durationAvailable}
     singleDurationPlans: null,
 

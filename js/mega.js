@@ -1537,10 +1537,11 @@ scparser.$add('d', function(a) {
         (function _checkMoveNodeShare(h) {
             const n = M.d[h];
             if (n) {
-                if (n.shares) {
-                    $.moveNodeShares[h] = n.shares;
+                const shares = M.getOutShares(h, null, false);
+                if (shares) {
+                    $.moveNodeShares[h] = shares;
                 }
-                if (n.t && M.c[h]) {
+                if (M.c[h] && (n.t || n.tvf)) {
                     Object.keys(M.c[h]).forEach(_checkMoveNodeShare);
                 }
             }

@@ -303,7 +303,7 @@ MegaData.prototype.filterByLocation = function(nodes, filter, sin) {
 
         if (
             !n // Undefined node
-            || n.fv // Versioned file
+            || n.fv && M.currentdirid !== 'public-links' // Versioned file not on public-links page
             || (n.s4 && n.p === M.RootID && this.getS4NodeType(n) === 'container') // S4 node
             || (this.gallery && !this.isGalleryNode(n)) // Non-media file in Gallery
             || (this.currentLabelFilter && !this.filterByLabel(n)) // Filter label applies here

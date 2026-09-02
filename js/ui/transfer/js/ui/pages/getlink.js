@@ -150,7 +150,7 @@ lazy(T.ui, 'addFilesLayout', () => {
 
             this.addedFiles.exp = cn.querySelector('#glb-expires-input');
             this.addedFiles.msg = cn.querySelector('#glb-msg-area');
-            this.addedFiles.pw = cn.querySelector('#glb-password-input');
+            this.addedFiles.pw = cn.querySelector('#it-set-link-password');
 
             // Init inputs UI
             T.ui.input.init(
@@ -836,7 +836,7 @@ lazy(T.ui, 'addFilesLayout', () => {
                 const {value: title} = document.getElementById('glb-title-input');
                 const {value: sender} = document.getElementById('glb-email-input');
                 const {value: message} = document.getElementById('glb-msg-area');
-                const {value: password} = document.getElementById('glb-password-input');
+                const {value: password} = document.getElementById('it-set-link-password');
                 const {value: expiry} = cn.querySelector('input[name="glb-expire-radio"]:checked');
 
                 const {xh, schedule} = this.data;

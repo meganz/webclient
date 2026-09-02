@@ -3473,7 +3473,7 @@ accountUI.transfers = {
                                 simpletipposition: 'top'
                             },
                             onClick: () => {
-                                eventlog(500945);
+                                eventlog(500945, `${m.p} ${m.id}`);
                                 msgDialog(
                                     `confirmation:!^${l.mig_acc_cancel}!${l.schedule_cancel_abort}`,
                                     '',
@@ -3481,7 +3481,7 @@ accountUI.transfers = {
                                     l.mig_acc_cancel_confirm_desc.replace('%1', provider.name),
                                     res => {
                                         if (res) {
-                                            eventlog(500946);
+                                            eventlog(500946, `${m.p} ${m.id}`);
                                             mega.migrate.cancelMigration(m.id).finally(() => {
                                                 this.renderMigrations();
                                             });

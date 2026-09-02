@@ -83,6 +83,7 @@ lazy(mega, 'migrate', () => {
         1: {name: 'Google Drive', icon: 'sprite-fm-uni icon-googledrive'},
         2: {name: 'Dropbox', icon: 'sprite-fm-uni icon-dropbox'},
         3: {name: 'Microsoft OneDrive', icon: 'sprite-fm-uni icon-onedrive'},
+        4: {name: 'Box', icon: 'sprite-fm-uni icon-box'},
     };
 
     const migrationStates = {
@@ -98,18 +99,21 @@ lazy(mega, 'migrate', () => {
 
     const serviceGuides = [
         {
+            providerId: 2,
             icon: 'icon-dropbox',
             name: 'Dropbox',
             link: 'h-how-to-export-files-from-dropbox',
             eventName: 501368
         },
         {
+            providerId: 3,
             icon: 'icon-onedrive',
             name: 'OneDrive',
             link: 'h-how-to-export-files-from-onedrive',
             eventName: 501369
         },
         {
+            providerId: 4,
             icon: 'icon-box',
             name: 'Box',
             link: 'h-how-to-export-files-from-box',
@@ -122,6 +126,38 @@ lazy(mega, 'migrate', () => {
             eventName: 501371
         },
     ];
+
+    const renderServiceGuides = (parent, providers) => {
+        const guides = serviceGuides.filter(item => !item.providerId || !providers[item.providerId]);
+
+        if (!guides.length) {
+            return;
+        }
+
+        const links = ce('div', parent, {class: 'links-container'});
+
+        ce('h2', links).textContent = l.mig_guides_header;
+        ce('p', links).textContent = l.mig_guides_info;
+
+        const linksBody = ce('div', links, {class: 'links-body'});
+
+        for (const item of guides) {
+            const lnk = `${guidesPrefix}${item.link}`;
+            const node = ce('a', linksBody, {
+                href: `https://${guidesDomain}/${lnk}`
+            });
+
+            ce('i', node, {class: `sprite-fm-uni ${item.icon} icon-size-24`});
+            ce('span', node).textContent = l.mig_how_to_export.replace('%1', item.name);
+            ce('i', node, {class: 'sprite-fm-mono icon-arrow-up-right-thin-outline'});
+
+            node.addEventListener('click', (ev) => {
+                ev.preventDefault();
+                eventlog(item.eventName);
+                mega.redirect(guidesDomain, lnk, false, false, false);
+            });
+        }
+    };
 
     const nodeSelectorTable = document.createElement('table');
     nodeSelectorTable.className = 'select-items grid-table';
@@ -193,6 +229,8 @@ lazy(mega, 'migrate', () => {
         }
 
         nodeList = Object.keys(prefetch.d.n);
+
+        return true;
     };
 
     options = {
@@ -220,14 +258,25 @@ lazy(mega, 'migrate', () => {
 
                         const cardList = ce('fieldset', cn, {class: 'card-select-container'});
 
-                        const items = Object.entries(providers).map(([id]) => ({
-                            value: id,
-                            icon: knownProviders[id].icon,
-                            title: knownProviders[id].name,
-                            parentNode: cardList,
-                            selected: false,
-                            iconSize: 48
-                        }));
+                        // Skip unknown providers
+                        const items = Object.entries(providers)
+                            .filter(([id]) => {
+                                if (knownProviders[id]) {
+                                    return true;
+                                }
+                                if (d) {
+                                    console.warn(`Migration provider ${id} not recognised; skipping.`);
+                                }
+                                return false;
+                            })
+                            .map(([id]) => ({
+                                value: id,
+                                icon: knownProviders[id].icon,
+                                title: knownProviders[id].name,
+                                parentNode: cardList,
+                                selected: false,
+                                iconSize: 48
+                            }));
 
                         if (importingProgress) {
                             cardList.disabled = true;
@@ -237,29 +286,7 @@ lazy(mega, 'migrate', () => {
                             ce('span', warning).textContent = l.mig_ongoing;
                         }
 
-                        const links = ce('div', cn, {class: 'links-container'});
-
-                        ce('h2', links).textContent = l.mig_guides_header;
-                        ce('p', links).textContent = l.mig_guides_info;
-
-                        const linksBody = ce('div', links, {class: 'links-body'});
-
-                        for (const item of serviceGuides) {
-                            const lnk = `${guidesPrefix}${item.link}`;
-                            const node = ce('a', linksBody, {
-                                href: `https://${guidesDomain}/${lnk}`
-                            });
-
-                            ce('i', node, {class: `sprite-fm-uni ${item.icon} icon-size-24`});
-                            ce('span', node).textContent = l.mig_how_to_export.replace('%1', item.name);
-                            ce('i', node, {class: 'sprite-fm-mono icon-arrow-up-right-thin-outline'});
-
-                            node.addEventListener('click', (ev) => {
-                                ev.preventDefault();
-                                eventlog(item.eventName);
-                                mega.redirect(guidesDomain, lnk, false, false, false);
-                            });
-                        }
+                        renderServiceGuides(cn, providers);
 
                         const infoBox = ce('div', container, {class: 'info-box'});
                         const icon = ce('i', null, {class: 'sprite-fm-mono icon-info'});
@@ -298,7 +325,7 @@ lazy(mega, 'migrate', () => {
                     text: l.mig_authorise,
                     action: async() => {
 
-                        eventlog(500947);
+                        eventlog(500947, String(selectedProviderId));
 
                         navigate.nextDisable();
                         cardGroup.clear();
@@ -317,6 +344,8 @@ lazy(mega, 'migrate', () => {
 
                             return msgDialog('warninga', '', l.mig_oauth_failed, errMsg);
                         }
+
+                        eventlog(501377, String(selectedProviderId));
 
                         loadingDialog.show('migrate-enqueue-request');
                         prefetchId = await mega.migrate.enqueuePrefetch(
@@ -372,7 +401,9 @@ lazy(mega, 'migrate', () => {
                 title: l.mig_review,
                 customContent: async() => {
 
-                    await _prefetch();
+                    if (!await _prefetch()) {
+                        return;
+                    }
 
                     const container = document.createElement('div');
                     const tableWrapper = document.createElement('div');
@@ -434,7 +465,7 @@ lazy(mega, 'migrate', () => {
                     description.appendChild(note);
 
                     const elm = document.createElement('p');
-                    elm.append(parseHTML(escapeHTML(l.mig_find_import).replace('%1', escapeHTML(targetFolderName))));
+                    elm.append(parseHTML(l.mig_find_import.replace('%1', escapeHTML(targetFolderName))));
                     description.appendChild(elm);
 
                     container.appendChild(description);
@@ -444,10 +475,11 @@ lazy(mega, 'migrate', () => {
                 next: {
                     action: async() => {
                         loadingDialog.show('migrate-enqueue');
-                        eventlog(500948);
+                        eventlog(500948, String(selectedProviderId));
                         const target = await mega.migrate.createImportFolder(targetFolderParent, targetFolderName);
                         if (!target) {
                             loadingDialog.hide('migrate-enqueue');
+                            msgDialog('warninga', '', l.mig_fail, l.mig_error, () => navigate.hide());
                             return;
                         }
                         const migrationId = await mega.migrate.enqueueMigration(prefetchId, target);
@@ -473,6 +505,8 @@ lazy(mega, 'migrate', () => {
                             msgDialog('warninga', '', l.mig_fail, l.mig_error, () => navigate.hide());
                             return;
                         }
+
+                        eventlog(501378, `${selectedProviderId} ${migrationId} ${prefetch.d.fc} ${prefetch.d.b}`);
 
                         navigate.goToStep(3);
                     },
@@ -596,8 +630,20 @@ lazy(mega, 'migrate', () => {
         }
 
         async runOAuthPopup(providerId) {
-            const provider = await mega.migrate.getProvider(providerId);
             const receiverId = 'storage_migration';
+
+            // Pre-open within the user gesture to avoid Safari shenanigans
+            // eslint-disable-next-line local-rules/open
+            const popup = window.open('', `${receiverId}_oauth_popup`, mega.migrate._popupFeatures(480, 640));
+
+            const provider = await mega.migrate.getProvider(providerId).catch(nop);
+
+            if (!provider) {
+                if (popup) {
+                    popup.close();
+                }
+                return {error: 'provider_unavailable'};
+            }
 
             const oAuthUrl = new URL(provider.oauth_url);
 
@@ -618,6 +664,17 @@ lazy(mega, 'migrate', () => {
             return popupResults;
         }
 
+        _popupFeatures(width, height) {
+            const winX = window.screenX || window.screenLeft;
+            const winY = window.screenY || window.screenTop;
+            const winW = window.outerWidth || document.documentElement.clientWidth;
+            const winH = window.outerHeight || document.documentElement.clientHeight;
+            const left = Math.round(winX + (winW - width) / 2);
+            const top = Math.round(winY + (winH - height) / 2);
+
+            return `width=${width},height=${height},top=${top},left=${left}`;
+        }
+
         _openOAuthPopup(authUrl, receiverId, width = 480, height = 640) {
 
             // Clear any existing popop poll: popup window will be reused
@@ -626,14 +683,7 @@ lazy(mega, 'migrate', () => {
                 oAuthPoll = null;
             }
 
-            const winX = window.screenX || window.screenLeft;
-            const winY = window.screenY || window.screenTop;
-            const winW = window.outerWidth || document.documentElement.clientWidth;
-            const winH = window.outerHeight || document.documentElement.clientHeight;
-            const left = Math.round(winX + (winW - width) / 2);
-            const top = Math.round(winY + (winH - height) / 2);
-
-            const features = `width=${width},height=${height},top=${top},left=${left}`;
+            const features = mega.migrate._popupFeatures(width, height);
 
             // noopener/noreferrer intentionally omitted, we need the popup reference for polling
             // eslint-disable-next-line local-rules/open
@@ -736,7 +786,6 @@ lazy(mega, 'migrate', () => {
 
             if (!ph || !w || !h) {
                 console.error('mscn failed', response);
-                msgDialog('warninga', '', l.mig_fail, l.mig_error, () => navigate.hide());
                 return null;
             }
 
@@ -746,6 +795,7 @@ lazy(mega, 'migrate', () => {
                 tph: ph,
                 tak: w,
                 tek: a32_to_base64(sk),
+                h
             };
         }
 

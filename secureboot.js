@@ -1115,7 +1115,7 @@ else if (tmp.substr(0, 4) === 'test') {
     tmp = -0x8feed;
 }
 else if (is_extension && tmp.startsWith('oauth.html?')) {
-    location.replace('/webclient/' + tmp);
+    location.replace(location.pathname.replace(/[^/]+$/, '') + tmp);
 }
 
 Object.defineProperty(self, 'mShowAds', {

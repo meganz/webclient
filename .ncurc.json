@@ -9,10 +9,12 @@
         "eslint-plugin-unicorn",
         "eslint-plugin-sonarjs",
         "eslint-plugin-no-unsanitized",
+        "cssnano"
         "stylelint",
         "stylelint-config-standard",
         "@babel/*",
         "chai",
+        "mocha",
         "sinon"
     ]
 }

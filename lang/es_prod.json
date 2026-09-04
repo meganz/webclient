@@ -4161,7 +4161,7 @@
     "mig_rate_limit": "Has alcanzado el l\u00edmite diario de importaciones. Int\u00e9ntalo de nuevo m\u00e1s tarde.",
     "mig_review": "Revisar",
     "mig_select_provider": "Seleccionar proveedor",
-    "mig_select_provider_title": "Selecciona tu servicio de almacenamiento en la nube anterior",
+    "mig_select_provider_title": "Selecciona tu servicio de almacenamiento en la nube",
     "mig_service_error": "La solicitud de importaci\u00f3n ha fallado con el c\u00f3digo de error %1",
     "mig_start_import": "Empezar a importar",
     "mig_too_large": "Esta importaci\u00f3n contiene demasiados elementos en la ra\u00edz de la unidad para procesarse en una sola importaci\u00f3n. Mueve algunos elementos a carpetas o divide la importaci\u00f3n en lotes m\u00e1s peque\u00f1os e int\u00e9ntalo de nuevo.",

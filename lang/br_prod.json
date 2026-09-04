@@ -4161,7 +4161,7 @@
     "mig_rate_limit": "Voc\u00ea atingiu o limite di\u00e1rio de importa\u00e7\u00e3o. Tente novamente mais tarde.",
     "mig_review": "Revisar",
     "mig_select_provider": "Selecionar provedor",
-    "mig_select_provider_title": "Selecione o seu provedor de armazenamento em nuvem",
+    "mig_select_provider_title": "Selecione um provedor de armazenamento em nuvem",
     "mig_service_error": "N\u00e3o foi poss\u00edvel importar. Erro de servi\u00e7o (c\u00f3digo %1)",
     "mig_start_import": "Come\u00e7ar a importar",
     "mig_too_large": "Esta importa\u00e7\u00e3o cont\u00e9m muitos itens na raiz da nuvem para serem processados em uma \u00fanica importa\u00e7\u00e3o. Mova alguns itens para pastas ou divida a importa\u00e7\u00e3o em lotes menores e tente novamente.",

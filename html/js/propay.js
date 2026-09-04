@@ -2853,6 +2853,8 @@ pro.propay = {
                     }
                     this.renderPlanInfo();
                     this.updatePayment();
+                    // Deselected: the label falls back off the gateway's own tax document name.
+                    pro.propay.billing.updateTaxEntryField();
 
                     return;
                 }

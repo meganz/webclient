@@ -225,15 +225,24 @@ pro.propay.billing = {
     },
 
     /**
+     * @returns {object|false} - The gateway driving the billing form, or false when none is selected
+     */
+    getActiveGateway() {
+        'use strict';
+        const gateway = pro.propay.onPropayPage()
+            ? pro.propay.currentGateway
+            : addressDialog.businessRegPage && addressDialog.businessRegPage.getSelectedGateway();
+        return gateway || false;
+    },
+
+    /**
      * Get the required fields for the current gateway
      * @returns {object} - The required fields for current gateway, split into type and requirement
      */
     getRequiredFields() {
         'use strict';
 
-        const currentGateway = pro.propay.onPropayPage()
-            ? pro.propay.currentGateway
-            : addressDialog.businessRegPage && addressDialog.businessRegPage.getSelectedGateway();
+        const currentGateway = this.getActiveGateway();
 
         const currentGatewayName = currentGateway && currentGateway.gatewayName || '';
 
@@ -658,6 +667,27 @@ pro.propay.billing = {
     },
 
     /**
+     * Only astropay sends one today, but any gateway may, so the API can rename without a release.
+     * @returns {string} - The gateway's own tax document name, or '' when it did not send one
+     */
+    getGatewayTaxIdLabel() {
+        'use strict';
+        const gateway = this.getActiveGateway();
+        const label = gateway && gateway.extra && gateway.extra.taxIdLabel;
+        return typeof label === 'string' ? label.trim() : '';
+    },
+
+    /**
+     * @param {string} [country] - Billing country; defaults to the selected one
+     * @returns {string} - Label for the tax number field, most specific source first
+     */
+    getTaxFieldLabel(country) {
+        'use strict';
+        country = country || this.country;
+        return this.getGatewayTaxIdLabel() || this.getTngrTaxName(country) || getTaxName(country);
+    },
+
+    /**
      * Alias the gateway's `cpf` requirement onto `taxCode` so the UI shows a single field.
      * Used by astropay - `cpf` and `taxCode` carry the same value and are submitted as both
      * (see {@link getEnteredBillingInfo}). Mutates `requiredFields` in place; must run before the
@@ -795,11 +825,10 @@ pro.propay.billing = {
             const optional = isOptional && field !== 'state';
             const $label = $('label', $wrapper);
             $label.toggleClass('optional', optional);
-            // taxCode label is country-specific (NIF / IVA / GST / etc.) - construct the optional
-            // variant by appending the generic " (Optional)" suffix at runtime.
+            // taxCode has no static label to append the shared optional suffix to.
             let text;
             if (field === this.TAX_CODE_FIELD) {
-                text = getTaxName(this.country);
+                text = this.getTaxFieldLabel();
                 if (optional && text) {
                     text = `${text} ${l[7347]}`;
                 }
@@ -1194,9 +1223,8 @@ pro.propay.billing = {
             return false;
         }
 
-        let validationRegex = this.tngrRes && this.tngrRes[country];
-        validationRegex = validationRegex && (validationRegex[state] || validationRegex[0]) || validationRegex;
-        const serverPattern = validationRegex && validationRegex.r;
+        const tngrRow = this.getTngrRow(country, state);
+        const serverPattern = tngrRow && tngrRow.r;
 
         if (serverPattern && !new RegExp(serverPattern).test(taxNumber)) {
             await paintInvalid();
@@ -2207,21 +2235,41 @@ pro.propay.billing = {
         return this.concurrentBillingPayments.has(gatewayName);
     },
 
-    getStateInfoFromTngr() {
+    /**
+     * Rows are keyed by bare state code with `0` country-wide, while state is held `CC-SS`.
+     * @param {string} [country] - Country to look up; defaults to the selected one
+     * @param {string} [state] - State to look up; defaults to the selected one
+     * @returns {object|false} - The tngr row, or false when the rules do not cover the country
+     */
+    getTngrRow(country, state) {
         'use strict';
-        const country = this.tngrRes && this.country && this.tngrRes[this.country] || false;
-        return country && (country[this.state] || country[0]) || false;
+        country = country || this.country;
+        if (state === undefined) {
+            state = country === this.country ? this.state : '';
+        }
+        const entry = this.tngrRes && country && this.tngrRes[country] || false;
+        const stateCode = typeof state === 'string' && state.split('-').pop() || '';
+        return entry && (entry[stateCode] || entry[0] || entry) || false;
     },
 
     /**
-     * Get the placeholder example for the tax number input based on country/state.
-     * @returns {string} example tax number, or empty string when none is configured
+     * @param {string} [country] - Country to look up; defaults to the selected one
+     * @returns {string} - The tax name from the tax number rules, or '' when they do not name one
+     */
+    getTngrTaxName(country) {
+        'use strict';
+        const row = this.getTngrRow(country);
+        const name = row && row.n;
+        return typeof name === 'string' ? name.trim() : '';
+    },
+
+    /**
+     * @returns {string} example tax number for the country/state, or '' when none is configured
      */
     getExampleTaxNumber() {
         'use strict';
-        const state = this.getStateInfoFromTngr();
-        const example = state && state.e || false;
-        return example || '';
+        const row = this.getTngrRow();
+        return row && row.e || '';
     },
 
     /**
@@ -2236,8 +2284,7 @@ pro.propay.billing = {
             this.$billingInfo
         );
         const example = this.getExampleTaxNumber();
-        const taxName = getTaxName(this.country);
-        $('label', $taxCodeInput.closest('.taxCode-input-wrapper')).text(taxName);
+        $('label', $taxCodeInput.closest('.taxCode-input-wrapper')).text(this.getTaxFieldLabel());
         if ($taxCodeInput.length > 0) {
             $taxCodeInput.attr('placeholder', example || '');
         }

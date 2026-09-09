@@ -78,11 +78,11 @@
     "grunt-contrib-concat": "2.1.0",
     "grunt-posthtml": "0.5.2",
     "htmlnano": "3.4.0",
-    "postcss": "8.5.26",
+    "postcss": "8.5.28",
     "postcss-url": "10.1.4",
     "posthtml": "0.16.7",
     "posthtml-urls": "1.0.0",
-    "webpack": "5.109.2",
+    "webpack": "5.110.3",
     "webpack-cli": "7.2.3"
   },
   "devDependencies": {
@@ -109,7 +109,7 @@
     "karma-mocha": "2.0.1",
     "karma-sinon": "1.0.5",
     "mocha": "11.8.0",
-    "sass": "1.103.1",
+    "sass": "1.104.0",
     "sass-loader": "17.0.1",
     "sinon": "15.0.3",
     "stylelint": "16.26.1",

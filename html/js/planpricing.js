@@ -1400,6 +1400,7 @@ lazy(pro, 'proplan2', () => {
 
         $planCardsContainer.toggleClass('promo', !!anyDiscount);
         $planCardsContainer.toggleClass('promo-all', !!matchingDiscount);
+        const $allPlanPromoHeader = $('.all-plans-promotional-info', $page).addClass('hidden');
 
         $('.pricing-plan-card', $planCardsContainer).addClass('hidden');
 
@@ -1623,7 +1624,7 @@ lazy(pro, 'proplan2', () => {
                 .replace('%1', matchingDiscount.dn)
                 .replace('%2', formatPercentage(pro.calculateSavings([matchingDiscount.dp, period === 12
                     ? pro.yearlyDiscountPercentage : 0])));
-            $('.all-plans-promotional-info', $page).text(text).removeClass('hidden');
+            $allPlanPromoHeader.text(text).removeClass('hidden');
         }
         if (recommendedPlan && !pro.anyDiscount) {
             setCardClassTxt(recommendedPlan, 'popular', l[23948]);

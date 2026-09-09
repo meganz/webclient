@@ -66,6 +66,9 @@ lazy(pro, 'proplan2', () => {
 
     const allowedPeriods = new Set([1, 12]);
 
+    // Progressively smaller price sizes, see the long-currency rules in the stylesheet
+    const PRICE_SIZES = ['long-currency1', 'long-currency2', 'long-currency3'];
+
     /**
      * @type {PricingPageInformation}
      */
@@ -318,6 +321,23 @@ lazy(pro, 'proplan2', () => {
     };
 
     /**
+     * Plan objects read the choice off pro, so this is the only place it is worked out.
+     *
+     * @param {String} currency Currency code to render prices in.
+     * @returns {void}
+     */
+    const setPageCurrency = (currency) => {
+
+        // Persisted on pro so plan objects and propay pick up the same choice
+        pro.displayEuro = currency !== pro.localCurrency;
+    };
+
+    /**
+     * @returns {String} Currency code prices are currently displayed in.
+     */
+    const displayedCurrency = () => (pro.displayEuro ? 'EUR' : pro.localCurrency) || 'EUR';
+
+    /**
      * Render plan features into the target element.
      *
      * @param {jQuery} $target Target container.
@@ -336,10 +356,55 @@ lazy(pro, 'proplan2', () => {
             </div>`;
         }).join('');
 
-        $target.empty().safeAppend(`
-            <div class="features-title">${l.pr_includes}</div>
-            ${featureHTML}
+        // The toggle only shows below small desktop, where the list collapses to shorten the card
+        $target.removeClass('expanded').empty().safeAppend(`
+            <div class="features-toggle" role="button" tabindex="0" aria-expanded="false">
+                <span class="features-toggle-txt">${l.extras_plan_title}</span>
+                <i class="sprite-fm-mono icon-chevron-down-thin-outline"></i>
+            </div>
+            <div class="features-list">
+                <div class="features-title">${l.pr_includes}</div>
+                ${featureHTML}
+            </div>
         `);
+    };
+
+    /**
+     * Collapse or expand the included-features list the given toggle bar belongs to.
+     *
+     * @param {HTMLElement} toggle The toggle bar that was activated.
+     * @returns {void}
+     */
+    const toggleFeatures = (toggle) => {
+        const $data = $(toggle).closest('.data');
+        const expanded = !$data.hasClass('expanded');
+
+        $data.toggleClass('expanded', expanded);
+        $('.features-toggle', $data).attr('aria-expanded', expanded);
+
+        if (resizeHandler) {
+            resizeHandler.resizePlansSection();
+        }
+    };
+
+    /**
+     * Delegated, as cards get rebuilt whenever the period or currency changes.
+     *
+     * @returns {void}
+     */
+    const initFeaturesToggle = () => {
+
+        $page.rebind('click.pricingfeatures', '.pricing-plan-features .features-toggle', function() {
+            toggleFeatures(this);
+            return false;
+        });
+
+        $page.rebind('keydown.pricingfeatures', '.pricing-plan-features .features-toggle', function(ev) {
+            if (ev.key === 'Enter' || ev.key === ' ') {
+                toggleFeatures(this);
+                return false;
+            }
+        });
     };
 
     const moveToBuyStep = (planId) => {
@@ -1027,8 +1092,16 @@ lazy(pro, 'proplan2', () => {
             $socialText.text(quotes[this.dataset.quoter][0]);
             $socialName.text(quotes[this.dataset.quoter][1]);
 
-            if ($socialIconsContainer[0].scrollWidth > $socialIconsContainer[0].clientWidth) {
-                $socialIconsContainer[0].scroll(this.offsetLeft - $socialIconsContainer[0].offsetLeft, 0);
+            const strip = $socialIconsContainer[0];
+            const maxScroll = strip.scrollWidth - strip.clientWidth;
+
+            // Centre the clicked logo, clamped so neither end scrolls past the logos into empty space
+            if (maxScroll > 0) {
+                const offset = this.getBoundingClientRect().left - strip.getBoundingClientRect().left
+                    - (strip.clientWidth - this.offsetWidth) / 2;
+
+                $socialIconsContainer.stop().animate(
+                    {scrollLeft: Math.max(0, Math.min(maxScroll, strip.scrollLeft + offset))}, 300, 'swing');
             }
 
             rotatingTimer = setInterval(rotatingQuotes, 9000);
@@ -1239,14 +1312,9 @@ lazy(pro, 'proplan2', () => {
 
         const anyYearlyDiscount = pro.instantDiscounts.shared.anyDiscount12;
 
-        $periodNote.toggleClass('monthly-only', !!anyYearlyDiscount);
-        if (anyYearlyDiscount) {
-            $periodNote.text(l.pr_save_up_to.replace('%1', Math.round(maxYearlyDiscount * 100)));
-        }
-        else {
-            $periodNote.text(l.pr_save_from
-                .replace('%1', formatPercentage(Math.round(minYearlyDiscount * 100) / 100)));
-        }
+        // calculateSavings rounds up, so the figure is a ceiling and never a floor
+        $periodNote.text(l.pr_save_up_to_yearly
+            .replace('%1', formatPercentage(anyYearlyDiscount ? maxYearlyDiscount : minYearlyDiscount)));
     };
 
     const initResizeHandler = () => {
@@ -1272,7 +1340,11 @@ lazy(pro, 'proplan2', () => {
                 if (recommend) {
                     recommend.style.height = 'max-content';
                     recommends.push(recommend);
-                    maxRecommendHeight = Math.max(maxRecommendHeight, recommend.offsetHeight - 8);
+
+                    // Deal banners carry spacer too, so measure by caption rather than by class
+                    if (recommend.textContent.trim()) {
+                        maxRecommendHeight = Math.max(maxRecommendHeight, recommend.offsetHeight);
+                    }
                 }
             }
 
@@ -1280,6 +1352,27 @@ lazy(pro, 'proplan2', () => {
                 if (recommend.classList.contains('spacer')) {
                     recommend.style.height = maxRecommendHeight + 'px';
                 }
+            }
+        };
+
+        // Escalated until the widest price fits, as a currency drawn as a code is not its length
+        const fitPriceSize = () => {
+            const prices = [];
+
+            for (const card of $planCards.not('.hidden').get()) {
+                const price = card.querySelector('.pricing-plan-price');
+
+                if (price) {
+                    prices.push(price);
+                }
+            }
+
+            const overflows = () => prices.some((el) => el.scrollWidth > el.clientWidth);
+
+            $planCardsContainer.removeClass(PRICE_SIZES.join(' '));
+
+            for (let i = 0; i < PRICE_SIZES.length && overflows(); i++) {
+                $planCardsContainer.removeClass(PRICE_SIZES.join(' ')).addClass(PRICE_SIZES[i]);
             }
         };
 
@@ -1291,9 +1384,12 @@ lazy(pro, 'proplan2', () => {
 
             const $nonHiddenCard = $planCards.not('.hidden').first();
 
+            fitPriceSize();
+
             const planCardsOffsetHeight = $nonHiddenCard && $nonHiddenCard[0] ? $nonHiddenCard[0].offsetHeight : 0;
 
-            if (windowWidth < pageWidth || windowWidth < 800) {
+            // Below XL the cards wrap into fixed-width rows, so they must stay in normal flow
+            if (windowWidth < 1320 || windowWidth < pageWidth) {
                 $planCardsContainer.removeClass('wide-container').css('height', '');
             }
             else if (planCardsOffsetHeight) {
@@ -1302,6 +1398,7 @@ lazy(pro, 'proplan2', () => {
             else {
                 $planCardsContainer.removeClass('wide-container').css('height', '');
             }
+
         };
 
         resizePlansSection();
@@ -1320,6 +1417,17 @@ lazy(pro, 'proplan2', () => {
             resizeRecommendSection,
             resizePlansSection,
         };
+    };
+
+    /**
+     * Show the pre-discount price struck through, ahead of the "only" label.
+     *
+     * @param {jQuery} $planCard Card to update.
+     * @param {String|false} price Formatted price, or false to show the label on its own.
+     * @returns {void}
+     */
+    const setWasPrice = ($planCard, price) => {
+        $('.pricing-plan-was-price', $planCard).text(price || '').toggleClass('hidden', !price);
     };
 
     const setCardClassTxt = (id, cls, txt) => {
@@ -1367,7 +1475,6 @@ lazy(pro, 'proplan2', () => {
             return;
         }
 
-        let periodText = period === 12 ? l[932] : l[931];
 
         const $planCardsContainer = $('.pricing-pg.pro-plans-cards-container', $page);
 
@@ -1416,7 +1523,7 @@ lazy(pro, 'proplan2', () => {
             }
             if (planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN && currentPlan[pro.UTQA_RES_INDEX_MONTHS] === 1) {
                 VpnPlanFound = currentPlan;
-                if (!localPriceInfo) {
+                if (!localPriceInfo && !pro.displayEuro) {
                     localPriceInfo = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
                 }
                 continue;
@@ -1432,7 +1539,6 @@ lazy(pro, 'proplan2', () => {
 
             if (tab !== 'pro' && !periodSwapped && pro.singleDurationPlans[planNum]) {
                 period = pro.singleDurationPlans[planNum];
-                periodText = period === 12 ? l[932] : l[931];
                 periodSwapped = true;
                 showYearlyPerMonth = showYearlyPerMonth && (period === 12);
             }
@@ -1448,15 +1554,12 @@ lazy(pro, 'proplan2', () => {
             const $planCard = $fillCards.filter(`#pro${planNum}`);
             $planCard.removeClass('hidden');
 
-            let planPrice = currentPlan[pro.UTQA_RES_INDEX_PRICE];
-            let priceCurrency = 'EUR';
+            // Both follow the currency selector, falling back to EUR per plan where it has to
+            const priceCurrency = planObj.currency;
+            let planPrice = planObj.price;
 
-            if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-                planPrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
-                priceCurrency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
-                if (!localPriceInfo) {
-                    localPriceInfo = priceCurrency;
-                }
+            if (priceCurrency !== 'EUR') {
+                localPriceInfo = priceCurrency;
             }
 
             // Render plan features
@@ -1468,16 +1571,18 @@ lazy(pro, 'proplan2', () => {
             const yearlyDifference = planObj && planObj.saveUpToPrecise;
 
             if (planObj.months === 12 && planObj.saveUpToPrecise && planObj.monthlyPlan) {
-                $('.pricing-plan-only', $planCard)
-                    .addClass('line-through')
-                    .text(planObj.monthlyPlan.getFormattedPrice('narrowSymbol', false, false, 1));
+                setWasPrice($planCard, planObj.monthlyPlan
+                    .getFormattedPrice('narrowSymbol', false, false, 1));
             }
             else {
-                $('.pricing-plan-only', $planCard).text(l.pr_only).removeClass('line-through');
+                setWasPrice($planCard, false);
             }
 
 
             setCardClassTxt(currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL], 'sale popular save spacer', false);
+
+            // A caption left from the other period spills past the nowrap banner and scrolls the row
+            $('.pricing-plan-recommend', $planCard).text('');
 
             if (currentPlan[pro.UTQA_RES_INDEX_EXTRAS].insdis) {
                 planPrice = currentPlan[pro.UTQA_RES_INDEX_EXTRAS].insdis.dp
@@ -1497,28 +1602,29 @@ lazy(pro, 'proplan2', () => {
 
                 basePricePlan = basePricePlan || pro.getPlanObj(currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]);
 
-                $('.pricing-plan-only', $planCard).addClass('line-through')
-                    .text(basePricePlan.getFormattedPrice('narrowSymbol', false, false, 1));
+                setWasPrice($planCard, basePricePlan
+                    .getFormattedPrice('narrowSymbol', false, false, 1));
             }
             else if (pro.instantDiscounts.shared.anyDiscount12 && months === 12
                 && (yearlyDifference >= pro.minimumAcknowledgedDiscount)) {
 
                 setCardClassTxt(currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL], 'save spacer', l.yearly_plan_saving
-                    .replace('%1', Math.floor(yearlyDifference)));
+                    .replace('%1', Math.round(yearlyDifference)));
             }
-            else if (pro.instantDiscounts.shared.anyDiscount1 && months === 1) {
+            // Reserves the banner height on cards without one, so every title lines up
+            else {
                 setCardClassTxt(currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL], 'spacer', true);
             }
 
             let billingFrequencyText;
             let priceText;
+            // The currency is carried by the price itself, so these only name the billing period
             if (showYearlyPerMonth) {
-                billingFrequencyText = l.curr_per_month_billed_yearly
-                    .replace('%1', priceCurrency);
+                billingFrequencyText = l.per_m_billed_yearly;
                 priceText = formatCurrency(planPrice / 12, priceCurrency, 'narrowSymbol');
             }
             else {
-                billingFrequencyText = priceCurrency + ' / ' + periodText;
+                billingFrequencyText = period === 12 ? l[23780] : l[23779];
                 priceText = formatCurrency(planPrice, priceCurrency, 'narrowSymbol');
             }
 
@@ -1527,8 +1633,8 @@ lazy(pro, 'proplan2', () => {
 
 
 
-            const planTaxInfo = pro.taxInfo
-                && pro.getStandardisedTaxInfo(currentPlan[pro.UTQA_RES_INDEX_EXTRAS].taxInfo);
+            // Off the plan object, so the taxed amount is in the same currency as priceCurrency
+            const planTaxInfo = pro.taxInfo && planObj.taxInfo;
             const $taxInfo = $('.pricing-plan-tax', $planCard).toggleClass('hidden', !planTaxInfo);
             if (planTaxInfo) {
                 if (pro.taxInfo.variant === 1) {
@@ -1539,26 +1645,19 @@ lazy(pro, 'proplan2', () => {
                     const discount = pro.getDiscount(currentPlan);
                     const discountMult = pro.calculateSavings([discount && discount.dp], true);
 
-                    const priceHTML = '<span class="bold">'
-                        + formatCurrency(
-                            (discountMult * planTaxInfo.taxedPrice) / ((showYearlyPerMonth && 12) || 1),
-                            priceCurrency, 'narrowSymbol')
-                        + (priceCurrency === 'EUR' ? ' ' : '* ')
-                        + '</span>'
-                        + priceCurrency;
+                    // The whole line is styled as one, so the price needs no markup of its own
+                    const taxedPrice = formatCurrency(
+                        (discountMult * planTaxInfo.taxedPrice) / ((showYearlyPerMonth && 12) || 1),
+                        priceCurrency, 'narrowSymbol')
+                        + (priceCurrency === 'EUR' ? '' : '*');
 
                     $('.tax-info', $taxInfo).addClass('hidden');
-                    $('.tax-price', $taxInfo).safeHTML(l.p_with_tax
-                        .replace('%1', priceHTML))
+                    $('.tax-price', $taxInfo)
+                        .text(l.p_with_tax.replace('%1', taxedPrice))
                         .removeClass('hidden');
                 }
             }
 
-            if (priceText) {
-                $planCard.toggleClass('long-currency1', priceText.length >= 9 && priceText.length <= 12);
-                $planCard.toggleClass('long-currency2', priceText.length >= 13 && priceText.length <= 16);
-                $planCard.toggleClass('long-currency3', priceText.length >= 17);
-            }
 
             // get the storage/bandwidth, then convert it to bytes (it comes in GB) to format.
             // 1073741824 = 1024 * 1024 * 1024
@@ -1627,6 +1726,9 @@ lazy(pro, 'proplan2', () => {
             $allPlanPromoHeader.text(text).removeClass('hidden');
         }
         if (recommendedPlan && !pro.anyDiscount) {
+
+            // Its own banner now, so it no longer needs the spacer holding room for one
+            setCardClassTxt(recommendedPlan, 'spacer', false);
             setCardClassTxt(recommendedPlan, 'popular', l[23948]);
         }
 
@@ -1663,6 +1765,15 @@ lazy(pro, 'proplan2', () => {
             initProFlexi();
         }
 
+        // CSS cannot count shown cards while the unused ones are still siblings
+        const $shownCards = $fillCards.not('.hidden');
+
+        $fillCards.removeClass('gap-below');
+
+        if ($shownCards.length % 2) {
+            $shownCards.eq(-2).addClass('gap-below');
+        }
+
         // hide/show the asterisk and the note depending on local prices availability
         $('.ars', $fillCards).toggleClass('hidden', localPriceInfo === 'EUR');
         // TODO: Add better handling for different price estimation notes
@@ -1695,7 +1806,6 @@ lazy(pro, 'proplan2', () => {
 
         let pricePerUser = pro.proplan.businessPlanData.bd && pro.proplan.businessPlanData.bd.us
             && pro.proplan.businessPlanData.bd.us.p;
-        let priceCurrency;
         let hasLocalPrice = false;
 
         const minStorageValue = pro.proplan.businessPlanData.bd.ba.s / 1024;
@@ -1704,21 +1814,28 @@ lazy(pro, 'proplan2', () => {
         let storagePrice = !storageLocalPrice
             && (pro.proplan.businessPlanData.bd.sto.pn || pro.proplan.businessPlanData.bd.sto.p);
 
+        // The add-on rates below only ever come quoted in the one currency, unlike the plan price
+        let addOnCurrency;
+
         if (pro.proplan.businessPlanData.isLocalInfoValid) {
 
-            priceCurrency = pro.proplan.businessPlanData.l.lc;
+            addOnCurrency = pro.proplan.businessPlanData.l.lc;
 
-            pricePerUser = formatCurrency(pro.proplan.businessPlanData.bd.us.lp * 3, priceCurrency, 'narrowSymbol');
-            storagePrice = formatCurrency(storageLocalPrice, priceCurrency, 'narrowSymbol');
+            pricePerUser = formatCurrency(pro.proplan.businessPlanData.bd.us.lp * 3, addOnCurrency, 'narrowSymbol');
+            storagePrice = formatCurrency(storageLocalPrice, addOnCurrency, 'narrowSymbol');
             hasLocalPrice = true;
         }
         else {
-            priceCurrency = 'EUR';
+            addOnCurrency = 'EUR';
             pricePerUser = formatCurrency(pricePerUser * 3);
             storagePrice = formatCurrency(storagePrice);
         }
 
         const businessPlanObj = pro.planObjects.createBusinessPlanObject(pro.proplan.businessPlanData);
+
+        // Follows the currency selector, so it has to come off the plan object rather than the API data
+        const priceCurrency = businessPlanObj.currency;
+
         $('.pricing-plan-price .vl', $businessCard).text(businessPlanObj.getFormattedPrice('narrowSymbol'));
         $('.pricing-plan-price-unit', $businessCard).text(`${priceCurrency} / ${l[931]}`);
 
@@ -1804,7 +1921,8 @@ lazy(pro, 'proplan2', () => {
 
     const initPeriodPickHandler = () => {
         const $periodContainer = $('.pricing-pg.pick-period-container.individual', $page);
-        const $radioOptions = $('.pricing-radio-option', $periodContainer);
+        const $switch = $('.pricing-period-switch', $periodContainer);
+        const $labels = $('.pricing-period-label', $periodContainer);
         const $strgFlexInput = $('#esti-storage', $proflexiBlock);
         const $transFlexInput = $('#esti-trans', $proflexiBlock);
 
@@ -1814,31 +1932,30 @@ lazy(pro, 'proplan2', () => {
             preSelectedPeriod = 12;
         }
 
-        if (preSelectedPeriod === 12) {
-            $radioOptions.removeClass('selected');
-            $radioOptions.filter('[data-period="12"]').addClass('selected');
-        }
+        /**
+         * @param {Number} period Billing period in months, 1 or 12.
+         * @param {Boolean} rerender Whether the cards need repricing, false while initialising.
+         * @returns {void}
+         */
+        const applyPeriod = (period, rerender) => {
+            const yearly = period === 12;
 
-        $periodContainer.toggleClass('yearly', preSelectedPeriod === 12);
+            $switch.toggleClass('toggle-on', yearly).attr('aria-checked', yearly);
 
-        $radioOptions.rebind('click.pricing', function() {
-            const $optionWrapper = $(this).closest('.pick-period-container');
-            $optionWrapper.toggleClass('yearly', this.dataset.period === '12');
+            if (!rerender) {
+                return;
+            }
 
-            $('.pricing-radio-option', $optionWrapper).removeClass('selected');
-
-            this.classList.add('selected');
-
-            if (this.dataset.period === '12') {
+            if (yearly) {
                 delay('pricing.plan', eventlog.bind(null, is_mobile ? 99867 : 99866));
             }
             else {
                 delay('pricing.plan', eventlog.bind(null, is_mobile ? 99869 : 99868));
             }
 
-            setSItem('pro.period', this.dataset.period);
+            setSItem('pro.period', period);
             fillPlansInfo({
-                duration: this.dataset.period | 0,
+                duration: period,
                 tab: pageInformation.currentTab.key || 'pro',
             });
 
@@ -1846,9 +1963,121 @@ lazy(pro, 'proplan2', () => {
 
             if (resizeHandler) {
                 resizeHandler.resizeRecommendSection(true);
-            }
 
+                // Card count and height both change with the period, and both drive the breakout
+                resizeHandler.resizePlansSection();
+            }
+        };
+
+        applyPeriod(preSelectedPeriod, false);
+
+        $switch.rebind('click.pricing', () => {
+            applyPeriod($switch.hasClass('toggle-on') ? 1 : 12, true);
             return false;
+        });
+
+        $switch.rebind('keydown.pricing', (ev) => {
+            if (ev.key === 'Enter' || ev.key === ' ') {
+                applyPeriod($switch.hasClass('toggle-on') ? 1 : 12, true);
+                return false;
+            }
+        });
+
+        // The labels either side of the switch pick their own period rather than flipping it
+        $labels.rebind('click.pricing', function() {
+            applyPeriod(this.dataset.period | 0, true);
+            return false;
+        });
+    };
+
+    const initCurrencyPickHandler = () => {
+        const $select = $('.pricing-currency-select', $periodPicker);
+        const $toggle = $('.pricing-currency-toggle', $select);
+        const $options = $('.pricing-currency-options', $select);
+        const {localCurrency} = pro;
+
+        // Drops the choice again once the user leaves the pages that quote plan prices
+        pro.watchDisplayCurrency();
+
+        // Nothing to pick between when the API only quoted EUR
+        $select.toggleClass('hidden', !localCurrency);
+
+        if (!localCurrency) {
+            return;
+        }
+
+        // Any choice already made this session is carried over, defaulting to the local currency
+        $options.safeHTML([escapeHTML(localCurrency), 'EUR'].map((code) =>
+            `<div class="pricing-currency-option" tabindex="0" data-currency="${code}">${code}</div>`).join(''));
+
+        const showOptions = (show) => {
+            $options.toggleClass('hidden', !show);
+            $toggle.attr('aria-expanded', show);
+        };
+
+        const renderSelection = () => {
+            const code = displayedCurrency();
+
+            $('.pricing-currency-code', $toggle).text(code);
+            $('.pricing-currency-option', $options)
+                .removeClass('selected')
+                .filter(`[data-currency="${code}"]`)
+                .addClass('selected');
+        };
+
+        const pickCurrency = (option) => {
+            setPageCurrency(option.dataset.currency);
+
+            renderSelection();
+            showOptions(false);
+
+            fillPlansInfo({
+                duration: (sessionStorage.getItem('pro.period') | 0) || 12,
+                tab: pageInformation.currentTab.key || 'pro',
+            });
+
+            if (resizeHandler) {
+                resizeHandler.resizeRecommendSection(true);
+                resizeHandler.resizePlansSection();
+            }
+        };
+
+        renderSelection();
+
+        $toggle.rebind('click.pricing', () => {
+            showOptions($options.hasClass('hidden'));
+            return false;
+        });
+
+        $toggle.rebind('keydown.pricing', (ev) => {
+            if (ev.key === 'Enter' || ev.key === ' ') {
+                showOptions($options.hasClass('hidden'));
+                return false;
+            }
+        });
+
+        const $option = $('.pricing-currency-option', $options);
+
+        $option.rebind('click.pricing', function() {
+            pickCurrency(this);
+            return false;
+        });
+
+        $option.rebind('keydown.pricing', function(ev) {
+            if (ev.key === 'Enter' || ev.key === ' ') {
+                pickCurrency(this);
+                return false;
+            }
+        });
+
+        $(document).rebind('click.pricingcurrency', (ev) => {
+            if (!$(ev.target).closest('.pricing-currency-select').length) {
+                showOptions(false);
+            }
+        });
+
+        mBroadcaster.once('pagechange', () => {
+            $(document).off('click.pricingcurrency');
         });
     };
 
@@ -1963,7 +2192,7 @@ lazy(pro, 'proplan2', () => {
             const maxPercentage = Math.max(...saveOptions);
             const $periodText = $(`.period-note-txt.${tabsInfo[tab].tabControlName}`, $periodPicker);
             if ((maxPercentage > 0) && (maxPercentage < 100)) {
-                $periodText.text(l.pr_save_up_to.replace('%1', maxPercentage));
+                $periodText.text(l.pr_save_up_to_yearly.replace('%1', formatPercentage(maxPercentage / 100)));
             }
             else {
                 // An error has occured, % savings will be wrong. Show no savings amount.
@@ -1972,8 +2201,6 @@ lazy(pro, 'proplan2', () => {
                 tabsInfo[tab].requiresUpdate = true;
             }
 
-            $(`.period-note-txt.${tabsInfo[tab].tabControlName}`, $periodPicker)
-                .text(l.pr_save_up_to.replace('%1', Math.max(...saveOptions)));
             $periodPicker.addClass(tabsInfo[tab].tabControlName);
         }
     };
@@ -2252,6 +2479,8 @@ lazy(pro, 'proplan2', () => {
             // Using the back arrow will rebuild the page and the cached items will be incorrect
             resetPricingPageInfo();
 
+            initCurrencyPickHandler();
+
             initPlansCards();
             populateBusinessPlanData();
 
@@ -2262,6 +2491,7 @@ lazy(pro, 'proplan2', () => {
 
             initTabHandlers();
             initPeriodPickHandler();
+            initFeaturesToggle();
             initPlansTabs();
             initSocial();
             initFaq();

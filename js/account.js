@@ -464,6 +464,13 @@ function u_logout(logout) {
         delete sessionStorage.buextra;
         delete sessionStorage.cnv2free;
         delete sessionStorage.prevProv;
+        delete sessionStorage['pro.displayEuro'];
+        delete sessionStorage['pro.urlCurrency'];
+
+        // Resolved once then held in memory, so dropping the key alone would not take effect
+        if (window.pro) {
+            pro._displayEuro = null;
+        }
 
         fminitialized = false;
         if ($.leftPaneResizable) {

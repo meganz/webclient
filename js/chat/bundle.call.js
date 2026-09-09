@@ -2,8 +2,8 @@
 "use strict";
 (self.webpackChunk_meganz_webclient = self.webpackChunk_meganz_webclient || []).push([[987],{
 
- 8402:
- (_, EXP_, REQ_) => {
+ 8402
+(_, EXP_, REQ_) {
 
 // ESM COMPAT FLAG
 REQ_.r(EXP_);
@@ -28,7 +28,7 @@ const utils = REQ_(3901);
 const ui_contacts = REQ_(8022);
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 const ui_utils = REQ_(6411);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/videoNode.jsx
+;// ./js/chat/ui/meetings/videoNode.jsx
 
 
 
@@ -597,7 +597,7 @@ class AudioLevelIndicator extends REaCt().Component {
 const meetings_button = REQ_(6740);
 // EXTERNAL MODULE: ./js/chat/ui/inviteParticipantsPanel.jsx
 const inviteParticipantsPanel = REQ_(8956);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/participantsNotice.jsx
+;// ./js/chat/ui/meetings/participantsNotice.jsx
 
 
 
@@ -690,7 +690,7 @@ class ParticipantsNotice extends mixins.w9 {
 ParticipantsNotice.NAMESPACE = 'participants-notice';
 // EXTERNAL MODULE: ./js/chat/ui/chatToaster.jsx
 const chatToaster = REQ_(8491);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/participantsBlock.jsx
+;// ./js/chat/ui/meetings/participantsBlock.jsx
 
 
 
@@ -960,7 +960,7 @@ class ParticipantsBlock extends mixins.w9 {
     return null;
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/videoNodeMenu.jsx
+;// ./js/chat/ui/meetings/videoNodeMenu.jsx
 
 
 
@@ -1120,7 +1120,7 @@ class VideoNodeMenu extends mixins.w9 {
 VideoNodeMenu.NAMESPACE = 'node-menu';
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
 const modalDialogs = REQ_(8120);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/modeSwitch.jsx
+;// ./js/chat/ui/meetings/modeSwitch.jsx
 
 
 
@@ -1313,7 +1313,7 @@ class ModeSwitch extends mixins.w9 {
 }
 ModeSwitch.NAMESPACE = 'modeSwitch';
 ModeSwitch.BASE_CLASS = 'mode';
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/streamHead.jsx
+;// ./js/chat/ui/meetings/streamHead.jsx
 
 
 
@@ -1583,7 +1583,7 @@ const fallback = REQ_(3439);
 const dropdowns = REQ_(1510);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 const buttons = REQ_(5155);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/floatExtendedControls.jsx
+;// ./js/chat/ui/meetings/floatExtendedControls.jsx
 
 
 
@@ -1663,7 +1663,7 @@ class FloatExtendedControls extends REaCt().Component {
   }
 }
 FloatExtendedControls.NAMESPACE = 'stream-extended-controls';
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/micObserver.jsx
+;// ./js/chat/ui/meetings/micObserver.jsx
 
 
 
@@ -1755,7 +1755,7 @@ const withMicObserver = Component => class extends mixins.w9 {
 const permissionsObserver = REQ_(192);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/hostsObserver.jsx
 const hostsObserver = REQ_(7677);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/float.jsx
+;// ./js/chat/ui/meetings/float.jsx
 
 
 
@@ -2405,7 +2405,7 @@ class Minimized extends mixins.w9 {
 Minimized.NAMESPACE = 'float-video-minimized';
 Minimized.UNREAD_EVENT = 'onUnreadCountUpdate.localStreamNotifications';
 const __Minimized = (0,mixins.Zz)(withMicObserver, permissionsObserver.$)(Minimized);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/stream.jsx
+;// ./js/chat/ui/meetings/stream.jsx
 
 
 
@@ -3146,7 +3146,7 @@ const composedTextArea = REQ_(2558);
 const historyPanel = REQ_(5522);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(1301);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/collapse.jsx
+;// ./js/chat/ui/meetings/collapse.jsx
 
 class Collapse extends REaCt().Component {
   constructor(...args) {
@@ -3183,7 +3183,7 @@ class Collapse extends REaCt().Component {
 }
 // EXTERNAL MODULE: ./js/chat/ui/contactsPanel/utils.jsx
 const contactsPanel_utils = REQ_(836);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/participants.jsx
+;// ./js/chat/ui/meetings/participants.jsx
 
 
 
@@ -3594,7 +3594,7 @@ class Participants extends mixins.w9 {
     }), this.renderParticipantsList())) : this.renderParticipantsList());
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/guest.jsx
+;// ./js/chat/ui/meetings/guest.jsx
 
 
 class Guest extends REaCt().Component {
@@ -3629,7 +3629,7 @@ class Guest extends REaCt().Component {
     }, l.sign_up_btn)));
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/sidebar.jsx
+;// ./js/chat/ui/meetings/sidebar.jsx
 
 
 
@@ -3743,7 +3743,7 @@ class Sidebar extends mixins.w9 {
     })));
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/search.jsx
+;// ./js/chat/ui/meetings/workflow/invite/search.jsx
 let _Search;
 
 
@@ -3773,7 +3773,7 @@ Search.inputRef = REaCt().createRef();
 Search.focus = () => {
   return _Search.inputRef && _Search.inputRef.current && _Search.inputRef.current.focus();
 };
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/footer.jsx
+;// ./js/chat/ui/meetings/workflow/invite/footer.jsx
 
 
 const Footer = ({
@@ -3796,7 +3796,7 @@ const Footer = ({
   }, l.add)));
 };
  const footer = Footer;
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/nil.jsx
+;// ./js/chat/ui/meetings/workflow/invite/nil.jsx
 
 
 const Nil = () => {
@@ -3809,7 +3809,7 @@ const Nil = () => {
  const nil = Nil;
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
 const ui_link = REQ_(4649);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/invite.jsx
+;// ./js/chat/ui/meetings/workflow/invite/invite.jsx
 
 
 
@@ -3916,7 +3916,7 @@ class Invite extends REaCt().Component {
         return;
       }
       const frequents = [];
-      const maxFreq = Math.max(response.length - ui_contacts.lO, 0);
+      const maxFreq = Math.max(response.length - 3, 0);
       for (let i = response.length - 1; i >= maxFreq; i--) {
         const contact = response[i];
         if (!this.state.excluded.includes(contact.userId)) {
@@ -4086,7 +4086,7 @@ class Invite extends REaCt().Component {
   }
 }
 Invite.NAMESPACE = 'invite-meeting';
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/ephemeral.jsx
+;// ./js/chat/ui/meetings/workflow/ephemeral.jsx
 
 
 
@@ -4113,7 +4113,7 @@ const Ephemeral = ({
   }, JSX_("p", null, l.ephemeral_info));
 };
  const workflow_ephemeral = Ephemeral;
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/offline.jsx
+;// ./js/chat/ui/meetings/offline.jsx
 
 
 const Offline = ({
@@ -4142,7 +4142,7 @@ const Offline = ({
  const meetings_offline = Offline;
 // EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 10 modules
 const conversationpanel = REQ_(5677);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/streamControls.jsx
+;// ./js/chat/ui/meetings/streamControls.jsx
 
 
 
@@ -4818,7 +4818,7 @@ class StreamControls extends mixins.w9 {
 }
 StreamControls.NAMESPACE = 'stream-controls';
  const streamControls = (0,mixins.Zz)(withMicObserver, permissionsObserver.$)(StreamControls);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/sidebarControls.jsx
+;// ./js/chat/ui/meetings/sidebarControls.jsx
 
 
 
@@ -4891,7 +4891,7 @@ const SidebarControls = ({
   }, npeers + 1))));
 };
  const sidebarControls = SidebarControls;
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/call.jsx
+;// ./js/chat/ui/meetings/call.jsx
 
 
 
@@ -5288,7 +5288,7 @@ class Call extends mixins.w9 {
       const {
         peers
       } = this.props;
-      if (action === utils.hK.ADD && peers.length === utils.$A) {
+      if (action === utils.hK.ADD && peers.length === 99) {
         return;
       }
       return action === utils.hK.ADD ? peers.addFakeDupStream() : peers.removeFakeDupStream();
@@ -5350,8 +5350,8 @@ class Call extends mixins.w9 {
     };
     this.handleInviteToggle = () => {
       if (Object.values(M.u.toJS()).some(u => u.c === 1)) {
-        const participants = (0,conversationpanel.excludedParticipants)(this.props.chatRoom);
-        if ((0,conversationpanel.allContactsInChat)(participants)) {
+        const participants = (0,conversationpanel.z)(this.props.chatRoom);
+        if ((0,conversationpanel.e)(participants)) {
           msgDialog(`confirmationa:!^${l[8726]}!${l.msg_dlg_cancel}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
             if (res) {
               contactAddDialog(null, false);
@@ -6020,18 +6020,15 @@ Call.STATE = {
 
  },
 
- 192:
- (_, EXP_, REQ_) => {
+ 192
+(_, EXP_, REQ_) {
 
- REQ_.d(EXP_, {
-   $: () =>  withPermissionsObserver
- });
- const _babel_runtime_helpers_extends4__ = REQ_(8168);
- const react0__ = REQ_(1594);
- const react0___default = REQ_.n(react0__);
- const _mixins_js1__ = REQ_(8264);
- const _ui_modalDialogs_jsx2__ = REQ_(8120);
- const _ui_utils_jsx3__ = REQ_(6411);
+ const _babel_runtime_helpers_extends0__ = REQ_(8168);
+ const react1__ = REQ_(1594);
+ const react1___default = REQ_.n(react1__);
+ const _mixins_js2__ = REQ_(8264);
+ const _ui_modalDialogs_jsx3__ = REQ_(8120);
+ const _ui_utils_jsx4__ = REQ_(6411);
 
 
 
@@ -6050,7 +6047,7 @@ const isUserActionError = error => {
   return error && error === errors.browser;
 };
 const withPermissionsObserver = Component => {
-  return class extends _mixins_js1__ .w9 {
+  return class extends _mixins_js2__ .w9 {
     constructor(props) {
       super(props);
       this.namespace = `PO-${Component.NAMESPACE}`;
@@ -6267,7 +6264,7 @@ const withPermissionsObserver = Component => {
         buttons,
         cover
       } = content[av] || {};
-      return JSX_(_ui_modalDialogs_jsx2__ .A.ModalDialog, {
+      return JSX_(_ui_modalDialogs_jsx3__ .A.ModalDialog, {
         dialogName: `${this.namespace}-permissions-${av}`,
         className: `
                         meetings-permissions-dialog
@@ -6294,7 +6291,7 @@ const withPermissionsObserver = Component => {
         className: "permissions-warning-cover"
       }, JSX_("span", {
         className: cover
-      })), JSX_(_ui_utils_jsx3__ .P9, {
+      })), JSX_(_ui_utils_jsx4__ .P9, {
         tag: "p",
         className: "permissions-warning-info",
         content: info
@@ -6355,7 +6352,7 @@ const withPermissionsObserver = Component => {
       });
     }
     render() {
-      return JSX_(Component, (0,_babel_runtime_helpers_extends4__ .A)({}, this.props, this.state, {
+      return JSX_(Component, (0,_babel_runtime_helpers_extends0__ .A)({}, this.props, this.state, {
         errMic: this.state.errMic,
         errCamera: this.state.errCamera,
         errScreen: this.state.errScreen,
@@ -6366,11 +6363,15 @@ const withPermissionsObserver = Component => {
     }
   };
 };
+ REQ_.d(EXP_, [
+   "$", 0,  withPermissionsObserver
+ ]);
+
 
  },
 
- 7128:
- (_, EXP_, REQ_) => {
+ 7128
+(_, EXP_, REQ_) {
 
 REQ_.r(EXP_);
  REQ_.d(EXP_, {
@@ -6378,13 +6379,13 @@ REQ_.r(EXP_);
  });
  const react0__ = REQ_(1594);
  const react0___default = REQ_.n(react0__);
- const _ui_modalDialogs_jsx2__ = REQ_(8120);
- const _ui_utils_jsx4__ = REQ_(6411);
- const _button_jsx5__ = REQ_(6740);
- const _preview_jsx7__ = REQ_(3546);
- const _historyPanel_jsx6__ = REQ_(5522);
- const _link_jsx3__ = REQ_(4649);
- const _utils_jsx1__ = REQ_(2153);
+ const _ui_modalDialogs_jsx1__ = REQ_(8120);
+ const _ui_utils_jsx2__ = REQ_(6411);
+ const _button_jsx3__ = REQ_(6740);
+ const _preview_jsx4__ = REQ_(3546);
+ const _historyPanel_jsx5__ = REQ_(5522);
+ const _link_jsx6__ = REQ_(4649);
+ const _utils_jsx7__ = REQ_(2153);
 
 
 
@@ -6399,7 +6400,7 @@ class Join extends react0___default().Component {
     this.NAMESPACE = 'join-meeting';
     this.state = {
       preview: false,
-      view: _utils_jsx1__ .j.INITIAL,
+      view: _utils_jsx7__ .j.INITIAL,
       firstName: '',
       lastName: '',
       previewAudio: true,
@@ -6430,7 +6431,7 @@ class Join extends react0___default().Component {
         ephemeralDialog: false
       });
       const msgFragments = l.ephemeral_data_lost.split(/\[A]|\[\/A]/);
-      return JSX_(_ui_modalDialogs_jsx2__ .A.ModalDialog, {
+      return JSX_(_ui_modalDialogs_jsx1__ .A.ModalDialog, {
         name: "end-ephemeral",
         dialogType: "message",
         icon: "sprite-fm-uni icon-warning",
@@ -6450,7 +6451,7 @@ class Join extends react0___default().Component {
           }
         }],
         onClose: onCancel
-      }, JSX_("p", null, msgFragments[0], JSX_(_link_jsx3__ .A, {
+      }, JSX_("p", null, msgFragments[0], JSX_(_link_jsx6__ .A, {
         to: "/register",
         onClick: () => loadSubPage('register')
       }, msgFragments[1]), msgFragments[2]));
@@ -6466,7 +6467,7 @@ class Join extends react0___default().Component {
                             sprite-fm-illustration-wide
                             ${mega.ui.isDarkTheme() ? 'mega-logo-dark' : 'img-mega-logo-light'}
                         `
-      })), JSX_("h1", null, JSX_(_ui_utils_jsx4__ .zT, null, l.you_have_invitation.replace('%1', (_this$props$chatRoom = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom.topic))), isEphemeral() && JSX_("div", {
+      })), JSX_("h1", null, JSX_(_ui_utils_jsx2__ .zT, null, l.you_have_invitation.replace('%1', (_this$props$chatRoom = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom.topic))), isEphemeral() && JSX_("div", {
         className: "ephemeral-info"
       }, JSX_("i", {
         className: "sprite-fm-uni icon-warning"
@@ -6479,12 +6480,12 @@ class Join extends react0___default().Component {
         className: `${this.NAMESPACE}-content`
       }, children), this.Chat());
       if (isEphemeral()) {
-        return JSX_($$CONTAINER, null, JSX_(_button_jsx5__ .A, {
+        return JSX_($$CONTAINER, null, JSX_(_button_jsx3__ .A, {
           className: "mega-button positive",
           onClick: () => this.setState({
             ephemeralDialog: true
           })
-        }, l.join_as_guest), JSX_(_button_jsx5__ .A, {
+        }, l.join_as_guest), JSX_(_button_jsx3__ .A, {
           className: "mega-button",
           onClick: () => loadSubPage('register')
         }, l[5582]), JSX_("span", null, l[5585], JSX_("a", {
@@ -6493,28 +6494,28 @@ class Join extends react0___default().Component {
             minUserType: 3,
             skipInitialDialog: 1
           }).done(() => this.setState({
-            view: _utils_jsx1__ .j.ACCOUNT
+            view: _utils_jsx7__ .j.ACCOUNT
           }))
         }, l[171])));
       }
-      return JSX_($$CONTAINER, null, JSX_(_button_jsx5__ .A, {
+      return JSX_($$CONTAINER, null, JSX_(_button_jsx3__ .A, {
         className: "mega-button positive",
         onClick: () => this.setState({
-          view: _utils_jsx1__ .j.GUEST
+          view: _utils_jsx7__ .j.GUEST
         })
-      }, l.join_as_guest), JSX_(_button_jsx5__ .A, {
+      }, l.join_as_guest), JSX_(_button_jsx3__ .A, {
         className: "mega-button",
         onClick: () => {
           let _this$props$chatRoom2;
           megaChat.loginOrRegisterBeforeJoining((_this$props$chatRoom2 = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom2.publicChatHandle, false, true, undefined, () => this.setState({
-            view: _utils_jsx1__ .j.ACCOUNT
+            view: _utils_jsx7__ .j.ACCOUNT
           }));
         }
-      }, l[171]), JSX_("p", null, JSX_(_ui_utils_jsx4__ .P9, {
+      }, l[171]), JSX_("p", null, JSX_(_ui_utils_jsx2__ .P9, {
         onClick: e => {
           e.preventDefault();
           megaChat.loginOrRegisterBeforeJoining(this.props.chatRoom.publicChatHandle, true, undefined, undefined, () => this.setState({
-            view: _utils_jsx1__ .j.ACCOUNT
+            view: _utils_jsx7__ .j.ACCOUNT
           }));
         }
       }, l[20635])));
@@ -6538,11 +6539,11 @@ class Join extends react0___default().Component {
         onClick: () => this.setState({
           preview: !preview
         })
-      }, JSX_(_ui_utils_jsx4__ .zT, null, chatRoom.topic), JSX_(_button_jsx5__ .A, {
+      }, JSX_(_ui_utils_jsx2__ .zT, null, chatRoom.topic), JSX_(_button_jsx3__ .A, {
         icon: "icon-minimise"
       })), preview && JSX_("div", {
         className: "chat-body"
-      }, JSX_(_historyPanel_jsx6__ .A, {
+      }, JSX_(_historyPanel_jsx5__ .A, {
         chatRoom,
         onMount: cmp => {
           let _cmp$messagesListScro;
@@ -6561,12 +6562,12 @@ class Join extends react0___default().Component {
         className: "card"
       }, JSX_("div", {
         className: "card-body"
-      }, children, JSX_("div", null, JSX_(_link_jsx3__ .A, {
+      }, children, JSX_("div", null, JSX_(_link_jsx6__ .A, {
         to: "https://mega.io/chatandmeetings",
         target: "_blank"
       }, l.how_meetings_work))), JSX_("div", {
         className: "card-preview"
-      }, JSX_(_preview_jsx7__ .A, {
+      }, JSX_(_preview_jsx4__ .A, {
         audio: previewAudio,
         video: previewVideo,
         context: this.NAMESPACE,
@@ -6609,7 +6610,7 @@ class Join extends react0___default().Component {
       name: "firstName"
     }, l[1096]), JSX_(this.Field, {
       name: "lastName"
-    }, l[1097])), JSX_(_button_jsx5__ .A, {
+    }, l[1097])), JSX_(_button_jsx3__ .A, {
       className: `
                     mega-button
                     positive
@@ -6640,7 +6641,7 @@ class Join extends react0___default().Component {
         }
       }
     }, l.join_chat_button));
-    this.Account = () => JSX_(this.Card, null, JSX_("h4", null, l.join_meeting), JSX_(_button_jsx5__ .A, {
+    this.Account = () => JSX_(this.Card, null, JSX_("h4", null, l.join_meeting), JSX_(_button_jsx3__ .A, {
       className: `mega-button positive large ${this.state.joining && " loading disabled"}`,
       onClick: () => {
         if (!this.state.joining) {
@@ -6657,20 +6658,20 @@ class Join extends react0___default().Component {
       className: "sprite-fm-uni icon-error"
     }), JSX_("div", {
       className: "unsupported-info"
-    }, JSX_("h3", null, l.heading_unsupported_browser), JSX_("h3", null, l.join_meeting_methods), JSX_("ul", null, JSX_("li", null, l.join_via_link), JSX_("li", null, JSX_(_ui_utils_jsx4__ .P9, null, l.join_via_mobile.replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">').replace('[/A]', '</a>'))))));
+    }, JSX_("h3", null, l.heading_unsupported_browser), JSX_("h3", null, l.join_meeting_methods), JSX_("ul", null, JSX_("li", null, l.join_via_link), JSX_("li", null, JSX_(_ui_utils_jsx2__ .P9, null, l.join_via_mobile.replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">').replace('[/A]', '</a>'))))));
     this.View = view => {
       switch (view) {
         default:
           return this.Intro();
-        case _utils_jsx1__ .j.GUEST:
+        case _utils_jsx7__ .j.GUEST:
           return this.Guest();
-        case _utils_jsx1__ .j.ACCOUNT:
+        case _utils_jsx7__ .j.ACCOUNT:
           return this.Account();
-        case _utils_jsx1__ .j.UNSUPPORTED:
+        case _utils_jsx7__ .j.UNSUPPORTED:
           return this.Unsupported();
       }
     };
-    this.state.view = sessionStorage.guestForced ? _utils_jsx1__ .j.GUEST : props.initialView || this.state.view;
+    this.state.view = sessionStorage.guestForced ? _utils_jsx7__ .j.GUEST : props.initialView || this.state.view;
     if (localStorage.awaitingConfirmationAccount) {
       this.showConfirmationDialog();
     }
@@ -6683,7 +6684,7 @@ class Join extends react0___default().Component {
     sessionStorage.removeItem('guestForced');
     if (!megaChat.hasSupportForCalls) {
       this.setState({
-        view: _utils_jsx1__ .j.UNSUPPORTED
+        view: _utils_jsx7__ .j.UNSUPPORTED
       });
     }
   }
@@ -6700,7 +6701,7 @@ class Join extends react0___default().Component {
       view,
       ephemeralDialog
     } = this.state;
-    return JSX_(_ui_utils_jsx4__ .Ay.RenderTo, {
+    return JSX_(_ui_utils_jsx2__ .Ay.RenderTo, {
       element: document.body
     }, JSX_("div", {
       className: this.NAMESPACE
@@ -6710,8 +6711,8 @@ class Join extends react0___default().Component {
 
  },
 
- 2914:
- (_, EXP_, REQ_) => {
+ 2914
+(_, EXP_, REQ_) {
 
 REQ_.r(EXP_);
  REQ_.d(EXP_, {
@@ -6821,18 +6822,15 @@ Loading.NAMESPACE = 'meetings-loading';
 
  },
 
- 3546:
- (_, EXP_, REQ_) => {
+ 3546
+(_, EXP_, REQ_) {
 
- REQ_.d(EXP_, {
-   A: () => __WEBPACK_DEFAULT_EXPORT__
- });
  const react0__ = REQ_(1594);
  const react0___default = REQ_.n(react0__);
- const _mixins_js4__ = REQ_(8264);
+ const _mixins_js1__ = REQ_(8264);
  const _contacts_jsx2__ = REQ_(8022);
- const _utils_jsx1__ = REQ_(3901);
- const _button_jsx3__ = REQ_(6740);
+ const _utils_jsx3__ = REQ_(3901);
+ const _button_jsx4__ = REQ_(6740);
  const _permissionsObserver_jsx5__ = REQ_(192);
 
 
@@ -6905,7 +6903,7 @@ class Preview extends react0___default().Component {
       (_this$props$resetErro = (_this$props = this.props).resetError) == null || _this$props$resetErro.call(_this$props, type === Preview.STREAMS.AUDIO ? Av.Audio : Av.Camera);
     };
     this.renderAvatar = () => {
-      if ((0,_utils_jsx1__ .P)()) {
+      if ((0,_utils_jsx3__ .P)()) {
         return JSX_("div", {
           className: "avatar-guest"
         }, JSX_("i", {
@@ -6984,7 +6982,7 @@ class Preview extends react0___default().Component {
       className: `${NAMESPACE}-controls`
     }, JSX_("div", {
       className: "preview-control-wrapper"
-    }, JSX_(_button_jsx3__ .A, {
+    }, JSX_(_button_jsx4__ .A, {
       simpletip: {
         ...SIMPLETIP_PROPS,
         label: audio ? l[16214] : l[16708]
@@ -7002,7 +7000,7 @@ class Preview extends react0___default().Component {
       }
     }), JSX_("span", null, l.mic_button), hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null), JSX_("div", {
       className: "preview-control-wrapper"
-    }, JSX_(_button_jsx3__ .A, {
+    }, JSX_(_button_jsx4__ .A, {
       simpletip: {
         ...SIMPLETIP_PROPS,
         label: video ? l[22894] : l[22893]
@@ -7024,7 +7022,11 @@ Preview.STREAMS = {
   AUDIO: 1,
   VIDEO: 2
 };
- const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins_js4__ .Zz)(_permissionsObserver_jsx5__ .$)(Preview);
+ const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins_js1__ .Zz)(_permissionsObserver_jsx5__ .$)(Preview);
+ REQ_.d(EXP_, [
+   "A", 0,  __WEBPACK_DEFAULT_EXPORT__
+ ]);
+
 
  }
 

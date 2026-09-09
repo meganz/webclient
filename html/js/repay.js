@@ -505,7 +505,7 @@ RepayPage.prototype.initPage = function() {
             if (showTaxInfo) {
                 $('.repay-td-tax-name', $taxInfo).text(l.tax_name_percentage
                     .replace('%1', taxInfo.name)
-                    .replace('%2', formatPercentage(+taxInfo.percentage / 100)));
+                    .replace('%2', formatPercentage(+taxInfo.percentage / 100, false, 2)));
                 $('.repay-td-tax-amount', $taxInfo).text(applyFormat(intl.format(taxInfo.taxAmount)));
 
                 $taxInfo.removeClass('hidden');

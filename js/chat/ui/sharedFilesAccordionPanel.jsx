@@ -1,4 +1,4 @@
-var React = require("react");
+import React from 'react';
 import {ContactAwareComponent, MegaRenderMixin} from "../mixins";
 import utils, { Emoji } from './../../ui/utils.jsx';
 

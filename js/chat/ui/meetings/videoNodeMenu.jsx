@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import Button from './button.jsx';
-import { isGuest, MODE } from './call.jsx';
+import { isGuest, MODE } from './utils.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
 
 export const Privilege = ({ chatRoom, stream }) => {

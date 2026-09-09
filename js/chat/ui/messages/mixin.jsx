@@ -1,7 +1,7 @@
 import React from 'react';
-import {ContactAwareComponent} from '../../mixins';
-import {Button} from "../../../ui/buttons.jsx";
-import {DropdownEmojiSelector} from "../../../ui/emojiDropdown.jsx";
+import { ContactAwareComponent } from '../../mixins.js';
+import { Button } from "../../../ui/buttons.jsx";
+import DropdownEmojiSelector from '../../../ui/emojiDropdown.jsx';
 
 class ConversationMessageMixin extends ContactAwareComponent {
 

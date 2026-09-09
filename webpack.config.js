@@ -1,11 +1,9 @@
 var webpack = require("webpack");
 
 var entryPoints = [
-    './js/chat/chat.jsx',
-    './js/chat/ui/conversations.jsx',
+    './js/chat/megaChunkLoader.jsx',
+    './js/chat/chat.jsx'
 ];
-
-const path = require('path');
 
 var BABEL_LOADER_OPTIONS = {
     plugins: [
@@ -29,14 +27,16 @@ var BABEL_LOADER_OPTIONS = {
         }],
         '@babel/preset-react'
     ],
-    comments: false
+    shouldPrintComment: (comment) => /webpackChunkName/.test(comment)
 };
 
 var webpackConfigs = {
     dev: {
         devServer: {
             port: 8089,
-            hot: 'only',
+            // Disable HMR, as to this ensure consistent behavior with the rest of the `webclient`; we don't want
+            // dynamically fetched and injected modules that are unverified at runtime, incl. during development.
+            hot: false,
             static: __dirname,
             liveReload: false,
             webSocketServer: 'ws',
@@ -52,7 +52,8 @@ var webpackConfigs = {
         output: {
             path: __dirname + "/.",
             publicPath: "/",
-            filename: "js/chat/bundle.js"
+            filename: "js/chat/bundle.js",
+            chunkFilename: "js/chat/bundle.[name].js",
         },
         resolve: {
             extensions: ['.js', '.jsx'],
@@ -65,14 +66,14 @@ var webpackConfigs = {
         },
         optimization: {
             // We no not want to minimize our code.
-            minimize: false
+            minimize: false,
+            // Disable automatic chunk splitting to prevent any auto-generated chunks that may bypass `secureboot`; we
+            // want deterministically generated chunks (e.g. via `webpackChunkName`) to ensure 1:1 mapping
+            // with `secureboot`
+            splitChunks: false
         },
         module: {
             rules: [
-                {
-                    test: /\.less$/,
-                    use: ['style-loader', 'css-loader', 'less-loader']
-                },
                 {
                     test: /\.(js|jsx)$/,
                     exclude: /(node_modules|bower_components)/,
@@ -105,17 +106,14 @@ var webpackConfigs = {
         output: {
             path: __dirname + "/",
             publicPath: "/",
-            filename: "js/chat/bundle.js"
+            filename: "js/chat/bundle.js",
+            chunkFilename: "js/chat/bundle.[name].js",
         },
         resolve: {
             extensions: ['.js', '.jsx'],
         },
         module: {
             rules: [
-                {
-                    test: /\.less$/,
-                    use: ['style-loader', 'css-loader', 'less-loader']
-                },
                 {
                     test: /\.(js|jsx)$/,
                     exclude: /(node_modules|bower_components)/,
@@ -134,6 +132,10 @@ var webpackConfigs = {
             minimize: false,
             sideEffects: true,
             usedExports: true,
+            // Disable automatic chunk splitting to prevent any auto-generated chunks that may bypass `secureboot`; we
+            // want deterministically generated chunks (e.g. via `webpackChunkName`) to ensure 1:1 mapping
+            // with `secureboot`
+            splitChunks: false
         },
         externals: {
             "jquery": "jQuery",

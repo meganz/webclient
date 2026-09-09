@@ -5,13 +5,7 @@ import { Navigation } from './navigation.jsx';
 import Actions from './actions.jsx';
 import { Chats, Meetings, Archived } from './conversationsList.jsx';
 import { withUpdateObserver } from '../updateObserver.jsx';
-
-export const NAMESPACE = 'lhp';
-
-export const FILTER = {
-    MUTED: 'muted',
-    UNREAD: 'unread'
-};
+import { NAMESPACE } from './utils.jsx';
 
 class LeftPanel extends MegaRenderMixin {
     domRef = React.createRef();

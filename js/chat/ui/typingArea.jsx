@@ -1,11 +1,11 @@
 import React from 'react';
 import { Emoji } from '../../ui/utils.jsx';
 import { MegaRenderMixin, SoonFcWrap } from '../mixins.js';
-import { DropdownEmojiSelector } from '../../ui/emojiDropdown.jsx';
+import DropdownEmojiSelector from '../../ui/emojiDropdown.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { EmojiAutocomplete } from './emojiAutocomplete.jsx';
 import GifPanel from './gifPanel/gifPanel.jsx';
-import { PerfectScrollbar } from './../../ui/perfectScrollbar.jsx';
+import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 
 export class TypingArea extends MegaRenderMixin {
     domRef = React.createRef();

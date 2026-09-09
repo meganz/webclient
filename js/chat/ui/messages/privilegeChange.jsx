@@ -1,7 +1,7 @@
-var React = require("react");
-var ContactsUI = require('./../contacts.jsx');
-var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
+import React from 'react';
 import { Emoji, ParsedHTML } from '../../../ui/utils.jsx';
+import { Avatar, ContactButton } from '../contacts.jsx';
+import { ConversationMessageMixin } from './mixin.jsx';
 
 class PrivilegeChange extends ConversationMessageMixin {
     haveMoreContactListeners() {
@@ -47,7 +47,7 @@ class PrivilegeChange extends ConversationMessageMixin {
             'c': 0
         };
 
-        var avatar = <ContactsUI.Avatar contact={otherContact}
+        var avatar = <Avatar contact={otherContact}
             className="message avatar-wrapper small-rounded-avatar"
             chatRoom={chatRoom} />;
         var otherDisplayName = M.getNameByHandle(otherContact.u);
@@ -72,7 +72,7 @@ class PrivilegeChange extends ConversationMessageMixin {
             <div className="message body" data-id={"id" + message.messageId} key={message.messageId}>
                 {avatar}
                 <div className="message content-area small-info-txt selectable-txt">
-                    <ContactsUI.ContactButton
+                    <ContactButton
                         className="message"
                         chatRoom={self.props.chatRoom}
                         contact={otherContact}

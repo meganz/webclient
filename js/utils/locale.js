@@ -915,20 +915,23 @@ function formatCurrency(value, currency, display, noDecimals) {
 /**
  * Function to return percentage structure as it is difference on some locale.
  * @param {Number} value Value to format
- * @param {Boolean} twoDecimals If the number should be displayed with 2 decimals
+ * @param {Boolean} [twoDecimals] If the number should be displayed with exactly 2 decimals
+ * @param {Number} [maxDecimals] Round to at most this many decimals, trailing zeros trimmed
  * @returns {String} Formateed percentage value with curreny locales
  */
-function formatPercentage(value, twoDecimals) {
+function formatPercentage(value, twoDecimals, maxDecimals) {
 
     'use strict';
 
-    twoDecimals = twoDecimals || false;
     const locales = getCountryAndLocales().locales;
     const options = {'style': 'percent'};
 
     if (twoDecimals) {
         options.maximumFractionDigits = 2;
         options.minimumFractionDigits = 2;
+    }
+    else if (maxDecimals) {
+        options.maximumFractionDigits = maxDecimals;
     }
 
     return value.toLocaleString(locales, options);

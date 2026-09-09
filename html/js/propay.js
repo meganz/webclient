@@ -1832,7 +1832,7 @@ pro.propay = {
             $('.tax-amount-descr', $taxInfo)
                 .text(l.tax_name_percentage
                     .replace('%1', getTaxName(pro.propay.billing.country))
-                    .replace('%2', formatPercentage(pro.taxInfo.taxPercent)));
+                    .replace('%2', formatPercentage(pro.taxInfo.taxPercent, false, 2)));
 
             $('.tax-amount-value', $taxInfo).text(taxAmountText + getCurrencyText(!forceEuro && this.planObj.currency));
 
@@ -2009,7 +2009,7 @@ pro.propay = {
                     .safeHTML((this.planObj.taxInfo ? l.total_price_taxed : l.total_price)
                         .replace('%1', newPrice)
                         .replace('%2', pro.taxInfo
-                            && (pro.taxInfo.taxName + ' ' + formatPercentage(pro.taxInfo.taxPercent))))
+                            && (pro.taxInfo.taxName + ' ' + formatPercentage(pro.taxInfo.taxPercent, false, 2))))
                     .removeClass('hidden');
             }
             else {

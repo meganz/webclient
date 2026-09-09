@@ -2613,6 +2613,7 @@
     "25049": "Payment failed",
     "25050": "Unfortunately, the payment did not go through. If you believe that this is an error on MEGA\u2019s part, please contact support at [A]https://mega.nz/support[/A]",
     "25081": "Thanks. Your account upgrade will be applied in the next few minutes.\nIf this is a new account and you haven\u2019t verified your email address yet, please do this now.",
+    "25082": "Use the day, month, year format (DD.MM.YYYY)",
     "about_no_vacancies_available": "No vacancies available currently.",
     "about_our_promise_title": "Our promise",
     "ac_closure_email_sent_msg": "An email was sent to %s with a link to close your account.",

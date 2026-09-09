@@ -2297,63 +2297,46 @@ MegaUtils.prototype.getPersistentDataEntries = promisify(async function(resolve,
  * Will return Null if the requested countrycode does not exist.
  * @param {String} countryCode The countrycode of the country to get the name of
  * @returns {Null|String}.
+ * @deprecated
  */
 MegaUtils.prototype.getCountryName = function(countryCode) {
     'use strict';
 
-    if (!this._countries) {
-        this.getCountries();
-    }
-
-    // Get the stringid for the country code specified.
-    if (this._countries.hasOwnProperty(countryCode)) {
-        return this._countries[countryCode];
-    } else {
-        if (d) {
-            console.error('Error - getCountryName: unrecognizable country code: ' + countryCode);
-        }
-        return null;
-    }
+    return RegionsCollection.countries[countryCode] || '';
 };
 
 /**
  * Returns an object with all countryCodes:countryNames in the user set language.
  * @returns Object
+ * @deprecated
  */
 MegaUtils.prototype.getCountries = function() {
     'use strict';
 
-    if (!this._countries) {
-        this._countries = (new RegionsCollection()).countries;
-    }
-    return this._countries;
+    return RegionsCollection.countries;
 };
 
 /**
  * Returns an object with all the stateCodes:stateNames.
  * @returns Object
+ * @deprecated
  */
 MegaUtils.prototype.getStates = function() {
     'use strict';
 
-    if (!this._states) {
-        this._states = (new RegionsCollection()).states;
-    }
-    return this._states;
+    return RegionsCollection.states;
 };
 
 /**
  * Return a country call code for a given country
  * @param {String} isoCountryCode A two letter ISO country code e.g. NZ, AU
  * @returns {String} Returns the country international call code e.g. 64, 61
+ * @deprecated
  */
 MegaUtils.prototype.getCountryCallCode = function(isoCountryCode) {
     'use strict';
 
-    if (!this._countryCallCodes) {
-        this._countryCallCodes = (new RegionsCollection()).countryCallCodes;
-    }
-    return this._countryCallCodes[isoCountryCode];
+    return RegionsCollection.countryCallCodes[isoCountryCode];
 };
 
 /**
@@ -2367,16 +2350,9 @@ MegaUtils.prototype.getCountryCallCode = function(isoCountryCode) {
 MegaUtils.prototype.getNumberTrunkCode = function(countryCallCode, phoneNumber) {
     'use strict';
 
-    if (!this._countryTrunkCodes) {
-        this._countryTrunkCodes = new RegionsCollection().countryTrunkCodes;
-    }
-
-    let trunkCodes;
-    if (this._countryTrunkCodes.hasOwnProperty(countryCallCode)) {
-        trunkCodes = this._countryTrunkCodes[countryCallCode];
-        if (typeof trunkCodes === 'function') {
-            trunkCodes = trunkCodes(phoneNumber);
-        }
+    let trunkCodes = RegionsCollection.countryTrunkCodes[countryCallCode];
+    if (typeof trunkCodes === 'function') {
+        trunkCodes = trunkCodes(phoneNumber);
     }
 
     for (let trunkCode in trunkCodes) {
@@ -2692,6 +2668,11 @@ MegaUtils.prototype.fmEventLog = function(eid) {
 MegaUtils.prototype.sqliteCheck = async function() {
     'use strict';
 
+    // Folderlink, lets skip the check
+    if (pfid) {
+        return;
+    }
+
     if (this.pendingSQLiteCheck) {
         return this.pendingSQLiteCheck;
     }
@@ -2708,9 +2689,9 @@ MegaUtils.prototype.sqliteCheck = async function() {
     await WebAssembly.compile(Uint8Array.of(0, 97, 115, 109, 1, 0, 0, 0));
 
     if (!opfsready) {
-        this.pendingSQLiteCheck = tSleep.race(7, new Promise((resolve) => {
+        this.pendingSQLiteCheck = new Promise((resolve) => {
             const blob = URL.createObjectURL(new Blob([
-                'onmessage = async() => {' +
+                'onmessage = () => {(async() => {' +
                 'const root = await navigator.storage.getDirectory();' +
                 'const fh   = await root.getFileHandle("_p_.bin", { create: true });' +
                 'const sah  = await fh.createSyncAccessHandle();' +
@@ -2718,7 +2699,7 @@ MegaUtils.prototype.sqliteCheck = async function() {
                 'sah.close();' +
                 'await root.removeEntry("_p_.bin");' +
                 'postMessage(size);' +
-                '};'
+                '})().catch(ex => postMessage(ex));};'
             ]));
             const worker = new Worker(blob);
 
@@ -2728,13 +2709,13 @@ MegaUtils.prototype.sqliteCheck = async function() {
                 URL.revokeObjectURL(blob);
             };
             worker.postMessage({});
-        })).then(size => {
+        }).then(size => {
             assert(size === 0, 'SQLite OPFS probe failed', size);
             localStorage.opfsready = 1;
         });
     }
 
-    this.pendingSQLiteCheck = tSleep.race(15, Promise.resolve(this.pendingSQLiteCheck).then(() => M.require('sqlite')))
+    this.pendingSQLiteCheck = tSleep.race(7, Promise.resolve(this.pendingSQLiteCheck).then(() => M.require('sqlite')))
         .then((res) => {
             assert(!res && self.sqlite3Worker1Promiser.defaultConfig.worker, 'SQLite runtime failure', res);
         })

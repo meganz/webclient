@@ -296,15 +296,12 @@ copyright.init_cndispute = function() {
         }
     });
 
-    // Set up the country values
-    var markup = '<OPTION value="0"></OPTION>';
-    var countries = M.getCountries();
-    for (var country in countries) {
-        if (countries.hasOwnProperty(country)) {
-            markup += '<option value="' + escapeHTML(country) + '">'
-                + escapeHTML(countries[country]) + '</option>';
-        }
+    let markup = '<option value="0"></option>';
+
+    for (const [code, name] of Object.entries(M.getCountries())) {
+        markup += `<option value="${escapeHTML(code)}">${escapeHTML(name)}</option>`;
     }
+
     $('.select.country select', '.dn-form').safeHTML(markup);
 };
 

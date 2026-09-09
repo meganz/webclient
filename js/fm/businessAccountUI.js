@@ -337,9 +337,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     if (!Object.keys(currSubAccounts).length) { // no subs
         return this.viewLandingPage();
     }
-    this.business.hasSubs = true;
-
-    loadingDialog.pshow();
 
     // API doesn't send the "Admin" user, i assume that this because the current admin is the caller.
     // if later, when we get multiple admins the same thing happened for other admins, then we can't rely
@@ -349,6 +346,16 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             currSubAccounts[this.currAdmin.u] = this.currAdmin;
         }
     }
+
+    const subUserHandles = Object.keys(currSubAccounts);
+
+    // Lone master slipped in via action packets or such. Show landing.
+    if (subUserHandles.length === 1 && this.currAdmin && subUserHandles[0] === this.currAdmin.u) {
+        return this.viewLandingPage();
+    }
+    this.business.hasSubs = true;
+
+    loadingDialog.pshow();
 
     currSubAccounts = mySelf.sortSubusers(currSubAccounts);
 
@@ -2366,8 +2373,8 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
     if (u_attr['%email']) {
         cEmail = u_attr['%email'];
     }
-    if (u_attr['%taxnum']) {
-        cVat = u_attr['%taxnum'];
+    if (u_attr.taxnum) {
+        cVat = u_attr.taxnum;
     }
     if (u_attr['%address1']) {
         cAddress = u_attr['%address1'];
@@ -2466,6 +2473,13 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
         });
     });
 
+    // Temporarily invalidated for the first step of invoicing-changes.
+    // To revert later once api support added.
+    $cCountrySelect.addClass('disabled').attr('disabled', 'disabled');
+    $cVatInput.prop('disabled', true).closest('.mega-input').addClass('disabled');
+    $cStateInput.prop('disabled', true).closest('.mega-input').addClass('disabled');
+    $('.taxcode-invoice-note', $profileContainer).addClass('hidden');
+
     $saveButton.rebind(
         'click.suba',
         function companyProfileSaveButtonClick() {
@@ -2521,16 +2535,10 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
                     $cVatInput.focus();
                     valid = false;
                 }
-                else if (addressDialog.testTaxCode(newTaxCode, cc)) {
+                else {
                     $cVatInput.megaInputsHideError();
                     attrsToChange.push({ key: '%taxnum', val: newTaxCode });
                     isTaxChanged = true;
-                }
-                else {
-                    valid = false;
-                    $cVatInput.megaInputsShowError(l.taxcode_error.replace('%s', mySelf.business.getTaxCodeName(cc)));
-                    $cVatInput.focus();
-                    $('.taxcode-invoice-note', $profileContainer).addClass('hidden');
                 }
             }
             if ($cAddressInput.val().trim() !== cAddress) {

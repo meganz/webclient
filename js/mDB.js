@@ -525,7 +525,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
     }
 
     // exit loop if we ran out of pending writes or have crashed
-    if (this.inflight || ch < 0 || this.crashed || this.writing) {
+    if (this.inflight || ch < 0 || this.crashed || this.writing || !this.db) {
         return;
     }
 
@@ -1126,6 +1126,26 @@ FMDB.prototype.restorenode = freeze({
         if (f.u === '~') {
             f.u = u_handle;
         }
+
+        if (f.t > 128) {
+
+            if (self.d) {
+                console.error(`Caught invalid node-type value for node ${f.h} from ${f.u}`, f.t, [{...f}, index]);
+            }
+
+            if (Array.isArray(f.k) && f.k.length > 0) {
+
+                f.t = f.k.length < 8 ? 1 : 0;
+            }
+            else if (self.d) {
+                console.warn(`Could not normalize borked 't'-value...`, f.k);
+            }
+            queueMicrotask(() => {
+                eventlog(99647, JSON.stringify([
+                    1, 0, f.t, f.h, f.p, !!f.shares | 0, f.u, f.u === u_handle | 0, typeof f.k, f.k && f.k.length, f.s
+                ]), true);
+            });
+        }
     },
 
     fa(d, idx) {
@@ -1409,7 +1429,7 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
     }
     else if (options.query) {
         // Perform custom user-provided query
-        t = options.query(t);
+        t = t && options.query(t);
     }
     else if (where) {
         for (let k = where.length; k--;) {

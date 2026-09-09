@@ -27,6 +27,17 @@
                 <div class="content">
                     <div class="plan-icon"></div>
                     <div class="plan-name title"></div>
+                    <div class="flex flex-row duration-options-wrapper">
+                        <button class="duration-option template hidden">
+                            <div class="duration">[$duration]</div>
+                            <div class="savings hidden"></div>
+                            <div class="best-value hidden">[$best_value]</div>
+                        </button>
+                    </div>
+                    <div class="duration-warning hidden">
+                        <i class="sprite-fm-mono icon-message-alert"></i>
+                        <span class="duration-warning-text"></span>
+                    </div>
                     <div class="plan-info hidden">
                         <div class="storage"></div>
                         <div class="transfer"></div>
@@ -36,32 +47,32 @@
                     <div class="includes hidden">
                         <div class="includes-content"></div>
                     </div>
-                    <div class="pricing">
-                        <div class="pricing-element duration">
-                            <span class="duration-name">[$duration]</span>
+                    <div class="pricing no-min-sk-height">
+                        <div class="pricing-element duration no-sk">
+                            <span class="duration-name no-sk">[$duration]</span>
                             <span class="duration-type"></span>
                         </div>
-                        <div class="pre-tax hidden tax-info pricing-element">
-                            <span class="pre-tax-descr">[$plan_excl_tax]</span>
+                        <div class="pre-tax hidden tax-info pricing-element no-sk">
+                            <span class="pre-tax-descr no-sk">[$plan_excl_tax]</span>
                             <span class="pre-tax-value"></span>
                         </div>
-                        <div class="pre-discount hidden discount-info pricing-element">
-                            <span class="pre-discount-descr">[$16166]</span>
+                        <div class="pre-discount hidden discount-info pricing-element no-sk">
+                            <span class="pre-discount-descr no-sk">[$16166]</span>
                             <span class="pre-discount-value"></span>
                         </div>
-                        <div class="tax-amount hidden tax-info pricing-element">
+                        <div class="tax-amount hidden tax-info pricing-element no-sk">
                             <span class="tax-amount-descr"></span>
                             <span class="tax-amount-value"></span>
                         </div>
-                        <div class="discount-amount hidden pricing-element">
+                        <div class="discount-amount hidden pricing-element no-sk">
                             <span class="discount-amount-descr"></span>
                             <span class="discount-amount-value"></span>
                         </div>
-                        <div class="pricing-element">
-                            <span class="due-now">[$16464]</span>
+                        <div class="pricing-element no-sk">
+                            <span class="due-now no-sk">[$16464]</span>
                             <span class="price"></span>
                         </div>
-                        <div class="pricing-element discount">
+                        <div class="pricing-element discount no-sk">
                             <span class="pre-discount-price"></span>
                         </div>
                     </div>
@@ -73,6 +84,7 @@
                     <span class="estimated-price euro hidden">
                         * [$est_price_acc_billed_euro]
                     </span>
+                    <div class="pro-for-duration hidden">[$pro_for_duration]</div>
                 </div>
             </div>
 
@@ -135,6 +147,9 @@
                                 </button>
                             </div>
                         </div>
+
+                        <div class="propay-use-type-tab-mount"></div>
+
                         <div class="create-account-wrapper no-sk hidden">
                             <h2 class="title">
                                 <span class="number">1</span>
@@ -188,7 +203,7 @@
                                 <h2 class="title no-create-account">[$478]</h2>
                                 <h2 class="title create-account">
                                     <span class="number">2</span>
-                                    [$6963]
+                                    [$478]
                                 </h2>
                                 <div class="dropdown-wrapper-primary">
                                     <div class="mega-input dropdown-input payment-options sk-pro" id="propay-payment-dropdown-pri">
@@ -212,48 +227,12 @@
                                     <i class="sprite-fm-mono icon-alert-circle-thin-outline"></i>
                                     [$method_does_not_support_trial]
                                 </div>
+                                <div class="gateway-country-unsupported hidden">
+                                    <i class="sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                                    [$payment_country_not_supported]
+                                </div>
                             </div>
-                                                        <div class="astropay-dialog propay-inline-dialog hidden no-sk" role="dialog" aria-labelledby="astropay-dialog-title"
-                                                            aria-modal="true">
 
-                                                            <h2>[$enter_details_below]</h2>
-                                                            <div class="redirect-info">[$redirect_to_third_party_info]</div>
-
-                                                            <section class="content no-sk">
-                                                                <div class="content-block gap-1 flex flex-column no-sk">
-                                                                    <label class="astropay-label" for="propay-astropay-name-field">[$7987]:</label>
-                                                                    <div class="mega-input box-style">
-                                                                        <input id="propay-astropay-name-field" class="astropay-name-field" type="text" placeholder="[$7988]">
-                                                                    </div>
-
-                                                                    <label class="astropay-label address" for="propay-astropay-address-field">[$561]:</label>
-                                                                    <div class="mega-input box-style">
-                                                                        <input id="propay-astropay-address-field" class="astropay-address-field" type="text"
-                                                                            placeholder="[$561]">
-                                                                    </div>
-
-                                                                    <label class="astropay-label city" for="propay-astropay-city-field">[$565]:</label>
-                                                                    <div class="mega-input box-style">
-                                                                        <input id="propay-astropay-city-field" class="astropay-city-field" type="text" placeholder="[$565]">
-                                                                    </div>
-
-                                                                    <label class="astropay-label postcode" for="propay-astropay-postcode-field">[$10659]:</label>
-                                                                    <div class="mega-input box-style">
-                                                                        <input id="propay-astropay-postcode-field" class="astropay-postcode-field" type="text" placeholder="[$10659]">
-                                                                    </div>
-
-                                                                    <label class="astropay-label tax" for="propay-astropay-tax-field">[$7989]:</label>
-                                                                    <div class="mega-input box-style">
-                                                                        <input id="propay-astropay-tax-field" class="astropay-tax-field" type="text" placeholder="[$7990]">
-                                                                    </div>
-
-                                                                    <label class="astropay-label phone" for="propay-astropay-phone-field">[$8797]</label>
-                                                                    <div class="mega-input box-style">
-                                                                        <input id="propay-astropay-phone-field" class="astropay-phone-field" type="text" placeholder="[$19152]">
-                                                                    </div>
-                                                                </div>
-                                                            </section>
-                                                        </div>
                             <div class="duration hidden">
                                 <h2 class="title trial hidden">[$how_often_want_to_pay]</h2>
                                 <h2 class="title one-time hidden">[$7994]</h2>
@@ -268,9 +247,320 @@
                             <h2 class="title">[$my_billing_address]</h2>
                             <div class="wrapper"></div>
                         </div>
+
+                        <div class="no-sk billing-section hidden">
+                            <h2 class="title no-create-account">[$your_details]</h2>
+                            <h2 class="title create-account">
+                                <span class="number">3</span>
+                                [$your_details]
+                            </h2>
+                            <div class="billing-wrapper no-sk">
+                                <!-- Fields that are always required -->
+                                <div class="required-fields">
+                                    <div class="flex flex-row flex-wrap no-sk w-full fields-wrapper">
+                                        <div class="field-pair country-taxCode-pair w-full">
+                                            <div class="country-input-wrapper flex flex-column billing-input w-half">
+                                                <label for="propay-billing-country-req">[$481]</label>
+                                                <div class="mega-input dropdown-input box-style country propay-billing-country-dropdown"
+                                                    id="propay-billing-country-req" tabindex="0">
+                                                    <span></span>
+                                                    <i class="sprite-fm-mono icon-dropdown"></i>
+                                                    <div class="mega-input-dropdown hidden">
+                                                        <div class="dropdown-scroll"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="error-message sk-pro">
+                                                    <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                    <span class="error-message-text">[$select_country]</span>
+                                                </div>
+                                            </div>
+                                            <div class="taxCode-input-wrapper flex flex-column billing-input w-half">
+                                                <div class="tax-validation-popover hidden">
+                                                    <i class="sprite-fm-mono icon-dialog-close tax-validation-popover-close"></i>
+                                                    <div class="tax-validation-popover-title">[$validation_failed_title]</div>
+                                                    <div class="tax-validation-popover-message"></div>
+                                                    <div class="tax-validation-popover-action"></div>
+                                                    <div class="tax-validation-popover-arrow"></div>
+                                                </div>
+                                                <label for="propay-billing-taxCode-req">[$tax_number]</label>
+                                                <div class="mega-input box-style country">
+                                                    <input type="text" value="" id="propay-billing-taxCode-req" />
+                                                </div>
+                                                <div class="error-message sk-pro">
+                                                    <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                    <span class="error-message-text">[$20953]</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="state-input-wrapper flex flex-column billing-input w-half">
+                                            <label for="propay-billing-state-req">[$7192]</label>
+                                            <div class="mega-input dropdown-input box-style country propay-billing-state-dropdown"
+                                                id="propay-billing-state-req" tabindex="0">
+                                                <span></span>
+                                                <i class="sprite-fm-mono icon-dropdown"></i>
+                                                <div class="mega-input-dropdown hidden">
+                                                    <div class="dropdown-scroll"></div>
+                                                </div>
+                                            </div>
+                                            <div class="error-message sk-pro">
+                                                <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                <span class="error-message-text">[$select_state]</span>
+                                            </div>
+                                        </div>
+                                        <div class="field-pair firstname-lastname-pair w-full">
+                                            <div class="firstname-input-wrapper flex flex-column billing-input w-half">
+                                                <label for="propay-billing-firstname-req">[$7342]</label>
+                                                <div class="mega-input box-style firstname">
+                                                    <input type="text" value="" id="propay-billing-firstname-req" />
+                                                </div>
+                                                <div class="error-message sk-pro">
+                                                    <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                    <span class="error-message-text">[$enter_first_name]</span>
+                                                </div>
+                                            </div>
+                                            <div class="lastname-input-wrapper flex flex-column billing-input w-half">
+                                                <label for="propay-billing-lastname-req">[$7345]</label>
+                                                <div class="mega-input box-style lastname">
+                                                    <input type="text" value="" id="propay-billing-lastname-req" />
+                                                </div>
+                                                <div class="error-message sk-pro">
+                                                    <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                    <span class="error-message-text">[$enter_last_name]</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="address1-input-wrapper flex flex-column billing-input w-full">
+                                            <label for="propay-billing-address1-req">[$561]</label>
+                                            <div class="mega-input box-style address1">
+                                                <input type="text" value="" id="propay-billing-address1-req" />
+                                            </div>
+                                            <div class="error-message sk-pro">
+                                                <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                <span class="error-message-text">[$enter_address]</span>
+                                            </div>
+                                        </div>
+                                        <div class="address2-input-wrapper flex flex-column billing-input w-full">
+                                            <label for="propay-billing-address2-req">[$address2]</label>
+                                            <div class="mega-input box-style address2">
+                                                <input type="text" value="" id="propay-billing-address2-req" />
+                                            </div>
+                                        </div>
+                                        <div class="field-pair city-postcode-pair w-full">
+                                            <div class="city-input-wrapper flex flex-column billing-input w-half">
+                                                <label for="propay-billing-city-req">[$565]</label>
+                                                <div class="mega-input box-style city">
+                                                    <input type="text" value="" id="propay-billing-city-req" />
+                                                </div>
+                                                <div class="error-message sk-pro">
+                                                    <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                    <span class="error-message-text">[$enter_city]</span>
+                                                </div>
+                                            </div>
+                                            <div class="postcode-input-wrapper flex flex-column billing-input w-half">
+                                                <label for="propay-billing-postcode-req">[$10659]</label>
+                                                <div class="mega-input box-style country">
+                                                    <input type="text" value="" id="propay-billing-postcode-req" />
+                                                </div>
+                                                <div class="error-message sk-pro">
+                                                    <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                    <span class="error-message-text">[$enter_valid_postcode]</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="dateOfBirth-input-wrapper flex flex-column billing-input w-half">
+                                            <label for="propay-billing-dateOfBirth-req">[$995]</label>
+                                            <div class="mega-input box-style dateOfBirth">
+                                                <input type="date" value="" id="propay-billing-dateOfBirth-req" />
+                                            </div>
+                                            <div class="error-message sk-pro">
+                                                <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                <span class="error-message-text">[$enter_birth_date]</span>
+                                            </div>
+                                        </div>
+                                        <div class="mobile-input-wrapper flex flex-column billing-input w-half">
+                                            <label for="propay-billing-mobile-req">[$7219]</label>
+                                            <div class="mega-input box-style mobile-number">
+                                                <input type="tel" value="" id="propay-billing-mobile-req" />
+                                            </div>
+                                            <div class="error-message sk-pro">
+                                                <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                <span class="error-message-text">[$enter_phone_number]</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                    <div class="flex items-center no-sk require-invoice-wrapper">
+                                    <div class="checkbox checkbox-item checkboxOff require-invoice">
+                                        <i class="sprite-fm-mono icon-check selected"></i>
+                                        <input class="checkboxOff checkbox-item require-invoice" type="checkbox" id="propay-require-invoice">
+                                    </div>
+                                    <label for="propay-require-invoice" class="invoice-label">[$i_need_a_tax_invoice]</label>
+                                </div>
+                                <div class="flex items-start no-sk require-invoice-note">
+                                    <i class="sprite-fm-mono icon-info"></i>
+                                    <span>[$tax_invoice_purchase_note]</span>
+                                </div>
+
+                                <!-- Fields that are required only when a user wants a tax invoice, or purchasing for business purposes -->
+
+                                <div class="invoice-fields">
+                                    <div class="flex flex-row flex-wrap no-sk w-full fields-wrapper">
+                                        <div class="companyName-input-wrapper flex flex-column billing-input w-full">
+                                            <label for="propay-billing-companyName-inv">[$19603]</label>
+                                            <div class="mega-input box-style companyName">
+                                                <input type="text" value="" id="propay-billing-companyName-inv" />
+                                            </div>
+                                            <div class="error-message sk-pro">
+                                                <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                <span class="error-message-text">[$19507]</span>
+                                            </div>
+                                        </div>
+                                        <div class="field-pair country-taxCode-pair w-full">
+                                            <div class="country-input-wrapper flex flex-column billing-input w-half">
+                                                <label for="propay-billing-country-inv">[$481]</label>
+                                                <div class="mega-input dropdown-input box-style country propay-billing-country-dropdown"
+                                                    id="propay-billing-country-inv" tabindex="0">
+                                                    <span></span>
+                                                    <i class="sprite-fm-mono icon-dropdown"></i>
+                                                    <div class="mega-input-dropdown hidden">
+                                                        <div class="dropdown-scroll"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="error-message sk-pro">
+                                                    <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                    <span class="error-message-text">[$select_country]</span>
+                                                </div>
+                                            </div>
+                                            <div class="taxCode-input-wrapper flex flex-column billing-input w-half">
+                                                <div class="tax-validation-popover hidden">
+                                                    <i class="sprite-fm-mono icon-dialog-close tax-validation-popover-close"></i>
+                                                    <div class="tax-validation-popover-title">[$validation_failed_title]</div>
+                                                    <div class="tax-validation-popover-message"></div>
+                                                    <div class="tax-validation-popover-action"></div>
+                                                    <div class="tax-validation-popover-arrow"></div>
+                                                </div>
+                                                <label for="propay-billing-taxCode-inv">[$tax_number]</label>
+                                                <div class="mega-input box-style taxCode">
+                                                    <input type="text" value="" id="propay-billing-taxCode-inv" />
+                                                </div>
+                                                <div class="error-message sk-pro">
+                                                    <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                    <span class="error-message-text">[$20953]</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="state-input-wrapper flex flex-column billing-input w-half">
+                                            <label for="propay-billing-state-inv">[$7192]</label>
+                                            <div class="mega-input dropdown-input box-style state propay-billing-state-dropdown"
+                                                id="propay-billing-state-inv" tabindex="0">
+                                                <span></span>
+                                                <i class="sprite-fm-mono icon-dropdown"></i>
+                                                <div class="mega-input-dropdown hidden">
+                                                    <div class="dropdown-scroll"></div>
+                                                </div>
+                                            </div>
+                                            <div class="error-message sk-pro">
+                                                <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                <span class="error-message-text">[$select_state]</span>
+                                            </div>
+                                        </div>
+                                        <div class="field-pair firstname-lastname-pair w-full">
+                                            <div class="firstname-input-wrapper flex flex-column billing-input w-half">
+                                                <label for="propay-billing-firstname-inv">[$7342]</label>
+                                                <div class="mega-input box-style firstname">
+                                                    <input type="text" value="" id="propay-billing-firstname-inv" />
+                                                </div>
+                                                <div class="error-message sk-pro">
+                                                    <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                    <span class="error-message-text">[$enter_first_name]</span>
+                                                </div>
+                                            </div>
+                                            <div class="lastname-input-wrapper flex flex-column billing-input w-half">
+                                                <label for="propay-billing-lastname-inv">[$7345]</label>
+                                                <div class="mega-input box-style lastname">
+                                                    <input type="text" value="" id="propay-billing-lastname-inv" />
+                                                </div>
+                                                <div class="error-message sk-pro">
+                                                    <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                    <span class="error-message-text">[$enter_last_name]</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="address1-input-wrapper flex flex-column billing-input w-full">
+                                            <label for="propay-billing-address1-inv">[$561]</label>
+                                            <div class="mega-input box-style address1">
+                                                <input type="text" value="" id="propay-billing-address1-inv" />
+                                            </div>
+                                            <div class="error-message sk-pro">
+                                                <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                <span class="error-message-text">[$enter_address]</span>
+                                            </div>
+                                        </div>
+                                        <div class="address2-input-wrapper flex flex-column billing-input w-full">
+                                            <label for="propay-billing-address2-inv">[$address2]</label>
+                                            <div class="mega-input box-style address2">
+                                                <input type="text" value="" id="propay-billing-address2-inv" />
+                                            </div>
+                                        </div>
+                                        <div class="field-pair city-postcode-pair w-full">
+                                            <div class="city-input-wrapper flex flex-column billing-input w-half">
+                                                <label for="propay-billing-city-inv">[$565]</label>
+                                                <div class="mega-input box-style city">
+                                                    <input type="text" value="" id="propay-billing-city-inv" />
+                                                </div>
+                                                <div class="error-message sk-pro">
+                                                    <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                    <span class="error-message-text">[$enter_city]</span>
+                                                </div>
+                                            </div>
+                                            <div class="postcode-input-wrapper flex flex-column billing-input w-half">
+                                                <label for="propay-billing-postcode-inv">[$10659]</label>
+                                                <div class="mega-input box-style postcode">
+                                                    <input type="text" value="" id="propay-billing-postcode-inv" />
+                                                </div>
+                                                <div class="error-message sk-pro">
+                                                    <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                    <span class="error-message-text">[$enter_valid_postcode]</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="dateOfBirth-input-wrapper flex flex-column billing-input w-half">
+                                            <label for="propay-billing-dateOfBirth-inv">[$995]</label>
+                                            <div class="mega-input box-style dateOfBirth">
+                                                <input type="date" value="" id="propay-billing-dateOfBirth-inv" />
+                                            </div>
+                                            <div class="error-message sk-pro">
+                                                <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                <span class="error-message-text">[$enter_birth_date]</span>
+                                            </div>
+                                        </div>
+                                        <div class="mobile-input-wrapper flex flex-column billing-input w-half">
+                                            <label for="propay-billing-mobile-inv">[$7219]</label>
+                                            <div class="mega-input box-style mobile-number">
+                                                <input type="tel" value="" id="propay-billing-mobile-inv" />
+                                            </div>
+                                            <div class="error-message sk-pro">
+                                                <i class="sprite-fm-mono icon-alert-triangle"></i>
+                                                <span class="error-message-text">[$enter_phone_number]</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center no-sk cconsent-input-wrapper billing-input hidden">
+                                    <div class="checkbox checkbox-item checkboxOff propay-billing-cconsent">
+                                        <i class="sprite-fm-mono icon-check selected"></i>
+                                        <input class="checkboxOff checkbox-item" type="checkbox"
+                                            id="propay-billing-cconsent-inv">
+                                    </div>
+                                    <label for="propay-billing-cconsent-inv" class="cconsent-label"></label>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="specific-payment-info hidden">
                             <div class="propay-inline-dialog dialog-template-tool payment-stripe-dialog hidden" role="dialog" aria-modal="true">
 
+                                <h2 class="title">[$payment_details]</h2>
                                 <div class="my-card">
                                     <div class="saved-card"></div>
                                 </div>
@@ -333,27 +623,28 @@
                                             </div>
                                             <div class="redeem-voucher">
                                                 <!-- TODO:: voucher-code-input needs to not be an ID, as it is duplicated -->
-
-                                                <div id="voucher-code-input" class="fm-account-input">
-                                                    <input type="text" value="" />
+                                                <div class="voucher-input-col">
+                                                    <div id="voucher-code-input" class="fm-account-input">
+                                                        <input type="text" value="" />
+                                                    </div>
+                                                    <div class="info">
+                                                        <div class="insufficient-balance error-message">
+                                                            <i class="sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                                                            <span></span>
+                                                        </div>
+                                                        <div class="redeemed error-message">
+                                                            <i class="sprite-fm-mono icon-check-circle-thin-outline"></i>
+                                                            <span></span>
+                                                        </div>
+                                                        <div class="insufficient-balance-redeemed error-message">
+                                                            <i class="sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                                                            <span></span>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <button class="mega-button positive voucher-redeem-now">
                                                     <span>[$7160]</span>
                                                 </button>
-                                            </div>
-                                            <div class="info">
-                                                <div class="insufficient-balance error-message">
-                                                    <i class="sprite-fm-mono icon-alert-circle-thin-outline"></i>
-                                                    <span></span>
-                                                </div>
-                                                <div class="redeemed error-message">
-                                                    <i class="sprite-fm-mono icon-check-circle-thin-outline"></i>
-                                                    <span></span>
-                                                </div>
-                                                <div class="insufficient-balance-redeemed error-message">
-                                                    <i class="sprite-fm-mono icon-alert-circle-thin-outline"></i>
-                                                    <span></span>
-                                                </div>
                                             </div>
                                             <div class="voucher-information-help">[$7202]</div>
                                         </div>
@@ -362,10 +653,6 @@
                             </div>
                         </div>
                         <footer class="desktop flex-column">
-                            <div class="ar warning">
-                                <i class="sprite-fm-mono icon-info"></i>
-                                <div class="warning-txt">[$23132]</div>
-                            </div>
                             <div class="subscription-info sk-pro">
                                 <div class="additional-tos s4-tos s4 hidden">
                                     <div class="tos flex items-center">
@@ -393,9 +680,7 @@
                                     [$10630]
                                 </div>
                                 <div class="allow recurring hidden">[$allow_future_charges_fp]</div>
-                                <div class="one-time hidden">
-                                    [$pro_for_duration]
-                                </div>
+                                <div class="one-time hidden"></div>
                                 <div class="trial hidden">
                                     [$after_trial_card_charged_m]
                                     [$10630]
@@ -422,16 +707,12 @@
                     </div>
                 </div>
 
-                <div class="right-block">
+                <div class="right-block no-min-sk-height">
                     <div class="right-block-card-wrapper">
                         <div class="plan-card fixed sk-card-loading sk-pro"></div>
                     </div>
                 </div>
                 <footer class="mobile">
-                    <div class="ar warning">
-                        <i class="sprite-fm-mono icon-info"></i>
-                        <div class="warning-txt">[$23132]</div>
-                    </div>
                     <div class="subscription-info">
                         <div class="additional-tos s4-tos s4 hidden">
                             <div class="tos flex items-center">
@@ -459,9 +740,7 @@
                             [$10630]
                         </div>
                         <div class="allow recurring hidden">[$allow_future_charges_fp]</div>
-                        <div class="one-time hidden">
-                            [$pro_for_duration]
-                        </div>
+                        <div class="one-time hidden"></div>
                         <div class="trial hidden">
                             [$after_trial_card_charged_m]
                             [$10630]
@@ -518,11 +797,11 @@
 
                             <div class="input-block">
                                 <span>[$1096]</span>
-                                <input class="first-name underlinedText no-title-top" type="text" value="" tabindex="2">
+                                <input class="firstname underlinedText no-title-top" type="text" value="" tabindex="2">
                             </div>
                                 <div class="input-block">
                                 <span>[$1097]</span>
-                                <input class="last-name underlinedText" type="text" value="" tabindex="3">
+                                <input class="lastname underlinedText" type="text" value="" tabindex="3">
                             </div>
 
                         </div>
@@ -561,6 +840,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="state-message-container">[$select_state]</div>
                             </div>
                         </div>
 
@@ -575,6 +855,13 @@
                                 <div class="taxcode-invoice-note">
                                     <i class="sprite-fm-mono icon-info-thin-outline"></i>
                                     <span></span>
+                                    <div class="tax-validation-popover hidden">
+                                        <i class="sprite-fm-mono icon-dialog-close tax-validation-popover-close"></i>
+                                        <div class="tax-validation-popover-arrow"></div>
+                                        <div class="tax-validation-popover-title">[$validation_failed_title]</div>
+                                        <div class="tax-validation-popover-message"></div>
+                                        <div class="tax-validation-popover-action"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

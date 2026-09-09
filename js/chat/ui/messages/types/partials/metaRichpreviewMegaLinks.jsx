@@ -166,7 +166,7 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                             const peers = callRoom ?
                                 callRoom
                                     .getParticipantsExceptMe(callRoom.getCallParticipants())
-                                    .map(h => M.getNameByHandle(h))
+                                    .map(h => escapeHTML(M.getNameByHandle(h)))
                                 : [];
                             const body = peers.length
                                 ? mega.utils.trans.listToString(peers, l.cancel_with_to_join)

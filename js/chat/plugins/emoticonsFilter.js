@@ -123,12 +123,6 @@ EmoticonsFilter.prototype.processHtmlMessage = function(messageContents) {
         }
     });
 
-    // inject the awesome onerror for twemojis
-    messageContents = messageContents.replace(
-        'class="emoji"',
-        'class="emoji"'
-    );
-
     // if only one emoji, make it big
     if (
         messageContents.substr(0, 4) === "<img" &&

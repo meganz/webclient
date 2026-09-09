@@ -2816,10 +2816,10 @@
                     </div>
                     <div class="compound-inputs">
                         <div class="mega-input box-style">
-                            <input class="first-name" type="text" value="" placeholder="[$1096]">
+                            <input class="firstname" type="text" value="" placeholder="[$1096]">
                         </div>
                         <div class="mega-input box-style">
-                            <input class="last-name" type="text" value="" placeholder="[$1097]">
+                            <input class="lastname" type="text" value="" placeholder="[$1097]">
                         </div>
                     </div>
                     <div class="mega-input box-style">
@@ -2975,7 +2975,7 @@
             </div>
             <div class="content-block address-block">
                 <div class="payment-half-block first">
-                    <input class="first-name underlinedText" type="text" value="" placeholder="[$1096]" tabindex="2">
+                    <input class="firstname underlinedText" type="text" value="" placeholder="[$1096]" tabindex="2">
                     <input class="address1 underlinedText" type="text" value="" placeholder="[$561] 1" tabindex="4">
                     <input class="city underlinedText" type="text" value="" placeholder="[$565]" tabindex="6">
                     <input class="postcode underlinedText" type="text" value="" placeholder="[$10659]" tabindex="8">
@@ -2983,7 +2983,7 @@
                     <div class="clear"></div>
                 </div>
                 <div class="payment-half-block second">
-                    <input class="last-name underlinedText" type="text" value="" placeholder="[$1097]" tabindex="3">
+                    <input class="lastname underlinedText" type="text" value="" placeholder="[$1097]" tabindex="3">
                     <input class="address2 underlinedText" type="text" value="" placeholder="[$561] 2 ([$2028])" tabindex="5">
                     <div id="address-dialog-states" class="states mega-input dropdown-input underlinedText" tabindex="-1" disabled>
                         <span>[$7192]</span>
@@ -2994,8 +2994,21 @@
                             </div>
                         </div>
                     </div>
-                    <input class="taxcode underlinedText" type="text" value="" placeholder="[$7347]" tabindex="9">
-                    <div class="taxcode-invoice-note"><span></span></div>
+                    <div class="state-message-container">[$select_state]</div>
+                    <div class="taxcode-input-wrapper">
+                        <div class="taxcode-container"></div>
+                    </div>
+                    <div class="taxcode-invoice-note">
+                        <i class="sprite-fm-mono icon-info-thin-outline"></i>
+                        <span></span>
+                        <div class="tax-validation-popover hidden">
+                            <i class="sprite-fm-mono icon-dialog-close tax-validation-popover-close"></i>
+                            <div class="tax-validation-popover-arrow"></div>
+                            <div class="tax-validation-popover-title">[$validation_failed_title]</div>
+                            <div class="tax-validation-popover-message"></div>
+                            <a class="tax-validation-popover-action"></a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="error-message hidden">[$10633]</div>
@@ -3437,62 +3450,6 @@
         </footer>
     </div>
 
-    <!-- Dialog: astropay-dialog -->
-    <div class="mega-dialog dialog-template-main astropay-dialog hidden"
-         role="dialog"
-         aria-labelledby="astropay-dialog-title"
-         aria-modal="true">
-
-        <button class="close js-close" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
-        </button>
-
-        <header>
-            <h2 id="astropay-dialog-title">[$7985]</h2>
-        </header>
-
-        <section class="content">
-            <div class="content-block">
-                <div class="astropay-information">[$7991] [$7986]</div>
-                <label class="astropay-label" for="astropay-name-field">[$7987]:</label>
-                <div class="mega-input box-style">
-                    <input id="astropay-name-field" class="astropay-name-field" type="text" placeholder="[$7988]">
-                </div>
-
-                <label class="astropay-label address" for="astropay-address-field">[$561]:</label>
-                <div class="mega-input box-style">
-                    <input id="astropay-address-field" class="astropay-address-field" type="text" placeholder="[$561]">
-                </div>
-
-                <label class="astropay-label city" for="astropay-city-field">[$565]:</label>
-                <div class="mega-input box-style">
-                    <input id="astropay-city-field" class="astropay-city-field" type="text" placeholder="[$565]">
-                </div>
-
-                <label class="astropay-label tax" for="astropay-tax-field">[$7989]:</label>
-                <div class="mega-input box-style">
-                    <input id="astropay-tax-field" class="astropay-tax-field" type="text" placeholder="[$7990]">
-                </div>
-            </div>
-        </section>
-
-        <footer>
-            <div class="footer-container space-between">
-                <a class="powered-by-astropay" href="https://www.astropay.com/" target="_blank" rel="noopener noreferrer">
-                    <i class="sprite-fm-uni icon-astropay"></i>
-                </a>
-                <div>
-                    <button class="mega-button cancel">
-                        <span>[$msg_dlg_cancel]</span>
-                    </button>
-                    <button class="mega-button positive accept">
-                        <span>[$870]</span>
-                    </button>
-                </div>
-            </div>
-        </footer>
-    </div>
-
     <!-- Dialog: bitcoin-provider-failure-dialog -->
     <div class="mega-dialog dialog-template-message bitcoin-provider-failure-dialog hidden"
          role="dialog"
@@ -3536,177 +3493,50 @@
             <p class="achievements-list-info">
                 [$achievem_storagetitle]
             </p>
+            <div class="progress-wrapper">
+                <div class="progress">
+                    <div class="title">[$ach_progress_label]</div>
+                    <div class="content">
+                        <div class="icon sprite-fm-mono icon-rocket-thin-outline"></div>
+                        <div class="progress-bar"></div>
+                        <div class="amount"></div>
+                    </div>
+                </div>
+                <div class="redeemed">
+                    <div class="title">[$ach_total_redeemed_storage]</div>
+                    <div class="content">
+                        <div class="icon sprite-fm-mono icon-cloud-thin-outline"></div>
+                        <div class="amount"></div>
+                    </div>
+                </div>
+                <div class="invites">
+                    <div class="title">[$ach_invites_count_label]</div>
+                    <div class="content">
+                        <div class="icon sprite-fm-mono icon-user-plus-thin-outline"></div>
+                        <div class="amount">0</div>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <section class="content">
             <div class="content-block">
                 <!-- Add scroll  -->
                 <div class="achievements-scroll">
-                    <div class="achievement-banner">
-                        <div class="achieved-block storage-quota">
-                            <div class="achievements-header-icon sprite-fm-uni icon-storage-quota"></div>
-                            <div>
-                                <div class="fm-account-header">
-                                    <span>[$20183]</span>
-                                </div>
-                                <span class="quota-txt">XX GB</span>
-                            </div>
-                        </div>
-                        <div class="achieved-block invitees">
-                            <div class="achievements-header-icon sprite-fm-uni icon-users"></div>
-                            <div>
-                                <div class="fm-account-header">
-                                    <span>[$20186]</span>
-                                    <i class="new-dialog-icon sprite-fm-mono icon-new-window"></i>
-                                </div>
-                                <span class="quota-txt">0</span>
-                            </div>
-                        </div>
-                        <div class="achieved-block">
-                            <button class="mega-button default js-dashboard-btn large ">
-                                <span>[$16668]</span>
-                            </button>
-                        </div>
-                    </div>
-
                     <div class="achievements-list">
-                        <!-- please place the achieved card to the end -->
-                        <!-- Add class "achieved", "one-reward" !-->
-                        <div class="achievements-cell ach-install-megasync">
-                            <div class="achievement-details">
-                                <div class="image-container">
-                                    <i class="achievement-icon sprite-fm-illustration img-achievements-desktop-app"></i>
-                                </div>
-                                <div class="achievement-full info">
-                                    <div>
-                                        <div class="subtitle-txt">
-                                            [$16278]
-                                        </div>
-                                        <div class="achi-content-txt">
-                                            [$20235]
-                                        </div>
-                                    </div>
-                                    <div class="achievement-dialog expires-txt"></div>
-                                    <button class="mega-button positive" data-event-id="500794">
-                                        <span>[$16295]</span>
-                                    </button>
-                                </div>
+                        <div class="template ach-list-item hidden">
+                            <div class="image-container">
+                                <div class="image"></div>
+                                <div class="status sprite-fm-mono icon-check-small-regular-outline"></div>
                             </div>
-                        </div>
-
-                        <!-- Add class "achieved", "one-reward" !-->
-                        <div class="achievements-cell ach-install-mobile-app">
-                            <div class="achievement-details">
-                                <div class="image-container">
-                                    <i class="achievement-icon sprite-fm-illustration img-achievements-mobile-app"></i>
-                                </div>
-                                <div class="achievement-full info">
-                                    <div>
-                                        <div class="subtitle-txt">
-                                            [$16280]
-                                        </div>
-                                        <div class="achi-content-txt">
-                                            [$20176]
-                                        </div>
-                                    </div>
-                                    <div class="achievement-dialog expires-txt"></div>
-                                    <button class="mega-button positive" data-event-id="500795">
-                                        <span>[$16295]</span>
-                                    </button>
-                                </div>
+                            <div class="text-wrapper">
+                                <div class="title"></div>
+                                <div class="text"></div>
+                                <a class="link"></a>
                             </div>
-                        </div>
-
-                        <!-- Add class "achieved", "one-reward" !-->
-                        <div class="achievements-cell ach-invite-friend">
-                            <div class="achievement-details">
-                                <div class="image-container">
-                                    <i class="achievement-icon sprite-fm-illustration img-achievements-invite-users"></i>
-                                </div>
-                                <div class="achievement-full info">
-                                    <div>
-                                        <div class="subtitle-txt">
-                                            [$16282]
-                                        </div>
-                                        <div class="achi-content-txt">
-                                            [$20177]
-                                        </div>
-                                    </div>
-                                    <div class="achievement-dialog expires-txt"></div>
-                                    <button class="mega-button positive" data-event-id="500796">
-                                        <span>[$8726]</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Add class "achieved", "one-reward" !-->
-                        <div class="achievements-cell ach-sms-verification">
-                            <div class="achievement-details">
-                                <div class="image-container">
-                                    <i class="achievement-icon sprite-fm-illustration img-achievements-sms-verification"></i>
-                                </div>
-                                <div class="achievement-full info">
-                                    <div>
-                                        <div class="subtitle-txt">
-                                            [$20409]
-                                        </div>
-                                        <div class="achi-content-txt">
-                                            [$achievem_smsveridesc]
-                                        </div>
-                                    </div>
-                                    <div class="achievement-dialog expires-txt"></div>
-                                    <button class="mega-button positive">
-                                        <span>[$1960]</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Add class "achieved", "one-reward" !-->
-                        <div class="achievements-cell ach-vpn-trial">
-                            <div class="achievement-details">
-                                <div class="image-container">
-                                    <i class="achievement-icon"></i>
-                                </div>
-                                <div class="achievement-full info">
-                                    <div>
-                                        <div class="subtitle-txt">
-                                            [$ach_vpn_trial_title]
-                                        </div>
-                                        <div class="achi-content-txt">
-                                            [$ach_vpn_trial_blurb]
-                                        </div>
-                                    </div>
-                                    <div class="achievement-dialog expires-txt"></div>
-                                    <button class="mega-button positive" data-event-id="500810">
-                                        <span>[$start_free_trial]</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Add class "achieved", "one-reward" !-->
-                        <div class="achievements-cell ach-pwm-trial">
-                            <div class="achievement-details">
-                                <div class="image-container">
-                                    <i class="achievement-icon"></i>
-                                </div>
-                                <div class="achievement-full info">
-                                    <div>
-                                        <div class="subtitle-txt">
-                                            [$ach_pwm_trial_title]
-                                        </div>
-                                        <div class="achi-content-txt">
-                                            [$ach_pwm_trial_blurb]
-                                        </div>
-                                    </div>
-                                    <div class="achievement-dialog expires-txt"></div>
-                                    <button class="mega-button positive" data-event-id="500811">
-                                        <span>[$start_free_trial]</span>
-                                    </button>
-                                </div>
-                            </div>
+                            <div class="expiry"></div>
+                            <div class="data"></div>
+                            <div class="invitees hidden sprite-fm-mono icon-chevron-right-thin-outline"></div>
                         </div>
                     </div>
                 </div>
@@ -3714,7 +3544,7 @@
         </section>
         <footer>
             <aside class="with-condition">
-                <p>[$achievem_dialogfootertext]</p>
+                <p>[$ach_storage_with_pro_plan]</p>
             </aside>
         </footer>
     </div>
@@ -3838,36 +3668,19 @@
         </button>
 
         <header>
+            <button class="sprite-fm-mono icon-arrow-left-thin-solid back"></button>
             <h2 id="invitation-dialog-title">[$16101]</h2>
         </header>
 
         <section class="content">
             <div class="content-block">
-                <div class="table">
-                    <div class="table-row header">
-                        <div class="table-cell">
-                        </div>
-                        <div class="table-cell">
-                            <span>[$7434]</span><!-- Email -->
-                        </div>
-                        <div class="table-cell">
-                            <span>[$89]</span><!-- Status -->
-                        </div>
-                        <div class="table-cell">
-                            <span class="asc">[$16100]</span><!-- Date Sent -->
-                        </div>
-                    </div>
-                </div>
                 <div class="table-scroll">
                     <div class="table-bg">
                         <div class="table">
 
                             <div class="table-row">
-                                <div class="table-cell icon">
-                                    <i class="sprite-fm-mono"></i>
-                                </div>
                                 <div class="table-cell email">
-                                    <strong></strong>
+                                    <span></span>
                                 </div>
                                 <div class="table-cell status">
                                     <span>
@@ -3875,30 +3688,21 @@
                                 </div>
                                 <div class="table-cell date">
                                     <span></span>
-                                    <button class="mega-button small resend">
-                                        <div>
-                                            <i class="sprite-fm-mono icon-sync"></i>
-                                        </div>
-                                    </button>
+                                <div class="status-icon sprite-fm-mono icon-check-small-regular-outline"></div>
                                 </div>
                             </div>
 
                         </div>
                     </div>
                 </div>
-                <div class="table-info hint">
-                    [$achievm_invitefrddesc]
-                </div>
             </div>
         </section>
 
         <footer>
             <div class="footer-container">
-                <button class="mega-button reinvite-all">
-                    <span>[$16103]</span>
-                </button>
-                <button class="mega-button positive invite-more">
-                    <span>[$16102]</span>
+                <button class="mega-button invite-more">
+                    <i class="sprite-fm-mono icon-plus-thin-outline"></i>
+                    <span>[$17465]</span>
                 </button>
             </div>
         </footer>

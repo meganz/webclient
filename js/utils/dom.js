@@ -54,7 +54,8 @@ function parseHTML(markup) {
             // console.debug(node.nodeName, node.outerHTML, node.data, [node]);
 
             var content = String(node.outerHTML).replace(/[\s\x00-\x19]+/g, '');
-            let invalid = /<[^>]+script:|data[%:]|(?:id|name)=["']*(?:child|node|attr|shadow|content)/i.test(content);
+            let invalid =
+                /<[^>]+(?:script:|data[%:]|(?:id|name)=["']*(?:child|node|attr|shadow|content))/i.test(content);
 
             if (!invalid) {
                 invalid = domNodeForEach(node, (n) => {
@@ -72,8 +73,10 @@ function parseHTML(markup) {
             }
 
             if (invalid) {
+                if (!self.buildOlderThan10Days) {
+                    eventlog(99642, JSON.stringify([2, escapeHTML(content.slice(0, 256))]), true);
+                }
                 console.warn('Filtered out invalid content passed to parseHTML...', [node]);
-                eventlog(99642, JSON.stringify([1, escapeHTML(content.slice(0, 256))]), true);
             }
             else {
                 fragment.appendChild(node);
@@ -180,7 +183,7 @@ function htmlentities(value) {
     if (!value) {
         return '';
     }
-    return $('<div/>').text(value).html();
+    return escapeHTML(value);
 }
 
 /**

@@ -1122,14 +1122,14 @@ var slideshowid;
                     var ev = document.createEvent("HTMLEvents");
                     ev.initEvent("pdfjs-cleanup.meganz", true);
                     document.getElementById('pdfpreviewdiv1').contentDocument.body.dispatchEvent(ev);
-                })();
+                }, false)();
             }
             if (_docxSeen) {
                 _docxSeen = false;
                 tryCatch(() => {
                     const ev = new Event('docxviewercleanup');
                     document.getElementById('docxpreviewdiv1').contentDocument.dispatchEvent(ev);
-                })();
+                }, false)();
             }
 
             tryCatch(cleanupXlsxViewer)();
@@ -2201,7 +2201,23 @@ var slideshowid;
         html = translate(pages[html]);
 
         for (let [k, v] of map) {
-            v = self.is_extension && js.includes(v) ? bootstaticpath + jsl2[v].f : window[v];
+
+            if (self.is_extension && js.includes(v)) {
+
+                v = bootstaticpath + jsl2[v].f;
+            }
+            else {
+                const rsc = mega[v];
+                assert(rsc && rsc.cdn);
+
+                v = rsc.cdn;
+                if (rsc.integrity) {
+                    const hash = btoa(
+                        String.fromCharCode.apply(null, rsc.integrity.match(/[\da-f]{2}/gi).map((x) => parseInt(x, 16)))
+                    );
+                    v += `" integrity="sha256-${hash}" crossorigin="anonymous`;
+                }
+            }
 
             assert(!!v, `${l[16]}, ${k}`);
 
@@ -2216,6 +2232,11 @@ var slideshowid;
                 ['viewer.js', 'pdfviewerjs'],
                 ['viewer.css', 'pdfviewercss'],
                 ['../build/pdf.js', 'pdfjs2']
+            ]),
+            xlsxviewer: new Map([
+                ['xlsx.viewer.js', 'xlsxviewer_js'],
+                ['xlsx.parser.js', 'xlsxparser_js'],
+                ['xlsx.viewer.css', 'xlsxviewercss']
             ]),
             docxviewer: new Map([
                 ['jszip.js', 'jszip_js'],
@@ -2239,7 +2260,7 @@ var slideshowid;
             elm.contentDocument.body.dispatchEvent(ev);
             slideshow_gesture(data.h, elm, 'PDF');
             return true;
-        });
+        }, false);
 
         if (_pdfSeen) {
 
@@ -2294,10 +2315,10 @@ var slideshowid;
             };
             elem.contentDocument.dispatchEvent(ev);
             slideshow_gesture(data.h, elem, 'DOCX');
-        });
+            return true;
+        }, false);
 
-        if (_docxSeen) {
-            signal();
+        if (_docxSeen && signal()) {
             return;
         }
 
@@ -2348,34 +2369,6 @@ var slideshowid;
         }).catch(tell);
     }
 
-    async function inlineXlsxViewerHtml() {
-
-        const _fetch = async(url, mime) => {
-            const r = await fetch(url);
-            if (!r.ok) {
-                throw new Error(`fetch ${url}: ${r.status}`);
-            }
-            const blob = new Blob([await r.blob()], { type: mime });
-            return new Promise((resolve, reject) => {
-                const fr = new FileReader();
-                fr.onload = () => resolve(fr.result);
-                fr.onerror = () => reject(fr.error);
-                fr.readAsDataURL(blob);
-            });
-        };
-
-        await M.require('xlsxviewer', 'xlsxparser_js', 'xlsxviewer_js', 'xlsxviewercss');
-        const [parserDataUrl, viewerDataUrl, viewerCssUrl] = await Promise.all([
-            _fetch(window.xlsxparser_js, 'application/javascript'),
-            _fetch(window.xlsxviewer_js, 'application/javascript'),
-            _fetch(window.xlsxviewercss, 'text/css')
-        ]);
-        return pages.xlsxviewer
-            .replace('{{xlsxviewercss}}', viewerCssUrl)
-            .replace('{{xlsxparser}}', parserDataUrl)
-            .replace('{{xlsxviewer}}', viewerDataUrl);
-    }
-
     function _linkSanityCheck(s) {
 
         if (typeof s !== 'string') {
@@ -2404,10 +2397,10 @@ var slideshowid;
                 '*'
             );
             slideshow_gesture(data.h, elem, 'XLSX');
-        });
+            return true;
+        }, false);
 
-        if (_xlsxSeen) {
-            signal();
+        if (_xlsxSeen && signal()) {
             return;
         }
 
@@ -2458,7 +2451,7 @@ var slideshowid;
         const bootSeq = ++_xlsxBootSeq;
         _xlsxGotReady = false;
         _xlsxPendingSignal = signal;
-        inlineXlsxViewerHtml().then((inlineHtml) => {
+        require('xlsxviewer', ['xlsxparser_js', 'xlsxviewer_js'], 'xlsxviewercss').then((inlineHtml) => {
             if (bootSeq !== _xlsxBootSeq) {
                 return;
             }

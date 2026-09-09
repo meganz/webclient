@@ -98,6 +98,30 @@ lazy(mega, 'linkImport', () => {
         };
     })();
 
+    // Public share-link matchers for third-party storage providers
+    const storageLinkMatchers = [
+        {
+            provider: 'google',
+            test: s =>
+                s.host === 'drive.google.com' &&
+                    (s.pathname.startsWith('/file/') || s.pathname.startsWith('/drive/folders/')) ||
+                s.host === 'docs.google.com' &&
+                    (s.pathname.startsWith('/document/d/') || s.pathname.startsWith('/spreadsheets/d/') ||
+                    s.pathname.startsWith('/presentation/d/') || s.pathname.startsWith('/videos/d/'))
+        },
+        {
+            // Dropbox share links: files import directly, folders import as a browsable .zip.
+            provider: 'dropbox',
+            test: s => (s.host === 'dropbox.com' || s.host === 'www.dropbox.com') &&
+                (s.pathname.startsWith('/s/') || s.pathname.startsWith('/sh/') || s.pathname.startsWith('/scl/'))
+        },
+        {
+            provider: 'box',
+            test: s => (s.host === 'box.com' || s.host === 'www.box.com' || s.host === 'app.box.com') &&
+                s.pathname.startsWith('/s/')
+        },
+    ];
+
     const _getUrlType = (s) => {
 
         // If link is same url as current site lets treat as mega link
@@ -107,14 +131,10 @@ lazy(mega, 'linkImport', () => {
             isPublicLink(isExtLink(s) ? s.hash : s.pathname + s.hash)) {
             return 'mega';
         }
-        else if (s.host === 'drive.google.com' &&
-            (s.pathname.startsWith('/file/') || s.pathname.startsWith('/drive/folders/')) ||
-            s.host === 'docs.google.com' &&
-            (s.pathname.startsWith('/document/d/') || s.pathname.startsWith('/spreadsheets/d/') ||
-            s.pathname.startsWith('/presentation/d/') || s.pathname.startsWith('/videos/d/'))
-        ) {
-            return 'google';
-        }
+
+        const match = storageLinkMatchers.find(m => m.test(s));
+
+        return match && match.provider;
     };
 
     const linkImportRequestStates = Object.freeze({
@@ -124,6 +144,8 @@ lazy(mega, 'linkImport', () => {
         CANCELLED: 3,
         ERROR: 4
     });
+
+    const MSQ_LINK_LIMIT = 20;
 
     const handlers = {
 
@@ -357,10 +379,6 @@ lazy(mega, 'linkImport', () => {
             },
             async linkHandler(link) {
 
-                if (link.provider !== 'google') {
-                    throw l.url_import_invalid_link;
-                }
-
                 const {result: jobId} = await api.req({
                     a: 'mspq',
                     tp: 4,
@@ -408,7 +426,7 @@ lazy(mega, 'linkImport', () => {
                     throw l.url_import_invalid_link;
                 }
 
-                link.nodeHandle = `ext-google-${jobId}-${Date.now()}`;
+                link.nodeHandle = `ext-${link.provider}-${jobId}-${Date.now()}`;
                 link.nodeData = {
                     name: metadata.n || link.raw
                 };
@@ -424,7 +442,7 @@ lazy(mega, 'linkImport', () => {
                 else {
                     link.type = 'folder';
                     link.nodeData = {
-                        name: link.raw,
+                        name: metadata.n || link.raw,
                         t: 1,
                         td: metadata.d,
                         tf: metadata.f,
@@ -432,36 +450,32 @@ lazy(mega, 'linkImport', () => {
                     };
                 }
             },
-            async import(links, targetHandle) {
-
-                const node = M.getNodeByHandle(targetHandle);
-                const writableKey = a32_to_base64([...crypto.getRandomValues(new Uint32Array(4))]);
-                const sres = await api_setshare(targetHandle, [{u: 'EXP', r: 0, w: writableKey, t: 2}]).catch(echo);
-                const share = M.getNodeShare(targetHandle);
-
-                if (!sres || sres.r && sres.r[0] !== 0) {
-                    throw l.url_import_temporarily_unavailable;
-                }
+            async import(links, target) {
 
                 const results = [];
 
-                for (const link of links) {
+                const uniqueLinks = [...new Set(links)];
 
-                    const {result: ires} = await api.req({
+                // batch links of the same provider
+                for (let i = 0; i < uniqueLinks.length; i += MSQ_LINK_LIMIT) {
+
+                    const chunk = uniqueLinks.slice(i, i + MSQ_LINK_LIMIT);
+
+                    const {result: migrationId} = await api.req({
                         a: 'msq',
                         tp: 8,
-                        ph: node.ph,
+                        ph: target.tph,
                         e: {
-                            ls: [link],
-                            tph: node.ph,
-                            tek: a32_to_base64(u_sharekeys[targetHandle][0]),
-                            tak: share.w
+                            ls: chunk,
+                            tph: target.tph,
+                            tek: target.tek,
+                            tak: target.tak
                         }
                     }).catch(ex => {
                         throw this._friendlyError(ex);
                     });
 
-                    results.push(ires);
+                    results.push({migrationId, n: chunk.length});
                 }
 
                 return results;
@@ -469,10 +483,67 @@ lazy(mega, 'linkImport', () => {
         }
     };
 
+    handlers.dropbox = {...handlers.google, icon: 'sprite-fm-uni icon-dropbox', PROVIDER_ID: 2};
+    handlers.box = {...handlers.google, icon: 'sprite-fm-uni icon-box', PROVIDER_ID: 4};
+
     const killIframes = () => {
         iframeLoader.destroy();
         importLinks = new Set();
         iframeWrapper.textContent = '';
+    };
+
+    const _classifyImportLinks = () => {
+        const fileLinks = [];
+        const folderLinks = [];
+        const thirdPartyLinks = new Map();
+
+        for (const link of importLinks) {
+
+            const {provider, url, dnd, type, raw} = link;
+
+            if (dnd) {
+                continue;
+            }
+
+            if (provider === 'mega') {
+                eventlog(501039);
+
+                if (type === 'file') {
+                    fileLinks.push(url.href);
+                }
+                else {
+                    folderLinks.push(link);
+                }
+            }
+            else if (handlers[provider] && handlers[provider].PROVIDER_ID) {
+                if (!thirdPartyLinks.has(provider)) {
+                    thirdPartyLinks.set(provider, []);
+                }
+                thirdPartyLinks.get(provider).push(raw);
+            }
+        }
+
+        return {fileLinks, folderLinks, thirdPartyLinks};
+    };
+
+    const _importThirdPartyLinks = async(thirdPartyLinks, target) => {
+        let count = 0;
+
+        for (const [provider, providerLinks] of thirdPartyLinks) {
+
+            const resArray = await handlers[provider].import(providerLinks, target).catch(ex => {
+                // surface a friendly error (e.g. rate limit) instead of failing silently
+                msgDialog('warninga', '', l.mig_fail, ex);
+                return [];
+            });
+
+            for (const {migrationId, n} of resArray) {
+                count += n;
+                eventlog(501040, `${handlers[provider].PROVIDER_ID} ${migrationId} ${n}`);
+            }
+        }
+
+        return count;
     };
 
     const options = {
@@ -591,6 +662,7 @@ lazy(mega, 'linkImport', () => {
                                     await handlers[link.provider].linkHandler(link).catch(ex => _(ex, link));
                                 }
                                 else {
+                                    eventlog(501388, link.url.hostname);
                                     _(l.url_import_invalid_link, link);
                                 }
                             }
@@ -888,8 +960,8 @@ lazy(mega, 'linkImport', () => {
                             nc.domNode.querySelector('.file-size').textContent = nc.size;
                         }
 
-                        if (provider === 'google') {
-                            nc.iconNode.className = handlers.google.icon;
+                        if (handlers[provider] && handlers[provider].icon) {
+                            nc.iconNode.className = handlers[provider].icon;
                         }
 
                         tr.appendChild(td);
@@ -909,44 +981,32 @@ lazy(mega, 'linkImport', () => {
                         let tFolderName = l.url_import_folder_prefix.replace('$1', time2date(Date.now() / 1000, 8));
 
                         if (duplicated(tFolderName, importTarget)) {
-                            tFolderName = fileconflict.findNewName(tFolderName, importTarget);
+                            tFolderName = fileconflict.findNewName(tFolderName, importTarget, true);
                         }
 
-                        const h = await M.createFolder(importTarget, tFolderName).catch(tell);
+                        const {fileLinks, folderLinks, thirdPartyLinks} = _classifyImportLinks();
+                        let success = 0;
+                        let start = 0;
+
+                        const target = thirdPartyLinks.size
+                            ? await mega.migrate.createImportFolder(importTarget, tFolderName)
+                            : null;
+
+                        if (thirdPartyLinks.size && !target) {
+                            loadingDialog.hide('url-import');
+                            msgDialog('warninga', '', l.mig_fail, l.mig_error);
+                            return dialog.hide();
+                        }
+
+                        const h = target ? target.h : await M.createFolder(importTarget, tFolderName).catch(tell);
 
                         if (!h) {
                             return dialog.hide();
                         }
 
-                        const fileLinks = [];
-                        const googleLinks = [];
-                        let success = 0;
-                        let start = 0;
+                        for (const link of folderLinks) {
 
-                        for (const link of importLinks) {
-
-                            const {provider, url, dnd, type, raw} = link;
-
-                            if (dnd) {
-                                continue;
-                            }
-
-                            // if it is mega file link, collect for bulk import
-                            if (provider === 'mega') {
-
-                                eventlog(501039);
-
-                                if (type === 'file') {
-                                    fileLinks.push(url.href);
-                                    continue;
-                                }
-                            }
-                            else if (provider === 'google') {
-                                googleLinks.push(raw);
-                                continue;
-                            }
-
-                            const res = await handlers[provider].import(link, h);
+                            const res = await handlers.mega.import(link, h);
 
                             // Importing failed, lets stop further processing
                             if (typeof res === 'number' && res < 0) {
@@ -966,21 +1026,8 @@ lazy(mega, 'linkImport', () => {
                             }
                         }
 
-                        if (googleLinks.length) {
-
-                            const googleResArray = await handlers.google.import(googleLinks, h).catch(ex => {
-                                // surface a friendly error (e.g. rate limit) instead of failing silently
-                                msgDialog('warninga', '', l.mig_fail, ex);
-                                return [];
-                            });
-
-                            for (const googleRes of googleResArray) {
-
-                                if (typeof googleRes !== 'number') {
-                                    start++;
-                                    eventlog(501040);
-                                }
-                            }
+                        if (target) {
+                            start += await _importThirdPartyLinks(thirdPartyLinks, target);
                         }
 
                         dialog.hide();
@@ -1024,10 +1071,15 @@ lazy(mega, 'linkImport', () => {
     };
 
     return {
-        showDialog() {
+        async showDialog() {
 
             if (M.isInvalidUserStatus()) {
                 return;
+            }
+
+            const quota = await M.getStorageQuota();
+            if (quota.isFull) {
+                return M.showOverStorageQuota(quota);
             }
 
             this.dialog = dialog = new MegaJourney(options);

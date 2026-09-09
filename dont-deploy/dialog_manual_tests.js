@@ -956,6 +956,191 @@ const dialogTest = {
     },
 
 
+    /* Dialog: achievements-list-dialog-scroll --> */
+    /* run from /fm/account - populates M.account.maf with 11 invite entries (varying
+       states) plus a redeemed-but-expired desktop install, then opens the achievements
+       list dialog. Replacing M.account.maf triggers M.maf's getter to re-prettify. */
+    ['achievements-list-dialog-scroll']: () => {
+        const nowSec = Math.floor(Date.now() / 1000);
+        const day = 86400;
+        const inviteStorage = 5 * 1024 * 1024 * 1024; // 5 GB
+        const inviteRewardId = '3';
+
+        const mk = (email, opts) => Object.assign(
+            {a: 3, r: inviteRewardId, m: [email], ts: nowSec - (opts.ago || 1) * day},
+            opts.csu !== undefined ? {csu: opts.csu} : {},
+            opts.c !== undefined ? {c: opts.c} : {},
+            opts.e !== undefined ? {e: opts.e} : {}
+        );
+
+        M.account.maf = {
+            u: {3: [inviteStorage, 0, '365d'], 4: [inviteStorage, 0, '365d']},
+            r: {[inviteRewardId]: [inviteStorage, 0, '365d']},
+            a: [
+                // Install MEGA Desktop App (a: 4) - redeemed but bonus expired
+                {
+                    a: 4, r: inviteRewardId,
+                    ts: nowSec - 400 * day, c: nowSec - 399 * day, e: nowSec - 35 * day
+                },
+                // Active bonuses (varying days remaining)
+                mk('friend01@example.com', {ago: 1,
+                    csu: nowSec - 1 * day, c: nowSec - 1 * day, e: nowSec + 365 * day}),
+                mk('friend02@example.com', {ago: 10,
+                    csu: nowSec - 10 * day, c: nowSec - 9 * day, e: nowSec + 200 * day}),
+                mk('friend03@example.com', {ago: 60,
+                    csu: nowSec - 60 * day, c: nowSec - 59 * day, e: nowSec + 130 * day}),
+                mk('friend04@example.com', {ago: 120,
+                    csu: nowSec - 120 * day, c: nowSec - 119 * day, e: nowSec + 60 * day}),
+                mk('friend05@example.com', {ago: 335,
+                    csu: nowSec - 335 * day, c: nowSec - 334 * day, e: nowSec + 30 * day}),
+                mk('friend06@example.com', {ago: 360,
+                    csu: nowSec - 360 * day, c: nowSec - 359 * day, e: nowSec + 5 * day}),
+                // Pending: invite sent, recipient has not signed up
+                mk('friend07@example.com', {ago: 2, csu: false}),
+                mk('friend08@example.com', {ago: 5, csu: false}),
+                // Pending app install: signed up but not yet completed
+                mk('friend09@example.com', {ago: 3, csu: nowSec - 3 * day}),
+                // Expired bonuses
+                mk('friend10@example.com', {ago: 400,
+                    csu: nowSec - 400 * day, c: nowSec - 399 * day, e: nowSec - 35 * day}),
+                mk('friend11@example.com', {ago: 450,
+                    csu: nowSec - 450 * day, c: nowSec - 449 * day, e: nowSec - 85 * day})
+            ]
+        };
+        mega.achievem.achievementsListDialog();
+    },
+
+
+    /* Dialog: invitation-dialog-mixed --> */
+    /* run from /fm/account - exercises rwd.e/left bonus states */
+    ['invitation-dialog-mixed']: () => {
+        const nowSec = Date.now() / 1000;
+        const day = 86400;
+        M.maf[3].rwds = [
+            {
+                m: ['expires-in-30@b.com'],
+                ts: nowSec - 5 * day,
+                csu: nowSec - 5 * day,
+                c: nowSec - 4 * day,
+                e: nowSec + 30 * day,
+                left: 30
+            },
+            {
+                m: ['expires-in-5@b.com'],
+                ts: nowSec - 20 * day,
+                csu: nowSec - 20 * day,
+                c: nowSec - 19 * day,
+                e: nowSec + 5 * day,
+                left: 5
+            },
+            {
+                m: ['invite-sent@b.com'],
+                ts: nowSec - 3600,
+                csu: false
+            },
+            {
+                m: ['bonus-expired@b.com'],
+                ts: nowSec - 400 * day,
+                csu: nowSec - 400 * day,
+                c: nowSec - 399 * day,
+                e: nowSec - 35 * day,
+                left: -35
+            },
+            {
+                m: ['pending-install@b.com'],
+                ts: nowSec - 2 * day,
+                csu: nowSec - 2 * day
+            }
+        ];
+        mega.achievem.invitationStatusDialog();
+    },
+
+
+    /* Dialog: invitation-dialog-scroll --> */
+    /* run from /fm/account - 10 entries to exercise scrolling */
+    ['invitation-dialog-scroll']: () => {
+        const nowSec = Date.now() / 1000;
+        const day = 86400;
+        M.maf[3].rwds = [
+            {
+                m: ['friend01@example.com'],
+                ts: nowSec - 1 * day,
+                csu: nowSec - 1 * day,
+                c: nowSec - 1 * day,
+                e: nowSec + 365 * day,
+                left: 365
+            },
+            {
+                m: ['friend02@example.com'],
+                ts: nowSec - 10 * day,
+                csu: nowSec - 10 * day,
+                c: nowSec - 9 * day,
+                e: nowSec + 200 * day,
+                left: 200
+            },
+            {
+                m: ['friend03@example.com'],
+                ts: nowSec - 60 * day,
+                csu: nowSec - 60 * day,
+                c: nowSec - 59 * day,
+                e: nowSec + 130 * day,
+                left: 130
+            },
+            {
+                m: ['friend04@example.com'],
+                ts: nowSec - 120 * day,
+                csu: nowSec - 120 * day,
+                c: nowSec - 119 * day,
+                e: nowSec + 60 * day,
+                left: 60
+            },
+            {
+                m: ['friend05@example.com'],
+                ts: nowSec - 335 * day,
+                csu: nowSec - 335 * day,
+                c: nowSec - 334 * day,
+                e: nowSec + 30 * day,
+                left: 30
+            },
+            {
+                m: ['friend06@example.com'],
+                ts: nowSec - 360 * day,
+                csu: nowSec - 360 * day,
+                c: nowSec - 359 * day,
+                e: nowSec + 5 * day,
+                left: 5
+            },
+            {
+                m: ['friend07@example.com'],
+                ts: nowSec - 2 * day,
+                csu: false
+            },
+            {
+                m: ['friend08@example.com'],
+                ts: nowSec - 5 * day,
+                csu: false
+            },
+            {
+                m: ['friend09@example.com'],
+                ts: nowSec - 400 * day,
+                csu: nowSec - 400 * day,
+                c: nowSec - 399 * day,
+                e: nowSec - 35 * day,
+                left: -35
+            },
+            {
+                m: ['friend10@example.com'],
+                ts: nowSec - 450 * day,
+                csu: nowSec - 450 * day,
+                c: nowSec - 449 * day,
+                e: nowSec - 85 * day,
+                left: -85
+            }
+        ];
+        mega.achievem.invitationStatusDialog();
+    },
+
+
     /* Dialog: storage-dialog --> */
     /* ALSO ON MOBILE */
     ['storage-dialog']: ({ version }) => {

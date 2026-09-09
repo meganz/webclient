@@ -354,7 +354,7 @@ lazy(mega, 'sets', () => {
 
         name = M.getSafeName(name);
         if (fileconflict.getNodeByName(target, name)) {
-            name = fileconflict.findNewName(name, target);
+            name = fileconflict.findNewName(name, target, true);
         }
 
         return name;

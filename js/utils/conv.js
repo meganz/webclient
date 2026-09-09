@@ -18,8 +18,8 @@
         if (!Array.isArray(input)) {
             input = [input];
         }
-        return input.reduce(function(obj, key, idx) {
-            obj[key] = value !== undefined ? value : (idx | 0) + 1;
+        return input.reduce((obj, key, idx) => {
+            obj[key] = value === undefined ? (idx | 0) + 1 : value;
             return obj;
         }, Object.create(null));
     };

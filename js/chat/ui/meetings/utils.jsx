@@ -74,7 +74,7 @@ export const inProgressAlert = (isJoin, chatRoom) => {
                 const { chatRoom: activeCallRoom } = megaChat.activeCall;
                 const peers = activeCallRoom ?
                     activeCallRoom.getParticipantsExceptMe(activeCallRoom.getCallParticipants())
-                        .map(h => M.getNameByHandle(h)) :
+                        .map(h => escapeHTML(M.getNameByHandle(h))) :
                     [];
                 let body = isJoin ? l.cancel_to_join : l.cancel_to_start;
                 if (peers.length) {

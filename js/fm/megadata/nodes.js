@@ -1237,7 +1237,7 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree, extra) {
                                     const message = `${l[6949]}, ${this.getNamedPath(cn[i])}: ${reason}`;
 
                                     console.error(message);
-                                    showToast('warning', message);
+                                    showToast('warning', escapeHTML(message));
                                 }
                             }
                             dump(res);
@@ -3201,7 +3201,16 @@ MegaData.prototype.getTreeHandles = function _(h, seen) {
         }
         else {
             seen[tree[i]] = 1;
-            result.push.apply(result, _(tree[i], seen));
+
+            const res = _(tree[i], seen);
+            if (res.length < 9e4) {
+                result.push(...res);
+            }
+            else {
+                while (res.length) {
+                    result.push(...res.splice(0, 9e4));
+                }
+            }
         }
     }
 
@@ -4274,12 +4283,6 @@ MegaData.prototype.getNodeByHandle = function(handle) {
     if (this.tnd[handle]) {
         // console.warn('feeding transient node...', handle);
         return this.tnd[handle];
-    }
-
-    for (var i = this.v.length; i--;) {
-        if (this.v[i].h === handle) {
-            return this.v[i];
-        }
     }
 
     if (handle && handle.length === 8) {

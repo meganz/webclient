@@ -1115,7 +1115,7 @@ else if (tmp.substr(0, 4) === 'test') {
     tmp = -0x8feed;
 }
 else if (is_extension && tmp.startsWith('oauth.html?')) {
-    location.replace('/webclient/' + tmp);
+    location.replace(location.pathname.replace(/[^/]+$/, '') + tmp);
 }
 
 Object.defineProperty(self, 'mShowAds', {
@@ -2241,8 +2241,10 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/proplan.js', n: 'proplan_js', j:1});
     jsl.push({f:'html/js/planpricing.js', n: 'planpricing_js', j:1});
     jsl.push({f:'html/js/propay.js', n: 'propay_js', j:1});
+    jsl.push({f:'html/js/propay-utils.js', n: 'propay_utils_js', j:1});
     jsl.push({f:'html/js/propay-signup.js', n: 'propay_signup_js', j:1});
     jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
+    jsl.push({f:'html/js/propay-billing.js', n: 'propay_billing_js', j:1});
     jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
 
     // Plan pages for features
@@ -2346,6 +2348,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/checkbox-group.js', n: 'checkbox_select_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/radial.js', n: 'radial_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/tooltip.js', n: 'tooltip_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/tabgroup.js', n: 'tabgroup_js', j: 1, w: 1});
+    jsl.push({f:'css/components/tabgroup.css', n: 'tabgroup_css', j: 2, w: 5});
 
     jsl.push({f:'js/vendor/megaDynamicList.js', n: 'mega_dynamic_list_js', j:1, w:5});
 
@@ -2499,8 +2503,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/components/meganz/top-menu.css', n:'top_menu_css', j:2, w:1});
         jsl.push({f:'js/ui/components/flyoutMenu.js', n: 'flyoutmenu_js', j: 1, w:1});
         jsl.push({f:'css/components/flyoutMenu.css', n: 'flyoutmenu_css', j:2,w:5});
-        jsl.push({f:'js/ui/components/tabgroup.js', n: 'tabgroup_js', j: 1, w:1});
-        jsl.push({f:'css/components/tabgroup.css', n: 'tabgroup_css', j:2,w:5});
         jsl.push({f:'js/ui/components/chatitem.js', n: 'chatitem_js', j: 1, w:1});
         jsl.push({f:'css/components/chatitem.css', n: 'chatitem_css', j:2,w:5});
         jsl.push({f:'css/components/meganz/fm-context-menu.css', n: 'fm_context_menu_css', j:2,w:5});
@@ -3309,6 +3311,7 @@ else if (!browserUpdate) {
                     }
                     if (!contenterror)
                     {
+                        jsl[e.data.jsi].sha256sb = e.data.hash;
                         jsl_current += jsl[e.data.jsi].w || 1;
                         jsl_progress();
                         if (++jslcomplete == jsl.length) initall();
@@ -3740,6 +3743,7 @@ else if (!browserUpdate) {
             else if (jsl[i].j === 4) { // new type to distinguish files to be used on iframes
                 if (!window[jsl[i].n]) {
                     var blobLink;
+
                     if ((jsl[i].n || '').indexOf('css') > -1) {
                         blobLink = mObjectURL([jsl[i].text.replace(j4re, j4tr)], 'text/css');
                     }
@@ -3749,7 +3753,22 @@ else if (!browserUpdate) {
                         }
                         blobLink = mObjectURL([jsl[i].text], 'text/javascript');
                     }
-                    window[jsl[i].n] = blobLink;
+
+                    tryCatch(function(i, blob, base) {
+                        var tmp = Object.defineProperties(mega[jsl[i].n] = {}, {
+                            cdn: {
+                                value: base + jsl[i].f
+                            },
+                            blob: {
+                                value: blob
+                            },
+                            integrity: {
+                                value: jsl[i].sha256sb
+                            }
+                        });
+                        freeze(tmp);
+                        window[jsl[i].n] = true;
+                    })(i, blobLink, bootstaticpath);
                 }
             }
             else if (jsl[i].j === 5) {

@@ -117,11 +117,11 @@ mobile.achieve.invites = Object.create(mobile.settingsHelper, {
                 this.validateInput(true);
             });
 
-            // Inline alert
+            // Inline alert shown when the recipient already has a pending invite
             this.inlineAlert = mobile.inline.alert.create({
                 parentNode: formNode,
                 componentClassname: 'sent-invites warning hidden',
-                title: l.invite_sent,
+                title: l.invite_already_sent,
                 icon: 'sprite-mobile-fm-mono icon-alert-circle-thin-outline',
                 iconSize: '24',
                 closeButton: true

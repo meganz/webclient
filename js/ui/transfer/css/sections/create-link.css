@@ -86,6 +86,7 @@
 
 .it-box.get-link-box .settings-body .section {
     border-top: 1px solid var(--main-borders-and-lines);
+    height: auto;
     margin: 24px 0 0;
     padding: 24px 0 0;
 }

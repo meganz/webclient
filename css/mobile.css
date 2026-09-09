@@ -3143,7 +3143,7 @@ div.checkboxOn {
     background-color: #fff;
     position: relative;
 }
-.payment-address-dialog .white-container-box::before, .astropay-dialog .mobile.fm-dialog-close::before, .payment-address-dialog .mobile.fm-dialog-close::before {
+.payment-address-dialog .white-container-box::before, .payment-address-dialog .mobile.fm-dialog-close::before {
     position:absolute;
     left: 0;
     top:0;
@@ -3753,109 +3753,6 @@ div.checkboxOn {
 .mobile .two-factor-page.verify-login-page .warning-text-field, .mobile.verify-number .warning-text-field {
     text-align: center;
 }
-/* AstroPay dialog */
-.mobile.main-block.astropay-dialog {
-    left: 0;
-    position: absolute;
-    top: 0;
-    z-index: 1200;
-}
-.astropay-dialog .mobile.content-cell {
-    text-align: initial;
-    width: 40%;
-}
-.astropay-dialog-body {
-    padding: 24px 36px;
-}
-.astropay-dialog .main-title {
-    color: #333;
-    font-family: "source_sans_prolight", sans-serif;
-    font-size: 32px;
-    line-height: 40px;
-}
-.astropay-information, .astropay-instructions {
-    color: #667;
-    font-size: 16px;
-    line-height: 26px;
-}
-.astropay-dialog .astropay-information {
-    margin-top: 24px;
-}
-.astropay-dialog .provider-name {
-    font-family: "source_sans_prosemibold", sans-serif;
-}
-.astropay-dialog .provider-icon {
-    margin: 0 2px;
-}
-.astropay-instructions {
-    margin-top: 30px;
-}
-.astropay-dialog .grey-container-box {
-    background-color: #f6f7f8;
-    padding: 25px 23px;
-}
-.astropay-dialog .white-container-box {
-    box-sizing: border-box;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    background-color: #fff;
-    box-shadow: inset 0 -2px 0 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.15);
-    padding: 13px;
-}
-.astropay-dialog .container-box-title {
-    padding-top: 0;
-    color: #999;
-    font-family: "source_sans_prolight", sans-serif;
-    font-size: 24px;
-    line-height: 31px;
-    margin-bottom: 24px;
-    margin-left: 12px;
-    margin-top: 12px;
-}
-.astropay-dialog .mobile.signin-input {
-    background-color: #F8F8F8;
-    height: 60px;
-    padding: 17px 55px 0 12px;
-    box-sizing: border-box;
-    position: relative;
-    margin-bottom: 2px;
-}
-.astropay-dialog .powered-by-astropay {
-    display: block;
-    margin: 40px auto 13px auto;
-}
-.astropay-dialog .accept {
-    color: #fff;
-    padding: 0 15px 0 15px;
-    font-size: 15px;
-    line-height: 48px;
-    border-radius: 2px;
-    display: block;
-    background-color: #ff4444;
-    cursor: pointer;
-    box-sizing: border-box;
-    text-align: center;
-    text-transform: lowercase;
-    margin-top: 40px;
-}
-.astropay-dialog .accept:first-letter {
-    text-transform: uppercase;
-}
-.astropay-dialog .disabled {
-    background-color: #eb4444;
-}
-.astropay-dialog .mobile.fm-dialog-close, .payment-address-dialog .mobile.fm-dialog-close {
-    border-radius: 50%;
-    background-color: white;
-    background-position: -78px -1140px;
-    height: 38px;
-    opacity: initial;
-    position: fixed;
-    width: 38px;
-    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-}
-.payment-address-dialog .mobile.fm-dialog-close {
-    opacity: 0;
-}
 /* Credit card billing address dialog */
 .payment-address-dialog,
 .wire-transfer-dialog {
@@ -4144,7 +4041,8 @@ div.checkboxOn {
     text-align: center;
     font-size: 14px;
 }
-.payment-address-dialog .states.disabled {
+.payment-address-dialog .states.disabled,
+.payment-address-dialog .countries.disabled {
     cursor: default;
     opacity: 0.5;
 }
@@ -9965,9 +9863,6 @@ code, c {
     color: #FF6F00;
     font-size: 13px;
     line-height: 18px;
-}
-.argentina-only .orange-notification.cell {
-    padding: 6px;
 }
 .orange-notification.cell.text {
     padding: 5px 0;

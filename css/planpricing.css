@@ -74,13 +74,20 @@
     --font-poppins: "Poppins", sans-serif;
     --font-inter: "Inter", sans-serif;
 
+    --font-size-9: 9px/normal;
     --font-size-12: 12px/14px;
     --font-size-24: 24px/32px;
 
     --text-poppins-600-24: 600 var(--font-size-24) var(--font-poppins);
 
+    --text-inter-700-14: 700 var(--font-copy-small) var(--font-inter);
+    --text-inter-700-12: 700 var(--font-size-12) var(--font-inter);
+    --text-inter-700-9: 700 var(--font-size-9) var(--font-inter);
+
     --text-inter-600-16: 600 var(--font-copy-medium) var(--font-inter);
     --text-inter-600-14: 600 var(--font-copy-small) var(--font-inter);
+    --text-inter-600-12: 600 var(--font-size-12) var(--font-inter);
+    --text-inter-600-9: 600 var(--font-size-9) var(--font-inter);
 
     --text-inter-400-16: 400 var(--font-copy-medium) var(--font-inter);
     --text-inter-400-14: 400 var(--font-copy-small) var(--font-inter);

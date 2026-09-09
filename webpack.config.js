@@ -47,9 +47,7 @@ var webpackConfigs = {
         },
         mode: 'development',
         entry: {
-            app: [
-                'webpack-dev-server/client?http://localhost:8089' // WebpackDevServer host and port
-            ].concat(entryPoints)
+            app: entryPoints
         },
         output: {
             path: __dirname + "/.",

@@ -39,10 +39,8 @@ var resizeDlgScrollBar = function($targetDialog) {
  */
 var astroPayDialog = {
 
-    $dialog: null,
     $backgroundOverlay: null,
     $pendingOverlay: null,
-    $propayPage: null,
 
     // Constant for the AstroPay gateway ID
     gatewayId: 11,
@@ -54,7 +52,6 @@ var astroPayDialog = {
     fullName: '',
     address: '',
     city: '',
-    postcode: '',
     taxNumber: '',
     phoneNumber: '',
     country: '',
@@ -67,203 +64,8 @@ var astroPayDialog = {
      */
     init: function (selectedProvider) {
 
-        /* Testing stub for different AstroPay tax validation
-        selectedProvider = {
-            displayName: 'AstroPay Visa',
-            gatewayId: 11,
-            gatewayName: 'astropayVI',
-            supportsAnnualPayment: 1,
-            supportsExpensivePlans: 1,
-            supportsMonthlyPayment: 1,
-            supportsRecurring: 1,
-            type: "subgateway",
-            extra: {
-                taxIdLabel: 'CPF'
-            }
-        };
-        //*/
-
-        // Cache DOM reference for lookup in other functions
-        this.$dialog = pro.propay.onPropayPage()
-            ? $('.astropay-dialog.propay-inline-dialog')
-            : $('.astropay-dialog:not(.propay-inline-dialog)');
-
-        this.$backgroundOverlay = $('.fm-dialog-overlay');
-        this.$pendingOverlay = $('.payment-result.pending.original');
-        this.$propayPage = $('.payment-section', 'body');
-
         // Store the provider details
         this.selectedProvider = selectedProvider;
-
-        // Initalise the rest of the dialog
-        this.initCloseButton();
-        // this.initConfirmButton();
-        this.updateDialogDetails();
-        this.showDialog();
-
-        pro.propay.skItems.astropay.endLoad('initAstropay');
-    },
-
-    getIsIndia() {
-        'use strict';
-        return (((u_attr && u_attr.ipcc) || getCountryAndLocales().country) === 'IN')
-            || (astroPayDialog.country === 'IN');
-    },
-
-    getRequiresPhoneNumber() {
-        'use strict';
-        return this.getIsIndia();
-    },
-
-    // India requires a postcode (PIN code) field of exactly 6 digits.
-    getRequiresPostcode() {
-        'use strict';
-        return this.getIsIndia();
-    },
-
-    /**
-     * Update the dialog details
-     */
-    updateDialogDetails: function () {
-
-        // Get the gateway name
-        var gatewayName = this.selectedProvider.gatewayName;
-
-        // Change icon and payment provider name
-        this.$dialog.find('.provider-icon').removeClass().addClass('provider-icon ' + gatewayName);
-        this.$dialog.find('.provider-name').text(this.selectedProvider.displayName);
-
-        // Localise the tax label to their country e.g. GST, CPF
-        var taxLabel = l[7989].replace('%1', this.selectedProvider.extra.taxIdLabel);
-        var taxPlaceholder = l[7990].replace('%1', this.selectedProvider.extra.taxIdLabel);
-
-        // If on mobile, the input placeholder text is just 'CPF Number'
-        if (is_mobile) {
-            taxPlaceholder = taxLabel;
-        }
-
-        // If they have previously paid before with Astropay
-        if (!is_mobile && (alarm.planExpired.lastPayment) && (alarm.planExpired.lastPayment.gwd)) {
-
-            // Get the extra data from the gateway details
-            var firstLastName = alarm.planExpired.lastPayment.gwd.name;
-            var taxNum = alarm.planExpired.lastPayment.gwd.cpf;
-
-            // Prefill the user's name and tax details
-            this.$dialog.find('.astropay-name-field').val(firstLastName);
-            this.$dialog.find('.astropay-tax-field').val(taxNum);
-        }
-
-        // Change the tax labels
-        this.$dialog.find('.astropay-label.tax').text(taxLabel + ':');
-        this.$dialog.find('.astropay-tax-field').attr('placeholder', taxPlaceholder);
-
-        // If the provider doesn't support extra address information, hide it.
-        // Currently only India needs Address and City, but others may need them in future.
-        if (!this.selectedProvider.supportsExtraAddressInfo) {
-            this.$dialog.find('.astropay-label.address').addClass('hidden');
-            this.$dialog.find('.astropay-address-field').parent().addClass('hidden');
-            this.$dialog.find('.astropay-label.city').addClass('hidden');
-            this.$dialog.find('.astropay-city-field').parent().addClass('hidden');
-        }
-
-        if (!astroPayDialog.getRequiresPhoneNumber()) {
-            $('.astropay-label.phone', this.$dialog).addClass('hidden');
-            $('.astropay-phone-field', this.$dialog).parent().addClass('hidden');
-        }
-        else {
-            // India phone numbers are at most 10 digits (national number, no country code)
-            $('.astropay-phone-field', this.$dialog).attr('maxlength', '10');
-        }
-
-        if (astroPayDialog.getRequiresPostcode()) {
-            // India PIN codes are exactly 6 digits
-            $('.astropay-postcode-field', this.$dialog).attr('maxlength', '6');
-        }
-        else {
-            $('.astropay-label.postcode', this.$dialog).addClass('hidden');
-            $('.astropay-postcode-field', this.$dialog).parent().addClass('hidden');
-        }
-    },
-
-    /**
-     * Display the dialog
-     */
-    showDialog: function () {
-
-        this.$dialog.removeClass('hidden');
-
-        // Hide the Propage page
-        if (is_mobile) {
-            this.$propayPage.addClass('hidden');
-        }
-
-        if (!is_mobile) {
-            // Keep the ps scrollbar block code after remove the hidden class from the dialog
-            // so that it shows the scrollbar initially
-            resizeDlgScrollBar(this.$dialog);
-
-            $(window).rebind('resize.billAddressDlg', resizeDlgScrollBar.bind(null, this.$dialog));
-        }
-    },
-
-    /**
-     * Hide the overlay and dialog
-     */
-    hideDialog: function(force) {
-        'use strict';
-
-        if (!this.$dialog) {
-            return;
-        }
-
-        this.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-
-        if (!pro.propay.onPropayPage() || force) {
-            this.$dialog.addClass('hidden');
-        }
-
-        // Show the Propage page
-        if (is_mobile) {
-            this.$propayPage.removeClass('hidden');
-        }
-        else {
-            $(window).unbind('resize.billAddressDlg');
-        }
-    },
-
-    /**
-     * Shows the background overlay
-     */
-    showBackgroundOverlay() {
-        'use strict';
-
-        if (pro.propay.onPropayPage()) {
-            return;
-        }
-
-        // Show the background overlay only for desktop
-        if (!is_mobile) {
-            this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
-        }
-    },
-
-    /**
-     * Functionality for the close button
-     */
-    initCloseButton: function () {
-        "use strict";
-        // Initialise the close and cancel buttons
-        this.$dialog.find('button.js-close, .cancel').rebind('click', function() {
-
-            // Hide the overlay and dialog
-            astroPayDialog.hideDialog();
-        });
-
-        // Prevent close of dialog from clicking outside the dialog
-        $('.fm-dialog-overlay.payment-dialog-overlay').rebind('click', function (event) {
-            event.stopPropagation();
-        });
     },
 
     /**
@@ -271,178 +73,66 @@ var astroPayDialog = {
      */
     submit() {
         "use strict";
-        // Store the full name and tax number entered
-        const propayIndicator = pro.propay.onPropayPage() ? 'propay-' : '';
-        astroPayDialog.fullName = $.trim(astroPayDialog.$dialog.find(`#${propayIndicator}astropay-name-field`).val());
-        astroPayDialog.address = $.trim(astroPayDialog.$dialog.find(`#${propayIndicator}astropay-address-field`).val());
-        astroPayDialog.city = $.trim(astroPayDialog.$dialog.find(`#${propayIndicator}astropay-city-field`).val());
-        astroPayDialog.postcode =
-            $.trim($(`#${propayIndicator}astropay-postcode-field`, astroPayDialog.$dialog).val());
-        astroPayDialog.taxNumber = $.trim(astroPayDialog.$dialog.find(`#${propayIndicator}astropay-tax-field`).val());
-        astroPayDialog.phoneNumber =
-            $.trim(astroPayDialog.$dialog.find(`#${propayIndicator}astropay-phone-field`).val());
 
-        const requirePhoneNumber = astroPayDialog.getRequiresPhoneNumber();
-        const cleanedPhone = requirePhoneNumber && M.validatePhoneNumber(astroPayDialog.phoneNumber);
-        // India mobile numbers are exactly 10 digits (national number, no country code).
-        // M.validatePhoneNumber only enforces a 4-digit floor, so check the digit count explicitly.
-        const phoneDigitCount = cleanedPhone ? cleanedPhone.replace(/\D/g, '').length : 0;
-        const phoneWrongLength = requirePhoneNumber && !!cleanedPhone && phoneDigitCount !== 10;
-        const phoneInvalidForIndia = requirePhoneNumber && (!cleanedPhone || phoneWrongLength);
+        this.selectedProvider = pro.propay.currentGateway;
 
-        const requirePostcode = astroPayDialog.getRequiresPostcode();
-        // India PIN codes must be exactly 6 characters
-        const postcodeWrongLength = requirePostcode
-            && astroPayDialog.postcode && astroPayDialog.postcode.length !== 6;
-        const postcodeInvalidForIndia = requirePostcode && (!astroPayDialog.postcode || postcodeWrongLength);
+        const enteredBillingInfo = pro.propay.billing.getEnteredBillingInfo();
 
-        // Make sure they entered something
-        if (
-            astroPayDialog.fullName === '' ||
-            phoneInvalidForIndia ||
-            postcodeInvalidForIndia ||
-            // If the provider supports extra address information, validate it.
-            // Currently only India needs Address and City, but others may need them in future.
-            this.selectedProvider.supportsExtraAddressInfo &&
-            (astroPayDialog.address === '' || astroPayDialog.city === '')
-        ) {
-
-            if (d) {
-                if (astroPayDialog.fullName === '') {
-                    console.warn('AstroPay: Full name is empty');
-                }
-                if (phoneInvalidForIndia) {
-                    if (phoneWrongLength) {
-                        console.warn(
-                            `AstroPay: India phone number is ${phoneDigitCount} digits: ${astroPayDialog.phoneNumber}`);
-                    }
-                    else {
-                        console.warn(
-                            'AstroPay: India phone number is missing or invalid',
-                            astroPayDialog.phoneNumber);
-                    }
-                }
-                if (postcodeInvalidForIndia) {
-                    if (postcodeWrongLength) {
-                        console.warn(
-                            'AstroPay: India postcode is not exactly 6 characters',
-                            astroPayDialog.postcode);
-                    }
-                    else {
-                        console.warn('AstroPay: India postcode is missing');
-                    }
-                }
-                if (this.selectedProvider.supportsExtraAddressInfo) {
-                    if (astroPayDialog.address === '') {
-                        console.warn('AstroPay: Address is empty');
-                    }
-                    if (astroPayDialog.city === '') {
-                        console.warn('AstroPay: City is empty');
-                    }
-                }
-            }
-
-            pro.propay.hideLoadingOverlay();
-            // Show error dialog with Missing payment details
-            msgDialog('warninga', l[6958], l[6959], '', () => {
-                astroPayDialog.hideDialog();
-            });
-
-            return false;
-        }
+        astroPayDialog.address = [enteredBillingInfo.address1, enteredBillingInfo.address2]
+            .filter(Boolean).join(', ');
+        astroPayDialog.city = enteredBillingInfo.city;
+        astroPayDialog.taxNumber = enteredBillingInfo.taxCode;
+        astroPayDialog.phoneNumber = enteredBillingInfo.mobile;
+        astroPayDialog.fullName = enteredBillingInfo.name;
 
         // If the tax number is invalid, show an error dialog
         if (!astroPayDialog.taxNumberIsValid()) {
 
-            if (d) {
-                console.warn(
-                    'AstroPay: Tax number is invalid for tax label',
-                    astroPayDialog.selectedProvider.extra.taxIdLabel, astroPayDialog.taxNumber);
-            }
-
             pro.propay.hideLoadingOverlay();
-            msgDialog('warninga', l[6958], l[17789], '', () => {
-                if (pro.propay.onPropayPage()) {
-                    astroPayDialog.hideDialog();
-                }
-                else {
-                    astroPayDialog.showBackgroundOverlay();
-                }
-            });
+            msgDialog('warninga', l[6958], l[17789], '');
 
-
-            return false;
-        }
-
-        // eslint-disable-next-line no-use-before-define
-        if (addressDialog.checkAndUpdateTaxAttr(astroPayDialog.taxNumber)) {
-            pro.propay.hideLoadingOverlay();
             return false;
         }
 
         // Try redirecting to payment provider
-        astroPayDialog.hideDialog();
         pro.propay.sendPurchaseToApi(11);
     },
 
     /**
-     * Checks if the tax number provided is valid for that tax label
+     * Checks if the tax number provided is valid for the user's selected billing country.
+     * @param {string} [taxNum] - Tax number to check; defaults to astroPayDialog.taxNumber
+     *     so the existing astroPayDialog.submit call site still works.
      * @returns {Boolean} Returns true if valid, false if not
      */
-    taxNumberIsValid: function () {
-
+    taxNumberIsValid(taxNum) {
         'use strict';
+        const country = pro.propay.billing.country;
+        taxNum = (taxNum === undefined ? astroPayDialog.taxNumber : taxNum) || '';
+        const taxNumCleaned = taxNum.replace(/([ !#$%&'()*+,./:;<=>?@[\\\]^_`{|}~-])+/g, '');
+        const len = taxNumCleaned.length;
 
-        // Use the tax label from the API and the tax number entered by the user
-        var taxLabel = astroPayDialog.selectedProvider.extra.taxIdLabel;
-        var taxNum = astroPayDialog.taxNumber;
-
-        // Remove special characters and check the length
-        var taxNumCleaned = taxNum.replace(/([~!@#$%^&*()_+=`{}\[\]\-|\\:;'<>,.\/? ])+/g, '');
-        var taxNumLength = taxNumCleaned.length;
-
-        // Check for Peru (between 8 and 9) and Argentina (between 7 and 9 or 11)
-        if (taxLabel === 'DNI' && taxNumLength >= 7 && taxNumLength <= 11) {
-            return true;
-        }
-
-        // Check for Mexico (between 10 and 18)
-        else if (taxLabel === 'CURP / RFC / IFE' && taxNumLength >= 10 && taxNumLength <= 18) {
-            return true;
-        }
-
-        // Check for Colombia (between 6 and 10)
-        else if (taxLabel === 'NUIP / CC / RUT' && taxNumLength >= 6 && taxNumLength <= 10) {
-            return true;
-        }
-
-        // Check for Uruguay (between 6 and 8)
-        else if (taxLabel === 'CI' && taxNumLength >= 6 && taxNumLength <= 8) {
-            return true;
-        }
-
-        // Check for Chile (between 8 and 9)
-        else if (taxLabel === 'RUT' && taxNumLength >= 8 && taxNumLength <= 9) {
-            return true;
-        }
-
-        // Check for India
-        else if (taxLabel === 'PAN' && taxNumLength === 10) {
-            return true;
-        }
-
-        // Check for Indonesia and Vietnam (no tax requirement), just collect anyway if they do enter something
-        else if (taxLabel === 'NPWP' || taxLabel === 'TIN') {
-            return true;
-        }
-
-        // Check for Brazil (CPF and CPNJ)
-        else if (taxLabel === 'CPF' &&
-            (astroPayDialog.cpfIsValid(taxNumCleaned) || astroPayDialog.cpnjIsValid(taxNumCleaned))) {
-            return true;
-        }
-        else {
-            return false;
+        switch (country) {
+            case 'AR':  // Argentina - DNI
+            case 'PE':  // Peru - DNI
+                return len >= 7 && len <= 11;
+            case 'MX':  // Mexico - CURP / RFC / IFE
+                return len >= 10 && len <= 18;
+            case 'CO':  // Colombia - NUIP / CC / RUT
+                return len >= 6 && len <= 10;
+            case 'UY':  // Uruguay - CI
+                return len >= 6 && len <= 8;
+            case 'CL':  // Chile - RUT
+                return len >= 8 && len <= 9;
+            case 'IN':  // India - PAN (exactly 10)
+                return len === 10;
+            case 'ID':  // Indonesia - NPWP: no strict format, accept any entered value
+            case 'VN':  // Vietnam - TIN: no strict format, accept any entered value
+                return true;
+            case 'BR':  // Brazil - CPF (personal) or CNPJ (company)
+                return astroPayDialog.cpfIsValid(taxNumCleaned) || astroPayDialog.cpnjIsValid(taxNumCleaned);
+            default:
+                // Non-AstroPay market; trust tngr/server validation.
+                return true;
         }
     },
 
@@ -649,11 +339,17 @@ var astroPayDialog = {
             message = l[7982];
         }
 
+        // Astropay applies stricter tax-number rules than our tnp check - drop any cached "Valid"
+        // verdict so the user isn't left staring at a green tick after astropay just rejected them.
+        if (pro.propay.billing) {
+            pro.propay.billing.lastValidatedTaxNumber = null;
+            pro.propay.billing.lastValidatedContextKey = null;
+            pro.propay.billing.validatedTaxNumbers = Object.create(null);
+            pro.propay.billing.clearTaxCodeStatus();
+        }
+
         // Show error dialog
-        msgDialog('warninga', l[7235], message, '', function () {
-            astroPayDialog.showBackgroundOverlay();
-            astroPayDialog.showDialog();
-        });
+        msgDialog('warninga', l[7235], message, '');
     },
 
     /**
@@ -840,7 +536,7 @@ var voucherDialog = {
     hasSufficientBalance() {
         'use strict';
 
-        const price = pro.propay.getPlan(true)[5];
+        const price = pro.propay.planObj.taxedPriceEuro;
         return parseFloat(pro.propay.proBalance) >= parseFloat(price);
         // $('.voucher-information-help', this.$dialog).toggleClass('hidden', hasSufficientBalance);
     },
@@ -960,7 +656,9 @@ var voucherDialog = {
 
         let state = 0;
 
-        if (!this.hasSufficientBalance() && pro.propay.usingBalance) {
+        // Skips initial-load-with-stale-balance-selection: only warn after the user actually
+        // saw balance cover a plan this session, or has just redeemed.
+        if (!this.hasSufficientBalance() && (pro.propay.balanceWasSufficient || redeemed)) {
             state |= 1;
         }
         if (redeemed) {
@@ -1266,21 +964,16 @@ var unionPay = {
      * @param {Object} utcResult
      */
     redirectToSite: function(utcResult) {
+        'use strict';
 
         // DynamicPay
-        // We need to redirect to their site via a post, so we are building a form :\
-        var form = $("<form name='pay_form' action='" + utcResult.EUR['url'] + "' method='post'></form>");
+        // We need to redirect to their site via a post, so we are building a form
+        const form = mCreateElement('form', {name: 'pay_form', action: utcResult.EUR.url, method: 'post'}, 'body');
 
-        for (var key in utcResult.EUR['postdata']) {
-            if (utcResult.EUR['postdata'].hasOwnProperty(key)) {
-
-                var input = $("<input type='hidden' name='" + key + "' value='"
-                          + utcResult.EUR['postdata'][key] + "' />");
-
-                form.append(input);
-            }
+        for (const [name, value] of Object.entries(utcResult.EUR.postdata)) {
+            mCreateElement('input', {type: 'hidden', name, value}, form);
         }
-        $('body').append(form);
+
         form.submit();
     }
 };
@@ -1297,21 +990,19 @@ var sabadell = {
      * @param {Object} utcResult
      */
     redirectToSite: function(utcResult) {
+        'use strict';
 
         // We need to redirect to their site via a post, so we are building a form
-        var url = utcResult.EUR['url'];
-        var form = $("<form id='pay_form' name='pay_form' action='" + url + "' method='post'></form>");
+        const form = mCreateElement(
+            'form',
+            {id: 'pay_form', name: 'pay_form', action: utcResult.EUR.url, method: 'post'},
+            'body'
+        );
 
-        for (var key in utcResult.EUR['postdata']) {
-            if (utcResult.EUR['postdata'].hasOwnProperty(key)) {
-
-                var input = $("<input type='hidden' name='" + key + "' value='"
-                          + utcResult.EUR['postdata'][key] + "' />");
-
-                form.append(input);
-            }
+        for (const [name, value] of Object.entries(utcResult.EUR.postdata)) {
+            mCreateElement('input', {type: 'hidden', name, value}, form);
         }
-        $('body').append(form);
+
         form.submit();
     },
 
@@ -1510,6 +1201,9 @@ var addressDialog = {
     validInputs: null,
     billingInfoFilled: null,
 
+    /** The country last selected in the dialog, used to prefill it on the next open */
+    lastSelectedCountry: null,
+
     businessPurchase: false,
 
     /**
@@ -1533,6 +1227,21 @@ var addressDialog = {
         this.loadingBillingInfo = this.fetchBillingInfo().always((billingInfo) => {
             billingInfo = billingInfo || Object.create(null);
 
+            // Align the dialog with the country the page was priced against. In-session picks win.
+            // Repay is locked to iu's txcc (the country the outstanding invoice was raised in).
+            const repayCountry = page === 'repay' && self.businessRegPage
+                && self.businessRegPage.planInfo && self.businessRegPage.planInfo.txcc;
+            const pageCountry = pro.propay.onPropayPage()
+                ? pro.propay.billing.country
+                : self.businessRegPage && self.businessRegPage.lastPricedCountry;
+
+            if (repayCountry) {
+                billingInfo.country = repayCountry;
+            }
+            else if (pageCountry && !addressDialog.lastSelectedCountry && page !== 'repay') {
+                billingInfo.country = pageCountry;
+            }
+
             const selectedState =
                 (billingInfo.country === 'US' || billingInfo.country === 'CA') && billingInfo.state || false;
 
@@ -1546,6 +1255,23 @@ var addressDialog = {
             self.initCloseButton();
             self.initCoinifyShareConsent();
             self.initRememberDetailsCheckbox();
+            pro.propay.billing.updateAddressDialogTax();
+
+            // Registerb has no page-level country dropdown - propay's initCountryDropdown does this
+            // via updateCountry(). Sync the prefill here so the plan price matches the address.
+            if (!pro.propay.onPropayPage() && self.businessRegPage) {
+                const prefilled = billingInfo.country
+                    || (u_attr && (u_attr.country || u_attr.ipcc))
+                    || pro.propay.billing.defaultCountry
+                    || '';
+                if (prefilled && prefilled !== self.businessRegPage.lastPricedCountry) {
+                    pro.propay.billing.country = prefilled;
+                    if (selectedState) {
+                        pro.propay.billing.state = `${prefilled}-${selectedState}`;
+                    }
+                    pro.propay.billing.refreshPricingForPage().catch(dump);
+                }
+            }
 
             onIdle(() => eventlog(500516));
         });
@@ -1553,21 +1279,18 @@ var addressDialog = {
         return this.loadingBillingInfo;
     },
 
-    /**
-     * Display the dialog
-     */
-    showDialog(blockShow) {
+    getDialog() {
         'use strict';
 
-        // Cache DOM reference for lookup in other functions
-        // const dialogParent = is_mobile ? '#startholder' : 'section.mega-dialog-container';
         // TODO: Improve for business
+
+        let $dialog;
 
         const dialogParent = is_mobile ? '#startholder' : 'section.mega-dialog-container';
 
         if (pro.propay.onPropayPage()) {
             const isBitcoin = pro.propay.currentGateway
-                && pro.propay.currentGateway.gatewayId === pro.propay.BITCOIN_GATE_ID;
+            && pro.propay.currentGateway.gatewayId === pro.propay.BITCOIN_GATE_ID;
 
             const $dobBlock = $('.date-of-birth-block', this.$dialog).toggleClass('hidden', !isBitcoin);
             $('.coinify-share-consent-container', this.$dialog).toggleClass('hidden', !isBitcoin);
@@ -1575,15 +1298,29 @@ var addressDialog = {
             $('.error', $dobBlock).removeClass('error');
             $('.message-container', $dobBlock).addClass('hidden');
 
-            this.$dialog = $('#propay .payment-address-dialog.propay-dialog');
+            $dialog = $('#propay .payment-address-dialog.propay-dialog');
         }
         else {
-            this.$dialog = $('.payment-address-dialog:not(.propay-dialog)', dialogParent);
+            $dialog = $('.payment-address-dialog:not(.propay-dialog)', dialogParent);
         }
 
-        if (!this.$dialog.length) {
-            this.$dialog = $('.payment-address-dialog');
+        if (!$dialog.length) {
+            $dialog = $('.payment-address-dialog');
         }
+
+        return $dialog;
+    },
+
+    /**
+     * Display the dialog.
+     * @param {boolean} [blockShow] - Skip showing the dialog and only update its state
+     * @returns {void}
+     */
+    showDialog(blockShow) {
+        'use strict';
+
+        // Cache DOM reference for lookup in other functions
+        this.$dialog = this.getDialog();
 
         this.$backgroundOverlay = $('.fm-dialog-overlay');
         this.$propayPage = $('.payment-section', '.fmholder');
@@ -1776,13 +1513,35 @@ var addressDialog = {
         }
 
 
-        this.firstNameMegaInput = new mega.ui.MegaInputs($('.first-name', this.$dialog));
-        this.lastNameMegaInput = new mega.ui.MegaInputs($('.last-name', this.$dialog));
+        this.firstNameMegaInput = new mega.ui.MegaInputs($('.firstname', this.$dialog));
+        this.lastNameMegaInput = new mega.ui.MegaInputs($('.lastname', this.$dialog));
         this.addressMegaInput = new mega.ui.MegaInputs($('.address1', this.$dialog));
         this.address2MegaInput = new mega.ui.MegaInputs($('.address2', this.$dialog));
         this.cityMegaInput = new mega.ui.MegaInputs($('.city', this.$dialog));
         this.postCodeMegaInput = new mega.ui.MegaInputs($('.postcode', this.$dialog));
-        this.taxCodeMegaInput = new mega.ui.MegaInputs($('.taxcode', this.$dialog));
+        const taxContainerEl = $('.taxcode-container', this.$dialog)[0];
+        if (taxContainerEl) {
+            // showDialog re-runs each open; recreate so we don't stack duplicate inputs.
+            taxContainerEl.textContent = '';
+            this.taxCodeComponent = new MegaInputComponent({
+                parentNode: taxContainerEl,
+                className: 'taxcode underlinedText',
+                // Seed so the megaInput creates its floating .mega-input-title; the real title
+                // is set by updateTitle() in initCountryDropdownChangeHandler before display.
+                placeholder: ' ',
+            });
+            this.taxCodeComponent.input.id = 'address-dialog-taxcode';
+            this.taxCodeComponent.input.tabIndex = 9;
+            // Back-compat alias - downstream code reads $input, updateTitle, hideError, etc.
+            this.taxCodeMegaInput = this.taxCodeComponent.megaInput;
+            pro.propay.billing.clearTaxCodeStatus();
+            pro.propay.billing.applyExhaustedLockout();
+        }
+        else {
+            // Propay dialog still has the inline <input class="taxcode"> with a sibling label.
+            this.taxCodeComponent = null;
+            this.taxCodeMegaInput = new mega.ui.MegaInputs($('.taxcode', this.$dialog));
+        }
 
         this.firstNameMegaInput.$input.rebind('focus.logFnEvent', () => eventlog(500450));
         this.lastNameMegaInput.$input.rebind('focus.logLnEvent', () => eventlog(500451));
@@ -1877,7 +1636,46 @@ var addressDialog = {
         // Initialise the selectmenu
         this.bindPaymentSelectEvents($statesSelect);
 
-        if (preselected || country === 'US' || country === 'CA') {
+        // tnp verdict + pricing are state-scoped, so on state change run the same refresh chain
+        // as syncBillingCountry: drop the last validated tax, clear status, show the dialog's
+        // price loader, re-validate if a tax value is entered (else just refresh pricing).
+        const handleStateChange = () => {
+            const newState = $('.option[data-state="active"]', $statesSelect).attr('data-value') || '';
+            if (newState === pro.propay.billing.state) {
+                return;
+            }
+            pro.propay.billing.state = newState;
+            pro.propay.billing.lastValidatedTaxNumber = null;
+            pro.propay.billing.lastValidatedContextKey = null;
+            pro.propay.billing.clearTaxCodeStatus();
+            if (newState) {
+                addressDialog.showStateRequiredForTax(false);
+            }
+            addressDialog.setBusinessPriceLoading(true);
+            const taxValue = String($('.taxcode', this.$dialog).val() || '').trim();
+            const refresh = taxValue
+                ? Promise.resolve(pro.propay.billing.validateTaxNumber(
+                    taxValue, pro.propay.billing.country, newState
+                )).then((valid) => valid || pro.propay.billing.refreshPricingForPage())
+                : pro.propay.billing.refreshPricingForPage();
+            return Promise.resolve(refresh)
+                .catch(dump)
+                .finally(() => addressDialog.setBusinessPriceLoading(false));
+        };
+        if (is_mobile) {
+            $statesSelect.rebind('change.syncTaxState', handleStateChange);
+        }
+        else {
+            const $stateOptions = $('.option', $statesSelect);
+            if (!$stateOptions.length) {
+                // The handler binds to existing .option elements - if the options are repopulated
+                // later by something other than initStateDropDown the handler is silently lost.
+                console.warn('syncTaxState: no .option elements to bind state-change handler to');
+            }
+            $stateOptions.rebind('change.syncTaxState', handleStateChange);
+        }
+
+        if (page !== 'repay' && (preselected || country === 'US' || country === 'CA')) {
             $statesSelect.removeClass('disabled').removeAttr('disabled');
         }
         else {
@@ -1938,9 +1736,13 @@ var addressDialog = {
         // Initialise the selectmenu
         this.bindPaymentSelectEvents($countriesSelect);
 
-        $countriesSelect
-            .rebind('click.logEvent', () => eventlog(500449))
-            .removeClass('disabled').removeAttr('disabled');
+        $countriesSelect.rebind('click.logEvent', () => eventlog(500449));
+        if (page === 'repay') {
+            $countriesSelect.addClass('disabled').attr('disabled', 'disabled');
+        }
+        else {
+            $countriesSelect.removeClass('disabled').removeAttr('disabled');
+        }
     },
 
     /**
@@ -1960,29 +1762,35 @@ var addressDialog = {
             : $('.states', this.$dialog);
         var $postcodeInput = inputSelector(this.postCodeMegaInput);
         var $taxcodeMegaInput = inputSelector(this.taxCodeMegaInput);
+        const $taxcodeInputWrapper = $('.taxcode-input-wrapper', this.$dialog);
         const $titleElemTaxCode = $('.mega-input-title', $taxcodeMegaInput.$input.parent());
         const $titleElemPostCode = $('.mega-input-title', $postcodeInput.$input.parent());
-        const $propayTaxTitle = $('.taxcode-title', this.$dialog);
         const $invoiceNote = $('.taxcode-invoice-note', this.$dialog);
 
         const countryCode = $('.option[data-state="active"]', $countriesSelect).attr('data-value');
         const taxName = getTaxName(countryCode);
-        const fullTaxName = `${taxName} ${l[7347]}`;
+        const billingType = pro.propay.billing.getBillingType();
+        const allRequiredFields = pro.propay.billing.getRequiredFields();
+        const requiredFields = allRequiredFields[`${billingType}Required`];
+        const fullTaxName = requiredFields.includes('taxCode') ? taxName : `${taxName} ${l[7347]}`;
+
+        if (page !== 'repay'
+            && [...requiredFields, ...allRequiredFields[`${billingType}Optional`]].includes('taxCode')) {
+            $taxcodeInputWrapper.removeClass('hidden');
+        }
+        else {
+            $taxcodeInputWrapper.addClass('hidden');
+        }
 
         if ($titleElemTaxCode.length) {
             $taxcodeMegaInput.updateTitle(fullTaxName);
         }
-        else {
-            $taxcodeMegaInput.$input.attr('placeholder', fullTaxName);
-        }
         $taxcodeMegaInput.hideError();
         $taxcodeMegaInput.$input.next('.message-container').addClass('hidden');
-
-        if (pro.propay.onPropayPage() && $propayTaxTitle.length) {
-            $propayTaxTitle.text(taxName);
+        // Preserve the exhausted note - hiding it would drop the "Switch to personal use" popover.
+        if (!pro.propay.billing.taxCodeLockedOut) {
+            $invoiceNote.addClass('hidden');
         }
-        $invoiceNote.removeClass('error hidden');
-        $('span', $invoiceNote).text(l.taxcode_note.replace('%s', taxName));
 
         // Change the States depending on the selected country
         var changeStates = function(selectedCountryCode) {
@@ -2032,40 +1840,155 @@ var addressDialog = {
                 $statesSelect.attr('tabindex', '-1');
                 $statesSelect.off('keydown.propay');
                 $('span', $statesSelect).first().text(l[7192]);
-                $('.option', $statesSelect).removeAttr('data-state').removeClass('active');
+            }
+
+            // Drop the previous state if its `${cc}-` prefix no longer matches (e.g. US -> CA).
+            const $active = $('.option[data-state="active"]', $statesSelect);
+            const activeCountry = String($active.attr('data-value') || '').substr(0, 2);
+            if ($active.length && activeCountry !== selectedCountryCode) {
+                $active.removeAttr('data-state').removeClass('active');
+                $('span', $statesSelect).first().text(l[7192]);
             }
 
             var taxName = getTaxName(selectedCountryCode);
             if ($titleElemTaxCode.length) {
-                $taxcodeMegaInput.updateTitle(taxName + ' ' + l[7347]);
-            }
-            else {
-                $taxcodeMegaInput.$input.attr('placeholder',taxName + ' ' + l[7347]);
+                $taxcodeMegaInput.updateTitle(taxName);
             }
 
-            if (pro.propay.onPropayPage() && $propayTaxTitle.length) {
-                $propayTaxTitle.text(taxName);
+            // Reset both state error variants; syncBillingCountry re-adds .tax-hint if applicable.
+            $statesSelect.removeClass('error tax-hint');
+        };
+
+        const syncBillingCountry = (selectedCode) => {
+            pro.propay.billing.country = selectedCode;
+            pro.propay.billing.initialCountry = selectedCode;
+            pro.propay.billing.lastValidatedTaxNumber = null;
+            pro.propay.billing.updateTaxEntryField();
+            const taxValue = String($('.taxcode', this.$dialog).val() || '').trim();
+            // Drop any status painted for the previous country so a fresh validation pass starts
+            // from a clean surface (silent basic/regex-fail paths would otherwise leave stale UI).
+            pro.propay.billing.clearTaxCodeStatus();
+            addressDialog.setBusinessPriceLoading(true);
+            // If the new country requires a state and none is selected yet, block the tax check
+            // and surface "State required for tax number validation" on the state field instead.
+            if (taxValue && addressDialog.dialogCountryHasStates() && !addressDialog.readDialogState()) {
+                addressDialog.showStateRequiredForTax(true, 'info');
+                return Promise.resolve(pro.propay.billing.refreshPricingForPage())
+                    .catch(dump)
+                    .finally(() => addressDialog.setBusinessPriceLoading(false));
             }
-
-            $('span', $invoiceNote).text(l.taxcode_note.replace('%s', taxName));
-
-            // Remove any previous validation error
-            $statesSelect.removeClass('error');
+            addressDialog.showStateRequiredForTax(false);
+            // Revalidate the tax number against the new country. When validation fails (invalid
+            // format, bad regex, rejected by tnp, etc.) fall back to a no-tax refresh so the price
+            // reflects the newly-selected country instead of staying on the previous country's.
+            const refresh = taxValue
+                ? Promise.resolve(pro.propay.billing.validateTaxNumber(taxValue, selectedCode))
+                    .then((valid) => valid || pro.propay.billing.refreshPricingForPage())
+                : pro.propay.billing.refreshPricingForPage();
+            return Promise.resolve(refresh)
+                .catch(dump)
+                .finally(() => addressDialog.setBusinessPriceLoading(false));
         };
 
         // Get the selected country ISO code e.g. CA and change States
         if (is_mobile) {
 
             $countriesSelect.rebind('change.selectCountry', function() {
-                changeStates($(':selected', $(this)).attr('data-value'));
+                const code = $(':selected', $(this)).attr('data-value');
+                addressDialog.lastSelectedCountry = code;
+                changeStates(code);
+                syncBillingCountry(code);
             });
         }
         else {
 
             $('.option', $countriesSelect).rebind('click.selectCountry', function() {
-                changeStates($(this).attr('data-value'));
+                const code = $(this).attr('data-value');
+                addressDialog.lastSelectedCountry = code;
+                changeStates(code);
+                syncBillingCountry(code);
             });
         }
+
+        this.initTaxCodeBlurValidation();
+    },
+
+    /**
+     * Bind blur/change on the tax-code input to run the same tnp validation as the propay form.
+     * @returns {void}
+     */
+    initTaxCodeBlurValidation() {
+        'use strict';
+        const $taxInput = $('.taxcode', this.$dialog);
+        if (!$taxInput.length) {
+            return;
+        }
+        const $buyNow = this.$dialog.find('.payment-buy-now');
+        const $countriesSelect = $('.countries', this.$dialog);
+        const $statesSelect = $('.states', this.$dialog);
+
+        // Desktop dropdowns are custom divs; mobile uses real `<select>` elements.
+        const readSelection = ($el) => {
+            if (!$el.length) {
+                return '';
+            }
+            if ($el.is('select')) {
+                const dataValue = $(':selected', $el).attr('data-value');
+                return String(dataValue || $el.val() || '');
+            }
+            return String($('.option[data-state="active"]', $el).attr('data-value') || '');
+        };
+
+        $taxInput.rebind('input.addrDlgTaxValidate', () => {
+            const value = String($taxInput.val() || '').trim();
+            if (!value) {
+                pro.propay.billing.lastValidatedTaxNumber = null;
+                pro.propay.billing.clearTaxCodeStatus();
+                $buyNow.removeClass('disabled');
+                return;
+            }
+            $buyNow.addClass('disabled');
+        });
+
+        const validate = () => {
+            const value = String($taxInput.val() || '').trim();
+            if (!value) {
+                $buyNow.removeClass('disabled');
+                addressDialog.showStateRequiredForTax(false);
+                return;
+            }
+            const country = readSelection($countriesSelect);
+            const state = readSelection($statesSelect);
+
+            // uts/utc/dci all need (country, state, tn) aligned - block tax validation until the
+            // state field is filled for countries that require one. Grey hint (not red error) -
+            // Continue-click will escalate to red via validateAndPay.
+            if (addressDialog.dialogCountryHasStates() && !state) {
+                pro.propay.billing.clearTaxCodeStatus();
+                addressDialog.showStateRequiredForTax(true, 'info');
+                $buyNow.removeClass('disabled');
+                return;
+            }
+            addressDialog.showStateRequiredForTax(false);
+
+            addressDialog.setBusinessPriceLoading(true);
+            return Promise.resolve(pro.propay.billing.validateTaxNumber(value, country, state))
+                .then((valid) => {
+                    if (valid) {
+                        addressDialog.clearGeneralErrorIfComplete();
+                    }
+                })
+                .catch(dump)
+                .finally(() => {
+                    addressDialog.setBusinessPriceLoading(false);
+                    if (!pro.propay.billing.taxCodeLockedOut) {
+                        $buyNow.removeClass('disabled');
+                    }
+                });
+        };
+
+        // Change only - binding blur too fired validate twice per commit and double-counted attempts.
+        $taxInput.rebind('change.addrDlgTaxValidate', validate);
     },
 
     /**
@@ -2093,10 +2016,6 @@ var addressDialog = {
     prefillInfo: function(billingInfo) {
         'use strict';
 
-        if (this.billingInfoFilled) {
-            return;
-        }
-
         const prefillMultipleInputs = (inputs, value) => {
             if (!inputs) {
                 console.error('Missing input field to fill');
@@ -2112,13 +2031,27 @@ var addressDialog = {
             }
         };
 
+        // taxCodeComponent is recreated on every dialog open, so its prefill must run every time -
+        // the other inputs persist across opens and skip refill to preserve any user edits.
+        // Prefer any tax number the user has already validated in this session over u_attr.taxnum
+        // so re-opening the dialog (e.g. "Add credit card") keeps their entered value.
+        const apiTaxValue = pro.propay.billing.lastValidatedTaxNumber
+            || (u_attr && u_attr.taxnum);
+        if (apiTaxValue) {
+            prefillMultipleInputs(this.taxCodeMegaInput, apiTaxValue);
+        }
+
+        if (this.billingInfoFilled) {
+            return;
+        }
+
 
         const getBillingProp = (propName, encoded) => {
             if (!billingInfo[propName] || !encoded) {
                 return billingInfo[propName];
             }
             const val = tryCatch(() => from8(billingInfo[propName]), () => {
-                console.error(`Invalid utf-8 encoded key value ${propName} -> ${billingInfo[propName]}`);
+                console.error(`Invalid utf-8 encoded key value for ${propName}`);
             })();
             return val || billingInfo[propName];
         };
@@ -2167,13 +2100,6 @@ var addressDialog = {
                 prefillMultipleInputs(this.postCodeMegaInput, getBillingProp('postcode', encodedVer));
             }
 
-            if (u_attr && u_attr['^taxnum'] || billingInfo.taxCode) {
-                prefillMultipleInputs(
-                    this.taxCodeMegaInput,
-                    u_attr && u_attr['^taxnum'] || getBillingProp('taxCode', encodedVer)
-                );
-            }
-
             if (billingInfo.dateOfBirth && pro.propay.onPropayPage()) {
                 prefillMultipleInputs(this.dateOfBirthMegaInput, getBillingProp('dateOfBirth', encodedVer));
             }
@@ -2187,6 +2113,7 @@ var addressDialog = {
 
         this.billingInfoFilled = true;
     },
+
 
     /**
      * Generate a list of billing info values either saved previously or guessed where applicable.
@@ -2207,11 +2134,12 @@ var addressDialog = {
             }
 
             var finished = function() {
-                if (!billingInfo.country) {
-                    billingInfo.country = u_attr.country ? u_attr.country : u_attr.ipcc;
+                if (addressDialog.lastSelectedCountry) {
+                    // Reopening the dialog: keep the country the user last selected.
+                    billingInfo.country = addressDialog.lastSelectedCountry;
                 }
-                if ((!billingInfo.taxCode || billingInfo.taxCode === '') && u_attr['%taxnum']) {
-                    billingInfo.taxCode = u_attr['%taxnum'];
+                else if (!billingInfo.country) {
+                    billingInfo.country = u_attr.country || u_attr.ipcc || '';
                 }
 
                 promise.resolve(billingInfo);
@@ -2362,6 +2290,7 @@ var addressDialog = {
         this.$dialog.find(closeButtonClass).rebind('click', function() {
 
             addressDialog.closeDialog();
+            // TODO: Clean this up, there does not seem to be a good reason to reload business on address dialog close
             // if we are coming from business plan, we need to reset registration
             if (mySelf.businessPlan && mySelf.userInfo) {
                 if (page === 'registerb') {
@@ -2396,8 +2325,152 @@ var addressDialog = {
             this.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             this.$dialog.removeClass('active').addClass('hidden');
         }
+        $('.tax-validation-popover', this.$dialog).addClass('hidden');
         if (typeof callback === 'function') {
             callback();
+        }
+    },
+
+    /**
+     * Recompute and repaint the business plan price in the dialog. Called after the businessPlan
+     * data is refreshed (e.g. tax/country changed). Mirrors the price logic inside `showDialog`
+     * for the business branch so price changes reflect without re-running the full dialog init.
+     * @returns {void}
+     */
+    updateBusinessPrice() {
+        'use strict';
+        if (!this.businessPlan || !this.userInfo || !this.$dialog) {
+            return;
+        }
+        let proPrice;
+        if (this.businessPlan.pastInvoice && this.businessPlan.currInvoice) {
+            proPrice = Number(this.businessPlan.currInvoice.t).toFixed(2);
+        }
+        else {
+            const quotaBlocks = Math.max(this.userInfo.storageQuota | 0, this.userInfo.transferQuota | 0);
+            proPrice = (this.userInfo.nbOfUsers * this.businessPlan.userFare
+                + (quotaBlocks ? quotaBlocks * this.businessPlan.quotaFare : 0)).toFixed(2);
+        }
+        this.businessPlan.totalPrice = proPrice;
+        this.proPrice = formatCurrency(proPrice);
+        $('.payment-plan-price .price', this.$dialog).text(this.proPrice);
+    },
+
+    /**
+     * Toggle the skeleton-loading state on the dialog's price and `.footer-container` while a
+     * tax / pricing refresh is in flight. Called from the tax blur + country-change handlers
+     * and held until the utqa response repaints the price.
+     * Mobile dialogs have no `.footer-container` so we fall back to the Pay button.
+     * @param {boolean} loading - true to start, false to end
+     * @returns {void}
+     */
+    setBusinessPriceLoading(loading) {
+        'use strict';
+        if (!this.$dialog || !pro.propay.sk) {
+            return;
+        }
+        this.skItems = this.skItems || {};
+
+        const priceEl = $('.payment-plan-price', this.$dialog).get(0);
+        const actionEl = $('.footer-container', this.$dialog).get(0)
+            || $('.payment-buy-now', this.$dialog).get(0);
+
+        if (priceEl && (!this.skItems.price || this.skItems.price.element !== priceEl)) {
+            this.skItems.price = pro.propay.sk.initSk(priceEl);
+        }
+        if (actionEl && (!this.skItems.payAction || this.skItems.payAction.element !== actionEl)) {
+            this.skItems.payAction = pro.propay.sk.initSk(actionEl);
+        }
+
+        const method = loading ? 'startLoad' : 'endLoad';
+        if (this.skItems.price) {
+            this.skItems.price[method]();
+        }
+        if (this.skItems.payAction) {
+            this.skItems.payAction[method]();
+        }
+    },
+
+    // Address-dialog counterpart of pro.propay.billing.setStateRequiredForTax. Text swaps between
+    // the tax-specific label and the default; CSS shows the message when the state select carries
+    // `.error` (red, Continue-click) or `.tax-hint` (grey, blur-triggered proactive hint).
+    showStateRequiredForTax(enabled, mode) {
+        'use strict';
+        if (!this.$dialog) {
+            return;
+        }
+        const $stateSelect = pro.propay.onPropayPage()
+            ? $('.states' + (is_mobile ? '.mobile' : '.desktop') + '-device', this.$dialog)
+            : $('.states', this.$dialog);
+        const $msg = $('.state-message-container', this.$dialog);
+        $stateSelect.removeClass('error tax-hint');
+        if (enabled) {
+            $stateSelect.addClass(mode === 'info' ? 'tax-hint' : 'error');
+            $msg.text(l.tax_state_required);
+        }
+        else {
+            $msg.text(l.select_state);
+        }
+    },
+
+    // Read the currently-selected state from the dialog's dropdown - handles both the desktop
+    // custom-div markup and the mobile <select>.
+    readDialogState() {
+        'use strict';
+        if (!this.$dialog) {
+            return '';
+        }
+        const $states = pro.propay.onPropayPage()
+            ? $('.states' + (is_mobile ? '.mobile' : '.desktop') + '-device', this.$dialog)
+            : $('.states', this.$dialog);
+        if ($states.is('select')) {
+            return String($(':selected', $states).attr('data-value') || $states.val() || '');
+        }
+        return String($('.option[data-state="active"]', $states).attr('data-value') || '');
+    },
+
+    // Whether the current country requires a state (US/CA per RegionsCollection.countriesWithStates).
+    dialogCountryHasStates() {
+        'use strict';
+        if (!this.$dialog) {
+            return false;
+        }
+        const country = $('.option[data-state="active"]', $('.countries', this.$dialog)).attr('data-value')
+            || String($(':selected', $('.countries', this.$dialog)).attr('data-value') || '');
+        const {countriesWithStates} = RegionsCollection;
+        return !!(country && countriesWithStates[country] && countriesWithStates[country].length);
+    },
+
+    // Drop the general "Please fill in all required fields" banner once every required field
+    // has a value - used by the blur-time tax revalidation path so a successful tax check
+    // clears the banner without waiting for the user to click Enter card details again.
+    clearGeneralErrorIfComplete() {
+        'use strict';
+        if (!this.$dialog || pro.propay.onPropayPage()) {
+            return;
+        }
+        const billingType = pro.propay.billing.getBillingType();
+        const requiredFields = pro.propay.billing.getRequiredFields()[`${billingType}Required`] || [];
+
+        const country = $('.option[data-state="active"]', $('.countries', this.$dialog)).attr('data-value');
+        const state = $('.option[data-state="active"]', $('.states', this.$dialog)).attr('data-value');
+        const taxCode = String($('.taxcode', this.$dialog).val() || '').trim();
+
+        const complete = requiredFields.every(field => {
+            if (field === 'country') {
+                return !!country;
+            }
+            if (field === 'state') {
+                return !!state;
+            }
+            if (field === 'taxCode') {
+                return !!taxCode;
+            }
+            return String($(`.${field}`, this.$dialog).val() || '').trim().length > 0;
+        });
+
+        if (complete) {
+            $('.error-message', this.$dialog).addClass(is_mobile ? 'v-hidden' : 'hidden');
         }
     },
 
@@ -2429,17 +2502,22 @@ var addressDialog = {
             return Array.isArray(input) ? input[1] : input;
         };
         // Selectors for form text fields
-        const fields = ['first-name', 'last-name', 'address1', 'address2', 'city', 'postcode'];
+        const fields = ['firstname', 'lastname', 'address1', 'address2', 'city', 'postcode'];
         const fieldValues = Object.create(null);
+        let billingInfoFromPropay = null;
         // Get the values from the inputs
-        for (let i = 0; i < fields.length; i++) {
-
-            // Get the form field value
-            const fieldName = fields[i];
-            const fieldValue = $(`.${fieldName}`, this.$dialog).val();
-
-            // Trim the text
-            fieldValues[fieldName] = $.trim(fieldValue);
+        if (pro.propay.onPropayPage()) {
+            billingInfoFromPropay = pro.propay.billing.getEnteredBillingInfo();
+            for (const field of fields) {
+                fieldValues[field] = $.trim(billingInfoFromPropay[field] || '');
+            }
+        }
+        else {
+            for (let i = 0; i < fields.length; i++) {
+                const fieldName = fields[i];
+                const fieldValue = $(`.${fieldName}`, this.$dialog).val();
+                fieldValues[fieldName] = $.trim(fieldValue);
+            }
         }
 
         // Get the values from the dropdowns
@@ -2447,10 +2525,19 @@ var addressDialog = {
         const $countrySelect = $('.countries', this.$dialog);
         const $dateOfBirthBlock = $('.date-of-birth-block', this.$dialog);
         const $dateOfBirthInputSection = $('.date-of-birth', $dateOfBirthBlock);
-        const state = $('.option[data-state="active"]', $stateSelect).attr('data-value');
-        const country = $('.option[data-state="active"]', $countrySelect).attr('data-value');
-        const taxCode = inputSelector(this.taxCodeMegaInput).$input.val().trim();
-        const dateOfBirth = $('input.date-of-birth-input', $dateOfBirthBlock).val();
+        const state = pro.propay.onPropayPage()
+            ? pro.propay.billing.state
+            : $('.option[data-state="active"]', $stateSelect).attr('data-value');
+        const country = billingInfoFromPropay && billingInfoFromPropay.country
+            || $('.option[data-state="active"]', $countrySelect).attr('data-value');
+        const taxCode = billingInfoFromPropay && billingInfoFromPropay.taxCode
+            || inputSelector(this.taxCodeMegaInput).$input.val().trim();
+        const dateOfBirth = billingInfoFromPropay && billingInfoFromPropay.dateOfBirth
+            || $('input.date-of-birth-input', $dateOfBirthBlock).val();
+
+        fieldValues.country = country;
+        fieldValues.taxCode = taxCode;
+        fieldValues.dateOfBirth = dateOfBirth;
 
         // Selectors for error handling
         const $errorMessage = $('.error-message', this.$dialog);
@@ -2459,6 +2546,7 @@ var addressDialog = {
 
         // Reset state of past error messages
         let stateNotSet = false;
+        let postcodeNotSet = false;
         let validCoinify = true;
 
         $errorMessage.addClass(is_mobile ? 'v-hidden' : 'hidden');
@@ -2482,25 +2570,55 @@ var addressDialog = {
             $countrySelect.addClass('error');
         }
 
-        // If the country is US or Canada then the State is also required field
-        if (((country === 'US') || (country === 'CA')) && !state) {
+        // State required when the country has one; active state's `${cc}-` prefix must still match
+        // (defensive - changeStates already clears mismatches). Text becomes the tax-context error
+        // when the user has entered a tax code, otherwise the default "Select a state" (HTML seed).
+        const {countriesWithStates} = RegionsCollection;
+        const countryHasStates = !!(country && countriesWithStates[country]
+            && countriesWithStates[country].length);
+        const activeStatePrefix = String(state || '').substr(0, 2);
+        const stateInvalidForCountry = activeStatePrefix && activeStatePrefix !== country;
+        const $stateMsg = $('.state-message-container', this.$dialog);
+        $stateSelect.removeClass('tax-hint');
+        if (countryHasStates && (!state || stateInvalidForCountry)) {
             $stateSelect.addClass('error');
+            $stateMsg.text(taxCode ? l.tax_state_required : l.select_state);
             stateNotSet = true;
         }
+        else {
+            $stateMsg.text(l.select_state);
+        }
 
-        const $invoiceNote = $('.taxcode-invoice-note', this.$dialog);
+        // If the country is US then the postcode is always required
+        if ((country === 'US') && !fieldValues.postcode) {
+            $('.postcode', this.$dialog).parent().addClass('error');
+            postcodeNotSet = true;
+        }
+
+        const billingType = pro.propay.billing.getBillingType();
+        const requiredFields = pro.propay.billing.getRequiredFields()[`${billingType}Required`] || [];
+
         const taxName = getTaxName(country);
         const taxMegaInput = inputSelector(this.taxCodeMegaInput);
-        if (taxCode && !this.testTaxCode(taxCode, country)) {
-            taxMegaInput.showError(l.taxcode_error.replace('%s', taxName));
-            if (!pro.propay.onPropayPage()) {
-                taxMegaInput.$input.next('.message-container').removeClass('hidden');
-                $invoiceNote.addClass('hidden');
+        if (!pro.propay.onPropayPage() && requiredFields.includes('taxCode')) {
+            if (taxCode) {
+                // Kick off validation if blur didn't already populate the cache. Cache is keyed
+                // by (country, state) - same shape validateTaxNumber writes to.
+                const stateKey = `${country}:${state || ''}`;
+                const cache = pro.propay.billing.validatedTaxNumbers[stateKey] || {};
+                if (cache[taxCode] !== true) {
+                    pro.propay.billing.validateTaxNumber(taxCode, country, state);
+                    return false;
+                }
             }
-            $invoiceNote.addClass('error');
-            $('i', $invoiceNote).addClass('icon-alert-triangle-thin-outline').removeClass('icon-info-thin-outline');
-            $('span', $invoiceNote).text(l.taxcode_error.replace('%s', taxName));
-            return false;
+            else {
+                // Paint the tax-specific error, but fall through so the general "Please fill in
+                // all required fields" banner still surfaces when other fields are also missing.
+                pro.propay.billing.renderTaxCodeStatus(
+                    l.taxcode_error.replace('%s', taxName),
+                    'invalid'
+                );
+            }
         }
 
         const isBitcoin = pro.propay.onPropayPage()
@@ -2520,27 +2638,34 @@ var addressDialog = {
                 $('.message-container', $dateOfBirthBlock).removeClass('hidden')
                     .safeHTML(l.coinify_req_dob_or_tax.replace('%1', taxName));
             }
-
         }
 
         taxMegaInput.hideError();
         taxMegaInput.$input.next('.message-container').addClass('hidden');
-        $invoiceNote.removeClass('error hidden');
-        $('i', $invoiceNote).removeClass('icon-alert-triangle-thin-outline').addClass('icon-info-thin-outline');
-        $('span', $invoiceNote).text(l.taxcode_note.replace('%s', taxName));
 
-        // Check all required fields
-        const fieldsValid = fieldValues['first-name']
-            && fieldValues['last-name']
-            && fieldValues.address1
-            && fieldValues.city
-            && fieldValues.postcode
-            && country
-            && !stateNotSet;
+        const fieldsValid = requiredFields.every(field => {
+            if (field === 'country') {
+                return country;
+            }
+            if (field === 'state') {
+                return state;
+            }
+            const value = (fieldValues[field] || '').trim();
+            return value.length > 0;
+        });
 
-        if (!fieldsValid || !validCoinify) {
+        const isValid = pro.propay.onPropayPage()
+            ? pro.propay.billing.canProceedToPayment
+            : fieldsValid && validCoinify && !postcodeNotSet && !stateNotSet;
 
-            console.warn('validateAndPay: Incomplete form fields', fieldValues, country, state, taxCode);
+        if (!isValid) {
+
+            console.warn('validateAndPay: Incomplete form fields', {
+                hasCountry: !!country,
+                hasState: !!state,
+                hasTaxCode: !!taxCode,
+                missingFields: Object.keys(fieldValues).filter(f => !fieldValues[f] && f !== 'address2'),
+            });
 
             // Show a general error and exit early if they are not complete
             $errorMessage.removeClass(is_mobile ? 'v-hidden' : 'hidden');
@@ -2566,8 +2691,6 @@ var addressDialog = {
 
         addressDialog.mostRecentValidInput = {
             ...fieldValues,
-            firstname: fieldValues['first-name'],
-            lastname: fieldValues['last-name'],
             country,
             state,
             taxCode,
@@ -2586,44 +2709,45 @@ var addressDialog = {
             }
         };
 
-        // If remember billing address, save as user attribute for future usage.
-        if (this.$rememberDetailsCheckbox.hasClass("checkboxOn")) {
-            saveAttribute('firstname', to8(fieldValues['first-name']));
-            saveAttribute('lastname', to8(fieldValues['last-name']));
-            saveAttribute('address1', to8(fieldValues.address1));
-            saveAttribute('address2', to8(fieldValues.address2));
-            saveAttribute('postcode', to8(fieldValues.postcode));
-            saveAttribute('city', to8(fieldValues.city));
-            saveAttribute('country', country);
-            saveAttribute('state', state);
-            saveAttribute('version', '2');
-            saveAttribute('dateOfBirth', to8(dateOfBirth));
-        } else {
-            // Forget Attribute.
-            const removeAttribute = function(name) {
-                mega.attr.setArrayAttribute('billinginfo', name, '', false, true);
-            };
-            removeAttribute('firstname');
-            removeAttribute('lastname');
-            removeAttribute('address1');
-            removeAttribute('address2');
-            removeAttribute('postcode');
-            removeAttribute('city');
-            removeAttribute('country');
-            removeAttribute('state');
-            removeAttribute('version');
-            removeAttribute('dateOfBirth');
-        }
+        // Propay-billing.validateBillingInfo already persisted these via its own saveBillingInfo
+        // pass; skip the duplicate write here when running under propay.
+        if (!pro.propay.onPropayPage()) {
+            // If remember billing address, save as user attribute for future usage.
+            if (this.$rememberDetailsCheckbox.hasClass("checkboxOn")) {
+                saveAttribute('firstname', to8(fieldValues.firstname));
+                saveAttribute('lastname', to8(fieldValues.lastname));
+                saveAttribute('address1', to8(fieldValues.address1));
+                saveAttribute('address2', to8(fieldValues.address2));
+                saveAttribute('postcode', to8(fieldValues.postcode));
+                saveAttribute('city', to8(fieldValues.city));
+                saveAttribute('country', country);
+                saveAttribute('state', state);
+                saveAttribute('version', '2');
+                saveAttribute('dateOfBirth', to8(dateOfBirth));
+            }
+            else {
+                // Forget Attribute.
+                const removeAttribute = function(name) {
+                    mega.attr.setArrayAttribute('billinginfo', name, '', false, true);
+                };
+                removeAttribute('firstname');
+                removeAttribute('lastname');
+                removeAttribute('address1');
+                removeAttribute('address2');
+                removeAttribute('postcode');
+                removeAttribute('city');
+                removeAttribute('country');
+                removeAttribute('state');
+                removeAttribute('version');
+                removeAttribute('dateOfBirth');
+            }
 
-        // Always save tax code, even if it is an empty string
-        saveAttribute('taxCode', to8(taxCode), true);
+            // Always save tax code, even if it is an empty string
+            saveAttribute('taxCode', to8(taxCode), true);
+        }
 
         // log the click on the 'subscribe' button
         delay('addressDlg.click', eventlog.bind(null, 99789));
-        if (addressDialog.checkAndUpdateTaxAttr(taxCode)) {
-            addressDialog.closeDialog();
-            return;
-        }
 
         if (typeof callback === 'function') {
             callback(addressDialog.mostRecentValidInput);
@@ -2644,101 +2768,6 @@ var addressDialog = {
     },
 
     /**
-     * Compare the new taxCode to the existing ^taxnum/%taxnum attribute as appropriate.
-     * Set if different and update the pricing information.
-     *
-     * @param {*} taxCode code to be set
-     * @returns {boolean}
-     */
-    checkAndUpdateTaxAttr(taxCode) {
-        'use strict';
-
-        // If user currently on the registerb page and has no current account,
-        // assume it is a business account for tax code updating.
-        const isBusinessRegistration = (page === 'registerb') && !u_type;
-        const updateProTax = (!u_attr.b || !this.businessPlan || !this.userInfo || !this.businessRegPage)
-            && !isBusinessRegistration;
-        const taxAttr = updateProTax ? '^taxnum' : '%taxnum';
-
-        if (taxCode !== undefined && taxCode !== u_attr[taxAttr] && !(!taxCode && !u_attr[taxAttr])) {
-            loadingDialog.show('propay-taxset');
-            u_attr[taxAttr] = taxCode;
-            const promise = (
-                updateProTax ?
-                    Promise.resolve(mega.attr.set2(null, 'taxnum', to8(taxCode), -2)) :
-                    Promise.resolve(new BusinessAccount().updateBusinessAttrs([{ key: taxAttr, val: taxCode }]))
-            )
-                .then(() => {
-                    if (mega.discountInfo) {
-                        return Promise.all([
-                            pro.loadMembershipPlans(nop, true),
-                            DiscountPromo.refreshDiscountInfo(),
-                        ]);
-                    }
-                    return pro.loadMembershipPlans(nop, true);
-                })
-                .then(() => {
-                    // Assume that busines plan does not have an instant discount
-                    if (pro.propay.onPropayPage()) {
-                        const plan = pro.getPlanObj(pro.propay.planNum, pro.propay.selectedPeriod);
-                        return plan && plan.getInstantDiscountInfo();
-                    }
-                });
-
-            if (pro.propay.onPropayPage()) {
-                promise
-                    .then(() => {
-                        pro.propay.updatePayment(undefined, true);
-                        pro.propay.renderPlanInfo();
-                    })
-                    .catch(dump)
-                    .always(() => {
-                        loadingDialog.hide('propay-taxset');
-                    });
-            }
-            else {
-                promise
-                    .then(() => {
-                        if (page === 'registerb') {
-                            if (is_mobile) {
-                                parsepage(pages.registerb);
-                            }
-                            if (mega.buinsessAccount && mega.buinsessAccount.cachedBusinessPlan) {
-                                delete mega.buinsessAccount.cachedBusinessPlan;
-                            }
-                            this.billingInfoFilled = false;
-                            const regBusiness = new BusinessRegister();
-
-                            const {nbusers, cname, fname, lname, tel, email} =
-                                (addressDialog.businessRegisterData || Object.create(null));
-
-                            delete addressDialog.businessRegisterData;
-
-                            regBusiness.initPage(nbusers, cname, tel, fname, lname, email, {
-                                skipPasswordReset: true,
-                                skipTermsReset: true,
-                            });
-                        }
-                        else if (page === 'repay') {
-                            parsepage(pages.repay);
-                            var repayPage = new RepayPage();
-                            repayPage.initPage();
-                        }
-                    })
-                    .catch(dump)
-                    .always(() => {
-                        loadingDialog.hide('propay-taxset');
-                    });
-            }
-            if (addressDialog.mostRecentValidInput) {
-                pro.propay.initBillingInfo(addressDialog.mostRecentValidInput);
-            }
-            return true;
-        }
-        return false;
-    },
-
-    /**
      * Setup the payment details to send to the API
      * @param {Object} fieldValues The form field names and their values
      * @param {type} state The value of the state dropdown
@@ -2746,18 +2775,26 @@ var addressDialog = {
      */
     proceedToPay(fieldValues, state, country, taxCode, allowEcpFlow) {
         'use strict';
-        // Set details for the UTC call
-        this.extraDetails.first_name = fieldValues['first-name'];
-        this.extraDetails.last_name = fieldValues['last-name'];
-        this.extraDetails.address1 = fieldValues['address1'];
-        this.extraDetails.address2 = fieldValues['address2'];
-        this.extraDetails.city = fieldValues['city'];
-        this.extraDetails.zip_code = fieldValues['postcode'];
-        this.extraDetails.country = country;
+
+        this.extraDetails = {};
+
+        const details = pro.propay.onPropayPage() ? pro.propay.billing.getEnteredBillingInfo() : {
+            ...fieldValues,
+            country,
+            taxCode,
+        };
+
+        this.extraDetails.first_name = details.firstname;
+        this.extraDetails.last_name = details.lastname;
+        this.extraDetails.address1 = details.address1;
+        this.extraDetails.address2 = details.address2;
+        this.extraDetails.city = details.city;
+        this.extraDetails.zip_code = details.postcode;
+        this.extraDetails.country = details.country;
         this.extraDetails.recurring = true;
-        this.extraDetails.taxCode = taxCode;
-        this.extraDetails.dob = fieldValues.dob;
-        this.extraDetails.cconsent = fieldValues.cconsent;
+        this.extraDetails.taxCode = details.taxCode;
+        this.extraDetails.dob = details.dob;
+        this.extraDetails.cconsent = details.cconsent;
 
         // If the country is US or Canada, add the state by stripping the country code off e.g. to get QC from CA-QC
         if ((country === 'US') || (country === 'CA')) {
@@ -3112,25 +3149,7 @@ var addressDialog = {
                 closeStripeDialog();
                 delete addressDialog.paymentInProcess;
                 if (ex === EEXIST) {
-                    const planNumber = parseInt(pro.propay.planNum);
-                    const warningTitle = planNumber === pro.ACCOUNT_LEVEL_FEATURE_VPN
-                        ? l.vpn_free_trial_used_h
-                        : l.pwm_free_trial_used_h;
-
-                    msgDialog(
-                        `confirmationa:!^${l.subscribe_btn}!${l.msg_dlg_cancel}`,
-                        '',
-                        warningTitle,
-                        l.vpn_free_trial_used_b,
-                        (yes) => {
-                            if (yes) {
-                                localStorage.ignoreTrial = '1';
-                                window.location.reload();
-                            }
-                        }
-                    );
-
-                    onIdle(() => eventlog(500522));
+                    addressDialog.showTrialAlreadyUsedDialog();
                 }
                 else {
                     tell(ex);
@@ -3637,7 +3656,8 @@ var addressDialog = {
                     && pro.propay.selectedProPackage
                     && pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_EXTRAS].trial) {
                     iframeSrc += `&trial=${pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_EXTRAS].trial.days}`;
-                    iframeSrc += `&tprice=${pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_PRICE]}`;
+                    iframeSrc += `&tprice=${Math.round(pro.propay.planObj.taxInfo.taxedPriceEuro * 100) / 100
+                        || Math.round(pro.propay.planObj.priceEuro * 100) / 100}`;
                     iframeSrc += `&locales=${getCountryAndLocales().locales}`;
                 }
 
@@ -3695,7 +3715,9 @@ var addressDialog = {
         'use strict';
 
         $('iframe#stripe-widget').remove();
-        closeStripeDialog(false, true);
+        // Both callers are teardowns (pagechange + "left propay during loading"), so skip the
+        // updatePayment refresh - the propay state may already be torn down.
+        closeStripeDialog(true, true);
 
         if (addressDialog.iframePageChangeHandler) {
             mBroadcaster.removeListener(addressDialog.iframePageChangeHandler);
@@ -3759,8 +3781,60 @@ var addressDialog = {
         }
 
 
-        // Show error dialog
-        msgDialog('warninga', l[7235], message, '', callbackFn || addressDialog.showDialog.bind(addressDialog));
+        if (pro.propay.skItems && pro.propay.skItems.continueBtn) {
+            pro.propay.skItems.continueBtn.endLoad('purchase');
+        }
+
+        // Propay renders billing inline, so reopening the legacy address dialog is wrong here.
+        const fallback = pro.propay.onPropayPage()
+            ? addressDialog.closeDialog.bind(addressDialog)
+            : addressDialog.showDialog.bind(addressDialog);
+        msgDialog('warninga', l[7235], message, '', callbackFn || fallback);
+    },
+
+    /**
+     * Prompt the user to subscribe instead when a free trial is refused because they already used one.
+     */
+    showTrialAlreadyUsedDialog() {
+        'use strict';
+        pro.propay.hideLoadingOverlay();
+        const planNumber = parseInt(pro.propay.planNum);
+        const warningTitle = planNumber === pro.ACCOUNT_LEVEL_FEATURE_VPN
+            ? l.vpn_free_trial_used_h
+            : l.pwm_free_trial_used_h;
+
+        msgDialog(
+            `confirmationa:!^${l.subscribe_btn}!${l.msg_dlg_cancel}`,
+            '',
+            warningTitle,
+            l.vpn_free_trial_used_b,
+            (yes) => {
+                if (yes) {
+                    pro.propay.ignoreTrial.add(pro.propay.planNum);
+                    const {skItems} = pro.propay;
+                    if (skItems && skItems.continueBtn) {
+                        skItems.continueBtn.endLoad('purchase');
+                    }
+                    const id = makeUUID();
+                    if (pro.propay.pageInitialised && skItems && skItems.rightBlock) {
+                        skItems.rightBlock.startLoad(id);
+                        skItems.continueBtn.startLoad(id);
+                    }
+                    // force=true bypasses the country/tax cache so pro.js re-applies ignoreTrial.
+                    Promise.resolve(pro.propay.billing.forceRefreshUtqa(true))
+                        .then(() => pro.propay.updatePayment(false, true))
+                        .catch(dump)
+                        .finally(() => {
+                            if (pro.propay.pageInitialised && skItems && skItems.rightBlock) {
+                                skItems.rightBlock.endLoad(id);
+                                skItems.continueBtn.endLoad(id);
+                            }
+                        });
+                }
+            }
+        );
+
+        onIdle(() => eventlog(500522));
     },
 
     /**
@@ -3770,37 +3844,6 @@ var addressDialog = {
     showPaymentResult: function(verifyUrlParam) {
         'use strict';
         return pro.showPaymentResult(verifyUrlParam);
-    },
-
-    testTaxCode(taxCode, countryCode) {
-        'use strict';
-
-        const EU_CODES = [
-            'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK',
-            'EE', 'FI', 'FR', 'DE', 'GR', // 'HU', Separate rules for Hungary
-            'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
-            'PL', 'PT', 'RO', 'SK', 'SI', 'SE', // 'ES', Separate rules for Spain
-        ];
-        countryCode = countryCode.toUpperCase();
-        const upperTaxCode = taxCode.toUpperCase();
-        const isEu = EU_CODES.includes(countryCode);
-
-        if (isEu && !upperTaxCode.startsWith(countryCode)) {
-            taxCode = countryCode + taxCode;
-        }
-
-        return !(
-            countryCode === 'HU' && !(
-                /^\d{8}-[1-5]-\d{2}$/.test(taxCode) ||
-                /^\d{8}$/.test(taxCode) ||
-                /^HU\d{8}$/.test(taxCode))
-            || countryCode === 'ES' && !(
-                /^\d{8}[A-Z]$/.test(taxCode)
-                || /^[X-Z]\d{7}[A-Z]$/.test(taxCode)
-                || /^[A-Z]\d{7}[\dA-Z]$/.test(taxCode))
-            || isEu && !/^[A-Z]{2}[\dA-Z]{2,13}$/.test(taxCode) ||
-                !/\S/.test(taxCode)
-        );
     }
 };
 
@@ -3915,8 +3958,8 @@ var cardDialog = {
      */
     clearPreviouslyEnteredCardData: function() {
 
-        $('.first-name', this.$dialog).val('');
-        $('.last-name', this.$dialog).val('');
+        $('.firstname', this.$dialog).val('');
+        $('.lastname', this.$dialog).val('');
         $('.credit-card-number', this.$dialog).val('');
         $('.cvv-code', this.$dialog).val('');
         $('.address1', this.$dialog).val('');
@@ -4048,8 +4091,8 @@ var cardDialog = {
 
         // All payment data
         var billingData =    {
-            first_name: $('.first-name', this.$dialog).val(),
-            last_name: $('.last-name', this.$dialog).val(),
+            first_name: $('.firstname', this.$dialog).val(),
+            last_name: $('.lastname', this.$dialog).val(),
             card_number: $('.credit-card-number', this.$dialog).val(),
             expiry_date_month: $('.expiry-date-month .option[data-state="active"]', this.$dialog).attr('data-value'),
             expiry_date_year: $('.expiry-date-year .option[data-state="active"]', this.$dialog).attr('data-value'),
@@ -4380,7 +4423,7 @@ var bitcoinDialog = {
 
         pro.propay.showLoadingOverlay('redirecting');
 
-        const url = this.utcResult.EUR.url;
+        const url = this.utcResult && this.utcResult.EUR && this.utcResult.EUR.url;
 
         if (!url) {
             console.error('No URL to redirect to');

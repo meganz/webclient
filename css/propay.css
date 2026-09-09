@@ -91,6 +91,7 @@
 }
 #propay .duration-option.selected {
     border: 1px solid var(--text-color-high);
+    font-weight: 700;
 }
 #propay div.radioOn::before{
     background: var(--text-color-high);
@@ -197,10 +198,271 @@
     color: var(--banner-text-error);
     font: var(--text-copy-small-pricing);
     align-items: center;
+    z-index: 12;
+    transform: translateZ(1px);
 }
 #propay .error .error-message i {
     margin-inline-end: 8px;
 }
+#propay .taxCode-input-wrapper.error,
+#propay .taxCode-input-wrapper.taxCode-status-exhausted {
+    transform: translateZ(1px);
+    z-index: 20;
+}
+#propay .taxCode-input-wrapper.taxCode-status-valid .mega-input {
+    border-color: var(--mobile-text-success);
+}
+#propay .taxCode-input-wrapper.taxCode-status-valid .error-message {
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    color: var(--mobile-text-success);
+    font: var(--text-copy-small-pricing);
+}
+#propay .taxCode-input-wrapper.taxCode-status-valid .error-message i {
+    margin-inline-end: 8px;
+    --mask-color: var(--mobile-text-success);
+}
+#propay .taxCode-input-wrapper.taxCode-status-exhausted .mega-input,
+#propay .taxCode-input-wrapper.taxCode-status-exhausted .mega-input::before {
+    background: var(--mobile-surface-2);
+    border-color: var(--surface-grey-3);
+    border-radius: 8px;
+}
+#propay .taxCode-input-wrapper.taxCode-status-exhausted input {
+    color: var(--text-color-disabled);
+    background: var(--mobile-surface-2);
+    cursor: default;
+}
+#propay .taxCode-input-wrapper.taxCode-status-exhausted .error-message {
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    color: var(--text-color-secondary);
+    font: var(--text-copy-small-pricing);
+    z-index: 15;
+    transform: translateZ(1px);
+}
+#propay .taxCode-input-wrapper.taxCode-status-exhausted .error-message i {
+    margin-inline-end: 8px;
+    --mask-color: var(--text-color-secondary);
+}
+#address-dialog-taxcode::placeholder {
+    color: var(--text-color-low);
+}
+#address-dialog-taxcode::-webkit-input-placeholder {
+    color: var(--text-color-low);
+}
+.mobile.payment-address-dialog #address-dialog-taxcode::placeholder,
+.mobile.payment-address-dialog #address-dialog-taxcode::-webkit-input-placeholder {
+    color: var(--text-color-black-low);
+}
+.mega-dialog.payment-address-dialog .state-message-container,
+.mobile.payment-address-dialog .state-message-container {
+    display: none;
+}
+.mega-dialog.payment-address-dialog .states.error ~ .state-message-container,
+.mega-dialog.payment-address-dialog .states.tax-hint ~ .state-message-container {
+    display: block;
+    margin-top: -16px;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+    text-align: center;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font: var(--text-copy-small-pricing);
+    color: var(--banner-text-error);
+    border: 1px solid var(--banner-border-error);
+    background: var(--banner-background-error);
+}
+.mega-dialog.payment-address-dialog .states.tax-hint:not(.error) ~ .state-message-container {
+    color: var(--text-color-secondary);
+    border-color: var(--surface-grey-3);
+    background: var(--surface-grey-2);
+}
+
+/* Temporary override until this dialog has light and dark modes */
+.mobile.payment-address-dialog {
+    --mobile-text-error: #ff4444;
+}
+.mobile.payment-address-dialog .states.error ~ .state-message-container,
+.mobile.payment-address-dialog .states.tax-hint ~ .state-message-container {
+    display: block;
+    margin-top: 4px;
+    color: var(--mobile-text-error);
+    font: var(--text-copy-small-pricing);
+}
+.mobile.payment-address-dialog .states.tax-hint:not(.error) ~ .state-message-container {
+    color: var(--text-color-secondary);
+}
+#propay .taxCode-input-wrapper.taxCode-status-loading .error-message,
+#propay .taxCode-input-wrapper.taxCode-status-info .error-message {
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    color: var(--text-color-secondary);
+    font: var(--text-copy-small-pricing);
+}
+#propay .taxCode-input-wrapper.taxCode-status-loading .error-message i {
+    margin-inline-end: 8px;
+    --mask-color: var(--text-color-secondary);
+    animation: rotate 1s linear infinite;
+}
+#propay .taxCode-input-wrapper.taxCode-status-info .error-message i {
+    display: none;
+}
+
+/* Taxcode invoice note styling */
+.taxcode-invoice-note {
+    align-items: center;
+    color: var(--mobile-text-secondary);
+    display: flex;
+    margin-top: 6px;
+    --mask-color: var(--mobile-icon-secondary);
+}
+.taxcode-invoice-note.hidden {
+    display: none;
+}
+.taxcode-invoice-note i {
+    margin-inline-end: 8px;
+}
+.taxcode-invoice-note.taxCode-status-valid {
+    color: var(--mobile-text-success);
+    --mask-color: var(--mobile-text-success);
+}
+.taxcode-invoice-note.taxCode-status-loading,
+.taxcode-invoice-note.taxCode-status-info {
+    color: var(--mobile-text-secondary);
+    --mask-color: var(--mobile-icon-secondary);
+}
+.taxcode-invoice-note.taxCode-status-loading i {
+    animation: rotate 1s linear infinite;
+}
+.taxcode-invoice-note.taxCode-status-info i {
+    display: none;
+}
+.taxcode-invoice-note.taxCode-status-exhausted {
+    color: var(--mobile-text-secondary);
+    --mask-color: var(--mobile-icon-secondary);
+}
+.taxcode-invoice-note.error {
+    position: relative;
+    color: var(--mobile-text-error);
+    --mask-color: var(--mobile-text-error);
+}
+.taxcode-invoice-note.error,
+.taxcode-invoice-note.taxCode-status-exhausted {
+    z-index: 3;
+}
+#propay .taxcode-invoice-note.error,
+#propay .taxcode-invoice-note.taxCode-status-exhausted,
+.mobile .taxcode-invoice-note.error,
+.mobile .taxcode-invoice-note.taxCode-status-exhausted {
+    transform: translateZ(1px);
+}
+.payment-half-block.taxCode-status-exhausted .taxcode,
+.taxCode-input-wrapper.taxCode-status-exhausted .taxcode {
+    color: var(--mobile-text-disabled);
+    cursor: default;
+}
+
+/* Validation-failed popover styling */
+.error-message,
+.taxcode-invoice-note,
+#propay .taxCode-input-wrapper {
+    position: relative;
+}
+.tax-validation-popover {
+    background: var(--surface-grey-1-inverted);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.24);
+    box-sizing: border-box;
+    color: var(--text-color-high-inverted);
+    inset-inline-start: 0;
+    max-width: 280px;
+    padding: 12px 16px;
+    position: fixed;
+    margin-top: 95px;
+    margin-inline-start: -138px;
+    left: unset;
+    z-index: 15;
+}
+#propay .tax-validation-popover {
+    top: calc(100% + 10px);
+    margin-top: 0;
+}
+.tax-validation-popover-arrow {
+    border-bottom: 8px solid var(--surface-grey-1-inverted);
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    height: 0;
+    inset-inline-start: 50%;
+    position: absolute;
+    top: -8px;
+    width: 0;
+    left: 50%;
+}
+.mobile .tax-validation-popover {
+    background: var(--surface-black);
+    color: var(--text-color-white-high);
+    top: 8px;
+    margin-top: 25px;
+    margin-inline-start: 0;
+}
+.mobile .tax-validation-popover-arrow {
+    border-bottom: 8px solid var(--surface-black);
+}
+.tax-validation-popover-close {
+    cursor: pointer;
+    inset-inline-end: 12px;
+    position: absolute;
+    top: 12px;
+    --mask-color: var(--mobile-text-inverse-secondary);
+    --icon-size: 18px;
+}
+/* Beats dialogs.css `.taxcode-invoice-note.error i { display: none }` on specificity. */
+.mega-dialog.payment-address-dialog .taxcode-invoice-note .tax-validation-popover .tax-validation-popover-close {
+    display: block;
+}
+.tax-validation-popover-title {
+    font: var(--text-body1-bold);
+    margin-bottom: 4px;
+    padding-inline-end: 24px;
+}
+.tax-validation-popover-message {
+    font: var(--text-body2);
+    margin-bottom: 6px;
+    color: var(--mobile-text-inverse-secondary);
+}
+.tax-validation-popover-action {
+    color: var(--text-color-high-inverted);
+    cursor: pointer;
+    display: inline-block;
+    font: var(--text-body2-bold);
+    margin-top: 4px;
+    text-decoration: underline;
+}
+.tax-validation-popover-action:hover {
+    text-decoration: none;
+    cursor: pointer;
+}
+#propay .tax-validation-popover-action {
+    font: var(--text-body1-bold);
+    color: var(--text-color-white-high);
+    display: flex;
+    width: 100%;
+    justify-content: flex-start;
+    border-top: 0.5px solid var(--mobile-icon-secondary);
+    margin-top: 8px;
+    padding-top: 8px;
+}
+#propay .tax-validation-popover-action a {
+    color: inherit;
+    font: inherit;
+    text-decoration: inherit;
+    text-decoration-color: currentcolor;
+}
+
 /* Checkbox */
 #propay .checkboxOn {
     background: var(--text-color-high);
@@ -223,6 +485,14 @@
 #propay .checkbox-item.checkboxOn i {
     display: flex;
 }
+/* mega input overrides */
+#propay .mega-input::before {
+    background: var(--surface-main)
+}
+#propay .left-block .mega-input input:-webkit-autofill {
+    margin: 0 1px;
+    box-shadow: 0 0 0 50px var(--surface-main) inset;
+}
 /* Main page elements */
 #propay .left-block-wrapper {
     display: flex;
@@ -237,13 +507,19 @@
     width: 100%;
     max-width: 621px;
 }
+#propay .left-block .propay-use-type-tab-mount .propay-use-type-tab-group {
+    width: fit-content;
+    max-width: calc(100% - 24px);
+    margin-inline-start: 24px;
+}
+#propay .left-block .propay-use-type-tab-mount .propay-use-type-tab-group .mega-tab-option {
+    flex: 0 1 auto;
+    white-space: normal;
+    text-align: center;
+}
 #propay .left-block .create-account-wrapper {
     display: flex;
     flex-direction: column;
-}
-#propay .left-block .create-account-wrapper .mega-input input:-webkit-autofill {
-    margin: 0 1px;
-    box-shadow: 0 0 0 50px var(--surface-grey-1) inset;
 }
 #propay .left-block .create-account-wrapper .title,
 #propay .left-block .create-account.title {
@@ -277,6 +553,9 @@
     display: flex;
     font: var(--text-inter-600-14);
     margin-bottom: 4px;
+}
+#propay .left-block .create-account-wrapper .password i {
+    cursor: pointer;
 }
 #propay .left-block .create-account-wrapper .password-strength {
     display: flex;
@@ -377,9 +656,16 @@
     padding-top: 40px;
 }
 #propay .left-block > *:not(:last-child):not(:first-child):not(.s4-wrapper) {
-    margin-bottom: 40px;
-    padding-bottom: 40px;
+    margin-bottom: 32px;
+}
+/* No provider selected: the footer info below is hidden, so drop the billing separator border. */
+#propay .left-block > .billing-section.no-border-bottom:not(.s4-wrapper) {
+    border-bottom: none;
+}
+#propay.propay .left-block-wrapper .left-block:not(.sk-active) > .propay-use-type-tab-mount {
+    padding-bottom: 0;
     border-bottom: 1px solid var(--stroke-mid-grey);
+    overflow: auto;
 }
 #propay .left-block .sk-active .sk-pro.mega-input::before {
     border: 0;
@@ -507,6 +793,18 @@
 #propay .left-block .payment-method .free-trial-unsupported i {
     margin-inline-end: 8px;
 }
+#propay .left-block .payment-method .gateway-country-unsupported {
+    display: flex;
+    font: var(--text-copy-small-pricing);
+    color: var(--color-warning-orange);
+    margin-top: 6px;
+}
+#propay .left-block .payment-method .gateway-country-unsupported i {
+    margin-inline-end: 8px;
+}
+#propay .left-block .payment-method .gateway-country-unsupported.error {
+    color: var(--banner-text-error);
+}
 #propay .left-block .duration-note.promo-ends-info {
     color: var(--text-color-secondary);
 }
@@ -540,31 +838,93 @@
 #propay .left-block .duration .duration-option .monthly-price {
     font: var(--font-copy-sm)
 }
-#propay .left-block .duration-note,
-#propay .ar.warning {
+#propay .left-block .duration-note {
     flex-direction: row;
     align-items: center;
     margin-top: 16px;
     font: var(--font-copy-sm);
-}
-#propay .ar.warning {
-    display: none;
-    margin-bottom: 24px;
-    align-items: flex-start;
-}
-#propay .ar.warning i{
-    margin-top: 3px;
-    margin-right: 8px;
-}
-#propay.ar .ar.warning {
-    display: flex;
-}
-#propay .left-block .duration-note {
     display: flex;
 }
 #propay .left-block .duration-note i {
     align-self: flex-start;
     margin: 2px 8px 0 0;
+}
+#propay .left-block .billing-wrapper {
+    --gap: 16px;
+}
+#propay .left-block .billing-wrapper .required-fields > *,
+#propay .left-block .billing-wrapper .invoice-fields > * {
+    display: flex;
+    justify-content: space-between;
+}
+/* Apply this rule only to the node that recieves the hidden class. The parent remains visible but 0px height */
+#propay .left-block .billing-wrapper .required-fields .fields-wrapper > *,
+#propay .left-block .billing-wrapper .invoice-fields .fields-wrapper > * {
+    margin-bottom: 16px;
+}
+#propay .left-block .billing-wrapper .billing-input {
+    position: relative;
+}
+#propay .left-block .billing-wrapper .w-half {
+    width: calc(50% - (var(--gap) / 2));
+}
+#propay .left-block .billing-wrapper .field-pair {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+#propay .left-block .billing-wrapper .field-pair.w-half > .billing-input.w-half {
+    width: 100%;
+}
+#propay .left-block .billing-wrapper label:not(.invoice-label):not(.cconsent-label) {
+    margin-bottom: 4px;
+}
+#propay .left-block .billing-wrapper label:not(.invoice-label) {
+    font: var(--text-inter-700-14);
+}
+#propay .left-block .billing-wrapper .require-invoice-wrapper {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    cursor: pointer;
+    width: fit-content;
+}
+#propay .left-block .billing-wrapper .require-invoice-wrapper label {
+    cursor: pointer;
+    font: var(--text-inter-400-14);
+    margin-bottom: 4px;
+}
+#propay .left-block .billing-wrapper .require-invoice-note {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    color: var(--text-color-secondary);
+}
+#propay .left-block .billing-wrapper .require-invoice-note span {
+    margin-top: 1px;
+    font: var(--text-inter-700-12);
+    margin-inline-start: 6px;
+}
+#propay .left-block .billing-wrapper .require-invoice-note i {
+    --icon-size: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+#propay .left-block .billing-wrapper .cconsent-input-wrapper {
+    display: flex;
+    align-items: center;
+    margin-top: 24px;
+    cursor: pointer;
+    width: fit-content;
+}
+#propay .left-block .billing-wrapper .cconsent-input-wrapper label {
+    cursor: pointer;
+    margin-inline-start: 8px;
+}
+#propay .left-block .billing-wrapper .cconsent-input-wrapper a {
+    text-decoration: underline;
 }
 #propay .left-block .duration .duration-note.one-off-payment-info {
     color: var( --color-warning-orange);
@@ -619,14 +979,6 @@
 #propay .left-block .propay-inline-dialog {
     font: var(--text-copy-secondary-pricing)
 }
-#propay .left-block .propay-inline-dialog.astropay-dialog {
-    margin-top: 22px;
-    padding-bottom: 56px;
-    border-bottom: 1px solid var(--stroke-mid-grey);
-}
-#propay .left-block .propay-inline-dialog.astropay-dialog h2 {
-    font-size: var(--text-copy-large-bold-pricing);
-}
 #propay .right-block {
     background-color: var(--surface-grey-2);
     display: flex;
@@ -642,7 +994,9 @@
     display: flex;
     background-color: var(--surface-main);
     flex-direction: column;
-    width: 369px;
+    min-width: 369px;
+    max-width: calc(100vw - 48px);
+    width: min-content;
     height: fit-content;
     color: var(--text-color-high);
     font: var(--text-h2);
@@ -692,8 +1046,103 @@
     background-color: #E4E4E5;
     color: var(--color-discount-secondary-text);
 }
-#propay .right-block .plan-card .plan-name {
+#propay .right-block .plan-card .plan-name.title {
     font: var(--text-h5-pricing);
+}
+#propay .right-block .plan-card .duration-options-wrapper {
+    display: flex;
+    width: 100%;
+    background: var(--mobile-surface-2);
+    padding: 4px;
+    border-radius: 8px;
+    margin-top: 24px;
+}
+#propay .right-block .plan-card .duration-options-wrapper > *:not(.template):not(:last-child) {
+    margin-inline-end: 4px;
+}
+#propay .right-block .plan-card .duration-options-wrapper .duration-option  {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+    flex: 1;
+    background: var(--mobile-surface-2);
+    border-radius: 6px;
+    border: none;
+    padding: 8px;
+    flex-wrap: wrap;
+    color: var(--text-color-high);
+}
+#propay .right-block .plan-card .duration-options-wrapper .duration-option .duration  {
+    font: var(--text-inter-400-14);
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+}
+/* Invisible bold copy reserves the selected (bold) width so the label doesn't reflow on select. */
+#propay .right-block .plan-card .duration-options-wrapper .duration-option .duration::after  {
+    content: attr(data-text);
+    font: var(--text-inter-700-14);
+    height: 0;
+    visibility: hidden;
+    overflow: hidden;
+    user-select: none;
+    pointer-events: none;
+}
+#propay .right-block .plan-card .duration-options-wrapper .duration-option.selected  {
+    background: var(--surface-main);
+    border: none;
+}
+#propay .right-block .plan-card .duration-options-wrapper .duration-option.selected .duration  {
+    font: var(--text-inter-700-14);
+}
+#propay .right-block .plan-card .duration-options-wrapper .duration-option > *:not(.hidden) {
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+}
+#propay .right-block .plan-card .duration-options-wrapper .duration-option.not-clickable {
+    cursor: default;
+}
+#propay .right-block .plan-card .duration-options-wrapper .duration-option .savings,
+#propay .right-block .plan-card .duration-options-wrapper .duration-option .best-value {
+    font: var(--text-inter-700-12);
+    border-radius: 4px;
+    white-space: nowrap;
+    padding: 4px 4px 4px 5px;
+}
+#propay .right-block .plan-card .duration-options-wrapper .duration-option .savings {
+    color: var(--mobile-text-info);
+    background: var(--mobile-notification-info);
+}
+#propay .right-block .plan-card .duration-options-wrapper .duration-option .best-value {
+    color: var(--mobile-text-success);
+    background: var(--mobile-notification-success);
+}
+#propay .right-block .plan-card .duration-options-wrapper.column-style .duration-option {
+    flex-direction: column;
+    padding: 12px 8px;
+}
+#propay .right-block .plan-card .duration-options-wrapper.column-style .duration-option .savings,
+#propay .right-block .plan-card .duration-options-wrapper.column-style .duration-option .best-value {
+    margin-top: 6px;
+    text-wrap: auto;
+}
+#propay .right-block .plan-card .duration-warning {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 12px;
+    color: var(--color-warning-orange);
+    font: var(--text-inter-600-14);
+}
+#propay .right-block .plan-card .duration-warning i {
+    --icon-size: 16px;
+    --mask-color: var(--color-warning-orange);
+    flex-shrink: 0;
+    margin-top: 2px;
+    margin-inline-end: 8px;
+}
+#propay .right-block .plan-card .duration-warning .duration-warning-text {
+    flex: 1;
 }
 #propay .right-block .plan-card .plan-info {
     display: flex;
@@ -806,6 +1255,16 @@
     border: none;
     font: var(--text-h3-bold);
 }
+#propay button.continue.continue-to-payment {
+    background-color: var(--mobile-button-primary);
+    color: var(--mobile-text-inverse);
+}
+#propay button.continue.disabled,
+#propay button.continue[disabled] {
+    background-color: var(--mobile-button-disabled);
+    color: var(--mobile-text-on-color-disabled);
+    opacity: 1;
+}
 #propay .stripe-button.payment-stripe-dialog {
     position: relative;
     height: 90px;
@@ -856,7 +1315,6 @@
 #propay .specific-payment-info .propay-inline-dialog.payment-stripe-dialog .iframe-container {
     height: 366px;
     transition: all 200ms ease;
-    margin-top: -26px;
 }
 #propay .specific-payment-info .bitcoin-invoice-dialog .content {
     display: flex;
@@ -908,13 +1366,15 @@
 }
 #propay .specific-payment-info .voucher-block .redeem-voucher {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     flex-grow: 1;
     color: var(--text-color-high);
     border: none;
     background: initial;
 }
-#propay .specific-payment-info .voucher-block .redeem-voucher .fm-account-input {
+#propay .specific-payment-info .voucher-block .voucher-input-col {
+    display: flex;
+    flex-direction: column;
     flex-grow: 1;
     margin-right: 24px;
 }
@@ -945,7 +1405,7 @@
 #propay .specific-payment-info .voucher-block .info > * {
     display: flex;
     align-items: normal;
-    margin-top: 8px;
+    margin-top: 17px;
 }
 #propay .specific-payment-info .voucher-block .info i {
     margin-top: 2px;
@@ -954,17 +1414,6 @@
     margin-top: 24px;
     font: var(--text-copy-small-pricing);
 }
-#propay .astropay-dialog .redirect-info {
-    margin-bottom: 4px;
-}
-#propay .astropay-dialog .mega-input.box-style::before {
-    background: var(--surface-main);
-}
-#propay .astropay-dialog .astropay-label {
-    font: var(--text-copy-small-bold-pricing);
-    margin: 18px 0 4px;
-}
-
 #propay footer .subscription-info {
     display: flex;
     flex-direction: column;
@@ -972,6 +1421,9 @@
 }
 #propay footer .subscription-info > * {
     margin-bottom: 16px;
+}
+#propay footer .subscription-info.legal-hidden > :not(.s4-tos) {
+    display: none;
 }
 #propay a {
     color: var(--text-color-info);
@@ -1090,13 +1542,13 @@
     height: 100%;
     top: 50%;
     left: 50%;
-    z-index: 11;
+    z-index: 97;
     transform: translate(-50%, -50%);
     background: rgba(34,34,34,0.95);
 }
 
 #propay footer.mobile {
-    padding: 64px 24px;
+    padding: 48px 24px;
 }
 
 /* Items from other pages */
@@ -1149,9 +1601,12 @@
     border: 0;
     overflow: hidden;
     cursor: pointer;
-    min-height: 32px;
     color: transparent;
     background-color: transparent;
+}
+#propay .sk-active:not(.no-min-sk-height).sk-pro,
+#propay .sk-active:not(.no-min-sk-height) .sk-pro {
+    min-height: 32px;
 }
 #propay h1.sk-pro,
 #propay .sk-active h2.sk-pro,
@@ -1190,6 +1645,41 @@
     position: absolute;
     overflow: hidden;
     background-image: linear-gradient(90deg, var(--mobile-surface-2) 50px, var(--mobile-surface-1) 150px, var(--mobile-surface-2) 250px);
+    background-size: 1000px 100%;
+    animation: loading-shimmer 2s infinite linear;
+    width: calc(100% + 2px);
+    height: 100%;
+    content: "";
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+    border-radius: 8px;
+    cursor: default;
+    z-index: 12;
+}
+
+/* Skeleton loading for the addressDialog (registerb / recurring sub / propay-bitcoin).
+   Mirrors the propay-page rules above but scoped to the dialog so the price + Pay button
+   can use `pro.propay.sk.startLoad` while the dialog lives outside `#propay`. */
+.payment-address-dialog .sk-active.sk-pro,
+.payment-address-dialog .sk-active .sk-pro {
+    position: relative;
+    border: 0;
+    overflow: hidden;
+    cursor: pointer;
+    color: transparent;
+    background-color: transparent;
+}
+.payment-address-dialog .sk-active:not(.no-min-sk-height).sk-pro,
+.payment-address-dialog .sk-active:not(.no-min-sk-height) .sk-pro {
+    min-height: 32px;
+}
+.payment-address-dialog .sk-active.sk-pro::after,
+.payment-address-dialog .sk-active .sk-pro::after {
+    position: absolute;
+    overflow: hidden;
+    background-image: linear-gradient(90deg, var(--mobile-surface-2) 50px,
+        var(--mobile-surface-1) 150px, var(--mobile-surface-2) 250px);
     background-size: 1000px 100%;
     animation: loading-shimmer 2s infinite linear;
     width: 100%;
@@ -1234,10 +1724,12 @@
 
 /* Desktop */
 @media only screen and (min-width: 1080px) {
+    #propay .right-block .plan-card.fixed:not(.sk-card-loading) {
+        overflow: auto;
+    }
     #propay .right-block .plan-card.fixed {
         left: calc(var(--left-panel-width) + var(--plan-card-left-gap));
         max-height: calc(100% - 140px);
-        overflow: auto;
         position: fixed;
         top: 88px;
     }
@@ -1310,7 +1802,7 @@
         right: 0;
         padding: 16px 24px;
         background: var(--surface-main);
-        z-index: 2;
+        z-index: 20;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
@@ -1350,6 +1842,20 @@
     }
 }
 
+
+@media only screen and (max-width: 768px) {
+    #propay .left-block .propay-use-type-tab-mount .propay-use-type-tab-group {
+        max-width: 100%;
+        margin-inline-start: 0;
+    }
+    .tax-validation-popover {
+        max-width: calc(100vw - 48px);
+    }
+    #propay .right-block .plan-card .duration-options-wrapper .duration-option .savings,
+    #propay .right-block .plan-card .duration-options-wrapper .duration-option .best-value {
+        font: var(--text-inter-700-9);
+    }
+}
 
 .fm-blocks-view .data-block-view.ui-selected i.selected {
     display: block;

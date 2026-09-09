@@ -146,7 +146,7 @@ Object.defineProperty(mega, 'achievem', {
                         var rwds = ach.rwds || [ach.rwd];
                         for (var i = rwds.length; i--;) {
                             var rwd = rwds[i];
-                            if (rwd && rwd.left >= 0) {
+                            if (rwd && 'c' in rwd && rwd.left >= 0) {
                                 base++;
                                 if (ach[1]) {
                                     quota.transfer.current += mafr[rwd.r][1];
@@ -213,6 +213,15 @@ Object.defineProperty(mega, 'achievem', {
 
 })(mega.achievem);
 
+// If storage cannot be found for an achievement, use this value
+mega.achievem.getFallbackAchQuota = (id) => {
+    'use strict';
+    if (d) {
+        console.error('using fallback achievement quota for achievement: ' + id);
+    }
+    eventlog(501195, id, true);
+    return pro.ACH_FALLBACK_GB * pro.BYTES_PER_GB;
+};
 
 /**
  * Check whether achievements are enabled for the current user.
@@ -306,158 +315,273 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
 
         return $dialog;
     });
-
-    $('.invitees .new-dialog-icon', $dialog).rebind('click', () => {
-        closeDialog();
-        fm_showoverlay();
-        mega.achievem.invitationStatusDialog();
-    });
-    $('.js-dashboard-btn', $dialog).rebind('click', () => {
-        eventlog(500793);
-        closeDialog();
-        loadSubPage('fm/dashboard');
-    });
 };
 
-/**
- * Show achievements list dialog
- * @param {Element} [$viewContext] element to bind the data dynamicaly
- * @param {boolean} [isDialog] boolean value for conditinal bindings
- */
-mega.achievem.bindStorageDataToView = function bindStorageDataToView($viewContext, isDialog) {
+mega.achievem.installDesktopApp = function installDesktopApp() {
     'use strict';
-    var ach = mega.achievem;
-    var maf = M.maf;
-    var totalStorage = 0;
-    var totalTransfer = 0;
-    var totalInviteeCount = 0;
-    var $cell;
-    var locFmt = l[16325].replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>');
+    const pf = navigator.platform.toUpperCase();
+    if (pf.includes('WIN')) {
+        open(`https://mega.${mega.tld}/MEGAsyncSetup.exe`, '', 'noopener,noreferrer');
+    }
+    else if (pf.includes('MAC')) {
+        open(`https://mega.${mega.tld}/MEGAsyncSetup.dmg`, '', 'noopener,noreferrer');
+    }
+};
 
-    const calculateAndBindRewardData = function calculateAndBindRewardData(data, idx) {
+mega.achievem.installMobileApp = function installMobileApp() {
+    'use strict';
+    mega.redirect('mega.io', 'mobile', false, false, false);
+};
 
-        if (data.rwds) {
-            console.error(data.rwds);
-            for (var i = data.rwds.length - 1; i >= 0; i--) {
-                // totalStorage += data.rwds[i].left > 0 ? data[0] : 0;
-                // totalTransfer += data.rwds[i].left > 0 ? data[1] : 0;
-                totalInviteeCount += data.rwds[i].left >= 0 ? 1 : 0;
+mega.achievem.showRewardStatus = function showRewardStatus(achievementData, $addedItem, $dialog, currentTime) {
+    'use strict';
+    if (!achievementData.rwd && !achievementData.rwds) {
+        return;
+    }
+
+    const {rwd, rwds} = achievementData;
+
+    let inviteCount = 0;
+    let storage = 0;
+    let expiry = 0;
+    if (rwds) {
+        for (const reward of rwds) {
+            // Skip sent (no rwd.e) and pending (no rwd.e) plus expired (rwd.left < 0)
+            if (!reward.e || reward.left < 0) {
+                continue;
             }
+            inviteCount += 1;
+            storage += achievementData[0];
         }
-        else if (data.rwd) {
-            locFmt = l[16336].replace(/[()]/g, '').replace('[S]', '<span>').replace('[/S]', '</span>');
-
-            // totalStorage += data[0];
-            // totalTransfer += data[1];
-
-            if (!data.rwd.expiry || !data.rwd.expiry.value) {
-                // this reward do not expires
-                locFmt = l.ach_bonus_applied;
+        if (rwd.a === mega.achievem.ACH_INVITE) {
+            $('.invitees .quota-txt', $dialog).text(inviteCount);
+            if (inviteCount > 0) {
+                $('.status', $addedItem).addClass('active');
             }
-            else if (data.rwd.left < 1) {
-                // show "Expired"
-                locFmt = l[1664];
-                // totalStorage -= data[0];
-                // totalTransfer -= data[1];
-                $('.expires-txt', $cell).addClass('error');
-                $cell.addClass('expired');
+            else {
+                $('.status', $addedItem).addClass('expired');
             }
-
-            if (idx !== ach.ACH_INVITE) {
-                $cell.addClass('achieved');
-
-                if (data.rwd.expiry.unit === "d" && data.rwd.left >= 0){
-                    locFmt = mega.icu.format(l.ach_expires_days, data.rwd.left)
-                        .replace('[S]', '<span>').replace('[/S]', '</span>');
-                    $('.expires-txt', $cell).safeHTML(locFmt);
-                }
-                else {
-                    $('.expires-txt', $cell).safeHTML(locFmt.replace('%1', data.rwd.left).replace('%2', l[16290]));
-                }
-                if (!$('.expires-txt', $cell).hasClass('error')) {
-                    $('.expires-txt', $cell).addClass('info');
-                }
+            // Always show the chevron so the invitation status can be viewed,
+            // even when no bonus is currently active (e.g. all pending or expired)
+            $('.invitees', $addedItem).removeClass('hidden');
+        }
+    }
+    else {
+        storage = achievementData[0];
+        const active = rwd.e && rwd.e > currentTime;
+        const isInvite = rwd.a === mega.achievem.ACH_INVITE;
+        if (active) {
+            // Invite card never shows a per-invite expiry countdown; matches the multi-invite branch
+            if (!isInvite) {
+                expiry = mega.icu.format(l.expires_days, rwd.left);
             }
+            $('.status', $addedItem).addClass('active');
         }
         else {
-            locFmt = l[16291].replace(/[()]/g, '').replace('[S]', '<span>').replace('[/S]', '</span>');
-            $('.expires-txt', $cell)
-                .removeClass('error')
-                .safeHTML('%n', locFmt, data.expiry.value, data.expiry.utxt);
-            $cell.removeClass('expired');
-        }
-
-    };
-
-    for (var idx in maf) {
-        if (maf.hasOwnProperty(idx)) {
-            idx |= 0;
-            var data = maf[idx];
-            var selector = ach.mapToElement[idx];
-            if (selector) {
-                $cell = $('.achievements-cell.' + selector, $viewContext).removeClass('hidden');
-
-                if (idx !== 3 && (data.rwd || data.rwds)) {
-                    $cell.addClass('one-reward');
-                }
-
-                if (idx === ach.ACH_VPNTRIAL) {
-                    $('.achi-content-txt', $cell).safeHTML(data.expiry && data.expiry.value
-                        ? l.ach_vpn_trial_blurb_expires
-                            .replace('%1', bytesToSize(data[0], 0))
-                            .replace('%2', data.expiry.value).replace('%3', data.expiry.utxt)
-                        : l.ach_vpn_trial_blurb.replace('%1', bytesToSize(data[0], 0)));
-                }
-                else if (idx === ach.ACH_PWMTRIAL) {
-                    $('.achi-content-txt', $cell).safeHTML(data.expiry && data.expiry.value
-                        ? l.ach_pwm_trial_blurb_expires
-                            .replace('%1', bytesToSize(data[0], 0))
-                            .replace('%2', data.expiry.value).replace('%3', data.expiry.utxt)
-                        : l.ach_pwm_trial_blurb.replace('%1', bytesToSize(data[0], 0)));
-                }
-
-                if (!$cell.hasClass('localized')) {
-                    $cell.addClass('localized');
-                }
-
-                calculateAndBindRewardData(data, idx);
-
-                ach.bind.call($('.mega-button.positive', $cell), ach.mapToAction[idx]);
-                $cell.removeClass('hidden');
-
-                // If this is the SMS achievement, and SMS achievements are not enabled yet, hide the container
-                if (selector === 'ach-sms-verification' && u_attr.flags.smsve !== 2) {
-                    $cell.addClass('hidden');
-                }
+            $('.status', $addedItem).addClass('expired');
+            // The invite card never fully expires - it can always accept more friends
+            if (!isInvite) {
+                expiry = l.bonus_expired;
+                $addedItem.addClass('expired');
             }
+        }
+        // Single-invite case: prettify stores 1 reward as `rwd` (not `rwds`),
+        // so mirror the multi-reward branch's chevron handling here. Always show
+        // the chevron so the invitation status can be viewed.
+        if (isInvite) {
+            $('.invitees .quota-txt', $dialog).text(active ? 1 : 0);
+            $('.invitees', $addedItem).removeClass('hidden');
         }
     }
 
-    const loadDialogMoreData = function loadDialogMoreData() {
+    if (expiry) {
+        $('.expiry', $addedItem).text(expiry);
+    }
+    if (storage) {
+        $('.data', $addedItem).text(bytesToSize(storage, 0));
+    }
+};
 
-        $('.storage-quota .quota-txt', $viewContext).text(bytesToSize(M.maf.storage.current, 0));
-        // $('.transfer-quota .quota-txt', $viewContext).text(bytesToSize(totalTransfer, 0));
+mega.achievem.getAchItems = function getAchItems() {
+    'use strict';
 
-        if (maf[3].rwds) {
-            $('.invitees .quota-txt', $viewContext).text(totalInviteeCount);
-            $('.invitees .new-dialog-icon', $viewContext).removeClass('hidden');
-        }
-        else if (maf[3].rwd && maf[3].rwd.left > 0) {
-            $('.invitees .quota-txt', $viewContext).text(1);
-            $('.invitees .new-dialog-icon', $viewContext).removeClass('hidden');
-        }
-        else {
-            $('.invitees .quota-txt', $viewContext).text(0);
-            $('.invitees .new-dialog-icon', $viewContext).addClass('hidden');
-        }
+    return [
+        {
+            title: l.install_desktop_app,
+            onClick: () => {
+                eventlog(501196);
+                mega.achievem.installDesktopApp();
+            },
+            className: 'ach-install-megasync',
+            id: 4,
+        },
+        {
+            title: l[16280],
+            onClick: () => {
+                eventlog(501197);
+                mega.achievem.installMobileApp();
+            },
+            className: 'ach-install-mobile-app',
+            id: 5,
+        },
+        {
+            title: l[16282],
+            onClick: () => {
+                eventlog(501198);
+                closeDialog();
+                mega.achievem.inviteFriendDialog();
+            },
+            className: 'ach-invite-friend',
+            id: 3,
+            nextAction: (e) => {
+                closeDialog();
+                mega.achievem.invitationStatusDialog();
+                e.stopPropagation();
+            },
+        },
+        {
+            title: l.ach_vpn_trial_title,
+            linkText: l.ach_learn_more_mega_vpn,
+            linkUrl: 'https://mega.io/vpn',
+            onClick: () => {
+                eventlog(501199);
+                loadSubPage('propay_vpn');
+            },
+            className: 'ach-vpn-trial',
+            id: 11,
+            // If user is pro, or is otherwise know to be inelligible for the free trial
+            hide: !!u_attr.p
+                || (pro.membershipPlans
+                    && pro.membershipPlans.length
+                    && !pro.getPlanObj(pro.ACCOUNT_LEVEL_FEATURE_VPN).trial),
+        },
+        {
+            title: l.ach_pwm_trial_title,
+            linkText: l.ach_learn_more_mega_pass,
+            linkUrl: 'https://mega.io/pass',
+            onClick: () => {
+                eventlog(501200);
+                loadSubPage('propay_pwm');
+            },
+            className: 'ach-pwm-trial',
+            id: 10,
+            // If user is pro, or is otherwise know to be inelligible for the free trial
+            hide: !!u_attr.p
+                || (pro.membershipPlans
+                    && pro.membershipPlans.length
+                    && !pro.getPlanObj(pro.ACCOUNT_LEVEL_FEATURE_PWM).trial),
+        },
+    ];
+};
 
+mega.achievem.bindStorageDataToView = function bindStorageDataToView($viewContext) {
+    'use strict';
+    const achievementsList = mega.achievem.getAchItems();
+
+    const data = M.maf;
+
+    // Show an achievement when it's eligible, or - even if hidden (e.g. ineligible for a
+    // VPN/PWM free trial) - when it has already been redeemed (has a reward).
+    const shouldShow = (achievement) => {
+        const achData = data[achievement.id];
+        return !!achData && (!achievement.hide || !!achData.rwd || !!achData.rwds);
     };
 
-    if (isDialog) {
-        loadDialogMoreData();
+    const achievementsShown = achievementsList.reduce((acc, achievement) => {
+        if (shouldShow(achievement)) {
+            acc += 1;
+        }
+        return acc;
+    }, 0);
+
+    const $template = $('.template.ach-list-item', $viewContext);
+    $('.ach-list-item:not(.template)', $viewContext).remove();
+
+    const currentTime = unixtime();
+
+    let redeemed = 0;
+
+    for (const achievement of achievementsList) {
+        if (!shouldShow(achievement)) {
+            continue;
+        }
+        const $item = $template.clone();
+        $item.addClass(achievement.className).removeClass('template');
+
+        $('.text-wrapper .title', $item).text(achievement.title);
+        $('.text-wrapper .text', $item).text(achievement.text);
+        $('.text-wrapper .link', $item).text(achievement.linkText);
+
+        $('.achievements-list', $viewContext).safeAppend($item.prop('outerHTML'));
+        const $addedItem = $(`.${achievement.className}`, $viewContext).removeClass('hidden');
+
+        if (achievement.linkUrl) {
+            $('.text-wrapper .link', $addedItem)
+                .attr('href', achievement.linkUrl)
+                .attr('target', '_blank')
+                .attr('rel', 'noopener noreferrer');
+        }
+        if (achievement.onClick) {
+            $addedItem.rebind('click', (e) => {
+                const $target = $(e.target);
+                const $closestAchItem = $target.hasClass('ach-list-item') ? $target : $target.closest('.ach-list-item');
+                // If user clicked on the hyperlink, or the item is expired, do not run the onclick action
+                if (!$target.is('a') && !$closestAchItem.hasClass('expired')) {
+                    achievement.onClick();
+                }
+            });
+        }
+        if (achievement.nextAction) {
+            $('.invitees', $addedItem).rebind('click', achievement.nextAction);
+        }
+
+        const achievementData = data[achievement.id];
+        if (achievement.id === mega.achievem.ACH_INVITE && achievementData) {
+            const perInviteBytes = achievementData[0] || (mega.achievem.getFallbackAchQuota(achievement.id));
+            $('.text-wrapper .text', $addedItem).text(
+                l.ach_invite_friend_app_bonus.replace('%1', bytesToSize(perInviteBytes, 0))
+            );
+        }
+        if (achievementData && achievementData.rwd) {
+            mega.achievem.showRewardStatus(achievementData, $addedItem, $viewContext, currentTime);
+            redeemed += 1;
+        }
+        else if (achievementData) {
+            $('.data', $addedItem)
+                .text(bytesToSize(achievementData[0] || (mega.achievem.getFallbackAchQuota(achievement.id)), 0));
+        }
+        else {
+            $addedItem.addClass('hidden');
+        }
     }
 
-    maf = ach = undefined;
+    $('.progress .amount', $viewContext).text(redeemed + '/' + achievementsShown);
+    $('.progress .progress-bar', $viewContext)
+        .css('--after-width', (redeemed / ((achievementsShown) || 1) * 100) + '%');
+    $('.redeemed .content .amount', $viewContext).text(bytesToSize(M.maf.storage.current, 0, 8));
+    $('.with-condition p', $viewContext)
+        .safeHTML(l.ach_storage_with_pro_plan.replace('%1', bytesToSize(20 * pro.BYTES_PER_TB, 0, 8)));
+
+    // the injected /pro anchor needs (re)binding, else it navigates away from the extension/app
+    clickURLs();
+
+    $('.invites .content .amount', $viewContext).text(mega.achievem.getInviteFriendsCount());
+};
+
+// "Number of Invites" - count every referral entry from the raw API array.
+// Matches mobile's mobile.achievements-block getValue('friends') logic; needed here
+// because prettified M.maf stores 1 invite as `rwd` (singular) and only switches to
+// the `rwds` array when there are 2+, so a per-achievement loop would miss the single case.
+mega.achievem.getInviteFriendsCount = function getInviteFriendsCount() {
+    'use strict';
+    const rewardedBonuses = (M.account.maf && M.account.maf.a) || [];
+    let count = 0;
+    for (const bonus of rewardedBonuses) {
+        if (bonus.a === mega.achievem.ACH_INVITE) {
+            count += 1;
+        }
+    }
+    return count;
 };
 
 /**
@@ -567,7 +691,6 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
         // Prevent showing of drop down list with contacts email addresses
         // Max allowed email address is 254 chars
         minChars: 255,
-        visibleComma: true,
         accountHolder: (M.u[u_handle] || {}).m || '',
         scrolLocation: 'invite',
         excludeCurrent: false,
@@ -744,6 +867,8 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
     }
     var $table = $scrollBlock.find('.table');
 
+    $('#invitation-dialog-title', $dialog).text(l.ach_invites_dlg_title);
+
     if (!invitationStatusDialog.$tmpl) {
         invitationStatusDialog.$tmpl = $('.table-row:first', $table).clone();
     }
@@ -768,6 +893,9 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
     var ach = mega.achievem;
     var maf = M.maf;
     maf = maf[ach.ACH_INVITE];
+
+    initPerfectScrollbar($scrollBlock);
+
 
     var locFmt;
 
@@ -860,51 +988,40 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
         var rwd = rwds[rlen];
         var $tmpl = invitationStatusDialog.$tmpl.clone();
 
-        $('.email strong', $tmpl).text(rwd.m[0]);
-        $('.date span', $tmpl).text(time2date(rwd.ts));
+        $('.email span', $tmpl).text(rwd.m[0]);
+        $('.date span', $tmpl).text(bytesToSize(maf[0], 0));
 
-        // If no pending (the invitee signed up)
-        if (rwd.csu) {// csu - contact (invitee) signed up
-            if (rwd.c) {// c - completed, time elapsed from time when app is installed
+        // If the bonus has been issued (rwd.e = expiration timestamp set)
+        if (rwd.e) {
 
-                $('.status', $tmpl)
-                    .safeHTML(
-                        '<strong class="green">@@</strong>' +
-                        '<span class="light-grey"></span>',
-                        l[16105]);// Quota Granted
+            $('.status', $tmpl)
+                .safeHTML(
+                    '<strong class="green">@@</strong>' +
+                    '<span class="light-grey"></span>',
+                    l[16105]);// Quota Granted
 
-                var expiry = rwd.expiry || maf.expiry;
-                locFmt = l[16336].replace('[S]', '').replace('[/S]', '');
-                $('.status .light-grey', $tmpl)
-                    .safeHTML('%n', locFmt, expiry.value, expiry.utxt);
-
-                $('.icon i', $tmpl).addClass('sprite-fm-mono icon-active granted-icon');
+            if (rwd.left > 0) {
+                $('.status', $tmpl).text(mega.icu.format(l.expires_days, rwd.left));
+                $('.status-icon', $tmpl).addClass('active');
             }
-            else {// Pending APP Install
-
-                $('.status', $tmpl)
-                    .safeHTML('<strong class="orange">@@</span>', l[16104]);// Pending App Install
-
-                $('.icon i', $tmpl).addClass('sprite-fm-mono icon-exclamation-filled pending-install-icon');
+            else {
+                $('.status', $tmpl).text(l.bonus_expired);
+                $('.status-icon', $tmpl).addClass('expired');
+                $tmpl.addClass('expired');
             }
+        }
+        else if (rwd.csu) {// csu - contact (invitee) signed up but bonus not yet issued
+            $('.status', $tmpl)
+                .safeHTML('<strong class="orange">@@</span>', l[16104]);// Pending App Install
 
-            // Remove reinvite button
-            $('.date button.resend', $tmpl).remove();
+            $('.icon i', $tmpl).addClass('sprite-fm-mono icon-exclamation-filled pending-install-icon');
         }
         else {// Pending
 
             $('.status', $tmpl)
-                .safeHTML('<strong >@@</span>', l[7379]);// Pending
+                .safeHTML('<strong >@@</span>', l.invite_sent);// Pending
 
-            $('.icon i', $tmpl).addClass('sprite-fm-mono icon-options pending-icon');
-
-            // In case that time-limit is not
-            $('.date button', $tmpl).rebind('click', function() {
-                var $row = $(this).closest('.table-row');
-
-                reinvite($('.email strong', $row).text(), $row);
-                return false;
-            });
+            $('.status-icon', $tmpl).addClass('hidden');
         }
 
         $table.append($tmpl);
@@ -922,15 +1039,9 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
         return false;
     });
 
-    $('button.reinvite-all', $dialog).rebind('click', function() {
-        $('.table-row', $table).each(function(idx, $row) {
-            $row = $($row);
-
-            if ($('.date div', $row).length) {
-                reinvite($('.email strong', $row).text(), $row);
-            }
-        });
-        $(this).addClass('hidden');
+    $('.back', $dialog).rebind('click', () => {
+        closeDialog();
+        mega.achievem.achievementsListDialog();
         return false;
     });
 

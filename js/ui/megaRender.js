@@ -42,7 +42,7 @@ mBroadcaster.once('boot_done', () => {
                                 `data-simpletip="${l.more_actions}" data-simpletipposition="top"></i>` +
                         '</a>' +
                         '<span class="versioning-indicator">' +
-                            '<i class="sprite-fm-mono icon-clock-rotate"></i>' +
+                            '<i class="sprite-fm-mono icon-clock-rotate-thin-outline"></i>' +
                         '</span>' +
                         '<i class="sprite-fm-mono icon-link-thin-outline simpletip" ' +
                             `data-simpletip="${l[6909]}" data-simpletipposition="top"></i>` +
@@ -1487,6 +1487,10 @@ mBroadcaster.once('boot_done', () => {
                     if (vTemplate) {
                         vTemplate.appendChild(versionColumnPrepare(aNode.tvf, aNode.tvb || 0));
                     }
+                }
+
+                if (aNode.fv) {
+                    aTemplate.classList.add('is-old-version');
                 }
 
                 if (aNode.vhl) {

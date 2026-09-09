@@ -199,7 +199,7 @@
                                     case ns.DONTCOPY:
                                         break;
                                     case ns.KEEPBOTH:
-                                        name = self.findNewName(name, node.p || target);
+                                        name = self.findNewName(name, node.p || target, file.t);
                                         /* falls through */
                                     case ns.REPLACE:
                                         proceed = save(file, name, action, node);
@@ -314,7 +314,9 @@
                 let res;
                 if (repeatAction) {
                     res = {
-                        name: repeatAction === ns.KEEPBOTH ? this.findNewName(impNode.name, t) : impNode.name,
+                        name: repeatAction === ns.KEEPBOTH
+                            ? this.findNewName(impNode.name, t, impNode.t)
+                            : impNode.name,
                         action: repeatAction,
                         checked: true,
                     };
@@ -653,7 +655,7 @@
                 $('.file-size', $a2).text('');
                 $('.file-size', $a3).text('');
                 if (op === 'dups') {
-                    $('.file-name', $a1).text(this.findNewName(file.name, target));
+                    $('.file-name', $a1).text(this.findNewName(file.name, target, true));
                     $('.file-name', $a2).text(name);
                     $('.file-date', $a1).text('');
                     $('.file-date', $a2).text('');
@@ -663,7 +665,7 @@
                     }
                 }
                 else {
-                    $('.file-name', $a3).text(this.findNewName(file.name, target));
+                    $('.file-name', $a3).text(this.findNewName(file.name, target, true));
                 }
             }
             else {
@@ -814,9 +816,17 @@
         /**
          * Given a filename, create a new one appending (1)..(n) as needed.
          * @param {String} oldName The old file name
+         * @param {Boolean} [isFolder] Whether the name belongs to a folder
          * @returns {String}
          */
-        getNewName: function(oldName) {
+        getNewName(oldName, isFolder) {
+            if (isFolder) {
+                // Folders hold no extension, hence the counter always goes at the very end of the name.
+                const num = oldName.match(/\((\d+)\)$/);
+
+                return num ? oldName.replace(/\(\d+\)$/, `(${(num[1] | 0) + 1})`) : `${oldName} (1)`;
+            }
+
             var newName;
             var idx = oldName.match(/\((\d+)\)(?:\..*?)?$/);
 
@@ -844,13 +854,14 @@
          * Find new name
          * @param {String} name The old file name
          * @param {String} target The target to lookup at
+         * @param {Boolean} [isFolder] Whether the name belongs to a folder
          * @returns {String}
          */
-        findNewName: function(name, target) {
+        findNewName(name, target, isFolder) {
             var newName = name;
 
             do {
-                newName = this.getNewName(newName);
+                newName = this.getNewName(newName, isFolder);
             } while (this.getNodeByName(target, newName) || this.locateFileInUploadQueue(target, newName));
 
             if (keepBothState[target]) {
@@ -990,7 +1001,7 @@
                 }
 
                 var name = keys[kIndex];
-
+                const isFolder = type === 'folders';
 
                 var contuineResolving = function(file, fname, action, checked) {
 
@@ -1020,7 +1031,7 @@
                             // rename old files
 
                             if (olderNode) {
-                                newName = fileconflict.findNewName(name, target);
+                                newName = fileconflict.findNewName(name, target, isFolder);
                                 M.rename(olderNode, newName).catch(dump);
                             }
                             else {
@@ -1030,7 +1041,7 @@
                                     if (h === newestIndex) {
                                         continue;
                                     }
-                                    newName = fileconflict.findNewName(name, target);
+                                    newName = fileconflict.findNewName(name, target, isFolder);
                                     saveKeepBothState(
                                         target, M.getNodeByHandle(dupEntriesOfGivenTypeAndName[h]), newName
                                     );
@@ -1091,7 +1102,7 @@
                                         if (z === newestIndex) {
                                             continue;
                                         }
-                                        var newFolderName = fileconflict.findNewName(name, target);
+                                        var newFolderName = fileconflict.findNewName(name, target, true);
                                         M.rename(duplicateEntries[type][name][z], newFolderName).catch(dump);
                                     }
                                 }

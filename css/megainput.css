@@ -314,10 +314,15 @@
 .mega-input.title-ontop.valued .mega-input-title,
 .mega-input.title-ontop.birth .mega-input-title,
 .mega-input.title-ontop.dropdown-input .mega-input-title,
-.mega-input.title-ontop.box-style .mega-input-title {
+.mega-input.title-ontop.box-style .mega-input-title,
+.mega-input.title-ontop.has-placeholder .mega-input-title {
     top: -20px;
     color: var(--text-color-low);
     font: var(--text-body2);
+}
+/* When a placeholder is set, surface it through the title-ontop suppression. */
+.mega-input.title-ontop.has-placeholder input::placeholder {
+    opacity: 1;
 }
 
 /* Smaller font size input */

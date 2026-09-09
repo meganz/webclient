@@ -348,7 +348,7 @@ RepayPage.prototype.initPage = function() {
 
             const taxInfo = {
                 name: res.txn,
-                percentage: (res.tx !== undefined) && +res.tx,
+                percentage: +res.tx,
                 variant: res.txva,
                 taxAmount: res.ltax || res.tax,
                 totalPrice: res.lt || res.t
@@ -357,7 +357,7 @@ RepayPage.prototype.initPage = function() {
 
             const showTaxInfo = !!(!res.exc
                 && name
-                && (percentage !== false)
+                && percentage
                 && (variant !== undefined)
                 && taxAmount && totalPrice);
 

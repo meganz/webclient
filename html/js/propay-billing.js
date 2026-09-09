@@ -1085,7 +1085,7 @@ pro.propay.billing = {
         // Skip the bailout when u_attr.taxnum is set - the initial no-tn utqa was fetched under
         // the account's tax-entity context, so its pricing doesn't match a Personal (tn:"") view.
         if (!force && !this.currentUtqa
-            && pro.taxInfo && pro.taxInfo.taxCountry === this.country
+            && pro.taxCountry && pro.taxCountry === this.country
             && !taxNumber
             && !(u_attr && u_attr.taxnum)) {
             this.currentUtqa = {country: this.country, taxNumber, state};
@@ -1100,9 +1100,8 @@ pro.propay.billing = {
             this.currentUtqa = {country: this.country, taxNumber, state};
         }
 
-        // Currency is IP-derived (u_attr.ipcc for logged-in, wmip fallback for anon) and stays
-        // independent of the user's selected billing country.
-        const curcc = u_attr && u_attr.ipcc || this.defaultCountry || undefined;
+        // IP-derived, independent of the billing country. wmip is live, u_attr.ipcc is pinned at boot.
+        const curcc = this.defaultCountry || u_attr && u_attr.ipcc || undefined;
 
         const plan = pro.getPlanObj(pro.propay.planNum, pro.propay.selectedPeriod);
         if (plan) {

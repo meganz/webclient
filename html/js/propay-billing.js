@@ -1029,6 +1029,10 @@ pro.propay.billing = {
             if (encodedVer && typeof value === 'string') {
                 value = tryCatch(() => from8(value), () => value)() || value;
             }
+            // Leave the field empty rather than prefilling a stored date Coinify would reject.
+            if (localKey === 'dateOfBirth' && pro.propay.validateDateOfBirth(value)) {
+                continue;
+            }
 
             const $inputs = $(
                 `#propay-billing-${localKey}-inv, #propay-billing-${localKey}-req`,
@@ -1313,19 +1317,6 @@ pro.propay.billing = {
     },
 
     /**
-     * Check whether the entered date of birth makes the user older than the given age.
-     * @param {string} dob - The entered date of birth (YYYY-MM-DD)
-     * @param {number} age - Minimum age in years
-     * @returns {boolean}
-     */
-    checkIsOlderThan(dob, age) {
-        'use strict';
-        const today = new Date();
-        const cutoff = new Date(today.getFullYear() - age, today.getMonth(), today.getDate());
-        return new Date(dob) < cutoff;
-    },
-
-    /**
      * Validate the country and (where applicable) state, optionally storing failures for display.
      * @param {boolean} storeResult - Whether to record failures in lastValidatedErrorFields
      * @returns {boolean} - Whether the country/state pair is valid
@@ -1470,18 +1461,20 @@ pro.propay.billing = {
             validData = false;
         }
 
-        // Bitcoin/Coinify requires the user to be at least 10 years old.
+        // Bitcoin/Coinify only accepts a date of birth from 1900 up to the user's 10th birthday.
         const isBitcoin = pro.propay.currentGateway
             && pro.propay.currentGateway.gatewayId === pro.propay.BITCOIN_GATE_ID;
-        if (isBitcoin && billingInfo.dateOfBirth && !this.checkIsOlderThan(billingInfo.dateOfBirth, 10)) {
+        const dobError = isBitcoin && billingInfo.dateOfBirth
+            ? pro.propay.validateDateOfBirth(billingInfo.dateOfBirth)
+            : '';
+        if (dobError) {
             pro.log('validateBillingInfo: Invalid date of birth');
             validData = false;
             this.lastValidatedErrorFields.dateOfBirth = true;
-            $('.dateOfBirth-input-wrapper .error-message-text', this.$billingInfo)
-                .text(l.coinify_too_young);
+            $('.dateOfBirth-input-wrapper .error-message-text', this.$billingInfo).text(dobError);
         }
         else if (this.lastValidatedErrorFields.dateOfBirth) {
-            pro.log('validateBillingInfo: Invalid date of birth');
+            // An earlier too-young attempt leaves its message behind, so relabel for the empty field.
             $('.dateOfBirth-input-wrapper .error-message-text', this.$billingInfo)
                 .text(l.enter_birth_date);
         }
@@ -2364,6 +2357,7 @@ pro.propay.billing = {
         this.initCconsent();
         this.updateRequiredFields();
         this.initSyncInputs();
+        pro.propay.setDateOfBirthRange($('input', this.getBillingSections().$dateOfBirth));
         this.initTaxCodeBlurValidation();
         this.initClearPayment();
         this.updateTaxEntryField();

@@ -37,8 +37,10 @@ var webpackConfigs = {
         devServer: {
             port: 8089,
             hot: 'only',
-            static: __dirname,
-            liveReload: false,
+            static: {
+                directory: __dirname,
+                watch: false
+            },
             webSocketServer: 'ws',
             historyApiFallback: true
         },

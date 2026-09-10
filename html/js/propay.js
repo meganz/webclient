@@ -1786,7 +1786,7 @@ pro.propay = {
         };
 
         let monthlyPlan = this.getMonthlyPlan();
-        const {months} = this.planObj;
+        const {months, currency} = this.planObj;
 
         let discountInfoForBase = this.getDiscount();
         if (!discountInfoForBase && this.anyPlanOfLevelDiscounted) {
@@ -1832,7 +1832,7 @@ pro.propay = {
             $('.tax-amount-descr', $taxInfo)
                 .text(l.tax_name_percentage
                     .replace('%1', getTaxName(pro.propay.billing.country))
-                    .replace('%2', formatPercentage(pro.taxInfo.taxPercent)));
+                    .replace('%2', formatPercentage(pro.taxInfo.taxPercent, false, 2)));
 
             $('.tax-amount-value', $taxInfo).text(taxAmountText + getCurrencyText(!forceEuro && this.planObj.currency));
 
@@ -1864,9 +1864,10 @@ pro.propay = {
                 : false;
 
             if (base) {
-                // Follow monthlyPlan's tax context (matches develop's monthlyPlan.taxInfo gate).
-                const hasTax = !!(monthlyPlan && monthlyPlan.taxInfo);
-                lda = (hasTax ? base.taxedPrice : base.price) - ldtp;
+
+                // ldtp/edtp are as the API quoted them, so subtract from the same footing
+                const hasTax = !!(monthlyPlan && monthlyPlan.taxInfoLocal);
+                lda = (hasTax ? base.taxedPriceLocal : base.priceLocal) - ldtp;
                 eda = (hasTax ? base.taxedPriceEuro : base.priceEuro) - edtp;
             }
 
@@ -1876,7 +1877,8 @@ pro.propay = {
             $('.plan-info .transfer', $planCard)
                 .text(bytesToSize(this.planObj.baseTransfer * discountInfo.m, 1, 4) + ' transfer');
 
-            const localDiscountAmount = (!forceEuro && lda) || eda;
+            // isEuro, not forceEuro, so the amount matches the currency it is labelled with below
+            const localDiscountAmount = (!isEuro && lda) || eda;
 
             const $discountAmount = $('.discount-amount', $planCard).toggleClass('hidden', !localDiscountAmount);
 
@@ -1888,8 +1890,8 @@ pro.propay = {
                     ]))));
 
                 $('.discount-amount-value', $discountAmount)
-                    .text(formatCurrency(-localDiscountAmount, this.planObj.currency, 'narrowSymbol')
-                        + getCurrencyText(!forceEuro && this.planObj.currency));
+                    .text(formatCurrency(-localDiscountAmount, isEuro ? 'EUR' : currency, 'narrowSymbol')
+                        + getCurrencyText(!isEuro && currency));
             }
 
             if (!this.planObj.taxInfo && base) {
@@ -1931,9 +1933,12 @@ pro.propay = {
                 formattedPlanPrice = this.getFormattedPriceNote(ldtp || edtp);
             }
 
+            // Balance forces euro without pro.displayEuro, so planObj.currency alone would mislabel
+            const priceCurrency = isEuro ? 'EUR' : currency;
+
             const createPriceHTML = (price, noAsterisk) => {
                 return `${price}<span class="local">${(isEuro || noAsterisk) ? '' : '*'}<span>
-                <span class="currency"> ${this.planObj.currency}</span>`;
+                <span class="currency"> ${priceCurrency}</span>`;
             };
 
             $('.pricing-element .price', $planCard).safeHTML(priceText);
@@ -1956,11 +1961,11 @@ pro.propay = {
                 : showTaxInfo ? taxedPrice : price;
 
             const oldPrice = createPriceHTML(
-                formatCurrency(price, this.planObj.currency, 'narrowSymbol'),
+                formatCurrency(price, priceCurrency, 'narrowSymbol'),
                 true
             );
 
-            const newPrice = createPriceHTML(formatCurrency(ldtp, this.planObj.currency, 'narrowSymbol'));
+            const newPrice = createPriceHTML(formatCurrency(ldtp, priceCurrency, 'narrowSymbol'));
 
             let discountHeaderText = l.special_deal_perc_off;
             let addNumMonths = false;
@@ -2004,7 +2009,7 @@ pro.propay = {
                     .safeHTML((this.planObj.taxInfo ? l.total_price_taxed : l.total_price)
                         .replace('%1', newPrice)
                         .replace('%2', pro.taxInfo
-                            && (pro.taxInfo.taxName + ' ' + formatPercentage(pro.taxInfo.taxPercent))))
+                            && (pro.taxInfo.taxName + ' ' + formatPercentage(pro.taxInfo.taxPercent, false, 2))))
                     .removeClass('hidden');
             }
             else {
@@ -2853,6 +2858,8 @@ pro.propay = {
                     }
                     this.renderPlanInfo();
                     this.updatePayment();
+                    // Deselected: the label falls back off the gateway's own tax document name.
+                    pro.propay.billing.updateTaxEntryField();
 
                     return;
                 }
@@ -3760,6 +3767,9 @@ pro.propay = {
         this.skItems.footers.startLoad();
         this.skItems.rightBlock.startLoad();
 
+        // Carried over from the pricing page, and dropped once the user leaves these pages
+        pro.watchDisplayCurrency();
+
         const userBusInfo = u_attr && u_attr.b;
         const userIsBusMasterAcc = userBusInfo && u_attr.b.m;
         const userFlexiInfo = u_attr && u_attr.pf;
@@ -3876,6 +3886,9 @@ pro.propay = {
                 loadSubPage('pro');
                 return false;
             }
+
+            // Needs the plans, to tell a currency that is on offer from one that is not
+            pro.applyUrlCurrency();
 
             if (discountInfo && !this.instantDiscount) {
                 if (!this.isNewAccount) {
@@ -4329,12 +4342,14 @@ pro.propay = {
             // etpn,  // Current net price (Eur)
             pd,       // Discount value
             ex,       // Expiration time
+            tx,       // Tax value
             txe,      // Tax excempt
             txn       // Tax label
         } = dci;
-        const isEuro = !lcc || lcc === 'EUR';
+        // Both sides are quoted, so follow the displayed currency and fall back where there is no local
+        const isEuro = pro.displayEuro || !lcc || lcc === 'EUR';
         const currency = isEuro && 'EUR' || lcc;
-        const isBeforeTax = txe === 2;
+        const isBeforeTax = txe === 2 && +tx;
         const newPrice = isEuro ? (isBeforeTax ? edtpn : edtp) : (isBeforeTax ? ldtpn : ldtp);
         const prevPrice = matchedPlanObj.getPricing(true, m)[isEuro ? 'priceEuro' : 'price'];
 

@@ -1768,7 +1768,7 @@ var addressDialog = {
         const $invoiceNote = $('.taxcode-invoice-note', this.$dialog);
 
         const countryCode = $('.option[data-state="active"]', $countriesSelect).attr('data-value');
-        const taxName = getTaxName(countryCode);
+        const taxName = pro.propay.billing.getTaxFieldLabel(countryCode);
         const billingType = pro.propay.billing.getBillingType();
         const allRequiredFields = pro.propay.billing.getRequiredFields();
         const requiredFields = allRequiredFields[`${billingType}Required`];
@@ -1850,7 +1850,7 @@ var addressDialog = {
                 $('span', $statesSelect).first().text(l[7192]);
             }
 
-            var taxName = getTaxName(selectedCountryCode);
+            var taxName = pro.propay.billing.getTaxFieldLabel(selectedCountryCode);
             if ($titleElemTaxCode.length) {
                 $taxcodeMegaInput.updateTitle(taxName);
             }
@@ -2598,7 +2598,7 @@ var addressDialog = {
         const billingType = pro.propay.billing.getBillingType();
         const requiredFields = pro.propay.billing.getRequiredFields()[`${billingType}Required`] || [];
 
-        const taxName = getTaxName(country);
+        const taxName = pro.propay.billing.getTaxFieldLabel(country);
         const taxMegaInput = inputSelector(this.taxCodeMegaInput);
         if (!pro.propay.onPropayPage() && requiredFields.includes('taxCode')) {
             if (taxCode) {

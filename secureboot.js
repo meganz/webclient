@@ -422,6 +422,10 @@ function getCleanSitePath(path) {
                 sessionStorage['pro.period'] = path.m;
                 sessionStorage['pro.initialDuration'] = path.m;
             }
+            // Only stashed here, as whether it is on offer is not known until the plans load
+            if (path.curr && path[0].startsWith('propay_')) {
+                sessionStorage['pro.urlCurrency'] = path.curr;
+            }
         }, false)();
 
         if (path.mt) {

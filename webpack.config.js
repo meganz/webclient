@@ -3,6 +3,8 @@ var webpack = require("webpack");
 var entryPoints = [
     './js/chat/chat.jsx',
     './js/chat/ui/conversations.jsx',
+    './js/chat/chatGlobalEventManager.jsx',
+    './js/chat/ui/meetings/workflow/incoming.jsx',
 ];
 
 const path = require('path');
@@ -37,8 +39,10 @@ var webpackConfigs = {
         devServer: {
             port: 8089,
             hot: 'only',
-            static: __dirname,
-            liveReload: false,
+            static: {
+                directory: __dirname,
+                watch: false
+            },
             webSocketServer: 'ws',
             historyApiFallback: true
         },

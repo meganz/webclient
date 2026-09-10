@@ -348,7 +348,7 @@ RepayPage.prototype.initPage = function() {
 
             const taxInfo = {
                 name: res.txn,
-                percentage: (res.tx !== undefined) && +res.tx,
+                percentage: +res.tx,
                 variant: res.txva,
                 taxAmount: res.ltax || res.tax,
                 totalPrice: res.lt || res.t
@@ -357,7 +357,7 @@ RepayPage.prototype.initPage = function() {
 
             const showTaxInfo = !!(!res.exc
                 && name
-                && (percentage !== false)
+                && percentage
                 && (variant !== undefined)
                 && taxAmount && totalPrice);
 
@@ -505,7 +505,7 @@ RepayPage.prototype.initPage = function() {
             if (showTaxInfo) {
                 $('.repay-td-tax-name', $taxInfo).text(l.tax_name_percentage
                     .replace('%1', taxInfo.name)
-                    .replace('%2', formatPercentage(+taxInfo.percentage / 100)));
+                    .replace('%2', formatPercentage(+taxInfo.percentage / 100, false, 2)));
                 $('.repay-td-tax-amount', $taxInfo).text(applyFormat(intl.format(taxInfo.taxAmount)));
 
                 $taxInfo.removeClass('hidden');

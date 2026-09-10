@@ -1169,7 +1169,7 @@ var ulmanager = {
         }
 
         if (promises.length) {
-            Promise.allSettled(promises).then(startUpload);
+            Promise.allSettled(promises).then(startUpload).catch(reportError);
         }
         else {
             startUpload();

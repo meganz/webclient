@@ -11,17 +11,13 @@
     const getStore = (h) => M.c[h] ? M.c : M.tnc;
     const contents = (h) => getStore(h)[h];
 
-    var setName = function(file, name) {
-        try {
-            Object.defineProperty(file, 'name', {
-                writable: true,
-                configurable: true,
-                value: M.getSafeName(name)
-            });
-        }
-        catch (e) {
-        }
-    };
+    const setName = tryCatch((file, name) => {
+        Object.defineProperty(file, 'name', {
+            value: name,
+            writable: true,
+            configurable: true
+        });
+    });
 
     var ns = {
         /**
@@ -99,7 +95,7 @@
 
                 var found = null;
                 var nodeTarget = file.target || target;
-                var nodeName = M.getSafeName(file.name);
+                const nodeName = file.name;
 
                 if (contents(nodeTarget)) {
                     found = this.getNodeByName(nodeTarget, nodeName, false);
@@ -298,7 +294,7 @@
                     decrNodes[n.p].push(tmp);
                 }
                 else {
-                    const exist = this.getNodeByName(t, M.getSafeName(tmp.name));
+                    const exist = this.getNodeByName(t, tmp.name);
                     if (exist) {
                         conflictRoots.push([tmp, exist]);
                     }
@@ -459,7 +455,7 @@
 
                 var found = null;
 
-                var nodeName = M.getSafeName(currNode.name);
+                const nodeName = currNode.name;
                 if (contents(target)) {
                     found = this.getNodeByName(target, nodeName, false);
                 }
@@ -514,14 +510,15 @@
          * @returns {MegaPromise}
          */
         prompt: function(op, file, node, remaining, target, dupsNB) {
+            const {name} = file;
             var promise = new MegaPromise();
             var $dialog = this.getDialog();
-            var name = M.getSafeName(file.name);
             var $a1 = $('.action-block.a1', $dialog).removeClass('hidden');
             var $a2 = $('.action-block.a2', $dialog).removeClass('hidden');
             var $a3 = $('.action-block.a3', $dialog).removeClass('hidden');
             var $icons = $('.item-type-icon-90', $dialog);
             var classes = $icons.attr('class').split(' ');
+
             $icons.removeClass(classes[classes.length - 1]); // remove last class
 
             // Hide the loading spinner, it will be shown again when the conflict is being resolved
@@ -531,7 +528,7 @@
                 $icons.addClass(`icon-${folderIcon(node)}-90`);
                 $('.info-txt.light-grey', $dialog).text(l[17556]);
                 $('.info-txt-fn', $dialog)
-                    .safeHTML(escapeHTML(l[17550]).replace('%1', '<strong>' + name + '</strong>'));
+                    .safeHTML(escapeHTML(l[17550]).replace('%1', `<strong>${escapeHTML(name)}</strong>`));
             }
             else {
                 $icons.addClass(`icon-${fileIcon(node)}-90`);
@@ -543,7 +540,7 @@
 
                 $('.info-txt.light-grey', $dialog).text(l[16487]);
                 $('.info-txt-fn', $dialog)
-                    .safeHTML(escapeHTML(l[16486]).replace('%1', '<strong>' + name + '</strong>'));
+                    .safeHTML(escapeHTML(l[16486]).replace('%1', `<strong>${escapeHTML(name)}</strong>`));
             }
 
             switch (op) {
@@ -552,7 +549,7 @@
                     $('.info-txt.light-grey', $dialog).text(l[22103]);
                     if (file.t) {
                         $('.info-txt-fn', $dialog)
-                            .safeHTML(l[22104].replace('{0}', '<strong>' + name + '</strong>'));
+                            .safeHTML(escapeHTML(l[22104]).replace('{0}', `<strong>${escapeHTML(name)}</strong>`));
 
                         $('.red-header', $a1).text(l[22105]);
                         $('.light-grey', $a1).text(l[22110]);
@@ -567,7 +564,7 @@
                         $('.light-grey', $a2).text(l[22108]);
 
                         $('.info-txt-fn', $dialog)
-                            .safeHTML(l[22109].replace('{0}', '<strong>' + name + '</strong>'));
+                            .safeHTML(escapeHTML(l[22109]).replace('{0}', `<strong>${escapeHTML(name)}</strong>`));
 
                     }
                     break;
@@ -677,7 +674,7 @@
                     $('.file-name', $a1).text(this.findNewName(file.name, target));
                     $('.file-name', $a2).text(name);
                     $('.file-name', $a3).text(name);
-                    $('.file-size', $a2).text(mega.icu.format(l[22113], dupsNB - 1));
+                    $('.file-size', $a2).text(mega.icu.format(escapeHTML(l[22113]), dupsNB - 1));
                     $('.file-date', $a1).text('');
                     $('.file-date', $a2).text('');
                     $('.file-date', $a3).text('');
@@ -741,8 +738,8 @@
 
             if (remaining) {
                 var remainingConflictText = remaining > 1 ?
-                    escapeHTML(l[16494]).replace('%1', '<span>' + remaining + '</span>') :
-                    l[23294];
+                    escapeHTML(l[16494]).replace('%1', `<span>${escapeHTML(remaining)}</span>`) :
+                    escapeHTML(l[23294]);
                 if (op === 'import') {
                     remainingConflictText = l.conflict_apply_all_nc;
                 }
@@ -1080,7 +1077,7 @@
 
                                     if ((f1 && f1.length) || (f2 && f2.length)) {
                                         loadingDialog.phide();
-                                        msgDialog('warninga', 'Moving Error', l[17739], 'Error in Merging');
+                                        msgDialog('warninga', 'Moving Error', escapeHTML(l[17739]), 'Error in Merging');
                                     }
                                     else {
                                         M.moveNodes([olderNode], M.RubbishID)

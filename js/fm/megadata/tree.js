@@ -132,6 +132,9 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
         s4.utils.renderContainerTree(dialog, sSubMap);
         stype = 's4';
     }
+    else if (n.h === 'albums') {
+        return this.renderAlbumsTree();
+    }
     /* eslint-enable local-rules/jquery-replacements */
 
     prefix = stype;
@@ -489,6 +492,55 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
 };
 
 /**
+ * Renders the album list in the Media tree panel.
+ * Skips computing automatic albums reading M.sets only.
+ *
+ * @returns {void} void
+ */
+MegaData.prototype.renderAlbumsTree = function() {
+    'use strict';
+
+    const wrap = document.querySelector('.js-albums-tree-panel');
+    const panel = wrap && wrap.querySelector('.content-panel.albums .tree');
+    if (!panel) {
+        return;
+    }
+
+    const albums = Object.values(this.sets)
+        .map(({ id, name }) => ({ id, label: name || l.unknown_album_name }))
+        .sort((a, b) => this.compareStrings(a.label, b.label, 1));
+
+    const cv = this.currentCustomView;
+    const openId = cv && cv.type === 'albums' && cv.nodeID;
+    const list = document.createElement('ul');
+    list.id = 'treesub_albums';
+    for (let i = 0; i < albums.length; i++) {
+        const { id, label } = albums[i];
+        const item = this.tree$tmpl.cloneNode(true);
+        const link = item.firstElementChild;
+        const title = link.querySelector('.nw-fm-tree-folder');
+        const icon = document.createElement('i');
+        const stacked = document.createElement('i');
+
+        item.id = `treeli_set_${id}`;
+        link.id = `treea_set_${id}`;
+        icon.className = 'item-type-icon icon-image-24 double';
+        stacked.className = 'item-type-icon icon-image-24';
+        icon.appendChild(stacked);
+        title.className = 'nw-fm-tree-icon-wrap';
+        title.append(icon, label);
+        if (id === openId) {
+            link.classList.add('selected');
+        }
+        list.appendChild(item);
+    }
+
+    panel.textContent = '';
+    panel.appendChild(list);
+    wrap.classList.toggle('contains-tree', albums.length > 0);
+};
+
+/**
  * getSearchedTreeHandles
  *
  * Search tree of given handle and return object of subfolders that has name contains search terms,
@@ -806,7 +858,7 @@ MegaData.prototype.addTreeUI = function() {
     var $treeItem = $('.nw-fm-tree-item', $treePanel);
 
     if (!folderlink) {
-        $treeItem.draggable(
+        $treeItem.not('[id^="treea_set_"]').draggable(
             {
                 revert: true,
                 containment: 'document',
@@ -892,6 +944,9 @@ MegaData.prototype.addTreeUI = function() {
         id = cv ? cv.nodeID : id;
 
         if (e.type === 'contextmenu') {
+            if (cv.type === 'albums') {
+                return false;
+            }
             $('.nw-fm-tree-item').removeClass('dragover');
             $this.addClass('dragover');
 

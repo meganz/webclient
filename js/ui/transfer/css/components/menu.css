@@ -97,9 +97,13 @@
     border-radius: var(--radius-i-md);
     box-shadow: var(--shadow-sm);
     padding: 4px;
-    position: absolute;
+    position: fixed;
     margin: 0;
     z-index: 250;
+}
+
+.it-menu.context.visible {
+    position: absolute;
 }
 
 .it-menu.context .it-menu-item {

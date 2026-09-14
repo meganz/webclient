@@ -80,6 +80,10 @@ lazy(T.ui, 'input', () => {
                     });
                 }
 
+                if (opt.input) {
+                    n.addEventListener('input', tryCatch(opt.input));
+                }
+
                 n = n.closest('.it-input');
                 if (n) {
                     n.addEventListener('click', () => {

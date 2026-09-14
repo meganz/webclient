@@ -1288,7 +1288,7 @@ var notify = {
         'use strict';
 
         notify.$popup.find('.notification-item.nt-contact-accepted').rebind('click', (e) => {
-            const contactId = $(e.currentTarget).closest('.notification-item').attr('contact-id');
+            const contactId = $(e.currentTarget).closest('.notification-item').attr('contact-handle');
             notify.closePopup();
 
             if (M.c.contacts && contactId in M.c.contacts) {
@@ -1315,7 +1315,7 @@ var notify = {
 
             // Get the folder ID from the HTML5 data attribute
             const $this = $(this);
-            const folderId = $this.attr('data-folder-id');
+            const folderId = $this.attr('data-folder-handle');
             const notificationID = $this.attr('id');
 
             if (!folderId) {
@@ -1361,8 +1361,8 @@ var notify = {
         // Select the notifications with shares or new files/folders
         $('.notification-item.nt-link-activity', this.$popup).rebind('click.laclick', (ev) => {
             const elm = $(ev.currentTarget);
-            const h = elm.attr('data-item-id');
-            const ph = elm.attr('data-item-id');
+            const h = elm.attr('data-item-nh');
+            const ph = elm.attr('data-item-ph');
 
             notify.closePopup();
             mega.Share.showLinkStatsDialog({h, ph}).catch(tell);
@@ -1378,7 +1378,7 @@ var notify = {
         this.$popup.find('.nt-takedown-notification, .nt-takedown-reinstated-notification').rebind('click', function() {
 
             // Get the folder ID from the HTML5 data attribute
-            const folderOrFileId = $(this).attr('data-folder-or-file-id');
+            const folderOrFileId = $(this).attr('data-ff-handle');
             const parentFolderId = folderOrFileId ? (notify.ndm.getNode(folderOrFileId) || {}).p : false;
 
             // Mark all notifications as seen and close the popup
@@ -1443,7 +1443,7 @@ var notify = {
         'use strict';
 
         $('.notifications-button.accept-contact-request', this.$popup).rebind('click.acceptContactRequest', (e) => {
-            const contactId = $(e.currentTarget).closest('.notification-item').attr('contact-id');
+            const contactId = $(e.currentTarget).closest('.notification-item').attr('contact-handle');
             M.acceptPendingContactRequest(contactId).catch(dump);
             notify.closePopup();
             eventlog(500467);
@@ -1451,7 +1451,7 @@ var notify = {
         });
 
         $('.notifications-button.decline-contact-request', this.$popup).rebind('click.declineContactRequest', (e) => {
-            const contactId = $(e.currentTarget).closest('.notification-item').attr('contact-id');
+            const contactId = $(e.currentTarget).closest('.notification-item').attr('contact-handle');
             M.denyPendingContactRequest(contactId).catch(dump);
             notify.closePopup();
             // TODO event log?
@@ -1495,7 +1495,7 @@ var notify = {
         'use strict';
 
         $('.nt-dynamic-notification', this.$popup).rebind('click.dynamicNotification', e => {
-            const dynamicId = $(e.currentTarget).attr('data-dynamic-id');
+            const dynamicId = $(e.currentTarget).attr('data-dynamic-ni');
             const {cta1, cta2, e: expTime} = notify.dynamicNotifs[dynamicId] || {};
 
             if (expTime !== undefined && expTime - unixtime() <= 0) {
@@ -1738,7 +1738,7 @@ var notify = {
         if (isContact) {
             const user = M.getUserByEmail(contactEmail);
             if (user) {
-                $notificationHtml.addClass('clickable').attr('contact-id', user.h);
+                $notificationHtml.addClass('clickable').attr('contact-handle', user.h);
             }
         }
         else {
@@ -1751,7 +1751,7 @@ var notify = {
                 .addClass('accept-contact-request').removeClass('hidden');
             $('span', $bAccept).text(l[5856]);
 
-            $notificationHtml.addClass('clickable').attr('contact-id', contactId);
+            $notificationHtml.addClass('clickable').attr('contact-handle', contactId);
         }
 
         return $notificationHtml;
@@ -1783,7 +1783,7 @@ var notify = {
             ? l.admin_sub_contacts
             : l.notification_contact_accepted;
 
-        $notificationHtml.addClass('nt-contact-accepted clickable').attr('contact-id', userHandle);
+        $notificationHtml.addClass('nt-contact-accepted clickable').attr('contact-handle', userHandle);
         $('.notification-info', $notificationHtml).text(title);
 
         return $notificationHtml;
@@ -1810,7 +1810,7 @@ var notify = {
             : notification.userHandle;
 
         // contact request accepted (action === 2)
-        $notificationHtml.addClass('nt-contact-accepted clickable').attr('contact-id', userHandle);
+        $notificationHtml.addClass('nt-contact-accepted clickable').attr('contact-handle', userHandle);
         $('.notification-info', $notificationHtml).text(l.notification_contact_accepted);
 
         return $notificationHtml;
@@ -1844,7 +1844,7 @@ var notify = {
                 $('.notification-info', $notificationHtml).text(info);
             }
 
-            $notificationHtml.addClass('clickable').attr('data-folder-id', handle);
+            $notificationHtml.addClass('clickable').attr('data-folder-handle', handle);
         }
 
         if (isDefaults) {
@@ -1881,7 +1881,7 @@ var notify = {
                 `nt-link-activity auto-height${h && M.getNodeShare(h) ? ' clickable' : ''}`
             )
             .attr({
-                'data-item-id': h || '',
+                'data-item-nh': h || '',
                 'data-item-ph': ph || ''
             });
 
@@ -2099,7 +2099,7 @@ var notify = {
                 $notificationHtml.addClass(isUpdate ? 'nt-updated-files' : 'nt-new-files');
             }
 
-            $notificationHtml.addClass('clickable').attr('data-folder-id', handle);
+            $notificationHtml.addClass('clickable').attr('data-folder-handle', handle);
         }
 
         if (isDefaults) {
@@ -2362,7 +2362,7 @@ var notify = {
 
         $notificationHtml.addClass(cssClass);
         if (isClickable) {
-            $notificationHtml.addClass('clickable').attr('data-folder-or-file-id', handle);
+            $notificationHtml.addClass('clickable').attr('data-ff-handle', handle);
         }
 
         $('.notification-avatar-icon', $notificationHtml).addClass('hidden');
@@ -2537,7 +2537,7 @@ var notify = {
         const folderNode = node ? this.ndm.getNode(node.p || notification.data.n) : false;
 
         if (folderNode) {
-            $notificationHtml.addClass('clickable').attr('data-folder-id', folderNode.h);
+            $notificationHtml.addClass('clickable').attr('data-folder-handle', folderNode.h);
             if (folderNode.name) {
                 this.renderNotificationTitle($notificationHtml, this.shortenNodeName(folderNode.name));
             }
@@ -2715,7 +2715,7 @@ var notify = {
         $('.notification-info', $notificationHtml).text(d);
 
         $notificationHtml.addClass(cssClass);
-        $notificationHtml.attr('data-dynamic-id', id);
+        $notificationHtml.attr('data-dynamic-ni', id);
         $notificationHtml.attr('id', `dynamic-notif-${id}`);
 
         return $notificationHtml;

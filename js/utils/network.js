@@ -457,7 +457,7 @@ function eventlog(id, msg, once) {
         if (msg) {
             req.m = String(msg).replace(/[\t\n\v\f\r\u200E\u200F\u202E]+/g, ' ');
 
-            if (req.m.length > 666) {
+            if (req.m.length > 1536) {
                 if (d) {
                     console.error('The message provided for %s is too large...', id, [req.m]);
                 }

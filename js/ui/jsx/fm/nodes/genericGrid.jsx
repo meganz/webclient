@@ -54,7 +54,7 @@ export default class GenericGrid extends GenericNodePropsComponent {
                     <span className="versioning-indicator">
                         <i className="sprite-fm-mono icon-versions-previous"></i>
                     </span>
-                    <i className="sprite-fm-mono icon-link"></i>
+                    <i className="sprite-fm-mono icon-link-thin-outline"></i>
                 </span>
                 <span className={"item-type-icon-90 icon-" + this.nodeProps.icon + "-90"}>{image}</span>
                 <div className="video-thumb-details">

@@ -8,6 +8,9 @@ export class GenericTableHeader extends MegaRenderMixin {
     render() {
         let { sortBy, columns } = this.props;
 
+        // Sorting can be turned off for the whole header (e.g. quick-access)
+        const headerSortable = this.props.sortable !== false;
+
         let columnsRendered = [];
         for (let i = 0; i < columns.length; i++) {
             let col = columns[i];
@@ -17,17 +20,19 @@ export class GenericTableHeader extends MegaRenderMixin {
                 col = col[0];
             }
 
+            const colSortable = col.sortable && headerSortable;
+
             let sortable;
-            if (col.sortable) {
+            if (colSortable) {
                 let classes = "";
                 if (sortBy[0] === col.id) {
-                    const ordClass = sortBy[1] === "desc" ? "icon-arrow-down" : "icon-arrow-up";
+                    const ordClass = sortBy[1] === "desc" ? "asc" : "desc";
                     classes = `${classes} ${ordClass}`;
                 }
                 if (col.id === 'fav') {
                     classes += ' hidden';
                 }
-                sortable = <i className={`sprite-fm-mono ${col.id} ${classes}`} />;
+                sortable = `arrow sprite-fm-mono icon-arrow-left-thin-solid ${col.id} ${classes}`;
             }
 
             columnsRendered.push(
@@ -37,14 +42,13 @@ export class GenericTableHeader extends MegaRenderMixin {
                     key={col.id + "_" + i}
                     onClick={(e) => {
                         e.preventDefault();
-                        if (col.sortable) {
+                        if (colSortable) {
                             this.props.onClick(col.id);
                         }
                     }}
                 >
-                    <span>{colProps?.label || col.label}</span>
+                    <span className={sortable || ''}>{colProps?.label || col.label}</span>
                     {col.icon && <i className={"sprite-fm-mono " + col.icon}></i>}
-                    {sortable}
                 </th>
             );
         }

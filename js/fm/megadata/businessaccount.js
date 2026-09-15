@@ -1206,12 +1206,14 @@ BusinessAccount.prototype.getBusinessPlanInfo = async function(forceUpdate, flex
 
             const {txn, tx, txva, txcc, txe} = result[0];
 
-            pro.taxInfo = !!(txn && (tx !== undefined)) && (txva !== undefined) && !txe && {
+            pro.taxInfo = !!(txn && +tx) && (txva !== undefined) && !txe && {
                 taxName: txn,
                 taxPercent: tx / 100,
                 variant: txva,
                 taxCountry: txcc,
             };
+
+            pro.taxCountry = txcc || false;
 
             // This utqa's tax context can differ from what pro.membershipPlans was built with;
             // force the next pro.loadMembershipPlans to refetch instead of reusing the cache.

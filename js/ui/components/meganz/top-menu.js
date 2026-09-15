@@ -300,6 +300,8 @@ class MegaTopMenu extends MegaMobileTopMenu {
                 href: '/fm/photos',
                 name: 'media',
                 typeClassname: 'drive',
+                hasTree: 'albums',
+                treeWrapClass: 'js-albums-tree-panel',
                 simpletip: l.media,
                 simpletipClass: 'small-sidebar-tip',
                 simpletipPos: 'right',

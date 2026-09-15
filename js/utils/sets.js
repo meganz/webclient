@@ -209,7 +209,7 @@ lazy(mega, 'sets', () => {
         /**
          * @param {String} h Node handle to assosiate with the set
          * @param {String} setId Set id to add the element to
-         * @param {String} setKey Set key to use for encryption
+         * @param {String|Number[]} setKey Set key to use for encryption
          * @returns {function(...[*]): Promise<void>}
          */
         add: async(h, setId, setKey) => {
@@ -218,6 +218,7 @@ lazy(mega, 'sets', () => {
             if (!n) {
                 throw new Error('Cannot find the node to add to the set...');
             }
+            setKey = typeof setKey === 'string' ? base64_to_a32(setKey) : setKey;
 
             return sendScReq('aep', {
                 h,
@@ -225,7 +226,7 @@ lazy(mega, 'sets', () => {
                 k: ab_to_base64(
                     asmCrypto.AES_CBC.encrypt(
                         a32_to_ab(n.k),
-                        a32_to_ab(decrypt_key(u_k_aes, base64_to_a32(setKey))),
+                        a32_to_ab(decrypt_key(u_k_aes, setKey)),
                         false
                     )
                 )

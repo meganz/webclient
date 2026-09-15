@@ -27,6 +27,9 @@ BusinessRegister.prototype.initPage = function(
     loadingDialog.show('registerb-init');
     extra = extra || Object.create(null);
 
+    // Carried over from the pricing page, and dropped once the user leaves these pages
+    pro.watchDisplayCurrency();
+
     var $pageContainer = $('.bus-reg-body');
     var mySelf = this;
 
@@ -341,7 +344,7 @@ BusinessRegister.prototype.initPage = function(
         if (taxInfo) {
             $('.plan-tax-val', $taxRow).text(l.tax_name_percentage
                 .replace('%1', pro.taxInfo.taxName)
-                .replace('%2', formatPercentage(pro.taxInfo.taxPercent)));
+                .replace('%2', formatPercentage(pro.taxInfo.taxPercent, false, 2)));
             $('.plan-tax-amount', $taxRow).text(
                 formatCurrency(pro.taxInfo.taxPercent * (totalUsr + Math.max(totalQuota, 0)), mySelf.planInfo.l.lc));
             $taxRow.removeClass('hidden');

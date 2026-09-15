@@ -195,6 +195,40 @@
         return chats;
     };
 
+    const isGalleryUploadTarget = () => section !== 'conversations'
+        && !(M.tree.s4 && M.tree.s4[$.mcselected])
+        && M.getNodeRoot($.mcselected) === M.RootID;
+
+    const handleDialogBanner = () => {
+        const banner = $dialog[0].querySelector('.picker-banner');
+        if (!$.mediaUpload && (!$.albumUpload || !isGalleryUploadTarget())) {
+            banner.classList.add('hidden');
+            return;
+        }
+        banner.classList.remove('info', 'warn', 'error', 'hidden');
+        const icon = banner.querySelector('.picker-banner-icon');
+        icon.classList.remove(
+            'icon-info-thin-outline',
+            'icon-alert-triangle-thin-outline',
+            'icon-x-circle-thin-outline'
+        );
+        const text = banner.querySelector('.picker-banner-msg');
+        if ($.mediaUpload) {
+            const galleryPossible = section === 'quick-access' ?
+                isGalleryUploadTarget() :
+                section === 'cloud-drive' || section === 'conversations';
+            text.textContent = galleryPossible ? l.upload_to_media_banner : l.choose_upload_location;
+            icon.classList.add('icon-info-thin-outline');
+            banner.classList.add('info');
+        }
+        else if ($.albumUpload) {
+            text.textContent = l.upload_to_album_banner
+                .replace('%s', mega.gallery.albums.store[$.albumUpload].label);
+            icon.classList.add('icon-info-thin-outline');
+            banner.classList.add('info');
+        }
+    };
+
     /**
      * Set the dialog button state to either disabled or enabled
      * @param {Object} $btn The jQuery's node or selector
@@ -260,6 +294,7 @@
         else {
             $('.dialog-newfolder-button span', $dialog).text(l.create_folder);
         }
+        handleDialogBanner();
     };
 
     let chatSel = [];
@@ -1957,6 +1992,7 @@
 
         // Activate tab
         $('.fm-picker-dialog-button[data-section="' + section + '"]', $dialog).addClass('active');
+        handleDialogBanner();
     };
 
     /**
@@ -2167,6 +2203,10 @@
                 var dir = M.currentdirid;
                 if (tab === 'conversations' && $.dialogSelChats) {
                     delete $.dialogSelChats;
+                }
+                if (M.isGalleryPage() || M.isAlbumsPage()) {
+                    // Gallery/album views are not a valid upload target
+                    dir = M.RootID;
                 }
                 closeMsg();
                 handleOpenDialog(tab, dir, { key: 'copyToUpload', value: [files, emptyFolders] });
@@ -2998,6 +3038,14 @@
                 if ($('.notagain', $dialog).prop('checked')) {
                     mega.config.setn('ulddd', 1);
                     eventlog(501137);
+                }
+                if ($.albumUpload) {
+                    if (isGalleryUploadTarget()) {
+                        mega.gallery.albums.handleUploadToAlbum();
+                    }
+                    else {
+                        delete $.albumUpload;
+                    }
                 }
 
                 closeDialog();

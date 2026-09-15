@@ -1248,6 +1248,9 @@ pro.proplan = {
         'use strict';
         mega.discountCode = page.substr(8);
 
+        // A short sale URL from a prior visit would override this code on every dci refresh.
+        delete mega.shortUrl;
+
         if (mega.discountCode.length < 15) {
             // it should be 22 length. but made 10 because i am not sure if len=22 is guaranteed
             delete mega.discountInfo;

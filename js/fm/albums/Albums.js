@@ -3655,6 +3655,7 @@ lazy(mega.gallery, 'albums', () => {
              * @type {Function[]}
              */
             this.setsSubscribers = [];
+            this._uplListeners = [];
         }
 
         subscribeToSetsChanges() {
@@ -4707,6 +4708,55 @@ lazy(mega.gallery, 'albums', () => {
             dialog.show();
         }
 
+        /**
+         * Add valid nodes to album via drag and drop
+         * @param {String} albumId Album the nodes were dropped onto
+         * @param {String[]} handles Handles of the nodes being dropped
+         * @returns {void} void
+         */
+        addDroppedNodes(albumId, handles) {
+            const album = M.sets[albumId];
+            if (!album || !handles.length || M.isInvalidUserStatus()) {
+                return;
+            }
+            const existing = new Set(Array.from(album.e.values(), (n) => n.h));
+            const elements = [];
+            for (let i = handles.length; i--;) {
+                const n = M.getNodeByHandle(handles[i]);
+                if (n.t) {
+                    mega.ui.toast.show(l.err_drag_album_folder);
+                    return;
+                }
+                else if (!M.isGalleryNode(n)) {
+                    mega.ui.toast.show(l.err_drag_album_types);
+                    return;
+                }
+                else if (existing.has(n.h)) {
+                    mega.ui.toast.show(l.err_drag_album_exist);
+                    return;
+                }
+                elements.push({ h: n.h, o: (existing.size + elements.length + 1) * 1000 });
+            }
+
+            loadingDialog.show('MegaAlbumsAddItems');
+            mega.sets.elements.bulkAdd(elements, albumId, album.k)
+                .then(() => {
+                    mega.ui.toast.show(
+                        mega.icu.format(l.added_to_albums, elements.length)
+                            .replace('%s', album.name || l.unknown_album_name),
+                        4,
+                        l[16797],
+                        {actionButtonCallback: () => M.openFolder(`albums/${albumId}`).catch(dump)}
+                    );
+                })
+                .catch(() => {
+                    console.error(`Cannot add items to album ${albumId}`);
+                })
+                .finally(() => {
+                    loadingDialog.hide('MegaAlbumsAddItems');
+                });
+        }
+
         openDialog(className, ...args) {
             let dialog;
             switch (className) {
@@ -4738,6 +4788,130 @@ lazy(mega.gallery, 'albums', () => {
             if (dialog) {
                 dialog.show();
             }
+        }
+
+        getUploadTarget() {
+            if (M.currentdirid === 'albums' || !M.currentCustomView) {
+                return false;
+            }
+            const { nodeID } = M.currentCustomView;
+            return this.store[nodeID] && !this.store[nodeID].filterFn && nodeID;
+        }
+
+        handleUploadToAlbum() {
+            if (this._uplListeners.length) {
+                return;
+            }
+            const pendingMap = new Map();
+            const ufo = Object.create(null);
+            const faMap = new Map();
+            const cleanup = (uid) => {
+                const ul = ulmanager.ulEventData[uid];
+                if (ul) {
+                    faMap.delete(ul.faid);
+                    faMap.delete(ul.h);
+                }
+                delete ulmanager.ulEventData[uid];
+                pendingMap.delete(uid);
+
+                if (!pendingMap.size) {
+                    for (let i = this._uplListeners.length; i--;) {
+                        mBroadcaster.removeListener(this._uplListeners[i]);
+                    }
+                    this._uplListeners.length = 0;
+                }
+            };
+            const onNodeReady = (uid, n) => {
+                if (M.isGalleryNode(n)) {
+                    const albumId = pendingMap.get(uid);
+                    if (albumId) {
+                        const album = this.store[albumId];
+                        if (album) {
+                            const { id, k, eHandles } = album;
+                            if (!eHandles[n.h]) {
+                                mega.sets.elements.add(n.h, id, k).catch(dump);
+                            }
+                        }
+                    }
+                }
+                cleanup(uid);
+            };
+            const onError = (uid) => {
+                if (pendingMap.has(uid)) {
+                    cleanup(uid);
+                }
+            };
+            const isFaReady = (fa, efa) => !efa || (fa ? String(fa).split('/').length : 0) >= efa;
+            const onComplete = (uid, h, faid) => {
+                if (!pendingMap.has(uid)) {
+                    return;
+                }
+                const n = M.getNodeByHandle(h);
+                const ul = ulmanager.ulEventData[uid];
+                if (ul) {
+                    ul.h = h;
+                    if (ul.efa && !n) {
+                        ul.efa = 0;
+                    }
+                    else if (ufo[faid]) {
+                        ul.efa = Math.max(0, ul.efa - ufo[faid]) | 0;
+                    }
+
+                    if (isFaReady(n && n.fa, ul.efa)) {
+                        onNodeReady(uid, n);
+                    }
+                    else {
+                        console.assert(!ul.faid || ul.faid === faid, `${faid} != ${ul.faid}`);
+                        ul.faid = faid;
+                        // Wait for FA
+                        faMap.set(h, uid);
+                        if (faid) {
+                            faMap.set(faid, uid);
+                        }
+                    }
+                }
+            };
+            const onFaError = (faid, error, onStorageAPIError, nFAiled) => {
+                const ul = ulmanager.ulEventData[faMap.get(faid)];
+                if (ul) {
+                    ul.efa = Math.max(0, ul.efa - nFAiled) | 0;
+                    if (ul.h) {
+                        const n = M.getNodeByHandle(ul.h);
+                        if (isFaReady(n && n.fa, ul.efa)) {
+                            onNodeReady(ul.uid, n);
+                        }
+                    }
+                }
+                else {
+                    ufo[faid] = (ufo[faid] | 0) + nFAiled;
+                }
+            };
+            const onFaComplete = (handle, fa) => {
+                delay(`albums:fa-ready:${handle}`, () => {
+                    const { h, uid, efa } = ulmanager.ulEventData[faMap.get(handle)] || false;
+                    const n = h && M.getNodeByHandle(h);
+                    if (n && isFaReady(fa, efa)) {
+                        onNodeReady(uid, n);
+                    }
+                });
+            };
+            const onStart = (data) => {
+                const entries = Object.values(data);
+                for (let i = entries.length; i--;) {
+                    const { uid, album } = entries[i];
+                    if (album) {
+                        pendingMap.set(uid, album);
+                    }
+                }
+            };
+            this._uplListeners.push(
+                mBroadcaster.addListener('upload:error', onError),
+                mBroadcaster.addListener('upload:abort', onError),
+                mBroadcaster.addListener('upload:completion', onComplete),
+                mBroadcaster.addListener('fa:error', onFaError),
+                mBroadcaster.addListener('fa:ready', onFaComplete),
+                mBroadcaster.addListener('upload:start', onStart)
+            );
         }
     }
 

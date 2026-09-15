@@ -677,13 +677,21 @@ lazy(mega, 'wsuploadmgr', () => {
 
         showthroughput(bytesinflight) {
             if (!this.abort && this.reader.file.owner) {
-                const {reader: {file}, bytesuploaded, speedometer} = this;
+                const {reader: {file, logger}, bytesuploaded, speedometer} = this;
 
                 if (!file.ulSilent) {
-                    const b = bytesuploaded + bytesinflight;
-                    const p = GlobalProgress[file.owner.gid].speed = speedometer.progress(b);
+                    const {gid} = file.owner;
 
-                    M.ulprogress(file, Math.floor(b / file.size * 100), b, file.size, p);
+                    if (GlobalProgress[gid]) {
+                        const b = bytesuploaded + bytesinflight;
+                        const p = speedometer.progress(b);
+
+                        GlobalProgress[gid].speed = p;
+                        M.ulprogress(file, Math.floor(b / file.size * 100), b, file.size, p);
+                    }
+                    else if (self.d) {
+                        logger.warn('Transfer %s is gone...', gid);
+                    }
                 }
             }
         }

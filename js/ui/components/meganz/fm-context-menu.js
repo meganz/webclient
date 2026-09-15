@@ -1190,10 +1190,6 @@
                 buttonId: 'transferit-item',
                 text: l.transfer_it_ctx,
                 icon: 'sprite-fm-mono icon-transfer-it',
-                rightBadge: {
-                    text: l[24648],
-                    badgeClass: 'transferit small',
-                },
                 onClick() {
                     if (mega.xferit) {
                         M.openTransferItOverlay(mega.ui.contextMenu.selectedItems).catch(tell);

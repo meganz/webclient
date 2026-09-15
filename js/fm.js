@@ -1801,6 +1801,10 @@ function closeDialog(ev) {
         delete $.nodeSaveAs;
         delete $.shareDialog;
         delete $.fileRequestNew;
+        onIdle(() => {
+            delete $.albumUpload;
+        });
+        delete $.mediaUpload;
 
         /* copy/move dialog - save to */
         delete $.saveToDialogCb;
@@ -2691,6 +2695,7 @@ function FMResizablePane(element, opts) {
 
     this.refresh = function(ev) {
         const width = $element.width();
+        $element.css('--dd-row-width', `${width}px`);
 
         if (opts.maxWidth && width >= opts.maxWidth) {
             $('.left-pane-drag-handle').css('cursor', 'w-resize');

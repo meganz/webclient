@@ -448,7 +448,14 @@ MegaData.prototype.isCustomView = function(pathOrID) {
     else if (pathOrID.startsWith('albums/')) {
         result.type = 'albums';
         result.nodeID = pathOrID.replace('albums/', '');
-        result.prefixTree = '';
+        result.prefixTree = 'set_';
+        result.prefixPath = 'albums/';
+    }
+    // Specific album id from tree
+    else if (pathOrID.startsWith('set_')) {
+        result.type = 'albums';
+        result.nodeID = pathOrID.replace('set_', '');
+        result.prefixTree = 'set_';
         result.prefixPath = 'albums/';
     }
     // This is a out-share id from tree

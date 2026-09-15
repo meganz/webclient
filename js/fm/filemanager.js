@@ -460,6 +460,17 @@ FileManager.prototype.initFileManager = async function() {
                     delete mega.rewind;
                 });
         }
+
+        if (!mega.lite.inLiteMode) {
+            const rebuildAlbumsTree = () => {
+                delay('albums:tree', () => {
+                    this.renderAlbumsTree();
+                    this.addTreeUIDelayed();
+                });
+            };
+            mega.sets.subscribe('asp', 'tree', rebuildAlbumsTree);
+            mega.sets.subscribe('asr', 'tree', rebuildAlbumsTree);
+        }
     }
 
     const res = await this.openFolder(path, true);
@@ -815,7 +826,10 @@ FileManager.prototype.initFileManagerUI = function() {
         }
 
         var setDDType = function() {
-            if (ids && ids.length && t) {
+            if (String(t).startsWith('set_')) {
+                dd = ids && ids.length ? 'album' : false;
+            }
+            else if (ids && ids.length && t) {
                 dd = ddtype(ids, t, e.altKey);
                 if (dd === 'move' && e.altKey) {
                     dd = 'copy';
@@ -885,6 +899,9 @@ FileManager.prototype.initFileManagerUI = function() {
             }
             else if (dd === 'chat-attach') {
                 $.draggingClass = ('dndc-to-conversations');
+            }
+            else if (dd === 'album') {
+                $.draggingClass = ('dndc-copy');
             }
             else {
                 const {type} = M.isCustomView(t) || {};
@@ -988,6 +1005,10 @@ FileManager.prototype.initFileManagerUI = function() {
                         });
                 }, 50);
             }
+            else if (dd === 'album') {
+                nRevert();
+                mega.gallery.albums.addDroppedNodes(t.replace('set_', ''), ids);
+            }
             else if (dd === 'download') {
                 nRevert();
                 var as_zip = e.altKey;
@@ -997,7 +1018,7 @@ FileManager.prototype.initFileManagerUI = function() {
         };
 
         if (a === 'drop' && dd !== undefined) {
-            Promise.resolve(M.getNodeByHandle(t) || dbfetch.get(t)).finally(() => {
+            Promise.resolve(dd === 'album' || M.getNodeByHandle(t) || dbfetch.get(t)).finally(() => {
                 setDDType();
                 if (dd) {
                     onMouseDrop();

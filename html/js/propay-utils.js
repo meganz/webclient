@@ -16,6 +16,67 @@ lazy(pro, 'log', () => {
     return (...args) => logger.debug(...args);
 });
 
+// Coinify accepts a date of birth from this floor up to the day the user turns DOB_MIN_AGE.
+pro.propay.DOB_MIN_DATE = '1920-01-01';
+pro.propay.DOB_MIN_AGE = 10;
+
+/**
+ * Get the latest date of birth Coinify accepts, i.e. today minus the minimum age.
+ * @returns {String} The date as YYYY-MM-DD
+ */
+pro.propay.getMaxDateOfBirth = function() {
+    'use strict';
+    const today = new Date();
+    // Today is local, the arithmetic is UTC - local midnight can be skipped entirely by a DST or
+    // date line shift (Samoa had no 30 Dec 2011), which would move the cutoff a day.
+    const cutoff = new Date(Date.UTC(
+        today.getFullYear() - pro.propay.DOB_MIN_AGE,
+        today.getMonth(),
+        today.getDate()
+    ));
+    if (cutoff.getUTCMonth() !== today.getMonth()) {
+        // 29 Feb rolls into March in a non leap year; clamp back to the 28th.
+        cutoff.setUTCDate(0);
+    }
+    const month = String(cutoff.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(cutoff.getUTCDate()).padStart(2, '0');
+    return `${cutoff.getUTCFullYear()}-${month}-${day}`;
+};
+
+/**
+ * Validate a date input value against the range Coinify accepts. Comparisons stay on the
+ * YYYY-MM-DD strings; `new Date('YYYY-MM-DD')` is UTC midnight and misjudges the birthday itself.
+ * @param {String} dob The entered date of birth as YYYY-MM-DD
+ * @returns {String} The error message to display, or '' when the date is acceptable
+ */
+pro.propay.validateDateOfBirth = function(dob) {
+    'use strict';
+
+    const parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dob);
+    if (!parts || dob < pro.propay.DOB_MIN_DATE) {
+        return l.enter_birth_date;
+    }
+
+    // Date rolls impossible days forward (2023-02-30 -> 2023-03-02), so round-trip to catch them.
+    const date = new Date(Date.UTC(parts[1], parts[2] - 1, parts[3]));
+    if (date.getUTCMonth() !== parts[2] - 1 || date.getUTCDate() !== +parts[3]) {
+        return l.enter_birth_date;
+    }
+
+    return dob > pro.propay.getMaxDateOfBirth() ? l.coinify_too_young : '';
+};
+
+/**
+ * Constrain date of birth inputs to the range Coinify accepts, so the native picker cannot
+ * offer an out of range date. Typed input still needs {@link pro.propay.validateDateOfBirth}.
+ * @param {Object} $inputs jQuery collection of `type="date"` inputs
+ * @returns {void}
+ */
+pro.propay.setDateOfBirthRange = function($inputs) {
+    'use strict';
+    $inputs.attr({'min': pro.propay.DOB_MIN_DATE, 'max': pro.propay.getMaxDateOfBirth()});
+};
+
 /**
  * Wire up a desktop custom dropdown plus (on mobile) a MegaMobileDropdown sheet sharing one onChange callback.
  * @param {Object} opts

@@ -324,6 +324,9 @@ MegaData.prototype.renderTree = function() {
         build('s4');
     }
     build('shares');
+    if (!mega.lite.inLiteMode) {
+        build('albums');
+    }
 
     // We are no longer build this tree, however, just leave this for potential later usage.
     // build('out-shares');

@@ -37,8 +37,10 @@ var webpackConfigs = {
             // Disable HMR, as to this ensure consistent behavior with the rest of the `webclient`; we don't want
             // dynamically fetched and injected modules that are unverified at runtime, incl. during development.
             hot: false,
-            static: __dirname,
-            liveReload: false,
+            static: {
+                directory: __dirname,
+                watch: false
+            },
             webSocketServer: 'ws',
             historyApiFallback: true
         },

@@ -97,6 +97,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     line-height: 0;
     background-color: rgba(217, 0, 7, 0);
     padding: 4px 0;
+    position: relative;
 }
 .fm-other-tree-panel .nw-fm-tree-item {
     overflow: hidden;
@@ -138,15 +139,47 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: relative;
     width: auto;
 }
+.nw-fm-tree-icon-wrap {
+    background-color: inherit;
+}
 .nw-fm-tree-item:hover .nw-fm-tree-folder,
 .nw-fm-tree-item.selected .nw-fm-tree-folder,
 .nw-fm-tree-item.dragover .nw-fm-tree-folder {
     color: white;
 }
+.nw-fm-tree-item.ui-droppable-hover::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: calc(var(--dd-row-width, 100%) - 4px);
+    border: var(--mobile-border-strong-selected) dashed 2px;
+    border-radius: 8px;
+    pointer-events: none;
+    z-index: 900;
+}
+.rtl .nw-fm-tree-item.ui-droppable-hover::after {
+    left: auto;
+    right: 0;
+}
+.nw-fm-tree-icon-wrap > .item-type-icon {
+    position: absolute;
+    left: 0;
+    top: 0;
+    --icon-size: 24px;
+}
+.rtl .nw-fm-tree-icon-wrap > .item-type-icon {
+    left: auto;
+    right: 0;
+}
 /* overriding for new tree view, need to merge with above style after dialog tree is reworked */
 .mega-component.mega-top-menu .nw-fm-tree-item {
     padding-top: 8px;
     padding-bottom: 8px;
+}
+.mega-component.mega-top-menu .nw-fm-tree-item:not(.hovered) {
+    background-color: var(--mobile-surface-1);
 }
 .mega-component.mega-top-menu .nw-fm-tree-item.selected {
     border-inline-start: 4px solid var(--mobile-border-brand);

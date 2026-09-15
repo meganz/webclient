@@ -2346,15 +2346,18 @@ i.account-icon.menu {
 }
 
 /* Double files icon with 2x 90 new mime icon */
-body .item-type-icon-90.double {
+body .item-type-icon-90.double,
+body .item-type-icon.double {
     background-position: calc(var(--icon-size) / -14) calc(var(--icon-size) / 16);
     background-color: inherit;
     overflow: hidden;
 }
-body.rtl .item-type-icon-90.double {
+body.rtl .item-type-icon-90.double,
+body.rtl .item-type-icon.double {
     background-position-x: calc(var(--icon-size) / 14);
 }
-body .item-type-icon-90.double .item-type-icon-90 {
+body .item-type-icon-90.double .item-type-icon-90,
+body .item-type-icon.double .item-type-icon {
     background-color: inherit;
     background-position: calc(var(--icon-size) / -8) calc(var(--icon-size) / 12);
     border-radius: calc(var(--icon-size) / 11);
@@ -2362,10 +2365,35 @@ body .item-type-icon-90.double .item-type-icon-90 {
     top: calc(var(--icon-size) / -6);
     position: absolute;
 }
-body.rtl .item-type-icon-90.double .item-type-icon-90 {
+body.rtl .item-type-icon-90.double .item-type-icon-90,
+body.rtl .item-type-icon.double .item-type-icon {
     right: calc(var(--icon-size) / 5);
     left: auto;
     background-position-x: calc(var(--icon-size) / 8);
+}
+
+body .item-type-icon.double {
+    background-position: 0 0;
+    overflow: visible;
+}
+body.rtl .item-type-icon.double {
+    background-position-x: 0;
+}
+body .item-type-icon.double .item-type-icon {
+    box-sizing: content-box;
+    width: calc(var(--icon-size) / 4 * 3);
+    height: calc(var(--icon-size) / 4 * 3);
+    padding: 1px;
+    background-origin: content-box;
+    background-size: var(--icon-size);
+    background-position: calc(var(--icon-size) / -8) calc(var(--icon-size) / -8);
+    left: calc(var(--icon-size) / 8 + 2px);
+    top: -1px;
+}
+body.rtl .item-type-icon.double .item-type-icon {
+    right: calc(var(--icon-size) / 8 + 2px);
+    left: auto;
+    background-position-x: calc(var(--icon-size) / -8);
 }
 
 /* Triple files icon with 3x 90 new mime icon */

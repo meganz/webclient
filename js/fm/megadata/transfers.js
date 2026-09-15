@@ -697,6 +697,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
         return;
     }
 
+    const toAlbum = $.albumUpload;
     var flag = 'ulMegaSyncAD';
 
     if (u.length > 999 && !ignoreWarning && !localStorage[flag]) {
@@ -721,7 +722,11 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             };
             var onclick = function() {
                 hideMEGAsyncDialog();
+                if (toAlbum) {
+                    $.albumUpload = toAlbum;
+                }
                 M.addUpload(u, true, emptyFolders, target);
+                delete $.albumUpload;
             };
             $(document).rebind('keyup.megasync-upload', onclick);
             $('.download-button.continue, .fm-dialog-close').rebind('click', onclick);
@@ -838,6 +843,9 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             if (toChat) {
                 f.chatid = target;
             }
+            if (toAlbum) {
+                f.albumid = toAlbum;
+            }
         }
         // unfortunately, looping again in reversed order
         // for (var ur = 0; ur < u.length; ur++) {
@@ -887,6 +895,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                             size: f.size,
                             name: f.name,
                             chat: f.chatid,
+                            album: f.albumid,
                             // store the minimal expected file attributes for this upload
                             efa: (is_image(f) ? 2 : 0) + (MediaInfoLib.isFileSupported(f) ? 1 : 0)
                         };

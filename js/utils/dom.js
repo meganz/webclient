@@ -49,13 +49,16 @@ function parseHTML(markup) {
         'XML': 1
     };
 
+    const {getOuterHTML, ctlrex} = parseHTML;
+    const test = (c) =>
+        /<[^>]+(?:script:|data[%:]|(?:id|name)=["']*(?:child|node|attr|shadow|content|\w*html))/i.test(c);
+
     $.parseHTML(markup, doc)
         .forEach((node) => {
             // console.debug(node.nodeName, node.outerHTML, node.data, [node]);
 
-            var content = String(node.outerHTML).replace(/[\s\x00-\x19]+/g, '');
-            let invalid =
-                /<[^>]+(?:script:|data[%:]|(?:id|name)=["']*(?:child|node|attr|shadow|content))/i.test(content);
+            const content = getOuterHTML(node).replace(ctlrex, '');
+            let invalid = test(content);
 
             if (!invalid) {
                 invalid = domNodeForEach(node, (n) => {
@@ -66,6 +69,7 @@ function parseHTML(markup) {
                         // console.warn('domAttrForEach(%s:%s)', a.name, a.value, [a], [n]);
 
                         return name[0] === 'o' && name[1] === 'n'
+                            || name[0] === 'f' && name[1] === 'o' && name[2] === 'r' && name[3] === 'm'
                             || nn !== 'A' && name[1] === 'r' && name[2] === 'e' && name[3] === 'f'
                             || nn !== 'IMG' && name[0] === 's' && name[1] === 'r' && name[2] === 'c';
                     });
@@ -87,6 +91,43 @@ function parseHTML(markup) {
 
     return fragment;
 }
+
+(() => {
+    'use strict';
+    const unbound = (cl, p) => {
+        const getter = Object.getOwnPropertyDescriptor(cl.prototype, p).get;
+        return tryCatch((a0) => getter.call(a0));
+    };
+    const getNodeType = unbound(Node, 'nodeType');
+    const getNodeValue = unbound(Node, 'nodeValue');
+    const getOuterHTML = unbound(Element, 'outerHTML');
+
+    const ctl = '\\u0000-\\u001F';
+    const rex = new RegExp(`[\\s${ctl}]+`, 'g');
+
+    Object.defineProperties(parseHTML, {
+        ctlrex: {
+            value: rex
+        },
+        getNodeType: {
+            value(node) {
+                return getNodeType(node) | 0;
+            }
+        },
+        getNodeValue: {
+            value(node) {
+                return getNodeValue(node);
+            }
+        },
+        getOuterHTML: {
+            value(node) {
+                const type = parseHTML.getNodeType(node);
+
+                return String(type < 2 && getOuterHTML(node) || getNodeValue(node) || `<a href="javascript:;">`);
+            }
+        }
+    });
+})();
 
 /**
  * Handy printf-style parseHTML to apply escapeHTML

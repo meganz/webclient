@@ -14,9 +14,13 @@
             return room ? megaChat.html(room.getRoomTitle()) : escapeHTML(l[7997]);
         }
         if (M.isGalleryPage()) {
-            return escapeHTML(l.media);
+            return escapeHTML(l.photos_timeline);
         }
         if (M.albums) {
+            const target = mega.gallery.albums.getUploadTarget();
+            if (target) {
+                return escapeHTML(`${l.albums} > ${mega.gallery.albums.store[target].label}`);
+            }
             return escapeHTML(l.albums);
         }
         if (M.currentCustomView && M.currentCustomView.type === 'pwm') {
@@ -114,7 +118,7 @@
             const { albums, albumIsRenderable } = mega.gallery;
             const album = albums.store[mega.gallery.getAlbumIdFromPath()];
             hasItems = album
-                ? album.nodes && album.nodes.length
+                ? !album.filterFn && album.nodes && album.nodes.length
                 : Object.values(albums.store).some(albumIsRenderable);
         }
         $overlay.toggleClass('transparent-overlay', !!(hasItems || M.chat));
@@ -146,8 +150,31 @@
             return false;
         }
 
+        // Check for any files the gallery is interested in
+        if (M.currentCustomView
+            && files.some(f => M.isGalleryImage({name: f.name, s: f.size}) || MediaInfoLib.isFileSupported(f))) {
+
+            if (M.currentCustomView.type === 'gallery') {
+                $.mediaUpload = true;
+            }
+            else if (M.currentCustomView.type === 'albums') {
+                $.albumUpload = mega.gallery.albums.getUploadTarget();
+            }
+        }
+
         if (M.isFileDragPage(page) || straight) {
-            M.addUpload(files, false, emptyFolders);
+            let target;
+            if ($.albumUpload || M.isAlbumsPage()) {
+                // Albums are not a valid upload target
+                target = M.lastSeenCloudFolder || M.RootID;
+
+                if ($.albumUpload) {
+                    mega.gallery.albums.handleUploadToAlbum();
+                }
+            }
+            M.addUpload(files, false, emptyFolders, target);
+            delete $.albumUpload;
+            delete $.mediaUpload;
 
             start_upload();
         }
@@ -366,14 +393,16 @@
             return false;
         }
 
+        let noUploadTarget = currentDir && currentDir !== 'dashboard' && (M.getNodeRights(currentDir) | 0) < 1;
+        if (String(M.currentdirid).includes('albums')) {
+            noUploadTarget = !mega.gallery.albums.getUploadTarget();
+        }
+        else if (M.currentCustomView && M.currentCustomView.type === 'gallery') {
+            noUploadTarget = false;
+        }
+
         if (
-            (
-                folderlink || currentDir &&
-                (
-                    currentDir !== 'dashboard' &&
-                    (M.getNodeRights(currentDir) | 0) < 1
-                )
-            ) &&
+            (folderlink || noUploadTarget) &&
             String(currentDir).indexOf("chat/") === -1
         ) {
             msgDialog('warningb', l[1676], l[1023]);

@@ -1067,12 +1067,12 @@ var ulmanager = {
                     ulmanager.ulStart(File);
                 }
                 else if (ctx.skipfile) {
-                    if (!(uq.skipfile = !File.file.chatid)) {
+                    if (!(uq.skipfile = !File.file.chatid && !File.file.albumid)) {
                         const eventData = ulmanager.ulEventData[File.file.id];
                         if (eventData) {
                             if (d) {
                                 ulmanager.logger.info('[%s] Cleaning efa on deduplication ' +
-                                    'for the chat to be aware...', ctx.n.h, eventData.efa);
+                                    'for the chat/album to be aware...', ctx.n.h, eventData.efa);
                             }
                             eventData.efa = 0;
                         }
@@ -1169,7 +1169,7 @@ var ulmanager = {
         }
 
         if (promises.length) {
-            Promise.allSettled(promises).then(startUpload);
+            Promise.allSettled(promises).then(startUpload).catch(reportError);
         }
         else {
             startUpload();

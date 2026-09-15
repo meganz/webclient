@@ -3418,6 +3418,7 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
     flex: 1;
     font: var(--mobile-font-heading-h2);
     margin-inline-end: 8px;
+    margin-block: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -3457,6 +3458,37 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
 .fm-picker-dialog .content-block.header .save-input-error .error-text,
 .fm-picker-dialog .summary-container .error-text {
     margin-inline-start: 8px;
+}
+.fm-picker-dialog .content-block.picker-banner {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    font: var(--mobile-font-caption-large-regular);
+    color: var(--mobile-text-primary);
+    max-width: 100%;
+    max-height: 100px;
+    overflow: hidden;
+}
+.fm-picker-dialog .content-block.picker-banner.info {
+    background: var(--mobile-notification-info);
+    --mask-color: var(--mobile-support-info);
+}
+.fm-picker-dialog .content-block.picker-banner.warn {
+    background: var(--mobile-notification-warning);
+    --mask-color: var(--mobile-support-warning);
+}
+.fm-picker-dialog .content-block.picker-banner.error {
+    background: var(--mobile-notification-error);
+    --mask-color: var(--mobile-support-error);
+}
+.fm-picker-dialog .content-block.picker-banner i {
+    margin-inline-end: 8px;
+    --icon-size: 24px;
+}
+.fm-picker-dialog .content-block.picker-banner .picker-banner-msg {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-height: 100%;
 }
 .fm-picker-dialog .content-block.sort .search-collapse-bar {
     margin-inline: auto 24px;

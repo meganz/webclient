@@ -51,7 +51,7 @@
                     <div class="list flex flex-column"></div>
                 </div>
                 <div class="accept-articles-read other-hidden hidden"></div>
-                <div class="s4-issue-form flex flex-column other-hidden hidden">
+                <div class="s4-issue-form flex flex-column s4-only other-hidden hidden">
                     <!-- affected endpoints -->
                     <div class="endpoints-wrapper input-block">
                         <span class="caption-b-l">[$affected_endpoints_label]</span>
@@ -141,59 +141,11 @@
                         <div class="subtext caption-l-r">
                             <div>[$response_message_subtext]</div>
                             <div>[$response_message_subtext1]</div>
-                            <div>
-                                <div class="flex align-center">
-                                    <i class="sprite-fm-mono icon-dot"></i>
-                                    [$response_message_subtext2]
-                                </div>
-                                <div class="flex align-center">
-                                    <i class="sprite-fm-mono icon-dot"></i>
-                                    [$response_message_subtext3]
-                                </div>
-                                <div class="flex align-center">
-                                    <i class="sprite-fm-mono icon-dot"></i>
-                                    [$response_message_subtext4]
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Logs -->
-                    <div class="logs-wrapper input-block">
-                        <div class="labels-block flex-row-gap-sm items-center">
-                            <span class="caption-b-l">[$logs]</span>
-                            <span class="caption-l-r">[$7347]</span>
-                        </div>
-                        <div class="logs"></div>
-                        <span class="caption-l-r">[$s4_logs_subtext]</span>
-                        <div class="error logs-error flex-row-gap-sm hidden">
-                            <div class="icon flex items-center">
-                                <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
-                            </div>
-                            <span></span>
-                        </div>
-                    </div>
-
-                    <!-- S4 message -->
-                    <div class="s4-message-wrapper input-block">
-                        <span class="caption-b-l">[$s4_message_title]</span>
-                        <div class="s4-message message mega-textarea"></div>
-                        <div class="error s4-message-error flex-row-gap-sm hidden">
-                            <div class="icon flex items-center">
-                                <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
-                            </div>
-                            <span></span>
-                        </div>
-                    </div>
-
-                    <!-- S4 message info -->
-                    <div class="info flex-row-gap-sm">
-                        <div class="icon">
-                            <i class="sprite-fm-mono icon-alert-circle-thin-outline"></i>
-                        </div>
-                        <div class="text flex-col-gap-sm">
-                            <span class="info-title">[$s4_message_info_title]</span>
-                            <span class="caption-l-r">[$s4_message_info_description]</span>
+                            <ul>
+                                <li>[$response_message_subtext2]</li>
+                                <li>[$response_message_subtext3]</li>
+                                <li>[$response_message_subtext4]</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -212,7 +164,7 @@
                 </div>
                 <div class="support-message common-hidden flex flex-column hidden">
                     <div class="message-input input-block flex flex-column">
-                        <div class="labels-block">
+                        <div class="labels-block caption-b-l">
                             <div>[$7368]</div>
                         </div>
                         <div class="message mega-textarea"></div>
@@ -223,14 +175,52 @@
                             <span>[$support_page_message_too_short_error]</span>
                         </div>
                     </div>
-                    <div class="info flex-row-gap-sm">
-                        <div class="icon">
-                            <i class="sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                </div>
+                <div class="attachments-wrapper input-block common-hidden hidden" role="group"
+                    aria-labelledby="attachments-label">
+                    <div class="labels-block flex-row-gap-sm items-center">
+                        <span class="caption-b-l" id="attachments-label">[$attachments_label]</span>
+                        <span class="caption-l-r">[$7347]</span>
+                    </div>
+                    <div class="attachments"></div>
+                    <span class="caption-l-r">[$attachments_subtext]</span>
+                    <div class="error attachments-error flex-row-gap-sm hidden">
+                        <div class="icon flex items-center">
+                            <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
                         </div>
-                        <div class="text flex-col-gap-sm">
-                            <span class="info-title">[$support_page_message_info_title]</span>
-                            <span class="caption-l-r">[$support_page_message_info]</span>
+                        <span aria-live="polite"></span>
+                    </div>
+                </div>
+
+                <!-- Generic info banner -->
+                <div class="message-info info info-banner flex-row-gap-sm common-hidden hidden">
+                    <div class="icon">
+                        <i class="sprite-fm-mono icon-info-thin-outline"></i>
+                    </div>
+                    <div class="text flex-col-gap-sm">
+                        <span class="info-title">[$support_page_message_info_title]</span>
+                        <span class="caption-l-r">[$support_page_message_info]</span>
+                    </div>
+                </div>
+
+                <!-- S4 description and its banner -->
+                <div class="s4-message-wrapper input-block s4-only other-hidden hidden">
+                    <span class="caption-b-l">[$s4_message_title]</span>
+                    <div class="s4-message message mega-textarea"></div>
+                    <div class="error s4-message-error flex-row-gap-sm hidden">
+                        <div class="icon flex items-center">
+                            <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
                         </div>
+                        <span></span>
+                    </div>
+                </div>
+                <div class="s4-message-info info info-banner flex-row-gap-sm s4-only other-hidden hidden">
+                    <div class="icon">
+                        <i class="sprite-fm-mono icon-info-thin-outline"></i>
+                    </div>
+                    <div class="text flex-col-gap-sm">
+                        <span class="info-title">[$s4_message_info_title]</span>
+                        <span class="caption-l-r">[$s4_message_info_description]</span>
                     </div>
                 </div>
                 <button class="common-hidden cta hidden">[$1694]</button>
@@ -276,7 +266,7 @@
                     <div>[$your_email_address]</div>
                 </div>
                 <div class="email-input"></div>
-                <div class="info plain text-secondary flex-row-gap-sm">
+                <div class="info plain caption-l-r text-secondary flex-row-gap-sm">
                     <div class="icon flex items-center">
                         <i class="sprite-fm-mono icon-help-circle-thin-outline"></i>
                     </div>

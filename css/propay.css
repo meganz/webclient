@@ -506,6 +506,7 @@
     padding: 64px;
     width: 100%;
     max-width: 621px;
+    min-width: 0;
 }
 #propay .left-block .propay-use-type-tab-mount .propay-use-type-tab-group {
     width: fit-content;

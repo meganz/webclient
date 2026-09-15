@@ -643,7 +643,9 @@
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr {
     position: relative;
-    display: block;
+    display: grid;
+    grid-template-columns: 123px 113px minmax(0, 1fr);
+    column-gap: 4px;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr:not(:last-child):not(.repay-breakdown-tb-tax)::before {
     content: "";
@@ -662,34 +664,29 @@
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr th:first-child,
 .bus-reg-plan.repay .repay-breakdown-tb tr td:first-child {
-    width: 123px;
     padding: 12px 0 8px;
     padding-inline-end: 8px;
     padding-inline-start: 12px;
     box-sizing: border-box;
-    display: inline-block;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(2),
 .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2) {
-   width: 113px;
     padding-inline-end: 4px;
     box-sizing: border-box;
-    display: inline-block;
-}
-.bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2) {
-    cursor: pointer;
-}
-.bus-reg-plan.repay .repay-breakdown-tb tr td.repay-td-total {
-    cursor: default;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr th:last-child,
 .bus-reg-plan.repay .repay-breakdown-tb tr td:last-child {
-    width: calc(100% - 244px);
     padding-inline-end: 12px;
     box-sizing: border-box;
     text-align: end;
-    display: inline-block;
     opacity: unset;
+}
+.bus-reg-plan.repay .repay-breakdown-tb .repay-td-tax-name,
+.bus-reg-plan.repay .repay-breakdown-tb .repay-extra-desc {
+    grid-column: 1 / 3;
+}
+.bus-reg-plan.repay .repay-breakdown-tb .repay-td-total {
+    grid-column: 2 / -1;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(3) {
     font-family: var(--text-font-family);
@@ -698,9 +695,15 @@
 .bus-reg-plan.repay .repay-breakdown-tb .content-desc {
     white-space: nowrap;
     text-overflow: ellipsis;
-    width: 81px;
+    width: calc(100% - 30px);
     display: inline-block;
     overflow: hidden;
+}
+
+/* sprite-fm-mono-after would otherwise size the cell itself to its icon */
+.bus-reg-plan.repay .repay-breakdown-tb .content-desc-container {
+    width: auto;
+    cursor: pointer;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2):after {
     width: 24px;
@@ -729,32 +732,16 @@
     font: var(--text-h3);
     font-family: var(--text-font-family);
     font-weight: bold;
-    text-align: start;
-    width: 110px;
     height: 50px;
     opacity: unset;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr.repay-breakdown-tb-tax td {
     color: var(--text-color-high);
-    font: var(--text-body-1);
+    font: var(--text-body1);
     font-family: var(--text-font-family);
     font-weight: bold;
-    text-align: start;
-    width: 110px;
     height: 40px;
     opacity: unset;
-}
-.bus-reg-plan.repay .repay-breakdown-tb tr.repay-breakdown-tb-tax td:last-child,
-.bus-reg-plan.repay .repay-breakdown-tb tr:last-child td:last-child {
-    padding-inline-end: 12px;
-    width: 210px;
-    text-align: end;
-}
-.bus-reg-plan.repay .repay-breakdown-tb tr.repay-breakdown-tb-tax td {
-    width: 130px;
-}
-.bus-reg-plan.repay .repay-breakdown-tb tr.repay-breakdown-tb-tax td:last-child {
-    width: 190px;
 }
 .bus-reg-plan.repay .repay-extra-details {
     background-color: var(--surface-grey-1);
@@ -773,12 +760,6 @@
 .bus-reg-plan.repay .repay-breakdown-tb tr.repay-extra-details::before {
     width: 100%;
     left: 0;
-}
-.bus-reg-plan.repay .repay-breakdown-tb tr.repay-extra-details td:first-child {
-    width: 235px;
-}
-.bus-reg-plan.repay .repay-breakdown-tb tr.repay-extra-details td:last-child {
-    width: calc(100% - 241px);
 }
 .bus-repay-block .main-left-block .repay-nb-users-info {
     font: var(--text-caption);
@@ -806,28 +787,9 @@
     .main-mid-pad.bus-repay .row-wrapper {
         padding-bottom: 8px;
     }
-    .bus-reg-plan.repay .repay-breakdown-tb tr:not(:last-child)::before {
-        width: calc(100% - 24px);
-    }
-    .bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(1),
-	.bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(1) {
-        width: 25%;
-        min-width: 90px;
-    }
-    .bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(2),
-	.bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2) {
-        width: 40%;
-        min-width: 136px;
-        white-space: normal;
-    }
-    .bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(3),
-	.bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(3) {
-        width: 30%;
-        min-width: 82px;
-    }
-    .bus-reg-plan.repay .repay-breakdown-tb tr:last-child td:last-child {
-        width: 70%;
-        min-width: 210px;
+    .bus-reg-plan.repay .repay-breakdown-tb tr {
+        grid-template-columns: minmax(90px, 25%) minmax(136px, 40%) minmax(82px, 30%);
+        justify-content: center;
     }
     .main-mid-pad.bus-repay .btn-container {
         text-align: center;
@@ -843,18 +805,7 @@
         display: block;
         margin: 0 auto 20px;
     }
-    .bus-reg-plan.repay .repay-breakdown-tb tr.repay-extra-details td:first-child {
-        width: 65%;
-        min-width: 234px;
-    }
-    .bus-reg-plan.repay .repay-breakdown-tb tr.repay-extra-details td:last-child {
-        width: 30.5%;
-        min-width: 82px;
-    }
     .bus-repay-block .main-left-block .repay-nb-users-info {
         margin-top: -2px;
-    }
-    .bus-reg-plan.repay .repay-breakdown-tb .content-desc {
-        width: calc(100% - 30px);
     }
 }

@@ -2037,16 +2037,16 @@ FileManager.prototype.initFileAndFolderSelectDialog = async function(type) {
     const diag = freeze({
         'create-new-link': {
             title: l[20667],
-            className: 'no-incoming', // Hide incoming share tab
             selectLabel: l[1523],
-            folderSelectable: true
+            folderSelectable: true,
+            hideIncoming: true,
         },
         'open-file': {
             title: l[22666],
-            className: 'no-incoming', // Hide incoming share tab
             selectLabel: l[865],
             folderSelectNotAllowed: true,
             folderSelectable: false, // Can select folder(s)
+            hideIncoming: true,
             customFilterFn(node) {
                 if (node.t) {
                     return true;
@@ -2077,7 +2077,7 @@ FileManager.prototype.initFileAndFolderSelectDialog = async function(type) {
         title: l[8011],
         selectLabel: l[1523],
         folderSelectable: true,
-        className: 'no-incoming',
+        hideIncoming: true,
         onClose: () => {
             doClose();
         },

@@ -116,6 +116,31 @@ export default class FMView extends MegaRenderMixin {
         this.props.onHighlighted(highlighted);
         $.selected = highlighted;
     }
+    _quickAccessDataSource() {
+        const dataSource = Object.create(null);
+        const top = mega.quickAccessLocations.top();
+
+        for (let i = 0; i < top.length; i++) {
+            const n = this.getDataSourceNode(top[i]);
+            if (n) {
+                if (this.props.hideIncoming && n.su) {
+                    continue;
+                }
+                dataSource[top[i]] = n;
+            }
+        }
+
+        return dataSource;
+    }
+    _searchFilter(searchValue, scope) {
+        const searchFilter = M.getFilterBySearchFn(searchValue);
+
+        // Scope the search to the selected tab (cloud drive / shares / s4)
+        if (!scope) {
+            return searchFilter;
+        }
+        return (n) => searchFilter(n) && M.getNodeRoot(n.h) === scope;
+    }
     getEntries(newState) {
         var self = this;
         var sortBy = newState && newState.sortBy || self.state.sortBy;
@@ -132,7 +157,10 @@ export default class FMView extends MegaRenderMixin {
             self.props.searchValue.length >= minSearchLength
         ) {
             dataSource = this.dataSource || {...M.tnd, ...M.d};
-            filterFunc = M.getFilterBySearchFn(self.props.searchValue);
+            filterFunc = this._searchFilter(self.props.searchValue, self.props.searchScope);
+        }
+        else if (self.props.currentlyViewedEntry === 'quick-access') {
+            dataSource = this._quickAccessDataSource();
         }
         else {
             const tmp =
@@ -159,6 +187,11 @@ export default class FMView extends MegaRenderMixin {
 
                 entries.push(n);
             }
+        }
+
+        // Quick-access keeps the frequency order
+        if (self.props.currentlyViewedEntry === 'quick-access') {
+            return entries;
         }
 
         if (sortBy[0] === "name") {
@@ -281,6 +314,19 @@ export default class FMView extends MegaRenderMixin {
                     .always(() => {
                         this.finishedLoading(newState);
                     });
+                return;
+            }
+            if (handle === 'quick-access') {
+                newState.isLoading = true;
+                this.setState(newState);
+
+                (async() => {
+                    await mega.quickAccessLocations.load();
+                    const top = mega.quickAccessLocations.top();
+                    if (top.length) {
+                        await dbfetch.geta(top);
+                    }
+                })().catch(dump).finally(() => this.finishedLoading(newState));
                 return;
             }
             if (this.getDataSourceNode(handle).t && !M.getChildren(handle)) {
@@ -433,6 +479,7 @@ export default class FMView extends MegaRenderMixin {
                     isLoading={this.state.isLoading || this.props.nodeLoading}
                     currentlyViewedEntry={this.props.currentlyViewedEntry}
                     entries={this.state.entries || []}
+                    searchScope={this.props.searchScope}
                     onExpand={(node) => {
                         this.setState({
                             'selected': [],
@@ -445,6 +492,8 @@ export default class FMView extends MegaRenderMixin {
                     folderSelectNotAllowed={this.props.folderSelectNotAllowed}
                     onAttachClicked={this.onAttachClicked}
                     viewMode={this.props.viewMode}
+                    showOwner={this.props.showOwner}
+                    shortGrid={this.props.shortGrid}
                     selected={this.state.selected}
                     highlighted={this.state.highlighted}
                     onContextMenu={this.props.onContextMenu || this.onContextMenu}

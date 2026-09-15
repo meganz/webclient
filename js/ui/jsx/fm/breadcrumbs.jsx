@@ -57,7 +57,6 @@ export default class Breadcrumbs extends MegaRenderMixin {
                     className="crumb-drop-link"
                     key={'drop_link_' + item.nodeId}
                     onClick={(e) => this.onBreadcrumbNodeClick(e, item.nodeId)}>
-                    <i className={`sprite-fm-mono icon24 ${classes[item.type] || 'folder'}`}></i>
                     <span>
                         {item.name}
                     </span>
@@ -165,10 +164,12 @@ export default class Breadcrumbs extends MegaRenderMixin {
                                     className={"fm-breadcrumbs contains-directories " + breadcrumbClasses}
                                     key={nodeId}
                                     onClick={(e) => this.onBreadcrumbNodeClick(e, nodeId)}>
-                                    <span className={`right-arrow-bg simpletip`} data-simpletip={nodeName}>
+                                    <span
+                                        className="right-arrow-bg simpletip selectable-txt"
+                                        data-simpletip={nodeName}>
                                         <span className="selectable-txt">{nodeName}</span>
                                     </span>
-                                    {k !== 0 && <i className="next-arrow sprite-fm-mono icon-arrow-right icon16"></i>}
+                                    {k !== 0 && <i className="sprite-fm-mono icon-chevron-right-thin-outline" />}
                                 </a>
                             );
                         }

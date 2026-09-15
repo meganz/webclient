@@ -1024,6 +1024,10 @@ li.active .call-duration i {
     text-align: left;
 }
 
+.contacts-actions:empty {
+    display: none;
+}
+
 .contacts-actions button i {
     --icon-size: 24px;
     --mask-color: var(--secondary-green);
@@ -1084,9 +1088,6 @@ li.active .call-duration i {
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 100%;
-}
-.contacts-table thead th.verification span {
-    padding-inline-start: 16px;
 }
 .contacts-table thead th span i {
     float: none;
@@ -1273,6 +1274,10 @@ td.verification .contact-item {
     top: 0;
 }
 
+.contacts-table td {
+    padding-inline-start: 8px;
+}
+
 .contacts-table th i {
     float: right;
     padding-inline-end: 5px;
@@ -1296,7 +1301,7 @@ td.verification .contact-item {
     justify-content: center;
     width: 32px;
     height: 32px;
-    margin: 0 8px;
+    margin-inline-end: 8px;
     vertical-align: middle;
 }
 
@@ -1315,7 +1320,7 @@ td.verification .contact-item {
 }
 
 .contacts-table .user-card-presence {
-    margin-bottom: 1px;
+    margin: 0 0 1px;
     margin-inline-end: 8px;
 }
 
@@ -1338,8 +1343,6 @@ td.verification .contact-item {
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: no-repeat center 21px linear-gradient(90deg, var(--stroke-grey-2), var(--stroke-grey-2));
-    background-size: auto 1px;
 }
 
 .contacts-list {

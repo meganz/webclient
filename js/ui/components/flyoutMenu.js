@@ -1024,10 +1024,10 @@ class MegaFlyoutMenu extends MegaComponent {
                                 return;
                             }
                             M.initFileAndFolderSelectDialog({
-                                className: '',
                                 folderSelectable: true,
                                 noShareFolderAttach: true,
                                 selectLabel: undefined,
+                                hideIncoming: false,
                             }).then(
                                 handles =>
                                     handles &&

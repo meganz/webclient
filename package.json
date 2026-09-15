@@ -109,12 +109,12 @@
     "karma-mocha": "2.0.1",
     "karma-sinon": "1.0.5",
     "mocha": "11.8.0",
-    "sass": "1.104.0",
+    "sass": "1.104.1",
     "sass-loader": "17.0.1",
     "sinon": "15.0.3",
     "stylelint": "16.26.1",
     "stylelint-config-standard": "39.0.1",
-    "stylelint-no-unsupported-browser-features": "8.1.1",
+    "stylelint-no-unsupported-browser-features": "8.1.2",
     "webpack-dev-server": "6.0.0"
   }
 }

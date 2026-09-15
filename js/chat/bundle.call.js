@@ -2420,7 +2420,7 @@ const __Minimized = (0,mixins.Zz)(withMicObserver, permissionsObserver.$)(Minimi
 
 
 
-const Admit = (0,external_React_.lazy)(() => REQ_.e( 752).then(REQ_.bind(REQ_, 3056)));
+const Admit = (0,external_React_.lazy)(() => REQ_.e( 752).then(() => REQ_(3056)));
 const NAMESPACE = 'stream';
 const chunkNodes = (nodes, size) => {
   if (nodes && nodes.length && size) {
@@ -3916,7 +3916,7 @@ class Invite extends REaCt().Component {
         return;
       }
       const frequents = [];
-      const maxFreq = Math.max(response.length - 3, 0);
+      const maxFreq = Math.max(response.length - ui_contacts.lO, 0);
       for (let i = response.length - 1; i >= maxFreq; i--) {
         const contact = response[i];
         if (!this.state.excluded.includes(contact.userId)) {

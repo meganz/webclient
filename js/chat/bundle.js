@@ -2831,6 +2831,7 @@ ContactAwareComponent.unavailableNames = Object.create(null);
    hU: () =>  ContactPickerWidget,
    hm: () =>  ContactPickerDialog,
    i1: () =>  ContactPresence,
+   lO: () =>  MAX_FREQUENTS,
    n4: () =>  ContactVerified,
    nB: () =>  ContactCard,
    uA: () =>  ContactAwareName
@@ -4476,18 +4477,18 @@ const fallback = REQ_(3439);
 
 
 
-const LeftPanel = (0,external_React_.lazy)(() => REQ_.e( 493).then(REQ_.bind(REQ_, 6065)));
-const EmptyConversationsPanel = (0,external_React_.lazy)(() => REQ_.e( 493).then(REQ_.bind(REQ_, 8596)));
-const ChatToaster = (0,external_React_.lazy)(() => REQ_.e( 493).then(REQ_.bind(REQ_, 8491)));
-const ConversationPanels = (0,external_React_.lazy)(() => REQ_.e( 493).then(REQ_.bind(REQ_, 5677)).then(m => ({
+const LeftPanel = (0,external_React_.lazy)(() => REQ_.e( 493).then(() => REQ_(6065)));
+const EmptyConversationsPanel = (0,external_React_.lazy)(() => REQ_.e( 493).then(() => REQ_(8596)));
+const ChatToaster = (0,external_React_.lazy)(() => REQ_.e( 493).then(() => REQ_(8491)));
+const ConversationPanels = (0,external_React_.lazy)(() => REQ_.e( 493).then(() => REQ_(5677)).then(m => ({
   default: m.ConversationPanels
 })));
-const ContactsPanel = (0,external_React_.lazy)(() => REQ_.e( 253).then(REQ_.bind(REQ_, 5392)));
-const ScheduleMeetingDialog = (0,external_React_.lazy)(() => REQ_.e( 716).then(REQ_.bind(REQ_, 8389)));
-const ScheduleOccurrenceDialog = (0,external_React_.lazy)(() => REQ_.e( 716).then(REQ_.bind(REQ_, 4156)));
-const ContactSelectorDialog = (0,external_React_.lazy)(() => REQ_.e( 543).then(REQ_.bind(REQ_, 2678)));
-const StartGroupChatWizard = (0,external_React_.lazy)(() => REQ_.e( 543).then(REQ_.bind(REQ_, 5199)));
-const StartMeetingDialog = (0,external_React_.lazy)(() => REQ_.e( 543).then(REQ_.bind(REQ_, 7190)));
+const ContactsPanel = (0,external_React_.lazy)(() => REQ_.e( 253).then(() => REQ_(5392)));
+const ScheduleMeetingDialog = (0,external_React_.lazy)(() => REQ_.e( 716).then(() => REQ_(8389)));
+const ScheduleOccurrenceDialog = (0,external_React_.lazy)(() => REQ_.e( 716).then(() => REQ_(4156)));
+const ContactSelectorDialog = (0,external_React_.lazy)(() => REQ_.e( 543).then(() => REQ_(2678)));
+const StartGroupChatWizard = (0,external_React_.lazy)(() => REQ_.e( 543).then(() => REQ_(5199)));
+const StartMeetingDialog = (0,external_React_.lazy)(() => REQ_.e( 543).then(() => REQ_(7190)));
 const VIEWS = {
   CHATS: 0x00,
   MEETINGS: 0x01,
@@ -8287,70 +8288,52 @@ function _extends() {
  	
 
  	
- 	(() => {
- 		// getDefaultExport function for compatibility with non-harmony modules
- 		REQ_.n = (module) => {
- 			const getter = module && module.__esModule ?
- 				() => module.default :
- 				() => module;
- 			REQ_.d(getter, { a: getter });
- 			return getter;
- 		};
- 	})();
+ 	// getDefaultExport function for compatibility with non-harmony modules
+ 	REQ_.n = (module) => {
+ 		const getter = module && module.__esModule ?
+ 			() => module.default :
+ 			() => module;
+ 		REQ_.d(getter, { a: getter });
+ 		return getter;
+ 	};
  	
  	
- 	(() => {
- 		// define getter/value functions for harmony exports
- 		REQ_.d = (exports, definition) => {
- 			if(Array.isArray(definition)) {
- 				let i = 0;
- 				while(i < definition.length) {
- 					var key = definition[i++];
- 					const binding = definition[i++];
- 					if(!REQ_.o(exports, key)) {
- 						if(binding === 0) {
- 							Object.defineProperty(exports, key, { enumerable: true, value: definition[i++] });
- 						} else {
- 							Object.defineProperty(exports, key, { enumerable: true, get: binding });
- 						}
- 					} else if(binding === 0) { i++; }
- 				}
- 			} else {
- 				for(var key in definition) {
- 					if(REQ_.o(definition, key) && !REQ_.o(exports, key)) {
- 						Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
- 					}
+ 	// define getter/value functions for harmony exports
+ 	REQ_.d = (exports, definition) => {
+ 		if(Array.isArray(definition)) {
+ 			let i = 0;
+ 			while(i < definition.length) {
+ 				var key = definition[i++];
+ 				const binding = definition[i++];
+ 				const descriptor = binding === 0 ? { enumerable: true, value: definition[i++] } : { enumerable: true, get: binding };
+ 				if(!REQ_.o(exports, key)) Object.defineProperty(exports, key, descriptor);
+ 			}
+ 		} else {
+ 			for(var key in definition) {
+ 				if(REQ_.o(definition, key) && !REQ_.o(exports, key)) {
+ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
  				}
  			}
- 		};
- 	})();
+ 		}
+ 	};
  	
  	
- 	(() => {
- 		REQ_.f = {};
- 		// This file contains only the entry chunk.
- 		// The chunk loading function for additional chunks
- 		REQ_.e = (chunkId) => {
- 			return Promise.all(Object.keys(REQ_.f).reduce((promises, key) => {
- 				REQ_.f[key](chunkId, promises);
- 				return promises;
- 			}, []));
- 		};
- 	})();
+ 	REQ_.f = {};
+ 	// This file contains only the entry chunk.
+ 	// The chunk loading function for additional chunks
+ 	REQ_.e = (chunkId) => {
+ 		return Promise.all(Object.keys(REQ_.f).reduce((promises, key) => {
+ 			REQ_.f[key](chunkId, promises);
+ 			return promises;
+ 		}, []));
+ 	};
  	
  	
- 	(() => {
- 		// This function allow to reference async chunks
- 		REQ_.u = (chunkId) => {
- 			// return url for filenames based on template
- 			return `js/chat/bundle.${  {"253":"contacts-panel","313":"cloud-browser","493":"core-ui","543":"start-conversation","716":"schedule-meeting","752":"waiting-room","987":"call"}[chunkId]  }.js`;
- 		};
- 	})();
+ 	// This function allow to reference async chunks
+ 	REQ_.u = (chunkId) => `js/chat/bundle.${  {"253":"contacts-panel","313":"cloud-browser","493":"core-ui","543":"start-conversation","716":"schedule-meeting","752":"waiting-room","987":"call"}[chunkId]  }.js`;
  	
  	
- 	(() => {
- 		REQ_.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
- 	})();
+ 	REQ_.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop);
  	
  	
  	(() => {
@@ -8398,20 +8381,14 @@ function _extends() {
  	})();
  	
  	
- 	(() => {
- 		// define __esModule on exports
- 		REQ_.r = (exports) => {
- 			if(Symbol.toStringTag) {
- 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
- 			}
- 			Object.defineProperty(exports, '__esModule', { value: true });
- 		};
- 	})();
+ 	// define __esModule on exports
+ 	REQ_.r = (exports) => {
+ 		Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+ 		Object.defineProperty(exports, '__esModule', { value: true });
+ 	};
  	
  	
- 	(() => {
- 		REQ_.p = "/";
- 	})();
+ 	REQ_.p = "/";
  	
  	
  	(() => {
@@ -8438,8 +8415,6 @@ function _extends() {
  							const promise = new Promise((resolve, reject) => installedChunkData = installedChunks[chunkId] = [resolve, reject]);
  							promises.push(installedChunkData[2] = promise);
  		
- 							// start chunk loading
- 							const url = REQ_.p + REQ_.u(chunkId);
  							// create error before stack unwound to get useful stacktrace later
  							const error = new Error();
  							const loadingEnded = (event) => {
@@ -8458,7 +8433,7 @@ function _extends() {
  									}
  								}
  							};
- 							REQ_.l(url, loadingEnded, `chunk-${  chunkId}`, chunkId);
+ 							REQ_.l(REQ_.p + REQ_.u(chunkId), loadingEnded, `chunk-${  chunkId}`, chunkId);
  						}
  					}
  				}
@@ -10147,11 +10122,11 @@ mega.ui.chat = mega.ui.chat || {};
 mega.ui.chat.getMessageString = messages_utils.d;
 
 
-const ScheduleMeeting = (0,external_React_.lazy)(() => REQ_.e( 716).then(REQ_.bind(REQ_, 8389)));
-const StartMeeting = (0,external_React_.lazy)(() => REQ_.e( 543).then(REQ_.bind(REQ_, 7190)));
-const ContactSelectorDialog = (0,external_React_.lazy)(() => REQ_.e( 543).then(REQ_.bind(REQ_, 2678)));
-const StartGroupChatWizard = (0,external_React_.lazy)(() => REQ_.e( 543).then(REQ_.bind(REQ_, 5199)));
-const CloudBrowserDialog = (0,external_React_.lazy)(() => REQ_.e( 313).then(REQ_.bind(REQ_, 6961)));
+const ScheduleMeeting = (0,external_React_.lazy)(() => REQ_.e( 716).then(() => REQ_(8389)));
+const StartMeeting = (0,external_React_.lazy)(() => REQ_.e( 543).then(() => REQ_(7190)));
+const ContactSelectorDialog = (0,external_React_.lazy)(() => REQ_.e( 543).then(() => REQ_(2678)));
+const StartGroupChatWizard = (0,external_React_.lazy)(() => REQ_.e( 543).then(() => REQ_(5199)));
+const CloudBrowserDialog = (0,external_React_.lazy)(() => REQ_.e( 313).then(() => REQ_(6961)));
 window.ChatCallIncomingDialog = (0,chat_utils.li)(Incoming);
 window.ScheduleMeetingDialogUI = {
   Schedule: (0,chat_utils.li)(ScheduleMeeting)

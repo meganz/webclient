@@ -649,7 +649,7 @@ class Invite extends mixins.w9 {
   buildContactsList() {
     megaChat.getFrequentContacts().then(frequentContacts => {
       if (this.isMounted()) {
-        const frequents = frequentContacts.slice(-3).map(c => c.userId);
+        const frequents = frequentContacts.slice(-ui_contacts.lO).map(c => c.userId);
         const contacts = this.getSortedContactsList(frequents);
         this.setState({
           frequents,

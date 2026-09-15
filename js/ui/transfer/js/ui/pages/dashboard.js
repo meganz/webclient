@@ -159,10 +159,15 @@ lazy(T.ui, 'dashboardLayout', () => {
             }
 
             // Init search input
-            T.ui.input.init(cn.querySelector('#tfrs-search-input'), (ev) => {
-                const {value} = ev.target || !1;
-                this.renderListContent(value && value.trim().replace(/\s+/g, ' '));
-            });
+            T.ui.input.init(
+                cn.querySelector('#tfrs-search-input'),
+                {
+                    input: (ev) => {
+                        const {value} = ev.target || !1;
+                        this.renderListContent(value && value.trim().replace(/\s+/g, ' '));
+                    }
+                }
+            );
 
             // Init sorting dropodown
             T.ui.dropdown.init(cn.querySelector('.js-sorting-select'), (mode) => {
@@ -797,6 +802,7 @@ lazy(T.ui, 'dashboardLayout', () => {
                 this.renderRecipientItem(xrf[i], cn);
             }
 
+            document.body.scrollTop = 0;
             pushHistoryState(`dashboard/${xh}`);
         },
 

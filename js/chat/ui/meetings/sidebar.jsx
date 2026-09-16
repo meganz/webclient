@@ -2,7 +2,7 @@ import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import ComposedTextArea from "../composedTextArea.jsx";
 import HistoryPanel from "../historyPanel.jsx";
-import Call, { VIEW } from './call.jsx';
+import { isModerator, VIEW } from './utils.jsx';
 import Participants from './participants.jsx';
 import Button from './button.jsx';
 import Guest from './guest.jsx';
@@ -11,7 +11,7 @@ const inviteAllowed = chatRoom => {
     if (chatRoom) {
         return chatRoom.type !== 'private' && !!(
             chatRoom.options[MCO_FLAGS.OPEN_INVITE] ||
-            Call.isModerator(chatRoom, u_handle) ||
+            isModerator(chatRoom, u_handle) ||
             chatRoom.publicLink
         );
     }

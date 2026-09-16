@@ -1,6 +1,3 @@
-import ReactDOM from "react-dom";
-import React from "react";
-
 var INTERSECTION_OBSERVER_AVAILABLE = typeof IntersectionObserver !== 'undefined';
 var RESIZE_OBSERVER_AVAILABLE = typeof ResizeObserver !== 'undefined';
 

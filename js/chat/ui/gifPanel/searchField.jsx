@@ -1,5 +1,5 @@
 import React from 'react';
-import { LABELS } from './gifPanel.jsx';
+import { LABELS } from './utils.jsx';
 
 export default class SearchField extends React.Component {
     static inputRef = React.createRef();

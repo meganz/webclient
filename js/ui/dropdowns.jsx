@@ -1,4 +1,4 @@
-var React = require("react");
+import React from 'react';
 import utils from './utils.jsx';
 import {MegaRenderMixin} from "../chat/mixins";
 import {ContactPickerWidget} from './../chat/ui/contacts.jsx';

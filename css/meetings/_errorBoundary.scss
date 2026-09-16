@@ -1,0 +1,30 @@
+.meetings-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border: 1px solid tomato;
+
+    &--content {
+        text-align: center;
+        color: var(--text-color-medium);
+
+        i {
+            display: block;
+            margin: 32px auto;
+            width: 195px;
+            height: 65px;
+        }
+
+        a {
+            text-decoration: underline;
+            color: var(--text-color-high);
+        }
+    }
+
+    &--details {
+        margin: 58px 0;
+        font: var(--text-code1);
+    }
+}

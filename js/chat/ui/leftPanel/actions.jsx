@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '../../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../../ui/dropdowns.jsx';
-import { FILTER, NAMESPACE } from './leftPanel.jsx';
+import { FILTER, NAMESPACE } from './utils.jsx';
 
 const Actions = ({
     view,

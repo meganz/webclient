@@ -1,5 +1,5 @@
-var React = require("react");
-import {MegaRenderMixin} from "../chat/mixins";
+import React from 'react';
+import { MegaRenderMixin } from '../chat/mixins.js';
 
 class AccordionPanel extends MegaRenderMixin {
     domRef = React.createRef();

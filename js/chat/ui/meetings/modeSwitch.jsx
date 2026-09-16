@@ -1,8 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import Button from './button.jsx';
-import { MODE } from './call.jsx';
-import { STREAMS_PER_PAGE } from './stream.jsx';
+import { MODE, STREAMS_PER_PAGE } from './utils.jsx';
 
 export default class ModeSwitch extends MegaRenderMixin {
     static NAMESPACE = 'modeSwitch';

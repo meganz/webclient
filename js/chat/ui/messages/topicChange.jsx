@@ -1,7 +1,7 @@
-var React = require("react");
-var ContactsUI = require('./../contacts.jsx');
-var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
+import React from 'react';
 import { Emoji, ParsedHTML } from '../../../ui/utils.jsx';
+import { Avatar, ContactButton } from '../contacts.jsx';
+import { ConversationMessageMixin } from './mixin.jsx';
 
 class TopicChange extends ConversationMessageMixin {
     render() {
@@ -35,7 +35,7 @@ class TopicChange extends ConversationMessageMixin {
         var messages = [];
 
 
-        var avatar = <ContactsUI.Avatar contact={contact}
+        var avatar = <Avatar contact={contact}
             chatRoom={chatRoom}
             className="message avatar-wrapper small-rounded-avatar"/>;
         const topic = megaChat.html(message.meta.topic);
@@ -46,7 +46,7 @@ class TopicChange extends ConversationMessageMixin {
                 {avatar}
 
                 <div className="message content-area small-info-txt selectable-txt">
-                    <ContactsUI.ContactButton
+                    <ContactButton
                         className="message"
                         chatRoom={chatRoom}
                         contact={contact}

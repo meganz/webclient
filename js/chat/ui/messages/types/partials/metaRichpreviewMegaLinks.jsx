@@ -1,7 +1,7 @@
 import React from 'react';
 import { Emoji } from '../../../../../ui/utils.jsx';
 import { ConversationMessageMixin } from '../../mixin.jsx';
-import { MetaRichpreviewLoading } from './metaRichPreviewLoading.jsx';
+import { MetaRichpreviewLoading } from './metaRichpreviewLoading.jsx';
 import {ContactVerified, ContactPresence, Avatar} from "../../../contacts.jsx";
 
 class MetaRichpreviewMegaLinks extends ConversationMessageMixin {

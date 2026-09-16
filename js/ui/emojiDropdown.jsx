@@ -1,9 +1,9 @@
-var React = require("react");
-import {MegaRenderMixin} from "../chat/mixins";
-var DropdownsUI = require('./dropdowns.jsx');
-var PerfectScrollbar = require('./perfectScrollbar.jsx').PerfectScrollbar;
+import React from 'react';
+import { MegaRenderMixin } from '../chat/mixins.js';
+import { Dropdown } from './dropdowns.jsx';
+import { PerfectScrollbar } from './perfectScrollbar.jsx';
 
-export class DropdownEmojiSelector extends MegaRenderMixin {
+export default class DropdownEmojiSelector extends MegaRenderMixin {
     domRef = React.createRef();
     emojiSearchRef = React.createRef();
 
@@ -517,7 +517,7 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
             popupContents = null;
         }
 
-        return <DropdownsUI.Dropdown
+        return <Dropdown
             className="popup emoji"
             {...self.props}
             isLoading={self.state.isLoading}
@@ -544,6 +544,6 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
             <div ref={this.domRef}>
                 {popupContents}
             </div>
-        </DropdownsUI.Dropdown>;
+        </Dropdown>;
     }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { getUniqueId } from "../mixins";
-import Call from './meetings/call.jsx';
+import { isExpanded } from './meetings/utils.jsx';
 import { Button } from "../../ui/buttons";
 
 const NAMESPACE = 'chat-toast';
@@ -48,7 +48,7 @@ export default class ChatToaster extends React.Component {
         const { isRootToaster, showDualNotifications, onShownToast } = this.props;
         const now = Date.now();
         if (this.toasts.length + this.persistentToasts.length) {
-            if (this.domRef.current && (!isRootToaster && Call.isExpanded() || M.chat)) {
+            if (this.domRef.current && (!isRootToaster && isExpanded() || M.chat)) {
                 if (this.toasts.length && !shownToast) {
                     this.dispatchToast(this.toasts.shift(), now);
                 }

@@ -1,6 +1,6 @@
-var React = require("react");
-var ConversationMessageMixin = require('../../mixin.jsx').ConversationMessageMixin;
-var MetaRichPreviewLoading = require('./metaRichPreviewLoading.jsx').MetaRichpreviewLoading;
+import React from 'react';
+import { ConversationMessageMixin } from '../../mixin.jsx';
+import { MetaRichpreviewLoading } from './metaRichpreviewLoading.jsx';
 
 class MetaRichpreview  extends ConversationMessageMixin {
     getBase64Url(b64incoming) {
@@ -46,7 +46,7 @@ class MetaRichpreview  extends ConversationMessageMixin {
             var previewContainer;
 
             if (isLoading) {
-                previewContainer = <MetaRichPreviewLoading message={message} isLoading={message.meta.isLoading} />;
+                previewContainer = <MetaRichpreviewLoading message={message} isLoading={message.meta.isLoading} />;
             }
             else {
                 var domainName = meta.url;

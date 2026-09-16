@@ -1,11 +1,11 @@
-var React = require("react");
-import {MegaRenderMixin} from "./../mixins";
-import MiniUI from "./../../ui/miniui.jsx";
-import {ContactPickerWidget} from './contacts.jsx';
+import React from 'react';
+import { MegaRenderMixin } from '../mixins.js';
+import MiniUI from './../../ui/miniui.jsx';
+import { ContactPickerWidget } from './contacts.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 
 
-export class StartGroupChatWizard extends MegaRenderMixin {
+export default class StartGroupChatWizard extends MegaRenderMixin {
     dialogName = 'start-group-chat';
 
     domRef = React.createRef();
@@ -376,11 +376,3 @@ export class StartGroupChatWizard extends MegaRenderMixin {
         );
     }
 }
-
-window.StartGroupChatDialogUI = {
-    StartGroupChatWizard,
-};
-
-export default {
-    StartGroupChatWizard
-};

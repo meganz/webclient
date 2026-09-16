@@ -1,7 +1,7 @@
-var React = require("react");
-var ContactsUI = require('./../contacts.jsx');
-var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
-import { Emoji } from '../../../ui/utils';
+import React from 'react';
+import { Emoji } from '../../../ui/utils.jsx';
+import { Avatar } from '../contacts.jsx';
+import { ConversationMessageMixin } from './mixin.jsx';
 
 class ChatHandleMessage extends ConversationMessageMixin {
     render() {
@@ -30,7 +30,7 @@ class ChatHandleMessage extends ConversationMessageMixin {
             cssClasses += " grouped";
         }
         else {
-            avatar = <ContactsUI.Avatar
+            avatar = <Avatar
                 contact={contact}
                 className="message  avatar-wrapper small-rounded-avatar"
                 chatRoom={this.props.chatRoom}

@@ -1,29 +1,14 @@
-import React from 'react';
+import React, { createRef } from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import SearchField from './searchField.jsx';
-import ResultContainer  from './resultContainer.jsx';
+import ResultContainer from './resultContainer.jsx';
 import { PerfectScrollbar } from '../../../ui/perfectScrollbar.jsx';
-
-export const STATUS = {
-    IN_PROGRESS: 1,
-    PAUSED: 2,
-    COMPLETED: 3
-};
-
-export const EVENTS = {
-    RESULT_OPEN: 'chatSearchResultOpen',
-    KEYDOWN: 'keydown'
-};
-
-const ACTIONS = {
-    PAUSE: 'pause',
-    RESUME: 'resume'
-};
+import { ACTIONS, STATUS, EVENTS } from './utils.jsx';
 
 const SEARCH_PANEL_CLASS = `search-panel`;
 
 export default class SearchPanel extends MegaRenderMixin {
-    domRef = React.createRef();
+    domRef = createRef();
     wrapperRef = null;
 
     state = {

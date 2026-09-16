@@ -8,6 +8,7 @@
 @use 'meetings/_leftPanel.scss';
 @use 'meetings/_inviteParticipantsPanel.scss';
 @use 'meetings/_chatOverlay.scss';
+@use 'meetings/_errorBoundary.scss';
 
 // The main `Meetings` in-call container
 @use 'meetings/_call.scss';

@@ -21,7 +21,7 @@ karma.conf.js
 nacl-fast.js
 pdf.worker.js
 js/cmsSnapshot.js
-js/chat/bundle.js
+js/chat/bundle*.js
 js/transfers/meths/firefox-extension.js
 contrib/Electron/main.js
 *.sh
@@ -30,5 +30,6 @@ js/utils/aws.js
 js/chat/emojidata/emojis.json
 eslint-local-rules.js
 Gruntfile.js
+webpack.config.js
 sqlite3.js
 sqlite3-worker1.js

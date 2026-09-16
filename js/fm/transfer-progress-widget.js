@@ -2789,7 +2789,9 @@ mega.tpw = new function TransferProgressWidget() {
     scope.hideOnboarding = () => {
         if (mega.ui.onboarding && mega.ui.onboarding.currentSectionName === 'tpw') {
             mega.ui.onboarding.forceSection();
-            closeDialog();
+            if ($.dialog === 'onboardingDialog') {
+                closeDialog();
+            }
         }
     };
     scope.clearCurrentView = () => {

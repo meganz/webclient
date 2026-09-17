@@ -60,7 +60,7 @@
  *              });`
  *
  * - Length Checker - Show number of characters entered below input field if it has a limit (no-of-chars / limit)
- *      Class: `lengthChecker`
+ *      Class: `lengthChecker`, add `lengthCheckerAlways` to keep it shown while the field is empty
  *      Example: `<input class="underlinedText lengthChecker" type="text" name="register-name" id="register-name"
  *          placeholder="[$195]" maxlength="1000" />`
  */
@@ -552,6 +552,7 @@ mega.ui.MegaInputs.prototype.underlinedText._lengthChecker = function() {
 
     if ($input.hasClass('lengthChecker') && maxLength) {
 
+        const always = $input.hasClass('lengthCheckerAlways');
         // Length section
         $wrapper.safeAppend('<div class="length-check hidden">' +
             '<span class="chars-used"></span>' +
@@ -560,7 +561,7 @@ mega.ui.MegaInputs.prototype.underlinedText._lengthChecker = function() {
 
         const $lengthCheck = $('.length-check', $wrapper);
 
-        if ($input.val().length) {
+        if (always || $input.val().length) {
             $lengthCheck.removeClass('hidden');
             $('.chars-used', $lengthCheck).text($input.val().length);
         }
@@ -575,7 +576,7 @@ mega.ui.MegaInputs.prototype.underlinedText._lengthChecker = function() {
 
             const inputSize = $input.val().length;
 
-            $lengthCheck.toggleClass('hidden', !inputSize);
+            $lengthCheck.toggleClass('hidden', !always && !inputSize);
 
             const $charsUsed = $('.chars-used', $wrapper);
             $charsUsed.text(inputSize);

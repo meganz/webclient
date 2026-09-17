@@ -2099,7 +2099,7 @@ lazy(mega.ui, 'mShareDialog', () => {
             Promise.resolve(mega.fileRequestCommon.storage.isDropExist(target))
                 .then((res) => {
                     if (res.length) {
-                        return mega.fileRequest.showRemoveWarning(res);
+                        return mega.fileRequest.showRemoveWarning(res, 'outshare');
                     }
                 })
                 .then(() => mega.keyMgr.setShareSnapshot(target))

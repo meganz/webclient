@@ -11,7 +11,7 @@
  *
  * Extensions:
  * - Length Checker - Show number of characters entered below textarea if it has a limit (no-of-chars / limit)
- *      Class: `lengthChecker`
+ *      Class: `lengthChecker`, add `lengthCheckerAlways` to keep it shown while the textarea is empty
  *      Example: `<textarea class="textArea lengthChecker input-name" name="register-name" id="register-name"
  *          placeholder="[$195]" maxlength="1000" />`
  *

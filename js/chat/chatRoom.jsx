@@ -1772,7 +1772,7 @@ ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(reso
         Promise.resolve(mega.fileRequestCommon.storage.isDropExist(link))
             .then((res) => {
                 if (res.length) {
-                    return mega.fileRequest.showRemoveWarning(res);
+                    return mega.fileRequest.showRemoveWarning(res, 'link');
                 }
             })
             .then(() => {

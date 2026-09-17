@@ -637,6 +637,10 @@ var ulmanager = {
             k: file.filekey
         };
 
+        if (file.fru) {
+            n.fru = file.fru;
+        }
+
         if (d) {
             // if it's set but undefined, the file-conflict dialog failed to properly locate a file/node...
             console.assert(file._replaces || !("_replaces" in file), 'Unexpected file versioning state...');
@@ -664,12 +668,15 @@ var ulmanager = {
 
         var req_type = 'p';
         var dir = target;
+        let parent = false;
 
         // Put to public upload folder
         if (is_megadrop) {
+            const root = mega.fileRequestUpload.getUploadPagePuHandle();
             req_type = 'pp';
             target = mega.fileRequestUpload.getUploadPageOwnerHandle();
-            dir = mega.fileRequestUpload.getUploadPagePuHandle();
+            parent = dir && dir !== root ? dir : false;
+            dir = root;
         }
         else if (file.xput) {
             req_type = 'xp';
@@ -689,6 +696,10 @@ var ulmanager = {
             }],
             i: requesti
         };
+
+        if (parent) {
+            req.sh = parent;
+        }
 
         M.setPitag(req, 'U', file);
 

@@ -138,7 +138,8 @@ function MegaData() {
         'playtime': this.sortByPlaytime.bind(this),
         'numFolders': this.sortByNumFolders.bind(this),
         'hbtime': this.sortByHeartbeatTime.bind(this),
-        'fileLoc': this.sortByLocation.bind(this)
+        'fileLoc': this.sortByLocation.bind(this),
+        'fru': this.sortByFru.bind(this)
     };
     Object.setPrototypeOf(sortRules, null);
     Object.defineProperty(this, 'sortRules', {value: Object.freeze(sortRules)});

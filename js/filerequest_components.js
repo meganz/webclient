@@ -1,4 +1,7 @@
 /* eslint-disable max-classes-per-file */
+/**
+ * @property {Object} mega.fileRequestUI
+ */
 lazy(mega, 'fileRequestUI', () => {
     'use strict';
 
@@ -33,24 +36,19 @@ lazy(mega, 'fileRequestUI', () => {
     }
 
     class EmbedCodeInputComponent extends ReadOnlyInputComponent {
-        constructor($selector) {
-            super($selector);
-
-            this.puPagePublicHandle = null;
-            this.lightTheme = null;
+        update(context) {
+            this.setContext(context);
         }
 
         setContext(context) {
             this.puPagePublicHandle = context.puPagePublicHandle;
-            this.lightTheme = context.lightTheme;
 
-            this.setContent(
-                generator
-                    .generateCode(
-                        this.puPagePublicHandle,
-                        this.lightTheme
-                    )
-            );
+            this.$input.each((index, element) => {
+                const $element = $(element);
+                $element.text(
+                    generator.generateCode(this.puPagePublicHandle, $element.data('theme'))
+                );
+            });
         }
     }
 
@@ -65,8 +63,7 @@ lazy(mega, 'fileRequestUI', () => {
             this.puPagePublicHandle = context.puPagePublicHandle;
 
             this.setContent(
-                generator
-                    .generateUrl(this.puPagePublicHandle)
+                context.link || generator.generateUrl(this.puPagePublicHandle)
             );
         }
     }
@@ -291,7 +288,7 @@ lazy(mega, 'fileRequestUI', () => {
                 }
 
                 const {
-                    name, title, description, theme, pupHandle
+                    name, title, description, theme, pupHandle, expiry, size
                 } = optionCallback($input);
 
                 const url = generator.generateUrlPreview(
@@ -299,7 +296,9 @@ lazy(mega, 'fileRequestUI', () => {
                     title,
                     description,
                     theme,
-                    pupHandle
+                    pupHandle,
+                    expiry,
+                    size
                 );
 
                 if (url) {
@@ -319,7 +318,7 @@ lazy(mega, 'fileRequestUI', () => {
         setOnClick() {
             this.eventOnClick(() => {
                 if (this.options.warning) {
-                    showLoseChangesWarning().done(closeDialog);
+                    showLoseChangesWarning().done(() => onIdle(() => closeDialog()));
                     return;
                 }
 
@@ -410,8 +409,8 @@ lazy(mega, 'fileRequestUI', () => {
             }
 
             const validationRules = this.options.validations;
-            let validationPostCallback = this.options.postValidation;
-            if (typeof this.options.postValidate !== 'function') {
+            let validationPostCallback = validationRules.postValidation;
+            if (typeof validationPostCallback !== 'function') {
                 validationPostCallback = null;
             }
 
@@ -427,7 +426,7 @@ lazy(mega, 'fileRequestUI', () => {
                     }
 
                     if (validationPostCallback) {
-                        validationPostCallback($input, false);
+                        validationPostCallback(this.$input, false);
                     }
 
                     return false;
@@ -452,7 +451,7 @@ lazy(mega, 'fileRequestUI', () => {
                     }
 
                     if (validationPostCallback) {
-                        validationPostCallback($input, false);
+                        validationPostCallback(this.$input, false);
                     }
 
                     return false;
@@ -462,7 +461,7 @@ lazy(mega, 'fileRequestUI', () => {
             this.resetErrorMessage();
 
             if (validationPostCallback) {
-                validationPostCallback($input, true);
+                validationPostCallback(this.$input, true);
             }
             return true;
         }
@@ -543,7 +542,7 @@ lazy(mega, 'fileRequestUI', () => {
                 .getInput()
                 .removeClass('disabled')
                 .closest(megaInputSelector)
-                .addClass(activeClass);
+                .removeClass(activeClass);
 
             this.nodeHandle = null;
         }
@@ -597,7 +596,7 @@ lazy(mega, 'fileRequestUI', () => {
                 namespace: namespace,
                 callback: ($button) => {
                     const $inputSection  = $button.closest('.file-request-input');
-                    const $input = $('.input-wrapper input', $inputSection);
+                    const $input = $('.input-wrapper input, .file-request-embed-code', $inputSection);
 
                     if (!$input.length) {
                         return;

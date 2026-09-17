@@ -3,6 +3,10 @@
     display: flex;
     flex-direction: column;
 }
+.fr-mgmt-container {
+    flex: 1 1 auto;
+    min-height: 0;
+}
 .fr-mgmt-container .fr-blurb > *:not(:last-child) {
     margin-bottom: 16px;
 }
@@ -20,10 +24,14 @@
     font: var(--mobile-font-caption-large-regular);
     color: var(--mobile-text-secondary);
 }
+.fr-mgmt-container .mega-input.description-field.textarea textarea {
+    overflow-y: auto;
+}
 
 .fr-mgmt-container .fr-buttons {
     display: flex;
     flex-direction: column;
+    margin-top: auto;
 }
 .fr-mgmt-container .fr-buttons .nav-elem {
     height: 48px;
@@ -35,14 +43,229 @@
 .fr-mgmt-container .fr-buttons .create-update {
     margin-top: 24px;
 }
+.mega-component.mega-overlay.fr-create-overlay .title,
+.mega-component.mega-overlay.fr-manage-overlay .title {
+    margin-top: 16px;
+}
 
-.fr-updated-sheet-contents .mega-input.with-icon i:not(.alert) {
-    order: 1;
+.fr-mgmt-container .link-banner {
+    margin: 16px 0;
+}
+.fr-mgmt-container .link-banner .banner-body {
+    background: var(--mobile-notification-success);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-regular);
+}
+.fr-mgmt-container .link-banner .banner-body i {
     margin-inline-end: 8px;
+    --mask-color: var(--mobile-support-success);
+    --icon-size: 24px;
+}
+.fr-mgmt-container .mega-input.fr-link-field.mobile {
+    height: 48px;
+    border: none;
+    border-radius: 8px;
+    background: var(--mobile-surface-1);
+}
+.fr-mgmt-container .mega-input.fr-link-field.mobile input.fr-link {
+    padding: 12px;
+    font: var(--mobile-font-caption-large-regular);
+    color: var(--mobile-text-primary);
+    text-overflow: ellipsis;
+}
+.fr-mgmt-container .fr-link-field i.action-icon.copy-input-value {
+    --icon-size: 20px;
+    --mask-color: var(--mobile-icon-primary);
+    margin-inline-end: 12px;
+}
+.fr-mgmt-container .fr-link-settings-btn {
+    width: fit-content;
+    margin-top: -8px;
+    margin-inline-start: auto;
+    padding: 0;
+}
+.mega-component.mega-overlay.fr-manage-overlay.action-button-bottom .overlay {
+    padding-bottom: 0;
+}
+.mega-component.mega-overlay.fr-manage-overlay.action-button-bottom .actions {
+    position: static;
+}
+.mega-component.mega-overlay.fr-manage-overlay .fr-mgmt-container {
+    flex: 0 0 auto;
+}
+.mega-component.mega-overlay.fr-manage-overlay .actions {
+    border-top: var(--mobile-border-strong) 1px solid;
+    padding-bottom: 16px;
+}
+.mega-component.mega-overlay.fr-manage-overlay .actions .fr-buttons {
+    width: 100%;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+.mega-component.mega-overlay.fr-manage-overlay .actions button {
+    margin-top: 16px;
+    width: 100%;
+}
+.mega-component.mega-overlay.fr-manage-overlay .actions button.fr-stop-btn {
+    color: var(--mobile-button-error);
 }
 
 @media screen and (min-width: 769px) {
     .mobile .fr-mgmt-container .mega-input.box-style {
         width: var(--mobile-elem-max-width);
     }
+}
+
+body.mobile .mega-component.mega-sheet.filereq-ob-dialog .sheet {
+    padding: 0 0 40px;
+}
+body.mobile .mega-component.mega-sheet.filereq-ob-dialog .header {
+    padding: 0;
+}
+body.mobile .mega-component.mega-sheet.filereq-ob-dialog .header-title {
+    margin-bottom: 20px;
+}
+body.mobile .mega-component.mega-sheet.filereq-ob-dialog .header-title > * {
+    margin: 0;
+}
+body.mobile .mega-component.mega-sheet.filereq-ob-dialog .header .close {
+    height: 32px;
+    width: 32px;
+    top: 16px;
+    border-radius: 100%;
+    background: var(--mobile-page-background);
+}
+body.mobile .mega-component.mega-sheet.filereq-ob-dialog .cloud-ob1 {
+    background: url("../../images/onboarding/cloud_ob_1.png") center / cover no-repeat;
+    width: 100%;
+    height: 200px;
+    display: block;
+    border-radius: var(--mobile-border-radius-large) var(--mobile-border-radius-large) 0 0;
+}
+body.mobile .mega-component.mega-sheet.normal.filereq-ob-dialog .sheet .main {
+    padding: 0 24px;
+}
+body.mobile .mega-component.mega-sheet.filereq-ob-dialog .main .title {
+    padding: 0;
+    height: 32px;
+    margin-bottom: 4px;
+}
+body.mobile .mega-component.mega-sheet.filereq-ob-dialog .main .subtitle {
+    margin-top: 0;
+}
+body.mobile .mega-component.mega-sheet.filereq-ob-dialog .main .subtitle span {
+    color: var(--mobile-text-primary);
+}
+.filereq-ob-dialog .filereq-ob-container .points-head {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-semibold);
+    margin: 8px 0 16px;
+}
+.filereq-ob-dialog .filereq-ob-container .filereq-points {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+.filereq-ob-dialog .filereq-ob-container .points-item {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    height: 48px;
+}
+.filereq-ob-dialog .filereq-ob-container .points-item i {
+    margin-inline-end: 16px;
+    --icon-size: 24px;
+}
+.mega-component.mega-sheet.create-update-fr-sheet .main .image,
+.mega-component.mega-sheet.close-fr-sheet .main .title,
+.mega-component.mega-sheet.remove-fr-sheet .main .title {
+    margin-top: 32px;
+}
+
+.mega-component.mega-sheet.remove-fr-sheet .remove-fr-contents .mega-checkbox {
+    margin: 36px 0 4px;
+}
+.mega-component.mega-sheet.remove-fr-sheet .remove-fr-contents .mega-checkbox .checkbox-wrapper {
+    width: 20px;
+    height: 20px;
+    margin-inline-end: 12px;
+    --icon-size: 18px;
+}
+.mega-component.mega-sheet.remove-fr-sheet .remove-fr-contents .mega-checkbox label {
+    text-align: start;
+}
+.fr-updated-sheet-contents .mega-input.fr-link-field.mobile {
+    border: none;
+    margin-top: 24px;
+    padding: 11px 0 12px;
+}
+.fr-updated-sheet-contents .mega-input.fr-link-field.mobile input.fr-link {
+    color: var(--mobile-text-placeholder);
+    padding: 11px 12px;
+}
+.fr-updated-sheet-contents .fr-link-field i.action-icon.copy-input-value {
+    --icon-size: 16px;
+}
+
+.mega-component.mega-overlay.fr-settings-overlay .header button:not(.close) {
+    margin-top: -1.5rem;
+    margin-inline-start: 18px;
+}
+.fr-settings-container .fr-setting-row {
+    margin-bottom: 32px;
+}
+.fr-settings-container .fr-setting-row.expiry-row.expanded {
+    margin-bottom: 24px;
+}
+.fr-settings-container .fr-setting-row .settings-wrap {
+    display: flex;
+    align-items: center;
+}
+.fr-settings-container .fr-setting-row .settings-info {
+    margin-inline-end: auto;
+}
+.fr-settings-container .fr-setting-row .settings-label {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-semibold);
+    white-space: nowrap;
+}
+.fr-settings-container .fr-setting-row .settings-desc {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-small-regular);
+    margin-top: 8px;
+    white-space: nowrap;
+}
+.fr-settings-container .fr-setting-row .expiry-picker {
+    margin-top: 16px;
+}
+.fr-settings-container .fr-setting-row .expiry-picker i {
+    order: 1;
+    margin-inline-end: 12px;
+}
+.fr-settings-container .fr-setting-row .password-input {
+    margin-top: 12px;
+}
+.fr-settings-container .file-size-wrap {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 16px;
+}
+.fr-settings-container .file-size-value {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.fr-settings-container .fr-setting-row .mega-input.file-size-unit {
+    flex: 0 0 80px;
+    margin-inline-start: 8px;
+    padding: 0 12px;
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-input-regular);
+    cursor: pointer;
+    min-width: auto;
+}
+.mega-component.mega-sheet.fr-size-menu .header {
+    margin-bottom: 24px;
 }

@@ -5726,11 +5726,13 @@
          aria-modal="true">
 
         <button class="close js-close" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
+            <i class="sprite-fm-mono icon-dialog-close-thin"></i>
         </button>
 
         <header>
-            <h2 id="file-request-dialog-title" class="dialog-title"></h2>
+            <div class="title-block">
+                <h2 id="file-request-dialog-title" class="dialog-title"></h2>
+            </div>
             <p class="dialog-caption"></p>
         </header>
 
@@ -5738,134 +5740,202 @@
             <div class="scrollable">
                 <div class="content-block primary hidden">
                     <div class="form-row select-folder">
-                        <label for="file-request-folder">[$1049]</label>
+                        <label for="frFolder">[$fr_destination]</label>
                         <div class="input-container">
-                            <div class="mega-input box-style mega-input-icon">
-                                <i class="sprite-fm-mono icon-folder-filled"></i>
-                                <input class="file-request-folder" type="text" placeholder="Folder name">
+                            <div class="mega-input pm box-style with-icon">
+                                <i class="sprite-fm-mono icon-folder-thin-solid"></i>
+                                <input id="frFolder" class="file-request-folder" type="text" placeholder="[$select_folder]">
                             </div>
-                            <button class="mega-button file-request-select-folder disabled">
-                                <span>[$file_request_dialog_button_select_folder]</span>
+                            <button class="mega-component secondary nav-elem normal button file-request-select-folder disabled">
+                                <div class="text-box-wrapper">
+                                    <span class="primary-text">[$file_request_dialog_button_select_folder]</span>
+                                </div>
                             </button>
                         </div>
                     </div>
                     <div class="form-row">
-                        <label for="file-request-title">[$file_request_dialog_label_title]</label>
-                        <span class="char-count"></span>
+                        <label for="frTitle">[$file_request_dialog_label_title]</label>
                         <div class="mega-input-wrapper">
-                            <div class="mega-input box-style">
-                                <input class="file-request-title" type="text" placeholder="[$file_request_dialog_placeholder_title]">
+                            <div class="mega-input pm box-style">
+                                <input id="frTitle" class="file-request-title" type="text" placeholder="[$file_request_dialog_placeholder_title]">
                             </div>
                             <div class="message-container"></div>
                         </div>
+                        <span class="char-count"></span>
                     </div>
                     <div class="form-row">
-                        <label for="file-request-description">[$16462]</label>
-                        <span class="char-count"></span>
+                        <div class="section-header">
+                            <label for="frDesc">[$16462]</label>
+                            <span>[$7347]</span>
+                        </div>
                         <div class="mega-input-wrapper">
-                            <div class="mega-input box-style">
-                                <input class="file-request-description" type="text" placeholder="[$file_request_dialog_placeholder_desc]">
-                            </div>
+                            <div class="file-request-description"></div>
                             <div class="message-container"></div>
                         </div>
-                        <p class="caption">[$file_request_dialog_caption_desc]</p>
-                    </div>
-                    <div class="footer-container space-between preview">
-                        <button class="mega-button file-request-preview-button">
-                            <span>[$file_request_dialog_button_preview]</span>
-                        </button>
+                        <span class="char-count"></span>
                     </div>
                 </div>
-                <hr class="divider"/>
+
                 <div class="content-block secondary hidden">
+                    <div class="form-row link-banner hidden">
+                        <div class="banner-body">
+                            <i class="sprite-fm-mono icon-check-circle-thin-outline"></i>
+                            <span>[$link_updated]</span>
+                        </div>
+                    </div>
                     <div class="form-row">
-                        <label for="file-request-share-link">[$file_request_dialog_label_url]</label>
+                        <div class="section-header">
+                            <label for="frShareLink">[$file_request_dialog_label_url]</label>
+                            <button class="mega-component text-icon nav-elem normal button fr-link-settings">
+                                <div class="text-box-wrapper">
+                                    <span class="primary-text">[$link_settings]</span>
+                                </div>
+                            </button>
+                        </div>
                         <div class="file-request-input input-share">
                             <div class="input-wrapper">
-                                <i class="sprite-fm-mono icon-link chain"></i>
-                                <input class="file-request-share-link" type="text" value="" readonly="readonly">
+                                <input id="frShareLink" class="file-request-share-link" type="text" value="" readonly="readonly">
                             </div>
-                            <div class="button-wrapper">
-                                <button class="mega-button positive copy">[$1394]</button>
+                            <button class="mega-component transparent-icon text-icon secondary nav-elem icon-only button copy">
+                                <i class="sprite-fm-mono icon-copy-thin-outline left-icon"></i>
+                            </button>
+                        </div>
+                        <button class="mega-component text-icon nav-elem normal button file-request-preview-button">
+                            <i class="sprite-fm-mono icon-external-link-thin-outline left-icon"></i>
+                            <div class="text-box-wrapper">
+                                <span class="primary-text">[$1899]</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="form-row embed-row">
+                        <div class="fr-embed-option-container">
+                            <div class="embed-button-label">
+                                <div>[$file_request_dialog_label_embed]</div>
+                                <span>[$fr_embed_desc]</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-block fr-embed hidden">
+                    <div class="form-row">
+                        <div class="embed-label">[$fr_embed_red]</div>
+                        <div class="embed-wrap">
+                            <div class="file-request-embed-button-container red-theme theme-light-forced">
+                                <i class="sprite-fm-mono icon-mega-thin-solid embed-mega-icon"></i>
+                                <div class="embed-action-text">[$upload_to_mega]</div>
+                            </div>
+                            <div class="file-request-input input-code">
+                                <div class="file-request-embed-code fr-theme-r selectable-txt" data-theme="r"></div>
+                                <button class="mega-component transparent-icon text-icon secondary nav-elem icon-only button copy">
+                                    <i class="sprite-fm-mono icon-copy-thin-outline left-icon"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
                     <div class="form-row">
-                        <label for="file-request-embed-code">[$file_request_dialog_label_embed]</label>
-                        <div class="file-request-embed-button-container">
-                            <div class="embed-button-header">
-                                [$file_request_dialog_theme_desc]
+                        <div class="embed-label">[$fr_embed_dark]</div>
+                        <div class="embed-wrap">
+                            <div class="file-request-embed-button-container dark-theme theme-light-forced">
+                                <i class="sprite-fm-mono icon-mega-thin-solid embed-mega-icon"></i>
+                                <div class="embed-action-text">[$upload_to_mega]</div>
                             </div>
-                            <div class="embed-button-selection light-theme">
-                                <div class="embed-block active">
-                                    <div class="embed-button-centre">
-                                        <div class="embed-button centre-button theme-light-forced">
-                                            <div class="embed-content-wrapper">
-                                                <div class="embed-mega-icon">
-                                                </div>
-                                                <div class="embed-action-text">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="embed-button-select">
-                                            <div class="embed-button-theme radioOn">
-                                                <input type="radio" class="embed-button-theme-input radioOn" value="0">
-                                            </div>
-                                            <div class="embed-button-subheading">
-                                                [$18217]
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="embed-block dark-theme">
-                                    <div class="embed-button-centre">
-                                        <div class="embed-button centre-button theme-light-forced">
-                                            <div class="embed-content-wrapper">
-                                                <div class="embed-mega-icon">
-                                                </div>
-                                                <div class="embed-action-text">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="embed-button-select">
-                                            <div class="embed-button-theme radioOff">
-                                                <input type="radio" class="embed-button-theme-input radioOff" value="1">
-                                            </div>
-                                            <div class="embed-button-subheading">
-                                                [$18216]
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="file-request-input input-code">
+                                <div class="file-request-embed-code fr-theme-d selectable-txt" data-theme="d"></div>
+                                <button class="mega-component transparent-icon text-icon secondary nav-elem icon-only button copy">
+                                    <i class="sprite-fm-mono icon-copy-thin-outline left-icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="embed-label">[$fr_embed_light]</div>
+                        <div class="embed-wrap dark-background">
+                            <div class="file-request-embed-button-container light-theme theme-dark-forced">
+                                <i class="sprite-fm-mono icon-mega-thin-solid embed-mega-icon"></i>
+                                <div class="embed-action-text">[$upload_to_mega]</div>
+                            </div>
+                            <div class="file-request-input input-code">
+                                <div class="file-request-embed-code fr-theme-l selectable-txt" data-theme="l"></div>
+                                <button class="mega-component transparent-icon text-icon secondary nav-elem icon-only button copy">
+                                    <i class="sprite-fm-mono icon-copy-thin-outline left-icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-block fr-settings hidden">
+                    <div class="form-row expiry">
+                        <div class="settings-wrap">
+                            <div class="settings-info">
+                                <div class="settings-label">[$expiry_date]</div>
+                                <div class="settings-desc">[$fr_expiry_desc]</div>
+                            </div>
+                            <div class="badge pro-only hidden">[$8695]</div>
+                        </div>
+                        <div class="hidden expiry-picker">
+                            <div class="mega-input-wrapper">
+                                <div class="mega-input pm box-style with-icon">
+                                    <input class="set-date" type="text" placeholder="[$8953]" readonly>
+                                    <i class="sprite-fm-mono icon-calendar-01-thin-outline"></i>
                                 </div>
                             </div>
                         </div>
-                        <div class="file-request-input input-code">
-                            <div class="input-wrapper">
-                                <i class="tab-icon url sprite-fm-mono icon-embed-code"></i>
-                                <input class="file-request-embed-code" type="text" value="" readonly="readonly">
+                    </div>
+                    <div class="form-row password">
+                        <div class="settings-wrap">
+                            <div class="settings-info">
+                                <div class="settings-label">[$17454]</div>
+                                <div class="settings-desc">[$fr_password_desc]</div>
                             </div>
-                            <div class="button-wrapper">
-                                <button class="mega-button positive copy">[$17408]</button>
+                            <div class="badge pro-only hidden">[$8695]</div>
+                        </div>
+                        <div class="hidden password-input"></div>
+                    </div>
+                    <div class="form-row size">
+                        <div class="settings-wrap">
+                            <div class="settings-info">
+                                <div class="settings-label">[$fr_size_title]</div>
+                                <div class="settings-desc">[$fr_size_desc]</div>
+                            </div>
+                            <div class="badge pro-only hidden">[$8695]</div>
+                        </div>
+                        <div class="hidden file-size-wrap">
+                            <div class="file-size-value"></div>
+                            <div class="file-size-unit box-style">
+                                <span>[$20159]</span>
+                                <i class="sprite-fm-mono icon-chevron-down-thin-outline"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row folders">
+                        <div class="settings-wrap">
+                            <div class="settings-info">
+                                <div class="settings-label">[$fr_folder_title]</div>
+                                <div class="settings-desc">[$fr_folder_desc]</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-        <footer class="alt-background">
+        <footer>
             <div class="footer-container space-between manage">
-                <button class="mega-button file-request-remove-button">
-                    <span>[$file_request_dialog_button_remove]</span>
+                <button class="mega-component text-icon nav-elem normal button file-request-remove-button">
+                    <div class="text-box-wrapper">
+                        <span class="primary-text">[$file_request_dialog_button_remove]</span>
+                    </div>
                 </button>
-                <button class="mega-button file-request-preview-button">
-                    <span>[$file_request_dialog_button_preview]</span>
+                <button class="mega-component text-icon nav-elem normal button file-request-preview-button hidden">
+                    <i class="sprite-fm-mono icon-external-link-thin-outline left-icon"></i>
+                    <div class="text-box-wrapper">
+                        <span class="primary-text">[$1899]</span>
+                    </div>
                 </button>
                 <div class="button-container">
-                    <button class="mega-button file-request-close-button">
-                        <span>[$msg_dlg_cancel]</span>
-                    </button>
-                    <button class="mega-button file-request-save-button positive">
-                        <span>[$msg_dlg_save]</span>
+                    <button class="mega-component secondary nav-elem normal button file-request-close-button">
+                        <div class="text-box-wrapper">
+                            <span class="primary-text">[$msg_dlg_cancel]</span>
+                        </div>
                     </button>
                 </div>
             </div>

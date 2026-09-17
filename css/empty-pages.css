@@ -144,13 +144,29 @@
 }
 
 /* file-request */
+.fm-empty-file-requests .file-request-empty-img {
+    background-image: url("../images/mega/filereq-empty.png");
+    background-size: contain;
+    width: 200px;
+    height: 166px;
+    margin: auto;
+}
+.fm-empty-file-requests .fm-empty-cloud-txt {
+    font: var(--mobile-font-heading-h2);
+    color: var(--mobile-text-primary);
+    margin-top: 24px;
+}
 .fm-empty-file-requests .fm-empty-description {
     max-width: 511px;
-    font-family: var(--text-font-family);
-    font-weight: 600;
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-secondary);
+    padding: 8px 0 24px;
 }
 .fm-empty-file-requests .fm-empty-options-item {
     margin-top: 6px;
+}
+.fm-empty-file-requests .fm-empty-options-item button .primary-text {
+    white-space: nowrap;
 }
 
 /* device-list */

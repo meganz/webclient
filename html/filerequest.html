@@ -1,23 +1,20 @@
 <!-- Template FileRequest upload item -->
 <div class="block-uploading-item hidden" id="file-upload-item-template">
     <div class="item-details">
+        <i class="item-type-icon"></i>
         <div class="item-name">
         </div>
         <div class="item-size">
         </div>
-        <div class="item-status transfer-status">
-        </div>
+        <i class="sprite-fm-mono icon-dialog-close-thin action-icon"></i>
     </div>
     <div class="item-progress">
         <div class="item-progress-bar" style="width: 0%"></div>
     </div>
     <div class="item-error hidden">
-        <span class="error-icon">
-            <i class="sprite-fm-mono icon-alert-triangle"></i>
-        </span>
+        <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
         <span class="error-message-wrapper">
             <span class="error-message">[$1578]</span>
-            <a class="error-reupload hidden">[$file_request_upload_error_reupload]</a>
         </span>
     </div>
 </div>
@@ -25,60 +22,77 @@
 
 <div class="file-request-upload-page">
     <div class="page-wrapper">
+        <div class="page-logo">
+            <i class="sprite-fm-uni icon-mega-logo"></i>
+            <i class="sprite-fm-illustration-wide img-mega-logo left-icon icon-size-24"></i>
+        </div>
         <div class="page-main">
-            <div class="page-logo">
-                <i class="sprite-fm-uni icon-mega-logo"></i>
-                <i class="icon-mega-logo-mobile hidden"></i>
+            <div class="page-header">
+                [$file_request_upload_content_title]
             </div>
             <div class="page-content">
                 <div class="content-wrapper">
-                    <h1 class="content-title">
-                        [$file_request_upload_content_title]
-                    </h1>
                     <div class="content-details">
-                        <span class="error-icon">
-                            <i class="sprite-fm-mono icon-alert-triangle"></i>
-                        </span>
                         <div class="detail-wrapper">
-                            <h2 class="detail-title">
+                            <i class="sprite-fm-mono icon-x-circle-thin-solid error-icon"></i>
+                            <div class="detail-title">
                                 EOFY Project
-                            </h2>
-                            <p class="detail-description">
+                            </div>
+                            <div class="detail-description">
                                 Can everyone please upload their reports by 00/00/0000
-                            </p>
-                            <p class="detail-upload-id">
-                                [$file_request_upload_content_upload_id] <span class="upload-id">XXXXX</span>
-                            </p>
+                            </div>
+                            <div class="badge-row hidden">
+                                <div class="fr-badge expiry-badge hidden">
+                                    <i class="sprite-fm-mono icon-clock-thin-outline"></i>
+                                    <span>Expires 01/01/1970</span>
+                                </div>
+                                <div class="fr-badge size-badge hidden">
+                                    <i class="sprite-fm-mono icon-hard-drive-thin-outline"></i>
+                                    <span>Max 1 GB</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="content-upload-block block-empty">
-                        <div class="block-empty-icon">
-                            <i class="sprite-fm-mime-90 icon-folder-upload-90"></i>
-                        </div>
-                        <div class="block-empty-icon error-icon">
-                            <i class="sprite-fm-mono icon-folder-upload-1"></i>
-                        </div>
-                        <div class="block-empty-caption">
+                        <div class="block-empty-icon"></div>
+                        <h3 class="block-empty-caption">
                             [$file_request_upload_empty]
+                        </h3>
+                        <div class="block-empty-subtext">
+                            [$empty_cloud_hint]
                         </div>
                     </div>
-                    <div class="content-upload-block mobile block-empty">
-                        <a class="upload-btn block-empty-upload-button" href="#">[$file_request_upload_empty_block_mobile]</a>
+                    <div class="content-upload-block block-finished hidden">
+                        <div class="block-finished-icon"></div>
+                        <h3 class="block-finished-caption">
+                            [$fr_upload_done]
+                        </h3>
+                        <div class="block-finished-subtext"></div>
                     </div>
                     <div class="content-upload-block block-uploading hidden">
                         <div class="block-uploading-scroll">
                         </div>
                     </div>
+                    <div class="current-upload-block hidden">
+                        <div class="upload-size">Total files 3.4 MB</div>
+                    </div>
                     <div class="content-upload-summary hidden">
                         <div class="upload-info">
+                            <div class="input-holder"></div>
+                            <div class="info-block">
+                                <i class="sprite-fm-mono icon-help-circle-thin-outline simpletip" data-simpletip="[$fr_upload_id_tip]"></i>
+                                <p class="detail-upload-id">
+                                    [$file_request_upload_content_upload_id] <span class="upload-id">XXXXX</span>
+                                </p>
+                                <span class="char-count">0/30</span>
+                            </div>
                         </div>
-                        <a class="upload-more">
-                            <span class="add-icon">
-                                <i class="sprite-fm-mono icon-plus-circle-filled"></i>
-                            </span>
-                            <span>[$file_request_upload_summary_button_add]</span>
-                        </a>
                     </div>
+                    <div class="upload-error-block">
+                        <i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>
+                        <span class="err-msg">[$fr_uploaded_remain_err]</span>
+                    </div>
+                    <div class="action-block hidden"></div>
                 </div>
             </div>
         </div>
@@ -86,23 +100,13 @@
             <div class="page-caption-wrapper">
                 <p>[$file_request_upload_caption_1]</p>
                 <p>[$file_request_upload_caption_2]</p>
-            </div>
-        </div>
-        <div class="page-footer">
-            <div class="page-copyright">
-                <div class="copyright-wrapper">
-                    <a href="https://mega.nz" target="_blank" class="wu-copyrights nz-url">
-                        <span>&copy; [$0]</span> <span class="year">[$381]</span>
-                    </a>
+                <div class="page-copyright">
+                    <div class="copyright-wrapper">
+                        <a href="https://mega.nz" target="_blank" class="wu-copyrights nz-url">
+                            <span>&copy; [$0]</span> <span class="year">[$381]</span>
+                        </a>
+                    </div>
                 </div>
-            </div>
-            <div class="page-language">
-                <a class="language-wrapper">
-                    <span class="language-icon">
-                        <i class="sprite-fm-mono icon-globe-01"></i>
-                    </span>
-                    <span class="language-text">EN</span>
-                </a>
             </div>
         </div>
     </div>

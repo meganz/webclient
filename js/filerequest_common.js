@@ -1,8 +1,12 @@
 /* eslint-disable max-classes-per-file */
+/**
+ * @property {FileRequestCommon} mega.fileRequestCommon
+ */
 lazy(mega, 'fileRequestCommon', () => {
     'use strict';
 
     const DEBUG = self.d > 1;
+
     const logger = new MegaLogger('common', null, MegaLogger.getLogger('FileRequest'));
     const treeClass = 'file-request-folder';
 
@@ -143,17 +147,24 @@ lazy(mega, 'fileRequestCommon', () => {
                 });
         }
 
-        update(puPagePublicHandle, title, description, name, email) {
+        update(puPagePublicHandle, title, description, name, email, settings) {
             const d = {
                 name: name || u_attr.name,
                 email: email || u_attr.email,
                 msg: title,
                 description: description
             };
+            const req = {a: 'ps', p: puPagePublicHandle, d};
+
+            if (settings) {
+                d.f = settings.folder ? 0 : 1;      // Disallow folder uploads
+                req.mfs = settings.limit || 0;      // Max file size in bytes
+                req.ets = settings.expiry || 0;     // Expiry timestamp (unix seconds)
+            }
 
             mLoadingSpinner.show('puf-update');
 
-            return api.screq({a: 'ps', p: puPagePublicHandle, d})
+            return api.screq(req)
                 .finally(() => {
                     mLoadingSpinner.hide('puf-update');
                 });
@@ -291,7 +302,10 @@ lazy(mega, 'fileRequestCommon', () => {
                 folderName,
                 state,
                 publicHandle,
-                pagePublicHandle
+                pagePublicHandle,
+                ets,
+                mfs,
+                f
             } = this.setPuHandleValues(options, update);
 
             // This is to look for
@@ -309,9 +323,12 @@ lazy(mega, 'fileRequestCommon', () => {
                 ph: publicHandle, // Handle public handle
                 fn: folderName, // Folder Name
                 s: state, // state
+                ets: ets || 0, // Expiry timestamp (unix seconds)
+                mfs: mfs || 0, // Max file size in bytes
                 d: {
-                    t: title || '', // Title
-                    d: description || '' // Description
+                    t: title || '',         // Title
+                    d: description || '',   // Description
+                    f: f || 0               // Disallow folder uploads
                 }
             };
 
@@ -338,7 +355,10 @@ lazy(mega, 'fileRequestCommon', () => {
                 folderName,
                 state,
                 publicHandle,
-                pagePublicHandle
+                pagePublicHandle,
+                ets,
+                mfs,
+                f
             } = options;
 
             const currentCacheData = this.getPuHandleByNodeHandle(nodeHandle);
@@ -349,6 +369,9 @@ lazy(mega, 'fileRequestCommon', () => {
                 publicHandle = isEmpty(publicHandle) ? currentCacheData.ph : publicHandle;
                 pagePublicHandle = isEmpty(pagePublicHandle) ? currentCacheData.p : pagePublicHandle;
                 state = isEmpty(state) ? currentCacheData.s : state;
+                ets = isEmpty(ets) ? currentCacheData.ets : ets;
+                mfs = isEmpty(mfs) ? currentCacheData.mfs : mfs;
+                f = isEmpty(f) ? currentCacheData.d.f : f;
             }
 
             return {
@@ -358,7 +381,10 @@ lazy(mega, 'fileRequestCommon', () => {
                 folderName,
                 state,
                 publicHandle,
-                pagePublicHandle
+                pagePublicHandle,
+                ets,
+                mfs,
+                f
             };
         }
 
@@ -414,7 +440,8 @@ lazy(mega, 'fileRequestCommon', () => {
         updatePuHandlePageId(
             puHandlePublicHandle,
             puPagePublicHandle,
-            puHandleState
+            puHandleState,
+            settings
         ) {
             if (DEBUG) {
                 logger.info('Storage.updatePuHandlePageId', {
@@ -438,7 +465,8 @@ lazy(mega, 'fileRequestCommon', () => {
                     nodeHandle: currentPuHandleKey,
                     state: puHandleState,
                     publicHandle: puHandlePublicHandle,
-                    pagePublicHandle: puPagePublicHandle
+                    pagePublicHandle: puPagePublicHandle,
+                    ...settings
                 }
             );
 
@@ -463,8 +491,15 @@ lazy(mega, 'fileRequestCommon', () => {
             const puHandlePublicHandle = puPageObject.ph;
             const puPagePublicHandle = puPageObject.p;
 
+            const settings = {
+                ets: puPageObject.ets,
+                mfs: puPageObject.mfs,
+                f: Object(puPageObject.d).f
+            };
+
             // Update puf.items with related PUP handle
-            const puHandleObject = this.updatePuHandlePageId(puHandlePublicHandle, puPagePublicHandle, puHandleState);
+            const puHandleObject =
+                this.updatePuHandlePageId(puHandlePublicHandle, puPagePublicHandle, puHandleState, settings);
             if (!puHandleObject) {
                 if (d) {
                     logger.error('Storage.addPuPage - no PUP object', {puPageObject});
@@ -508,7 +543,8 @@ lazy(mega, 'fileRequestCommon', () => {
                     folderName,
                     state: puHandleState,
                     publicHandle: puHandlePublicHandle,
-                    pagePublicHandle: puPagePublicHandle
+                    pagePublicHandle: puPagePublicHandle,
+                    ...settings
                 }
             );
 
@@ -538,7 +574,10 @@ lazy(mega, 'fileRequestCommon', () => {
                 state,
                 publicHandle,
                 pagePublicHandle,
-                name
+                name,
+                ets,
+                mfs,
+                f
             } = this.setPuPageValues(options, update);
 
             const puHandleCacheData = {
@@ -549,9 +588,12 @@ lazy(mega, 'fileRequestCommon', () => {
                 s:  state, // state
                 msg: message,
                 name: name || u_attr.name,
+                ets: ets || 0, // Expiry timestamp (unix seconds)
+                mfs: mfs || 0, // Max file size in bytes
                 d: {
-                    t: title || '', // Title
-                    d: description || '' // Description
+                    t: title || '',         // Title
+                    d: description || '',   // Description
+                    f: f || 0               // Disallow folder uploads
                 }
             };
 
@@ -576,7 +618,10 @@ lazy(mega, 'fileRequestCommon', () => {
                 state,
                 publicHandle,
                 pagePublicHandle,
-                name
+                name,
+                ets,
+                mfs,
+                f
             } = options;
 
             const currentCacheData = this.getPuPageByPageId(pagePublicHandle);
@@ -590,6 +635,9 @@ lazy(mega, 'fileRequestCommon', () => {
                 state = isEmpty(state) ? currentCacheData.s : state;
                 message = isEmpty(message) ? currentCacheData.msg : message;
                 name = isEmpty(name) ? currentCacheData.name : name;
+                ets = isEmpty(ets) ? currentCacheData.ets : ets;
+                mfs = isEmpty(mfs) ? currentCacheData.mfs : mfs;
+                f = isEmpty(f) ? currentCacheData.d.f : f;
             }
 
             return {
@@ -601,11 +649,14 @@ lazy(mega, 'fileRequestCommon', () => {
                 state,
                 publicHandle,
                 pagePublicHandle,
-                name
+                name,
+                ets,
+                mfs,
+                f
             };
         }
 
-        updatePuPage(puPagePublicHandle, title, description) {
+        updatePuPage(puPagePublicHandle, title, description, settings) {
             if (DEBUG) {
                 logger.info('Storage.updatePuPage - Update PUP', {
                     puPagePublicHandle,
@@ -641,7 +692,8 @@ lazy(mega, 'fileRequestCommon', () => {
                     title,
                     description,
                     message,
-                    pagePublicHandle: puPagePublicHandle
+                    pagePublicHandle: puPagePublicHandle,
+                    ...settings
                 },
                 true
             );
@@ -654,7 +706,7 @@ lazy(mega, 'fileRequestCommon', () => {
             }
         }
 
-        updatePuHandle(puHandleNodeHandle, title, description) {
+        updatePuHandle(puHandleNodeHandle, title, description, settings) {
             if (DEBUG) {
                 logger.info('Storage.updatePuHandle - update PUH', {
                     puHandleNodeHandle,
@@ -667,7 +719,8 @@ lazy(mega, 'fileRequestCommon', () => {
                 {
                     nodeHandle: puHandleNodeHandle,
                     title,
-                    description
+                    description,
+                    ...settings
                 },
                 true
             );
@@ -830,11 +883,10 @@ lazy(mega, 'fileRequestCommon', () => {
             this.urlTemplate = ``;
         }
 
-        generateCode(puPagePublicHandle, isLightTheme) {
+        generateCode(puPagePublicHandle, theme) {
             const width = 0;
             const height = 0;
-            const theme = isLightTheme ? 'l' : 'd';
-            const link = `${getBaseUrl()}/filerequest#!${puPagePublicHandle}!${theme}!${lang}`;
+            const link = `${getBaseUrl()}/filerequest#!${puPagePublicHandle}!${theme || 'l'}!${lang}`;
 
             return this.codeTemplate
                 .replace('%w', width > 0 ? width : 250)
@@ -847,15 +899,18 @@ lazy(mega, 'fileRequestCommon', () => {
             return `${getBaseUrl()}/filerequest/${puPagePublicHandle}`;
         }
 
-        generateUrlPreview(name, title, description, theme, pupHandle) {
+        generateUrlPreview(name, title, description, theme, pupHandle, expiry, size) {
             const extensionSymbol = is_extension ? '#' : '/';
             const encodedName = name ? `!n-${base64urlencode(to8(name))}` : '';
             const encodedTitle = title ? `!t-${base64urlencode(to8(title))}` : '';
             const encodedDescription = description ? `!d-${base64urlencode(to8(description))}` : '';
             const encodedTheme = theme ? `!m-${base64urlencode(to8(theme))}` : '';
+            const encodedExpiry = expiry ? `!e-${base64urlencode(to8(String(expiry)))}` : '';
+            const encodedSize = size ? `!s-${base64urlencode(to8(String(size)))}` : '';
 
             return `${getAppBaseUrl()}${extensionSymbol}` +
-                `filerequest/${pupHandle || ''}${encodedName}${encodedTitle}${encodedDescription}${encodedTheme}`;
+                `filerequest/${pupHandle || ''}${encodedName}${encodedTitle}${encodedDescription}` +
+                `${encodedTheme}${encodedExpiry}${encodedSize}`;
         }
 
         windowOpen(url) {
@@ -867,6 +922,27 @@ lazy(mega, 'fileRequestCommon', () => {
                 'width=770, height=770, resizable=no,' +
                 'status=no, location=no, titlebar=no, toolbar=no'
             );
+        }
+
+        async encryptLink(pwd, data) {
+            const algorithm = exportPassword.currentAlgorithm;
+            const saltLengthBytes = exportPassword.algorithms[algorithm].saltLength / 8;
+            const handleBytes = exportPassword.base64UrlDecode(data.handle);
+            const keyBytes = new Uint8Array(32);
+            keyBytes.set(handleBytes);
+            const len = `${handleBytes.length}`;
+            const linkInfo = {
+                type: exportPassword.LINK_TYPE_DROP,
+                saltBytes: crypto.getRandomValues(new Uint8Array(saltLengthBytes)),
+                handle: `fr${'0'.repeat(6 - len.length)}${len}`,
+                keyBytes,
+            };
+            linkInfo.publicHandle = linkInfo.handle;
+            return new Promise((resolve) => {
+                exportPassword.deriveKey(algorithm, linkInfo.saltBytes, pwd, (derivedKeyBytes) => {
+                    resolve(exportPassword.encrypt.encryptAndMakeLink(linkInfo, derivedKeyBytes));
+                });
+            });
         }
     }
 
@@ -924,8 +1000,80 @@ lazy(mega, 'fileRequestCommon', () => {
         }
     }
 
-    /** @class mega.fileRequestCommon */
-    return new class {
+    const MB = 1024 * 1024;
+    const GB = MB * 1024;
+    const DEFAULT_SIZE = 100 * MB;
+    const UNIT = freeze({ MB: 'mb', GB: 'gb' });
+    const UNIT_BYTES = freeze({ [UNIT.MB]: MB, [UNIT.GB]: GB });
+    const UNIT_LABELS = freeze({ [UNIT.MB]: l[20159], [UNIT.GB]: l[17696] });
+
+    const linkSettings = freeze({
+        unit: UNIT,
+        unitLabels: UNIT_LABELS,
+        read(puHandleObject) {
+            const stored = puHandleObject || {};
+            return {
+                expiry: stored.ets > Date.now() / 1000 ? stored.ets : false,
+                password: false,
+                size: stored.mfs > 0 ? stored.mfs : false,
+                folder: !Object(stored.d).f
+            };
+        },
+        unitFor(bytes) {
+            return bytes >= GB ? UNIT.GB : UNIT.MB;
+        },
+        toBytes(value, unit) {
+            value = parseFloat(value) || 0;
+            return value > 0 ? Math.round(value * UNIT_BYTES[unit]) : 0;
+        },
+        fromBytes(bytes, unit) {
+            return (bytes || DEFAULT_SIZE) / UNIT_BYTES[unit];
+        },
+        setSizeState(input, state) {
+            const { bytes, origSize, enabled } = state;
+            input.error = '';
+            input.warning = '';
+            if (!enabled || origSize && bytes === origSize || !origSize && bytes === DEFAULT_SIZE) {
+                return;
+            }
+
+            if (!bytes) {
+                input.error = l.fr_size_missing;
+            }
+            else if (bytes < 5 * MB) {
+                input.warning = l.fr_size_small;
+            }
+            else {
+                input.success = l.fr_size_set.replace('%1', bytesToSize(bytes));
+            }
+        },
+        isInvalid(settings, state) {
+            return !!(
+                state.expiry && !settings.expiry
+                || state.password && !state.passwordValid
+                || state.size && !settings.size
+            );
+        },
+
+        async save(puHandleObject, data) {
+            const { title, description, settings, password } = data;
+            const link = password
+                ? await mega.fileRequest.generator
+                    .encryptLink(password, { handle: puHandleObject.p })
+                    .catch(tell) || null
+                : null;
+
+            await mega.fileRequest.update(puHandleObject.h, title, description, {
+                expiry: settings.expiry,
+                limit: settings.size,
+                folder: settings.folder,
+            }, true);
+
+            return link;
+        }
+    });
+
+    return new class FileRequestCommon {
         constructor() {
             this.init();
         }
@@ -933,7 +1081,7 @@ lazy(mega, 'fileRequestCommon', () => {
         init() {
             /** @class mega.fileRequestCommon.storage */
             lazy(this, 'storage', () => new FileRequestStorage);
-            /** @class mega.fileRequestCommon.fileRequestApi */
+            /** @property {FileRequestApi} mega.fileRequestCommon.fileRequestApi */
             lazy(this, 'fileRequestApi', () => new FileRequestApi());
             /** @class mega.fileRequestCommon.generator */
             lazy(this, 'generator', () => new FileRequestGenerator);
@@ -941,6 +1089,27 @@ lazy(mega, 'fileRequestCommon', () => {
             lazy(this, 'actionHandler', () => new FileRequestActionHandler());
             /** @function mega.fileRequestCommon.addFileRequestIcon */
             lazy(this, 'addFileRequestIcon', () => addFileRequestIcon);
+            /** @property {Object} mega.fileRequestCommon.linkSettings */
+            this.linkSettings = linkSettings;
+        }
+
+        /**
+         * Parse node fru tags for user renderable values
+         *
+         * @param {String} [fru] The node's file request tag, if any.
+         * @returns {String} The label to show for it.
+         */
+        getUploaderLabel(fru) {
+            if (typeof fru !== 'string' || !fru) {
+                return l.anonymous_user;
+            }
+            const pos = fru.indexOf('/');
+            if (pos < 0) {
+                return fru;
+            }
+            const tag = fru.substring(0, pos);
+            const name = fru.substring(pos + 1) || l.anonymous_user;
+            return tag ? `${name}_${tag}` : name;
         }
     };
 });

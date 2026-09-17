@@ -526,7 +526,7 @@ mBroadcaster.once('boot_done', () => {
 
                 eventlog(99833);
 
-                mobile.fileRequestManagement.showOverlay(nodeHandle);
+                mega.fileRequest.start(nodeHandle);
 
                 return false;
             }

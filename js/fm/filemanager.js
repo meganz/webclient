@@ -23,6 +23,7 @@ function FileManager() {
     this.columnsWidth.cloud.owner = { max: 180, min: 130, curr: 130, viewed: false };
     this.columnsWidth.cloud.numFolders = { max: 280, min: 130, curr: 200, viewed: false };
     this.columnsWidth.cloud.hbtime = { max: 180, min: 130, curr: 130, viewed: false };
+    this.columnsWidth.cloud.fru = { max: 220, min: 130, curr: 180, viewed: false };
 
     this.columnsWidth.makeNameColumnStatic = function() {
 
@@ -113,6 +114,8 @@ function FileManager() {
             M.columnsWidth.cloud.label.disabled = true;
             M.columnsWidth.cloud.accessCtrl.viewed = false;
             M.columnsWidth.cloud.accessCtrl.disabled = true;
+            M.columnsWidth.cloud.fru.viewed = false;
+            M.columnsWidth.cloud.fru.disabled = true;
 
             if (String(M.currentdirid).startsWith('search/')) {
                 M.columnsWidth.cloud.fileLoc.viewed = true;
@@ -138,7 +141,9 @@ function FileManager() {
             if (storedColumnsPreferences === undefined) {
                 // restore default columns (to show/hide columns)
                 const defaultColumnShow = new Set(['fav', 'fname', 'size', 'type', 'timeAd', 'extras', 'accessCtrl']);
-                const defaultColumnHidden = new Set(['label', 'timeMd', 'versions', 'playtime', 'fileLoc', 'owner']);
+                const defaultColumnHidden = new Set(
+                    ['label', 'timeMd', 'versions', 'playtime', 'fileLoc', 'owner', 'fru']
+                );
 
                 for (const col in M.columnsWidth.cloud) {
                     if (defaultColumnShow.has(col)) {
@@ -217,6 +222,15 @@ function FileManager() {
             else {
                 M.columnsWidth.cloud.accessCtrl.viewed = false;
                 M.columnsWidth.cloud.accessCtrl.disabled = true;
+            }
+
+            if (M.currentrootid === 'file-requests' && M.currentdirid !== M.currentrootid) {
+                M.columnsWidth.cloud.fru.viewed = true;
+                M.columnsWidth.cloud.fru.disabled = false;
+            }
+            else {
+                M.columnsWidth.cloud.fru.viewed = false;
+                M.columnsWidth.cloud.fru.disabled = true;
             }
         }
 
@@ -3496,14 +3510,18 @@ FileManager.prototype.getLinkAction = function(selNodes, isEmbed) {
 
         const mdList = mega.fileRequestCommon.storage.isDropExist(selNodes);
         if (mdList.length) {
-            const fldName = mdList.length > 1 ? l[17626] :
-                l[17403].replace('%1', escapeHTML(M.getNodeByHandle(mdList[0]).name));
-
-            msgDialog('confirmation', l[1003], fldName, l[18229], function(e) {
-                if (e) {
-                    mega.fileRequest.removeList(mdList, true).then(showDialog).catch(dump);
-                }
-            });
+            msgDialog(
+                `warninga:!^${l.file_request_action_remove_prompt_button}!${l[82]}`,
+                l[1003],
+                l.file_request_action_remove_prompt_title,
+                mdList.length > 1 ? l.fr_action_links_cancel : l.fr_action_link_cancel,
+                (e) => {
+                    if (e === false) {
+                        mega.fileRequest.removeList(mdList, true).then(showDialog).catch(dump);
+                    }
+                },
+                1
+            );
         }
         else {
             showDialog();

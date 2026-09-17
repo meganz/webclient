@@ -479,14 +479,17 @@ button.nav-elem.no-active:active,
     --icon-size: 22px;
     position: absolute;
 }
-
+.nav-elem.loading.load-text.sprite-fm-theme-after::after {
+    position: relative;
+    margin-inline-start: 10px;
+}
 .nav-elem.loading.sprite-fm-theme-after.visible-txt::after,
 .nav-elem.loading.sprite-fm-uni-after.visible-txt::after {
     position: relative;
     margin-inline-start: 0.5rem;
 }
 
-.nav-elem.loading .text-box-wrapper.sk-elm {
+.nav-elem.loading:not(.load-text) .text-box-wrapper.sk-elm {
     opacity: 0;
 }
 

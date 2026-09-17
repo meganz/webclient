@@ -340,21 +340,26 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
                                 this.props.onAttachClicked();
                             }
                             if (frs.length) {
-                                const fldName = frs.length > 1
-                                    ? l[17626]
-                                    : l[17403].replace('%1', escapeHTML(M.getNameByHandle(frs[0])) || l[1049]);
-                                msgDialog('confirmation', l[1003], fldName, l[18229], (e) => {
-                                    if (e) {
-                                        mega.fileRequest
-                                            .removeList(frs)
-                                            .then(() => {
-                                                for (let i = 0; i < frs.length; i++) {
-                                                    createPublicLink(frs[i]);
-                                                }
-                                            })
-                                            .catch(dump);
-                                    }
-                                });
+                                const fldName = frs.length > 1 ? l.fr_action_links_cancel : l.fr_action_link_cancel;
+                                msgDialog(
+                                    `warninga:!^${l.file_request_action_remove_prompt_button}!${l[82]}`,
+                                    l[1003],
+                                    l.file_request_action_remove_prompt_title,
+                                    fldName,
+                                    (e) => {
+                                        if (e === false) {
+                                            mega.fileRequest
+                                                .removeList(frs)
+                                                .then(() => {
+                                                    for (let i = 0; i < frs.length; i++) {
+                                                        createPublicLink(frs[i]);
+                                                    }
+                                                })
+                                                .catch(dump);
+                                        }
+                                    },
+                                    1
+                                );
                             }
                         });
                     }

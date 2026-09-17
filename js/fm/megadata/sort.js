@@ -918,3 +918,21 @@ MegaData.prototype.sortByHeartbeatTimeFn = function(d) {
         return M.doFallbackSortWithFolder(a, b);
     };
 };
+
+/**
+ * Sort by file request uploader
+ *
+ * Primary by upload tag then breaking on user entered name. No tag or name is considered anonymous.
+ *
+ * @param {Number} d 1 ascending, -1 descending
+ * @returns {void}
+ */
+MegaData.prototype.sortByFru = function(d) {
+    'use strict';
+
+    this.sortfn = (a, b, d) => {
+        return this.compareStrings(a.fru, b.fru, d) || this.doFallbackSort(a, b, d);
+    };
+    this.sortd = d;
+    this.sort();
+};

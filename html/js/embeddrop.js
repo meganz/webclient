@@ -26,10 +26,11 @@ function init_page() {
         });
 
     var id = tmp[1];
-    var theme = tmp[2] === 'l' ? 'light-theme' : 'dark-theme';
+    var themeClasses = {r: 'red-theme', d: 'dark-theme', l: 'light-theme'};
+    var theme = themeClasses[tmp[2]] || 'light-theme';
 
     var textNode = mCreateElement('div', {'class': 'embed-action-text'});
-    textNode.textContent = l[18215] || '(translation-missing)';
+    textNode.textContent = l.upload_to_mega;
     document.body.textContent = '';
 
     mCreateElement('div', {id: "FileRequest", 'class': "embed-button centre-button"}, [

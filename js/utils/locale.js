@@ -1565,9 +1565,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[i1]', '<i class="small-icon tab-icon"></i>')
         .replace('[i2]', '<i class="small-icon enter-icon left-pad"></i>');
 
-    l.file_request_upload_empty = escapeHTML(l.file_request_upload_empty)
-        .replace('[A]', '<a class="upload-btn block-empty-upload-link" href="#">')
-        .replace('[/A]', '</a>');
     l.file_request_upload_caption_2 = escapeHTML(l.file_request_upload_caption_2)
         .replace('[A]', '<a target="_blank" href="https://help.mega.io/files-folders/sharing/upload-file-request">')
         .replace('[/A]', '</a>');
@@ -1861,10 +1858,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a class="clickurl primary-link" target="_blank" href="/support">').replace('[/A]', '</a>');
 
     l.account_reset_details = escapeHTML(l.account_reset_details).replace('[B]', '<b>').replace('[/B]', '</b>');
-
-    l.file_request_overlay_blurb = escapeHTML(l.file_request_overlay_blurb)
-        .replace(/\[S\d]/g, '<span>')
-        .replace(/\[\/S\d]/g, '</span>');
 
     l.invite_subject_text = escapeHTML(encodeURIComponent(l.invite_subject_text));
 

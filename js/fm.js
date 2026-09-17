@@ -672,6 +672,7 @@ function fmtopUI() {
             !(
                 M.onDeviceCenter ||
                 M.currentdirid === 'shares' ||
+                M.currentdirid === 'file-requests' ||
                 M.currentdirid === M.RubbishID ||
                 M.currentdirid === 'faves' ||
                 M.currentdirid === 'recents'
@@ -781,7 +782,7 @@ function fmtopUI() {
             $('.fm-right-files-block', document).addClass('visible-notification');
 
             if (M.currentdirid === M.currentrootid) {
-                primary = '.fm-new-file-request';
+                primary = M.v.length ? '.fm-new-file-request' : false;
                 mega.ui.secondaryNav.hideBreadcrumb();
                 mega.ui.secondaryNav.domNode.classList.add('no-small-content');
             }

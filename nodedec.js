@@ -456,6 +456,9 @@ function crypto_makeattr(n, nn) {
     if (typeof n.des !== 'undefined') {
         ar.des = n.des;
     }
+    if (n.fru !== undefined) {
+        ar.fru = n.fru;
+    }
     if (typeof n.pwm !== 'undefined') {
         ar.pwm = JSON.stringify(n.pwm).slice(1, -1);
     }
@@ -470,9 +473,9 @@ function crypto_makeattr(n, nn) {
 function crypto_clearattr(n) {
     // derived node attr directory, see crypto_procattr()
     const dattrs = [
-        'ar', 'des', 'f', 'fav', 'gps',
-        'hash', 'lbl', 'mtime', 'name',
-        'rr', 's4', 'sds', 'sen', 'tags'
+        'ar', 'des', 'f', 'fav', 'fru',
+        'gps', 'hash', 'lbl', 'mtime',
+        'name', 'rr', 's4', 'sds', 'sen', 'tags'
     ];
     const old = {};
 
@@ -585,6 +588,11 @@ function crypto_procattr(n, key) {
             if (typeof o.des !== 'undefined') {
                 n.des = o.des;
                 delete o.des;
+            }
+
+            if (o.fru !== undefined) {
+                n.fru = o.fru;
+                delete o.fru;
             }
 
             if (typeof o.pwm !== 'undefined') {
@@ -1192,7 +1200,7 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
     /** @class decWorkerPool */
     return new class extends Array {
         get url() {
-            const WORKER_VERSION = 14;
+            const WORKER_VERSION = 15;
             return `${window.is_extension || window.is_karma ? '' : '/'}nodedec.js?v=${WORKER_VERSION}`;
         }
 

@@ -351,7 +351,8 @@ table tr.ui-selected .grid-file-request-manage {
 .grid-table.fm.v-versions [megatype="versions"],
 .grid-table.fm.v-playtime [megatype="playtime"],
 .grid-table.fm.v-extras [megatype="extras"],
-.grid-table.fm.v-fileLoc [megatype="fileLoc"] {
+.grid-table.fm.v-fileLoc [megatype="fileLoc"],
+.grid-table.fm.v-fru [megatype="fru"] {
     display: table-cell;
 }
 .grid-table.fm td.space-maintainer-start {

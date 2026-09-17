@@ -41,7 +41,7 @@
     position: absolute;
     width: 100%;
     overflow: auto;
-    background-color: var(--color-surface-2);
+    background: var(--mobile-surface-1);
 }
 
 .rtl .file-request-upload-page {
@@ -77,24 +77,38 @@
 .file-request-upload-page .page-wrapper {
     height: 100%;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .file-request-upload-page .page-main {
-    max-width: 600px;
-    width: 100%;
+    max-width: 544px;
+    padding: 24px 32px;
     display: flex;
     flex-direction: column;
-    margin: 0 auto 84px;
+    margin: auto;
+}
+.file-request-upload-page.long-desc .page-main {
+    max-width: 664px;
 }
 
-.file-request-upload-page .page-main .page-logo {
-    margin: 47px auto 79px;
+.file-request-upload-page .page-logo {
+    padding: 16px 12px;
+    margin-inline-start: 24px;
 }
 
-.file-request-upload-page .page-main .page-logo i {
-    --icon-size: 67px;
+.file-request-upload-page .page-logo i {
+    --icon-size: 32px;
 }
-
+.file-request-upload-page .page-logo .img-mega-logo {
+    display: none;
+}
+.file-request-upload-page .page-header {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-semibold);
+    text-align: center;
+    margin-bottom: 8px;
+}
 .file-request-upload-page .page-main .page-content {
     border-radius: 10px;
     background-color: var(--color-page-background);
@@ -109,9 +123,6 @@
 }
 
 .file-request-upload-page .page-main .page-content .content-details {
-    border-radius: 8px;
-    padding: 24px;
-    background-color: var(--color-surface-1);
     margin-bottom: 20px;
 }
 
@@ -119,22 +130,40 @@
     display: none;
 }
 
-.file-request-upload-page .page-main .page-content .content-details .detail-wrapper {
-    display: flex;
-    flex-direction: column;
-    row-gap: 24px;
-}
-
 .file-request-upload-page .page-main .page-content .content-details .detail-title {
-    margin-bottom: 0;
-    margin-top: 0;
-    color: var(--color-text-primary);
-    font: var(--text-h2);
-    overflow-wrap: break-word;
-    word-break: break-word;
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-semibold);
+    word-break: break-all;
 }
-
-.file-request-upload-page .page-main .page-content .content-details .detail-description,
+.file-request-upload-page .page-main .page-content .content-details .detail-description {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-regular);
+    margin-top: 8px;
+    word-break: break-all;
+}
+.file-request-upload-page .page-main .page-content .content-details .badge-row {
+    display: flex;
+    margin-top: 20px;
+    margin-bottom: -2px;
+    flex-wrap: wrap;
+}
+.file-request-upload-page .page-main .page-content .content-details .fr-badge {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    color: var(--mobile-text-primary);
+    background: var(--mobile-button-secondary);
+    border-radius: 16px;
+    font: var(--mobile-font-caption-large-regular);
+    padding: 4px 12px;
+    margin-inline-end: 8px;
+    margin-bottom: 2px;
+    --icon-size: 16px;
+}
+.file-request-upload-page .page-main .page-content .content-details .fr-badge span {
+    margin-inline-start: 8px;
+    line-height: 16px;
+}
 .file-request-upload-page .page-main .page-content .content-details .detail-upload-id {
     margin-bottom: 0;
     margin-top: 0;
@@ -149,24 +178,35 @@
     -webkit-user-select: text;
 }
 
-.file-request-upload-page .page-main .page-content .content-details.content-error {
-    text-align: center;
-    border: 1px solid var(--color-support-error);
-    background-color: inherit;
+.file-request-upload-page.err-invalid .page-main {
+    max-width: 640px;
+}
+.file-request-upload-page.err-invalid .page-content {
+    padding: 40px 40px 56px;
+}
+.file-request-upload-page.err-invalid .page-main .page-content .content-details.content-error {
+    margin: 0;
+}
+.file-request-upload-page.err-invalid .page-main .page-content .content-details.content-error .error-icon {
+    display: block;
+    --icon-size: 36px;
+    --mask-color: var(--mobile-support-error);
 }
 
-.file-request-upload-page .page-main .page-content .content-details.content-error .detail-description,
-.file-request-upload-page .page-main .page-content .content-details.content-error .detail-title,
-.file-request-upload-page .page-main .page-content .content-details.content-error .detail-upload-id {
-    color: var(--color-text-error);
+.file-request-upload-page .page-main .page-content .content-details.content-error .detail-title {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-heading-h2);
+    margin: 16px 0;
+}
+.file-request-upload-page .page-main .page-content .content-details.content-error .detail-description {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-regular);
 }
 
 .file-request-upload-page .page-main .page-content .content-upload-block {
     border-radius: 8px;
-    height: 314px;
-    border-style: solid;
-    border-width: 1px;
-    border-color: var(--color-border-strong);
+    border: var(--mobile-border-strong) 1px dashed;
+    min-width: 480px;
 }
 
 .file-request-upload-page .page-main .page-content .block-empty {
@@ -175,71 +215,83 @@
     border-style: dashed;
     flex-direction: column;
     text-align: center;
+    min-height: 480px;
 }
-
-.file-request-upload-page .page-main .page-content .mobile.block-empty {
-    display: none;
-}
-
-body.file-request-drag .file-request-upload-page .page-main .page-content .block-empty,
-body.file-request-drag .file-request-upload-page .page-main .page-content .block-uploading {
-    border-style: solid;
-    border-color: var(--color-support-info);
-}
-
-.file-request-upload-page .page-main .page-content .block-empty .block-empty-icon.error-icon {
-    display: none;
-}
-
-.file-request-upload-page .page-main .page-content .block-empty .block-empty-icon i {
+.file-request-upload-page .page-main .page-content .block-empty .block-empty-icon {
+    background-image: url("../images/mega/empty/empty-cloud.webp");
+    background-size: contain;
+    width: 120px;
+    height: 120px;
     margin: 0 auto;
-    --icon-size: 64px;
 }
 
 .file-request-upload-page .page-main .page-content .block-empty .block-empty-caption {
-    margin-top: 32px;
-    font: var(--text-regular);
-    color: var(--color-text-secondary);
+    margin: 24px auto 0;
+    font: var(--mobile-font-heading-h3);
+    color: var(--mobile-text-primary);
 }
-
-.file-request-upload-page .page-main .page-content .block-empty .block-empty-caption .block-empty-upload-link {
-    text-decoration: underline;
-    color: var(--color-link-primary);
+.file-request-upload-page .page-main .page-content .block-empty .block-empty-subtext {
+    margin-top: 8px;
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-secondary);
 }
-
-.file-request-upload-page .page-main .page-content .block-empty.block-empty-error .block-empty-icon:not(.error-icon) {
-    display: none;
+.file-request-upload-page .page-main .page-content .block-empty button {
+    margin: 24px auto 0;
+    height: 36px;
+    width: fit-content;
 }
-
-.file-request-upload-page .page-main .page-content .block-empty.block-empty-error .block-empty-icon.error-icon {
-    display: block;
+.file-request-upload-page .page-main .page-content .block-empty button span {
+    font: var(--mobile-font-caption-large-semibold);
 }
-
-.file-request-upload-page .page-main .page-content .block-empty.block-empty-error .block-empty-icon.error-icon i {
-    --mask-color: var(--color-icon-disabled);
+.file-request-upload-page .page-main .page-content .block-finished {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 480px;
+    width: 480px;
+    padding: 8px;
+    box-sizing: border-box;
 }
-
-.file-request-upload-page .page-main .page-content .block-empty.block-empty-error .block-empty-caption .block-empty-upload-link,
-.file-request-upload-page .page-main .page-content .block-empty.block-empty-error .block-empty-caption {
-    color: var(--color-text-disabled);
+.file-request-upload-page .page-main .page-content .block-finished .block-finished-icon {
+    background-image: url("../images/onboarding/green-check-3d.png");
+    background-size: contain;
+    width: 160px;
+    height: 160px;
+    margin: 0 auto;
 }
-
-.file-request-upload-page .page-main .page-content .block-empty.block-empty-error .block-empty-caption .block-empty-upload-link {
-    cursor: default;
+.file-request-upload-page .page-main .page-content .block-finished .block-finished-caption {
+    font: var(--mobile-font-heading-h3);
+    color: var(--mobile-text-primary);
+    margin: 24px 0 8px;
 }
-
+.file-request-upload-page .page-main .page-content .block-finished .block-finished-subtext {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+    text-align: center;
+}
+.file-request-upload-page .page-main .page-content .block-finished .block-finished-subtext b {
+    font: var(--mobile-font-copy-semibold);
+}
+.file-request-upload-page .page-main .page-content .block-finished button.nav-elem {
+    margin-top: 24px;
+    height: 36px;
+}
+.file-request-upload-page .page-main .page-content .block-finished button.nav-elem span {
+    font: var(--mobile-font-caption-large-semibold);
+}
 .file-request-upload-page .page-main .page-content .block-uploading {
     display: flex;
-    border-style: solid;
     flex-direction: column;
-    padding-inline-end: 2px;
+    height: 376px;
+}
+.file-request-upload-page.remain-err .page-main .page-content .block-uploading {
+    height: 300px;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-scroll {
-    height: 314px;
     overflow-y: scroll;
-    padding-inline-start: 11px;
-    padding-inline-end: 9px;
+    padding: 16px;
     box-sizing: border-box;
 }
 
@@ -254,78 +306,66 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-details {
     display: flex;
-    padding: 16px 16px 14px;
+    align-items: center;
 }
 
-.file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item:first-child {
-    margin-top: 4px;
+.file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item {
+    margin-bottom: 12px;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading div.block-uploading-item.last-item {
-    margin-bottom: 8px;
+    margin-bottom: 0;
 }
-
-.file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-details .item-name,
-.file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-details .item-size,
-.file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-details .item-status {
-    font: var(--text-caption);
-    letter-spacing: 0.02em;
+.file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-type-icon {
+    margin-inline-end: 4px;
+}
+.file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-details .item-name {
+    font: var(--mobile-font-caption-large-regular);
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-details .item-name {
-    color: var(--color-text-primary);
+    color: var(--mobile-text-primary);
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    margin-inline-end: 4px;
+    flex-grow: 1;
 }
-
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-details .item-size {
-    width: 70px;
-    margin-inline-start: 16px;
-    margin-inline-end: 16px;
-    color: var(--color-text-secondary);
-    flex: 0 0 70px;
-}
-
-.file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-details .item-status {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-small-regular);
     margin-inline-start: auto;
-    color: var(--color-text-secondary);
-    text-align: right;
-
-    height: initial;
-    padding: initial;
-    white-space: initial;
-    position: initial;
-    display: initial;
-
-    width: 75px;
-    flex: 0 0 75px;
+    margin-inline-end: 8px;
+    width: fit-content;
+    white-space: nowrap;
 }
-
-.rtl .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-details .item-status {
-    text-align: left;
+.file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item.transfer-oversize .item-name,
+.file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item.transfer-oversize .item-size {
+    color: var(--mobile-text-error);
+}
+.file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-details .action-icon {
+    cursor: pointer;
+    --icon-size: 16px;
+    --mask-color: var(--mobile-icon-primary);
+}
+.file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item.transfer-completed .action-icon {
+    cursor: default;
+    --mask-color: var(--mobile-support-success);
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-error {
     display: none;
-    color: var(--color-text-error);
+    color: var(--mobile-text-error);
     margin-top: 8px;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-error span {
     display: inline-block;
-    font: var(--text-caption);
+    font: var(--mobile-font-caption-small-regular);
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-error .error-message {
     margin-inline-start: 8px;
-}
-
-.file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-error .error-reupload {
-    text-decoration: underline;
-    color: var(--color-link-primary);
-    font: var(--text-link-small);
-    margin-inline-start: 3px;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-error .error-icon i {
@@ -334,29 +374,51 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-progress {
-    border-bottom: 1px solid var(--color-border-strong);
-    height: 2px;
+    background: transparent;
+    height: 3px;
+    margin-top: 4px;
+    border-radius: 5px;
 }
-
+.file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item.transfer-started .item-progress {
+    background: var(--mobile-surface-2);
+}
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-progress-bar {
-    background-color: var(--color-support-success);
-    height: 2px;
+    background: var(--mobile-support-success);
+    border-radius: 5px;
+    height: 3px;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item.transfer-error .item-error {
-    display: block;
+    display: flex;
+    align-items: center;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item.transfer-error .item-progress-bar {
-    background-color: var(--color-support-error);
+    background-color: var(--mobile-support-error);
+}
+.file-request-upload-page .page-main .page-content .current-upload-block {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+}
+.file-request-upload-page .page-main .page-content .current-upload-block .fr-add-more {
+    padding: 0;
+    height: 36px;
+}
+.file-request-upload-page .page-main .page-content .current-upload-block .fr-add-more span {
+    text-decoration: underline;
+    font: var(--mobile-font-caption-large-semibold);
+}
+.file-request-upload-page .page-main .page-content .current-upload-block .upload-size {
+    margin-inline-start: auto;
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-small-regular);
 }
 
 .file-request-upload-page .page-main .page-content .content-upload-summary {
-    margin-top: 16px;
+    margin-top: 20px;
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    flex-direction: row-reverse;
+    flex-direction: column;
 }
 
 .file-request-upload-page .page-main .page-content .content-upload-summary .upload-more {
@@ -380,200 +442,227 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
     font: var(--text-regular);
     color: var(--color-text-secondary);
 }
-
+.file-request-upload-page .page-main .page-content .content-upload-summary .mega-input {
+    border: var(--mobile-border-subtle) 1px solid;
+    height: 36px;
+    margin-bottom: 4px;
+}
+.file-request-upload-page .page-main .page-content .content-upload-summary .mega-input span.optional {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-regular);
+}
+.file-request-upload-page .page-main .page-content .content-upload-summary .mega-input input {
+    font: var(--mobile-font-caption-large-regular);
+    height: 36px;
+}
+.file-request-upload-page .page-main .page-content .content-upload-summary .mega-input input::placeholder {
+    font: var(--mobile-font-caption-large-regular);
+    opacity: 1;
+}
+.file-request-upload-page .page-main .page-content .content-upload-summary .mega-component.disabled {
+    opacity: 1;
+}
+.file-request-upload-page .page-main .page-content .content-upload-summary .mega-component.disabled .mega-input {
+    opacity: 1;
+    background: var(--mobile-button-disabled);
+    border: 1px solid var(--mobile-border-disabled);
+    color: var(--mobile-text-disabled);
+}
+.file-request-upload-page .page-main .page-content .content-upload-summary .mega-component.disabled input,
+.file-request-upload-page .page-main .page-content .content-upload-summary .mega-component.disabled input::placeholder {
+    color: var(--mobile-text-disabled);
+}
+.file-request-upload-page .page-main .page-content .content-upload-summary .info-block {
+    display: flex;
+    align-items: center;
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-small-regular);
+    --icon-size: 16px;
+    --mask-color: var(--mobile-icon-secondary);
+}
+.file-request-upload-page .page-main .page-content .content-upload-summary .info-block i {
+    margin-inline-end: 4px;
+}
+.file-request-upload-page .page-main .page-content .content-upload-summary .info-block p {
+    margin: 0;
+    word-break: break-all;
+}
+.file-request-upload-page .page-main .page-content .content-upload-summary .info-block span {
+    margin-inline-start: auto;
+}
+.file-request-upload-page .page-main .page-content .upload-error-block {
+    display: none;
+    padding: 16px 24px;
+    align-items: center;
+    background: var(--mobile-notification-error);
+    border-radius: 8px;
+    margin-top: 20px;
+    --icon-size: 24px;
+    --mask-color: var(--mobile-support-error);
+}
+.file-request-upload-page.remain-err .page-main .page-content .upload-error-block {
+    display: flex;
+}
+.file-request-upload-page .page-main .page-content .upload-error-block .err-msg {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-regular);
+    margin-inline-start: 8px;
+}
+.file-request-upload-page .page-main .page-content .action-block {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+.file-request-upload-page .page-main .page-content .action-block button {
+    height: 36px;
+}
+.file-request-upload-page .page-main .page-content .action-block button span {
+    font: var(--mobile-font-caption-large-semibold);
+}
 .file-request-upload-page .page-caption {
     box-sizing: border-box;
     width: 100%;
     position: sticky;
     text-align: center;
-    top: calc(100vh - 210px);
+    top: calc(100vh - 120px);
 }
 
 .file-request-upload-page .page-caption .page-caption-wrapper {
-    max-width: 600px;
     margin: 0 auto;
-    color: var(--color-text-secondary);
-    font: var(--text-regular);
+    padding: 12px;
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-small-regular);
 }
 
-.file-request-upload-page .page-caption .page-caption-wrapper p:first-child {
-    margin-top: 0;
+.file-request-upload-page .page-caption .page-caption-wrapper p {
+    margin: 0;
+}
+.file-request-upload-page .page-caption .page-caption-wrapper p:nth-child(2) {
+    margin: 8px 0 16px;
 }
 
 .file-request-upload-page .page-caption .page-caption-wrapper p a {
     text-decoration: underline;
-    color: var(--color-link-primary);
-    font: var(--text-link-large);
+    color: var(--mobile-link-primary);
 }
 
-.file-request-upload-page .page-footer {
-    box-sizing: border-box;
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    height: 80px;
-    background-color: var(--color-page-background);
-    font: var(--text-regular);
-    padding: 28px 21px;
-    position: sticky;
-    top: calc(100vh - 82px);
-    align-items: center;
+.file-request-upload-page .page-copyright .copyright-wrapper a {
+    color: var(--mobile-text-primary);
 }
 
-.file-request-upload-page .page-footer .page-copyright .copyright-wrapper a {
-    color: var(--color-text-primary);
-}
-
-.file-request-upload-page .page-footer .page-language .language-wrapper {
-    display: flex;
-    justify-content: center;
-}
-
-.file-request-upload-page .page-footer .page-language .language-wrapper .language-icon i {
-    --icon-size: 22px;
-    --mask-color: var(--color-icon-secondary);
-}
-
-.file-request-upload-page .page-footer .page-language .language-wrapper .language-text {
-    text-decoration: underline;
-    font: var(--text-label);
-    padding: 0 12px;
-    color: var(--color-text-secondary);
-}
-
-@media only screen and (max-width: 768px) {
-    .file-request-upload-page .page-main .page-logo {
-        margin: 27px auto;
+@media only screen and (max-width: 740px),
+    only screen and (orientation: landscape) and (max-height: 600px) {
+    .file-request-upload-page .page-logo {
+        padding: 24px;
+        margin: 0;
+        border-bottom: 1px solid var(--mobile-border-strong);
     }
-
-    .file-request-upload-page .page-main .page-logo .icon-mega-logo {
+    .file-request-upload-page .page-logo .icon-mega-logo {
         display: none;
     }
-
-    .file-request-upload-page .page-main .page-logo .icon-mega-logo-mobile {
-        background-image: url("../images/mega/icon-mega-logo-light.svg");
-        display: block !important;
-        height: 32px;
-        width: 99px;
-    }
-
-    .theme-dark .page-main .page-logo .icon-mega-logo-mobile {
-        background-image: url("../images/mega/icon-mega-logo-dark.svg");
-    }
-
-    .file-request-upload-page .page-main {
-        padding: 0;
-        width: inherit;
-        margin-bottom: 40px;
-    }
-
-    .file-request-upload-page .page-main .page-content {
-        border-radius: unset;
-        padding-top: 40px;
-    }
-
-    .file-request-upload-page .page-main .page-content .content-title {
-        margin-bottom: 20px;
-    }
-
-    .file-request-upload-page .page-main .page-content .content-details.content-error {
-        background-color: var(--color-notification-error);
-        padding: 20px 24px;
-        border: unset;
-        display: flex;
-        text-align: left;
-    }
-
-    .rtl .file-request-upload-page .page-main .page-content .content-details.content-error {
-        text-align: right;
-    }
-
-    .file-request-upload-page .page-main .page-content .content-details.content-error .error-icon {
-        display: inline;
-        color: var(--color-support-error);
-        --icon-size: 23px;
-    }
-
-    .file-request-upload-page .page-main .page-content .content-details.content-error .detail-wrapper {
-        margin-inline-start: 8px;
-        row-gap: unset;
-    }
-
-    .file-request-upload-page .page-main .page-content .content-details.content-error .detail-title {
-        font: var(--text-strong);
-    }
-
-    .file-request-upload-page .page-main .page-content .content-details.content-error .detail-title,
-    .file-request-upload-page .page-main .page-content .content-details.content-error .detail-description {
-        color: var(--color-text-primary);
-        margin-bottom: 8px;
-    }
-
-    .file-request-upload-page .page-main .page-content .content-upload-block,
-    .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-scroll {
-        height: 232px;
-    }
-
-    .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item.transfer-error .item-error {
-        display: flex;
-        align-items: center;
-        column-gap: 5px;
-    }
-
-    .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-error .error-message-wrapper span {
-        display: inline;
-    }
-
-    .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-error .error-message {
-        margin-inline-start: 0;
-    }
-
-    .file-request-upload-page .page-main .page-content .block-empty {
-        display: none;
-    }
-
-    .file-request-upload-page .page-main .page-content .mobile.block-empty {
-        display: flex;
-        border-style: unset;
-        height: auto;
-    }
-
-    .file-request-upload-page .page-main .page-content .block-empty .block-empty-upload-button {
-        background-color: var(--color-button-primary);
-        font: var(--button-label);
-        color: var(--color-text-inverse-accent);
-        border-radius: 8px;
-        text-decoration: none;
-        padding: 14px 24px;
-    }
-
-    .file-request-upload-page .page-main .page-content .block-empty.block-empty-error .block-empty-upload-button {
-        background-color: var(--color-button-disabled);
-        color: var(--color-text-on-color-disabled);
-    }
-
-    .file-request-upload-page .page-main .page-content .content-upload-summary {
-        flex-direction: column;
-        row-gap: 24px;
-        margin-top: 20px;
-    }
-
-    .file-request-upload-page .page-caption {
-        padding: 0 20px;
-        top: calc(100vh - 255px);
-    }
-
-    .file-request-upload-page .page-footer {
-        height: auto;
-        /* justify-content: center;
-        text-align: center; */
-    }
-
-    .file-request-upload-page .page-footer .page-copyright .copyright-wrapper a span {
+    .file-request-upload-page .page-logo .img-mega-logo {
         display: block;
+        --height: 24px;
+        --width: 74px;
     }
-
-    /* .file-request-upload-page .page-footer .page-language {
+    .file-request-upload-page .page-main {
+        max-width: 100%;
+        box-sizing: border-box;
+        padding: 12px 24px;
+        margin: 0;
+    }
+    .file-request-upload-page .page-main .page-content .content-details .detail-description {
+        font: var(--mobile-font-caption-large-regular);
+    }
+    .file-request-upload-page .page-main .page-content .content-upload-block {
+        max-width: 100%;
+        min-width: 100%;
+        min-height: auto;
+    }
+    .file-request-upload-page .page-main .page-content .block-empty {
+        border: none;
+        margin-bottom: 0;
+        padding: 8px 0 0;
+    }
+    .file-request-upload-page .page-main .page-content .block-empty .block-empty-caption,
+    .file-request-upload-page .page-main .page-content .block-empty .block-empty-subtext {
         display: none;
-    } */
+    }
+    .file-request-upload-page .page-main .page-content .block-empty button {
+        height: 48px;
+        margin-top: 28px;
+        width: 100%;
+    }
+    .file-request-upload-page .page-main .page-content .block-empty button span {
+        font: var(--mobile-font-link-large-semibold);
+    }
+    .file-request-upload-page .page-main .page-content .block-uploading {
+        height: 153px;
+    }
+    .file-request-upload-page .page-main .page-content .current-upload-block {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+    }
+    .file-request-upload-page .page-main .page-content .current-upload-block .fr-add-more {
+        height: 40px;
+    }
+    .file-request-upload-page .page-main .page-content .current-upload-block .fr-add-more span {
+        font: var(--mobile-font-link-large-semibold);
+    }
+    .file-request-upload-page .page-main .page-content .current-upload-block .upload-size {
+        margin: 0;
+        font: var(--mobile-font-caption-large-regular);
+        line-height: 36px;
+    }
+    .file-request-upload-page .page-main .page-content .content-upload-summary {
+        margin-top: 44px;
+    }
+    .file-request-upload-page .page-main .page-content .content-upload-summary .mega-input {
+        border: var(--mobile-border-strong) 1px solid;
+        height: 47px;
+    }
+    .file-request-upload-page .page-main .page-content .content-upload-summary .mega-input input,
+    .file-request-upload-page .page-main .page-content .content-upload-summary .mega-input input::placeholder {
+        font: var(--mobile-font-input-regular);
+    }
+    .file-request-upload-page .page-main .page-content .content-upload-summary .info-block {
+        --icon-size: 24px;
+    }
+    .file-request-upload-page .page-main .page-content .action-block button {
+        margin-top: 8px;
+        height: 48px;
+        width: 100%;
+    }
+    .file-request-upload-page .page-main .page-content .action-block button span {
+        font: var(--mobile-font-link-large-semibold);
+    }
+    .file-request-upload-page .page-main .page-content .block-finished {
+        align-items: flex-start;
+        justify-content: flex-start;
+        height: auto;
+        border: none;
+        padding: 0;
+    }
+    .file-request-upload-page .page-main .page-content .block-finished .block-finished-icon {
+        margin: 0;
+    }
+    .file-request-upload-page .page-main .page-content .block-finished .block-finished-caption {
+        margin-top: 20px;
+        font: var(--mobile-font-copy-semibold);
+    }
+    .file-request-upload-page .page-main .page-content .block-finished .block-finished-subtext {
+        text-align: start;
+        font: var(--mobile-font-caption-large-regular);
+    }
+    .file-request-upload-page .page-main .page-content .block-finished button.nav-elem {
+        height: 48px;
+        margin-top: 28px;
+        width: 100%;
+    }
+    .file-request-upload-page .page-main .page-content .block-finished button.nav-elem span {
+        font: var(--mobile-font-link-large-semibold);
+    }
+    .file-request-upload-page .page-main .page-header.hidden + .page-content {
+        margin-top: 30px;
+    }
 }

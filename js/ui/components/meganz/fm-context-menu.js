@@ -1156,15 +1156,11 @@
                                 }
 
                                 if (mega.ui.contextMenu.selectedItems[0] === 'file-requests') {
-                                    openNewFileRequestDialog()
-                                        .then(handle => handle && mega.fileRequest.dialogs.createDialog.init(handle))
-                                        .catch(dump);
+                                    mega.fileRequest.start();
                                     return;
                                 }
 
-                                mega.fileRequest.dialogs.createDialog.init(
-                                    mega.ui.contextMenu.selectedItems[0]
-                                );
+                                mega.fileRequest.start(mega.ui.contextMenu.selectedItems[0]);
                             }
                         },
                         {
@@ -1770,8 +1766,7 @@
                     if (M.isInvalidUserStatus()) {
                         return;
                     }
-
-                    mega.fileRequest.dialogs.createDialog.init(mega.ui.contextMenu.selectedItems[0]);
+                    mega.fileRequest.start(mega.ui.contextMenu.selectedItems[0]);
                 }
             },
             {

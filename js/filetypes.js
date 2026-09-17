@@ -686,7 +686,7 @@ function folderIcon(node, root) {
     let folderIcon = '';
     root = root || M.getNodeRoot(node.h);
 
-    if (root === M.RubbishID) {
+    if (M.RubbishID && root === M.RubbishID) {
         folderIcon = 'rubbish-';
     }
 
@@ -703,11 +703,11 @@ function folderIcon(node, root) {
         return `${folderIcon}folder-users`;
     }
     // My chat files
-    else if (node.h === M.cf.h) {
+    else if (M.cf && node.h === M.cf.h) {
         return `${folderIcon}folder-chat`;
     }
     // Camera uploads
-    else if (node.h === M.CameraId) {
+    else if (M.CameraId && node.h === M.CameraId) {
         return `${folderIcon}folder-camera-uploads`;
     }
     // S4 Object storage

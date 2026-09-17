@@ -955,6 +955,7 @@ twofactor.verifySetupDialog = {
                     })
                     .finally(() => {
                         $verifyButton.removeClass('disabled');
+                        twofactor.account.init();
                     });
             }
             else {

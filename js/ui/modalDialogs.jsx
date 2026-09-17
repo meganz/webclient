@@ -258,7 +258,9 @@ class ModalDialog extends MegaRenderMixin {
                                     <i className={v.iconBefore}/>
                                 </div> : null
                             }
-                            <span>{v.label}</span>
+                            <div className="text-box-wrapper sk-elm">
+                                <span className="primary-text">{v.label}</span>
+                            </div>
                             {v.iconAfter ?
                                 <div>
                                     <i className={v.iconAfter}/>
@@ -297,9 +299,11 @@ class ModalDialog extends MegaRenderMixin {
                     role="dialog"
                     aria-modal="true"
                     onClick={self.props.onClick}>
-                    <button className="close" onClick={self.onCloseClicked}>
-                        <i className="sprite-fm-mono icon-dialog-close"></i>
-                    </button>
+                    {!self.props.hideCloseBtn &&
+                        <button className="close" onClick={self.onCloseClicked}>
+                            <i className="sprite-fm-mono icon-dialog-close" />
+                        </button>
+                    }
                     {
                         self.props.title ?
                             self.props.dialogType === "message" ?

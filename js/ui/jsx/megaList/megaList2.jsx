@@ -301,7 +301,7 @@ export class MegaList2 extends MegaRenderMixin {
             delay('chat:mega-list2:thumb-loader', () => this.enqueueThumbnailRetrieval(), 20);
         }
 
-        this._firstRender = this._firstRender || this.props.viewmode !== M.viewmode;
+        this._firstRender = this._firstRender || this.props.viewMode !== M.viewmode;
 
         if (this._firstRender && this.domRef) {
             this._firstRender = false;

@@ -613,6 +613,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         'mtime': l[94],
         'type': l[93],
         'size': l[87],
+        'fru': l.uploaded_by,
         'versions': l[17150],
         'playtime': l.duration,
         'fileLoc': l.file_location_label

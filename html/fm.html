@@ -1262,13 +1262,15 @@
 
             <div class="fm-empty-section fm-empty-file-requests hidden">
                 <div class="fm-empty-pad">
-                    <i class="section-icon sprite-fm-mono icon-folder-mega-drop-filled"></i>
+                    <div class="file-request-empty-img"></div>
                     <div class="fm-empty-cloud-txt">[$file_request_page_empty_title]</div>
                     <div class="fm-empty-description">[$file_request_page_empty_desc]</div>
                     <div class="fm-empty-options">
                         <div class="fm-empty-options-item">
-                            <button class="mega-button positive fm-new-file-request">
-                                <span>[$file_request_action_create]</span>
+                            <button class="mega-component nav-elem normal button primary fm-new-file-request">
+                                <div class="text-box-wrapper sk-elm">
+                                    <span class="primary-text">[$file_request_action_create]</span>
+                                </div>
                             </button>
                         </div>
                     </div>
@@ -1404,6 +1406,10 @@
                                     </th>
                                     <th megatype="size">
                                         <div class="arrow size sprite-fm-mono icon-arrow-left-thin-solid">[$87]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="fru">
+                                        <div class="arrow fru sprite-fm-mono icon-arrow-left-thin-solid">[$uploaded_by]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th megatype="versions">

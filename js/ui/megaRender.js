@@ -269,6 +269,7 @@ mBroadcaster.once('boot_done', () => {
                     '<td megatype="timeMd" class="time md"></td>' +
                     '<td megatype="type" class="type"></td>' +
                     '<td megatype="size" class="size"></td>' +
+                    '<td megatype="fru" class="fru"></td>' +
                     '<td megatype="versions" class="hd-versions"></td>' +
                     '<td megatype="playtime" class="playtime"></td>' +
                     '<td megatype="fileLoc" class="fileLoc">' +
@@ -1742,6 +1743,11 @@ mBroadcaster.once('boot_done', () => {
                     if (manageIcon) {
                         manageIcon.classList.remove('hidden');
                     }
+                }
+
+                const uploadBy = renderTemplate.querySelector('.fru');
+                if (uploadBy) {
+                    uploadBy.textContent = mega.fileRequestCommon.getUploaderLabel(aNode.fru);
                 }
 
                 return renderTemplate;

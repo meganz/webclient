@@ -1133,6 +1133,55 @@ mega.gallery = {
     albumsRendered: false,
     publicSet: Object.create(null)
 };
+// Plain object to read/write onboarding flags on mobile. View onboarding.js for full logic.
+lazy(mega.ui, 'onboarding', () => {
+    if (folderlink || u_type < 3) {
+        return;
+    }
+    // Don't touch without updating the onboarding.js version.
+    window.OBV4_FLAGS = {
+        OBV4: 'obv4f',
+        CLOUD_DRIVE: 'obcd',
+        CLOUD_DRIVE_INIT: 'obcdi',
+        FR_INIT_DLG: 'obfrdlg',
+        UNUSED_3: 'unused3',
+        CHAT: 'obmc',
+        UNUSED_1: 'unused1',
+        CHAT_NAV: 'obmclp',
+        CLOUD_DRIVE_NEW_NAV: 'obcdnn',
+        CLOUD_DRIVE_NEW_NAV_START: 'obcdnns',
+        CLOUD_DRIVE_NEW_NAV_LEFT: 'obcdnnl',
+        CLOUD_DRIVE_NEW_NAV_BENTO: 'obcdnnb',
+        CLOUD_DRIVE_NEW_NAV_ACCOUNT: 'obcdnna',
+        CLOUD_DRIVE_NEW_NAV_CHAT: 'obcdnnc',
+        CLOUD_DRIVE_NEW_NAV_CONTACT: 'obcdnnp',
+        TPW_NEW: 'obtpw',
+        TPW_NEW_MOVE: 'obtpwm',
+        TPW_NEW_VIEW: 'obtpwv',
+        TPW_NEW_HIDE: 'obtpwh',
+        CHAT_CALL_UI: 'obmcui',
+        CHAT_CALL_RECORDING: 'obmcrec',
+        CHAT_CALL_RAISE: 'obmcrai',
+        UNUSED_13: 'unused13',
+        UNUSED_14: 'unused14',
+        UNUSED_15: 'unused15',
+        CLOUD_DRIVE_DC: 'obcddc',
+        CLOUD_DRIVE_DC_BUBBLE: 'obcddcb',
+        PASS: 'obmp',
+        PASS_INIT: 'obmpi',
+        UNUSED_16: 'unused16',
+        UNUSED_17: 'unused17',
+    };
+    mega.ui.onboardingFlags = OBV4_FLAGS;
+    const flagMap = attribCache.bitMapsManager.exists('obv4')
+        ? attribCache.bitMapsManager.get('obv4')
+        : new MegaDataBitMap('obv4', false, Object.values(OBV4_FLAGS));
+    return freeze({
+        map: Object.create(null),
+        sections: Object.create(null),
+        flagStorage: flagMap,
+    });
+});
 
 /** Global function to be used in mobile mode, checking if the action can be taken by the user.
  * It checks the user validity (Expired business, or ODQ Paywall)

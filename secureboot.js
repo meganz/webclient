@@ -2967,6 +2967,7 @@ else if (!browserUpdate) {
         'pdfviewercss': {f:'css/pdf.viewer.css', n: 'pdfviewercss', j:4 },
         'pdfviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdfviewerjs', j:4 },
         'filerequest': {f:'html/filerequest.html', n: 'filerequest', j:0 },
+        'filerequest_css': {f:'css/filerequest.css', n: 'filerequest_css', j:2, w:5 },
         'businessAcc_js': {f:'js/fm/megadata/businessaccount.js', n: 'businessAcc_js', j:1 },
         'businessAccUI_js': {f:'js/fm/businessAccountUI.js', n: 'businessAccUI_js', j:1 },
         'charts_js': {f:'js/vendor/Chart.js', n: 'charts_js', j:1},
@@ -3231,7 +3232,7 @@ else if (!browserUpdate) {
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
         'unsub': ['unsub', 'unsub_js'],
-        'filerequest': ['filerequest', 'filerequest_upload_js']
+        'filerequest': ['filerequest', 'filerequest_upload_js', 'filerequest_css']
     };
 
     if (is_mobile) {

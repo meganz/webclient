@@ -406,73 +406,114 @@ export default class BrowserEntries extends MegaRenderMixin {
         this.props.onSortByChanged(newState.sortBy);
     }
 
-    render() {
-        var viewMode = this.props.viewMode;
+    /**
+     * Empty-state UI
+     * @returns {Object} {icon, title, subtitle?}
+     */
+    _getEmptyState() {
+        const {
+            currentlyViewedEntry: cve,
+            searchScope: section
+        } = this.props;
 
-        let listAdapterOpts = this.props.listAdapterOpts || {};
+        if (cve === 'search') {
+            return {
+                icon: 'glass-details',
+                title: l.no_search_results,
+                subtitle: l.search_again
+            };
+        }
+
+        if (cve === 'quick-access') {
+            return {
+                icon: 'glass-clock',
+                title: l.dlg_empty_title_frequents,
+                subtitle: l.dlg_empty_text_frequents
+            };
+        }
+
+        if (cve === 'shares') {
+            return {
+                icon: 'glass-shared-folder',
+                title: l[6871],
+                subtitle: l.dlg_empty_text_share
+            };
+        }
+
+        if (cve === M.RootID) {
+            return {icon: 'glass-cloud-circle', title: l.empty_cloud_title};
+        }
+
+        if (section === 's4') {
+            const type = M.getS4NodeType(cve);
+
+            if (type === 'container' || type === 'bucket') {
+                return {
+                    icon: 'glass-object-bucket',
+                    title: {container: l.dlg_empty_title_s4, bucket: l.dlg_empty_title_bucket}[type]
+                };
+            }
+        }
+
+        // Empty sub-folder / contact folder
+        return { icon: 'glass-folder', title: M.u[cve] ? l[6787] : l[782]};
+    }
+
+    _renderEmptyState({icon, title, subtitle}) {
+        return (
+            <div className={'dialog-empty-block active'}>
+                <div className="image">
+                    <i className={icon} />
+                </div>
+                <div className="title">
+                    <h1>{title}</h1>
+                </div>
+                {subtitle && <div className="subtitle">{subtitle}</div>}
+            </div>
+        );
+    }
+
+    render() {
+        const {
+            shortGrid,
+            listAdapterColumns,
+            listAdapterOpts = {},
+            viewMode
+        } = this.props;
 
         if (!viewMode) {
-            listAdapterOpts.columns = [
-                ColumnFavIcon,
-                ColumnNodeName,
-                ColumnSize,
-                ColumnTimeAdded,
-                ColumnExtras
-            ];
+            // Optionally show the incoming-share owner (avatar + name/email) in the name column
+            const nameColumn = this.props.showOwner ? [ColumnNodeName, {showOwner: true}] : ColumnNodeName;
+
+            listAdapterOpts.columns = shortGrid
+                ? [nameColumn, ColumnExtras]
+                : [
+                    ColumnFavIcon,
+                    nameColumn,
+                    ColumnSize,
+                    ColumnTimeAdded,
+                    ColumnExtras
+                ];
         }
-        if (this.props.listAdapterColumns) {
-            listAdapterOpts.columns = this.props.listAdapterColumns;
+
+        if (listAdapterColumns) {
+            listAdapterOpts.columns = listAdapterColumns;
         }
 
         if (this.props.isLoading) {
-            return (
-                <div className="dialog-empty-block active dialog-fm folder">
-                    <div className="dialog-empty-pad">
-                        <i className="sprite-fm-mono icon-cloud-drive" />
-                        <div className="dialog-empty-header">
-                            {l[5533]}
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-        else if (!this.props.entries.length && this.props.currentlyViewedEntry === 'search') {
-            return (
-                <div className="dialog-empty-block active dialog-fm folder">
-                    <div className="dialog-empty-pad">
-                        <i  className="sprite-fm-mono icon-preview-reveal" />
-                        <div className="dialog-empty-header">
-                            {l[978]}
-                        </div>
-                    </div>
-                </div>
-            );
+            return this._renderEmptyState({
+                icon: 'loader sprite-fm-mono icon-loader-grad-small-regular-outline',
+                title: l[5533]
+            });
         }
         else if (!this.props.entries.length) {
             const nilComp = this.props.NilComponent;
-            return (
-                nilComp && (typeof nilComp === "function" ? nilComp() : nilComp) ||
-                <div className="dialog-empty-block active dialog-fm folder">
-                    {
-                        this.props.currentlyViewedEntry === 'shares' ?
-                            <div className="dialog-empty-pad">
-                                <i className="sprite-fm-mono icon-folder-incoming-share-filled"/>
-                                <div className="dialog-empty-header">
-                                    {l[6871]}
-                                </div>
-                            </div>
-                            :
-                            <div className="dialog-empty-pad">
-                                <i className="sprite-fm-mono icon-folder-filled"/>
-                                <div className="dialog-empty-header">
-                                    {this.props.currentlyViewedEntry === M.RootID ? l[1343] : (
-                                        M.u[this.props.currentlyViewedEntry] ? l[6787] : l[782]
-                                    )}
-                                </div>
-                            </div>
-                    }
-                </div>
-            );
+
+            // NilComp overrides the default empty state (except for the search results)
+            const nil = this.props.currentlyViewedEntry !== 'search'
+                && nilComp && (typeof nilComp === "function" ? nilComp() : nilComp);
+
+            return nil || this._renderEmptyState(this._getEmptyState());
         }
 
         return <MegaList2
@@ -508,6 +549,7 @@ export default class BrowserEntries extends MegaRenderMixin {
             header={!viewMode && <GenericTableHeader
                 columns={listAdapterOpts.columns}
                 sortBy={this.state.sortBy}
+                sortable={this.props.currentlyViewedEntry !== 'quick-access'}
                 onClick={this.toggleSortBy}
                 headerContainerClassName={this.props.headerContainerClassName}
             />}

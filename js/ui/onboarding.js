@@ -2,11 +2,12 @@
 
 // Bump this version number if changes are required in an existing section or if required to reduce complexity.
 window.ONBOARD_VERSION = 6;
+// Update mobile.js version as well when changing flags.
 window.OBV4_FLAGS = {
     OBV4: 'obv4f',
     CLOUD_DRIVE: 'obcd',
     CLOUD_DRIVE_INIT: 'obcdi',
-    UNUSED_2: 'unused2',
+    FR_INIT_DLG: 'obfrdlg',
     UNUSED_3: 'unused3',
     CHAT: 'obmc',
     UNUSED_1: 'unused1',

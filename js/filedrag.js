@@ -9,6 +9,9 @@
     };
 
     function pathInfo() {
+        if (optionReference.fileRequestEnabled) {
+            return 'nop';
+        }
         if (M.chat) {
             const room = window.megaChatIsReady && megaChat.getCurrentRoom();
             return room ? megaChat.html(room.getRoomTitle()) : escapeHTML(l[7997]);
@@ -63,11 +66,9 @@
     }
 
     function addOverlay() {
-        if (optionReference.fileRequestEnabled) {
-            $('body', document).addClass('file-request-drag');
+        if (is_mobile && optionReference.fileRequestEnabled) {
             return;
         }
-
         const $overlay = $('.drag-n-drop.overlay');
         const $block = document.body.classList.contains('overlayed') ? $() : $(`
             .files-grid-view:visible, 
@@ -80,12 +81,20 @@
             .fm-recents:not(.emptied) .fm-recents.scroll:visible,
             .s4-grid-view:visible,
             .empty-state:visible,
+            .file-request-upload-page .content-upload-block:visible,
             .fm-empty-section:visible
         `);
         const setOverlaySize = () => {
             if ($block.length) {
-                const { height, left, width } = $block[0].getBoundingClientRect();
-                $overlay.removeClass('chat-offset');
+                const { height, left, width, top } = $block[0].getBoundingClientRect();
+                if (optionReference.fileRequestEnabled) {
+                    $overlay[0].style.setProperty('--fdbleft', `${left}px`);
+                    $overlay[0].style.setProperty('--fdbtop', `${top}px`);
+                    $overlay.addClass('fr-offset').width(width).height(height);
+                    return;
+                }
+
+                $overlay.removeClass('chat-offset fr-offset');
                 if (M.chat && $block.parent('.with-pane').length) {
                     $overlay.addClass('chat-offset');
                     $overlay.height(height - 32);
@@ -107,7 +116,7 @@
                 const { width, height } = document.body.getBoundingClientRect();
                 $overlay.width(width - 32);
                 $overlay.height(height - 32);
-                $overlay.removeClass('flyout-offset chat-offset');
+                $overlay.removeClass('flyout-offset chat-offset fr-offset');
             }
         };
         $overlay.removeClass('hidden');
@@ -121,16 +130,15 @@
                 ? !album.filterFn && album.nodes && album.nodes.length
                 : Object.values(albums.store).some(albumIsRenderable);
         }
+        if (optionReference.fileRequestEnabled) {
+            hasItems = mega.fileRequestUpload.uploadPage.queue.total;
+        }
         $overlay.toggleClass('transparent-overlay', !!(hasItems || M.chat));
         $('.crumb', $overlay).safeHTML(pathInfo());
     }
 
     function removeOverlay() {
         optionReference.touchedElement = 0;
-        if (optionReference.fileRequestEnabled) {
-            $('body', document).removeClass('file-request-drag');
-            return;
-        }
 
         $(window).off('resize.filedrag');
         $('.drag-n-drop.overlay').addClass('hidden');
@@ -553,7 +561,7 @@
         if (M.isFileDragPage(page)) {
             return true;
         }
-        if (String(page).startsWith('pro')) {
+        if (String(page).startsWith('pro') || page === 'support') {
             return false;
         }
         return !(is_fm() && // if page is fm,

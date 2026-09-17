@@ -355,6 +355,10 @@ lazy(mega.ui, 'mInfoPanel', () => {
                     this.text = time2date(this.node.ts);
                     break;
                 }
+                case TYPES.FILEREQ_UPLOADER: {
+                    this.text = mega.fileRequestCommon.getUploaderLabel(this.node.fru);
+                    break;
+                }
             }
         }
 
@@ -828,6 +832,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         MIME: 'mime',
         THUMBNAIL: 'thumbnail',
         NAME: l.info_panel_name,
+        FILEREQ_UPLOADER: l.uploaded_by,
         ACTIVITY: l[8020],
         TAKEDOWN: 'takedown',
         NODE_TYPE: l[93],
@@ -1488,6 +1493,19 @@ lazy(mega.ui, 'mInfoPanel', () => {
         }
         if (M.currentdirid === "recents") {
             blockSet.add(TYPES.ACTIVITY);
+        }
+        if (
+            // Not a file request folder itself
+            (!mega.fileRequest || !mega.fileRequest.publicFolderExists(node.h)) && (
+                // Tagged nodes
+                node.fru ||
+                // Nodes in file request section
+                M.currentdirid !== M.currentrootid && M.currentrootid === 'file-requests' ||
+                // Other nodes belonging to a file request (historic)
+                mega.fileRequest && M.getPath(node.h).some(h => mega.fileRequest.publicFolderExists(h))
+            )
+        ) {
+            blockSet.add(TYPES.FILEREQ_UPLOADER);
         }
     }
 

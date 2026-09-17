@@ -507,6 +507,40 @@
 .mega-input.fix-msg.error .message-container {
     color: var(--banner-text-error);
 }
+.mega-input.pm .message-container {
+    color: var(--mobile-text-primary);
+}
+.mega-input.pm .message-container i {
+    --mask-color: var(--mobile-icon-primary);
+}
+.mega-input.pm.success .message-container {
+    color: var(--mobile-text-success);
+}
+.mega-input.pm.success .message-container i {
+    --mask-color: var(--mobile-text-success);
+}
+.mega-input.pm.warning .message-container {
+    color: var(--mobile-text-warning);
+}
+.mega-input.pm.warning .message-container i {
+    --mask-color: var(--mobile-text-warning);
+}
+.mega-input.pm.error .message-container {
+    color: var(--mobile-text-error);
+}
+.mega-input.pm.error .message-container i {
+    --mask-color: var(--mobile-text-error);
+}
+.mega-input.pm.msg .message-container {
+    align-items: flex-start;
+    display: flex;
+}
+.mega-input.pm.msg .message-container > i.sprite-fm-mono {
+    --icon-size: 16px;
+    flex: none;
+    margin-inline: 0 6px;
+    margin-top: 0;
+}
 .mega-input .action-icon {
     --icon-size: 20px;
     opacity: 0.7;

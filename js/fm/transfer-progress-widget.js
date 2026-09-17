@@ -442,7 +442,12 @@ mega.tpw = new function TransferProgressWidget() {
         const page = String(self.page || '');
 
         // pages to hide always
-        if (page.includes('register') || page.includes('download') || page === 'login') {
+        if (
+            page.includes('register') ||
+            page.includes('download') ||
+            page === 'login' ||
+            page.includes('filerequest')
+        ) {
             mega.tpw.hideWidget();
             return;
         }

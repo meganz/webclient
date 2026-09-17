@@ -13,7 +13,7 @@ export class ColumnExtras extends GenericNodePropsComponent {
             <span className="versioning-indicator">
                 <i className="sprite-fm-mono icon-versions-previous"></i>
             </span>
-            <i className="sprite-fm-mono icon-link"></i>
+            <i className="sprite-fm-mono icon-link-thin-outline"></i>
         </td>;
     }
 }

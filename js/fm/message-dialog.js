@@ -156,7 +156,7 @@ Object.defineProperty(msgDialog, 'desktop', {
         else if (typeof checkboxCallback === 'string') {
             const key = checkboxCallback;
             assert(['cslrem','nowarnpl','skipDelWarning','skipcdtos4','skips4tocd','skips4tos4',
-                    'skipSenToS4','rwReinstate','dcPause'].includes(key), key);
+                    'skipSenToS4','rwReinstate','dcPause', 'frRemoveSkip'].includes(key), key);
             checkboxCallback = checked => checked ? mega.config.set(key, 1) : mega.config.remove(key);
         }
 

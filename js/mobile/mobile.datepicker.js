@@ -6,6 +6,8 @@ class MegaMobileDatePicker extends MegaComponent {
      * @param {Object} options Instance options.
      * @param {Object} options.parentNode The node to append the date picker to.
      * @param {Object} [options.componentClassname] ...
+     * @param {Boolean} [options.allowToday] Allow today to be picked, instead of tomorrow onwards.
+     * @param {String} [options.placeholder] Placeholder shown while no date is set.
      */
     constructor(options) {
 
@@ -20,6 +22,7 @@ class MegaMobileDatePicker extends MegaComponent {
         frontInput.disabled = true;
         frontInput.className = 'underlinedText no-title-top with-icon';
         frontInput.id = options.frontInputID || '';
+        frontInput.placeholder = options.placeholder || '';
 
         this.domNode.append(frontInput);
 
@@ -29,9 +32,11 @@ class MegaMobileDatePicker extends MegaComponent {
 
         this.frontInput.$wrapper.addClass('box-style mobile');
 
-        // Set min (1 day in future) and max (Dec 31, 2060) dates
+        // Set min (today, or 1 day in future) and max (Dec 31, 2060) dates
         var minDate = new Date();
-        minDate.setDate(minDate.getDate() + 1);
+        if (!options.allowToday) {
+            minDate.setDate(minDate.getDate() + 1);
+        }
 
         const targetNode = this.domNode;
         this.picker = document.createElement('input');

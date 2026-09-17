@@ -162,6 +162,9 @@ class MegaSheet extends MegaOverlay {
 
             M.safeShowDialog(options.name, () => {
                 super.show(options);
+                // clear() already removes this on hide, but nothing ever added it, so no sheet could
+                // be targeted by its own name in CSS. Added here to make that hook actually work.
+                this.domNode.classList.add(options.name);
                 this.type = options.type || 'normal';
                 this.height = options.sheetHeight || 'auto';
                 this.width = options.sheetWidth || '';

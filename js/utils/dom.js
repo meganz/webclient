@@ -51,7 +51,7 @@ function parseHTML(markup) {
 
     const {getOuterHTML, ctlrex} = parseHTML;
     const test = (c) =>
-        /<[^>]+(?:script:|data[%:]|(?:id|name)=["']*(?:child|node|attr|shadow|content|\w*html))/i.test(c);
+        /<[^>]+(?:script:|data[%:]|(?:id|name)=["']*(?:child|node|attr|shadow|content|\w*erhtml))/i.test(c);
 
     $.parseHTML(markup, doc)
         .forEach((node) => {
@@ -70,6 +70,7 @@ function parseHTML(markup) {
 
                         return name[0] === 'o' && name[1] === 'n'
                             || name[0] === 'f' && name[1] === 'o' && name[2] === 'r' && name[3] === 'm'
+                            || name[0] === 'p' && name[1] === 'i' && name[2] === 'n' && name[3] === 'g'
                             || nn !== 'A' && name[1] === 'r' && name[2] === 'e' && name[3] === 'f'
                             || nn !== 'IMG' && name[0] === 's' && name[1] === 'r' && name[2] === 'c';
                     });
@@ -78,7 +79,7 @@ function parseHTML(markup) {
 
             if (invalid) {
                 if (!self.buildOlderThan10Days) {
-                    eventlog(99642, JSON.stringify([2, escapeHTML(content.slice(0, 256))]), true);
+                    eventlog(99642, JSON.stringify([3, escapeHTML(content.slice(0, 768))]), true);
                 }
                 console.warn('Filtered out invalid content passed to parseHTML...', [node]);
             }

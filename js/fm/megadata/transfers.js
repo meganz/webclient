@@ -1213,6 +1213,10 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
             delay('percent_megatitle', percent_megatitle, 450);
 
             tfsheadupdate({t: gid});
+
+            if (is_megadrop) {
+                return;
+            }
             mega.tpw.updateDownloadUpload(mega.tpw.UPLOAD, gid, perc, bl, bt, bps, ul.pos, ul.starttime);
         }
     });
@@ -1329,6 +1333,10 @@ MegaData.prototype.ulcomplete = function(ul, h, faid) {
     tfsheadupdate({f: gid});
     mega.tpw.finishDownloadUpload(gid, ul, h);
 
+    if (ul.id && is_megadrop) {
+        mega.fileRequestUpload.onItemUploadCompletion(ul.id);
+    }
+
     this.ulfinalize(ul, ul.skipfile ? l[1668] : l[1418], h);
 };
 
@@ -1357,11 +1365,7 @@ MegaData.prototype.ulfinalize = function(ul, status, h) {
         delete $.transferprogress['ul_' + id];
     }
 
-    // If File request windows exists and upload
-    if (id && is_megadrop) {
-        mega.fileRequestUpload.onItemUploadCompletion(id);
-    }
-    else if (h) {
+    if (h && !is_megadrop) {
         // @todo better error handling..
         M.confirmNodesAtLocation(h).catch(tell);
     }
@@ -1437,7 +1441,10 @@ MegaData.prototype.isFileDragPage = function(page) {
 MegaData.prototype.transferRowExists = function(gid) {
     'use strict';
 
-    if (is_mobile || is_megadrop) {
+    if (is_megadrop && mega.fileRequestUpload) {
+        return !!mega.fileRequestUpload.uploadPage.rows[gid];
+    }
+    if (is_mobile) {
         return !!document.getElementById(gid);
     }
     return mega.tpw ? mega.tpw.hasDOMRow(gid) : false;
@@ -1455,6 +1462,14 @@ function onUploadError(ul, errorstr, reason, xhr, isOverQuota) {
         ulmanager.logger.error('onUploadError', ul.id, ul.name, errorstr, reason, hostname(ul.posturl));
     }
 
+    ul._gotTransferError = true;
+    if (is_megadrop) {
+        if (!isOverQuota) {
+            mega.fileRequestUpload.setItemError(ul.id, errorstr);
+        }
+        return;
+    }
+
     if (is_mobile) {
         mobile.uploadOverlay.error(ul, errorstr);
         return;
@@ -1463,8 +1478,6 @@ function onUploadError(ul, errorstr, reason, xhr, isOverQuota) {
     const gid = ulmanager.getGID(ul);
     tfsheadupdate(isOverQuota ? {o: gid} : {e: gid});
     mega.tpw.errorDownloadUpload(gid, errorstr, isOverQuota);
-
-    ul._gotTransferError = true;
 }
 
 function fm_tfspause(gid, overquota) {

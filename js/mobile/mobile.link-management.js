@@ -76,7 +76,7 @@ mobile.linkManagement = {
         const mdList = mega.fileRequestCommon.storage.isDropExist(this.handle);
 
         if (mdList.length) {
-            mega.fileRequest.showRemoveWarning(mdList).then(() => tmpFn.call(this)).catch(dump);
+            mega.fileRequest.showRemoveWarning(mdList, 'link').then(() => tmpFn.call(this)).catch(dump);
         }
         else {
             tmpFn.call(this);

@@ -1,6 +1,5 @@
 import React from 'react';
 import ModalDialogsUI from './modalDialogs.jsx';
-import ViewModeSelector from "./jsx/fm/viewModeSelector.jsx";
 import Breadcrumbs from "./jsx/fm/breadcrumbs.jsx";
 import FMView from "./jsx/fm/fmView.jsx";
 
@@ -18,15 +17,20 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
         'className': ''
     };
 
-    static getFilterFunction(customFilterFn) {
+    static getFilterFunction(customFilterFn, skipIncoming) {
         // XXX: Carefully check usages around the codebase before making any changes here...
         return tryCatch((n) => {
             // Filter non S4-container items
+
             if (n.s4 && n.p === M.RootID && M.getS4NodeType(n) === 'container') {
                 return false;
             }
 
             if (!n.name || missingkeys[n.h] || M.getNodeShare(n).down) {
+                return false;
+            }
+
+            if (skipIncoming && n.su) {
                 return false;
             }
 
@@ -54,20 +58,8 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
         this.onSelected = this.onSelected.bind(this);
         this.onHighlighted = this.onHighlighted.bind(this);
         this.handleTabChange = this.handleTabChange.bind(this);
-        this.onViewModeSwitch = this.onViewModeSwitch.bind(this);
         this.onBreadcrumbNodeClick = this.onBreadcrumbNodeClick.bind(this);
         this.onExpand = this.onExpand.bind(this);
-    }
-
-    onViewModeSwitch(newMode) {
-        let currentViewMode = mega.config.get('cbvm') | 0;
-        if (newMode === currentViewMode) {
-            return;
-        }
-
-        mega.config.set('cbvm', newMode);
-
-        this.forceUpdate();
     }
 
     getHeaderButtonsClass() {
@@ -78,8 +70,16 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
         return classes.join(' ');
     }
 
+    getSearchPlaceholder() {
+        switch (this.state.selectedTab) {
+            case 's4': return l.dlg_search_s4;
+            case 'shares': return l.dlg_search_share;
+            default: return l.dlg_search_cd;
+        }
+    }
+
     getSearchIconClass() {
-        const classes = ['sprite-fm-mono', 'icon-preview-reveal'];
+        const classes = ['sprite-fm-mono', 'icon-search-light-outline', 'left-icon'];
         if (this.state.isActiveSearch && this.state.searchText.length > 0) {
             classes.push('disabled');
         }
@@ -186,8 +186,11 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
     clearSelectionAndHighlight() {
         this.onSelected([]);
         this.onHighlighted([]);
-        if (selectionManager) {
-            selectionManager.clear_selection();
+
+        // Clear the FMView's own selection manager (not the global one) so the
+        // previously selected node loses its `ui-selected` state on tab/view change.
+        if (this.fmView && this.fmView.selectionManager) {
+            this.fmView.selectionManager.clear_selection();
         }
     }
 
@@ -233,16 +236,16 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
         assert(this.dialogBecameVisible);
         var self = this;
 
-        const viewMode = mega.config.get('cbvm') | 0;
-
-        const classes = `add-from-cloud ${self.props.className} dialog-template-tool `;
+        const classes = `dialog-template-tool item-picker-type ${self.props.className}`;
 
         let folderIsHighlighted = false;
         let share = false;
         let isS4Cn = false;
         let isSearch = this.state.currentlyViewedEntry === 'search';
         const entryId = isSearch ? self.state.highlighted[0] : self.state.currentlyViewedEntry;
-        const filterFn = CloudBrowserDialog.getFilterFunction(this.props.customFilterFn);
+        const filterFn = CloudBrowserDialog.getFilterFunction(
+            this.props.customFilterFn, !!this.props.hideIncoming
+        );
 
         // Flag that the specific node is part of the `Incoming Shares` node chain;
         // The `Attach` button is not available for isIncomingShare nodes.
@@ -261,9 +264,10 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
         });
 
         let buttons = [{
-            "label": this.props.cancelLabel,
-            "key": "cancel",
-            "onClick": e => {
+            label: this.props.cancelLabel,
+            key: 'cancel',
+            defaultClassname: 'nav-elem normal button action secondary',
+            onClick: e => {
                 e.preventDefault();
                 e.stopPropagation();
                 if (this.props.onCancel) {
@@ -285,9 +289,10 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
 
             buttons.push(
                 {
-                    "label": this.props.openLabel,
-                    "key": "select",
-                    className: `positive ${className} ${highlighted.length > 1 ? 'disabled' : ''}`,
+                    label: this.props.openLabel,
+                    key: 'select',
+                    className: `${className} ${highlighted.length > 1 ? 'disabled' : ''}`,
+                    defaultClassname: 'nav-elem normal button action',
                     onClick: e => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -300,9 +305,10 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
                     }
                 },
                 allowAttachFolders ? {
-                    "label": l[8023],
-                    "key": "attach",
-                    className: "positive " + className,
+                    label: l[8023],
+                    key: 'attach',
+                    defaultClassname: 'nav-elem normal button action secondary',
+                    className,
                     onClick: () => {
                         this.props.onClose();
                         onIdle(() => {
@@ -334,21 +340,26 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
                                 this.props.onAttachClicked();
                             }
                             if (frs.length) {
-                                const fldName = frs.length > 1
-                                    ? l[17626]
-                                    : l[17403].replace('%1', escapeHTML(M.getNameByHandle(frs[0])) || l[1049]);
-                                msgDialog('confirmation', l[1003], fldName, l[18229], (e) => {
-                                    if (e) {
-                                        mega.fileRequest
-                                            .removeList(frs)
-                                            .then(() => {
-                                                for (let i = 0; i < frs.length; i++) {
-                                                    createPublicLink(frs[i]);
-                                                }
-                                            })
-                                            .catch(dump);
-                                    }
-                                });
+                                const fldName = frs.length > 1 ? l.fr_action_links_cancel : l.fr_action_link_cancel;
+                                msgDialog(
+                                    `warninga:!^${l.file_request_action_remove_prompt_button}!${l[82]}`,
+                                    l[1003],
+                                    l.file_request_action_remove_prompt_title,
+                                    fldName,
+                                    (e) => {
+                                        if (e === false) {
+                                            mega.fileRequest
+                                                .removeList(frs)
+                                                .then(() => {
+                                                    for (let i = 0; i < frs.length; i++) {
+                                                        createPublicLink(frs[i]);
+                                                    }
+                                                })
+                                                .catch(dump);
+                                        }
+                                    },
+                                    1
+                                );
                             }
                         });
                     }
@@ -360,11 +371,12 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
             (!this.props.noShareFolderAttach || !(isIncomingShare && folderIsHighlighted))
         ) {
             buttons.push({
-                "label": this.props.selectLabel,
-                "key": "select",
-                "className": "positive " +
-                    (this.state.selected.length === 0 || share && share.down || isS4Cn ? "disabled" : ""),
-                "onClick": e => {
+                label: this.props.selectLabel,
+                key: 'select',
+                defaultClassname: 'nav-elem normal button action',
+                className: this.state.selected.length === 0
+                    || share && share.down || isS4Cn ? "disabled" : "",
+                onClick: e => {
                     if (this.state.selected.length > 0) {
                         this.props.onSelected(this.state.selected);
                         this.props.onAttachClicked();
@@ -380,7 +392,7 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
         if (self.state.searchText.length >= MIN_SEARCH_LENGTH) {
             clearSearchBtn = (
                 <i
-                    className="sprite-fm-mono icon-close-component"
+                    className="sprite-fm-mono icon-dialog-close-thin"
                     onClick={() => {
                         self.onClearSearchIconClick();
                     }}
@@ -393,78 +405,109 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
 
         return (
             <ModalDialogsUI.ModalDialog
-                title={self.props.title || l[8011]}
-                className={
-                    classes +
-                    // Amend the container height when the bottom breadcrumb is visible,
-                    // i.e. in search mode, incl. having file/folder selected
-                    (isSearch && this.state.selected.length > 0 ? 'has-breadcrumbs-bottom' : '') +
-                    this.dialogName
-                }
+                className={`${classes} ${this.dialogName}`}
                 onClose={() => {
                     self.props.onClose(self);
                 }}
-                dialogName="add-from-cloud-dialog dialog-template-tool"
+                dialogName="attach-cloud-dialog"
                 popupDidMount={self.onPopupDidMount}
+                hideCloseBtn={true}
+                viewMode={0}
                 buttons={buttons}>
+
+                <section className="left-panel">
+                    <div className="fm-picker-dialog-tree-panel">
+                        <button
+                            className={
+                                `nav-elem text-only full-width` +
+                                `${self.state.selectedTab === 'quick-access' ? ' active' : ''}`
+                            }
+                            onClick={() => self.handleTabChange('quick-access')}>
+                            <i className="sprite-fm-mono icon-clock-thin-solid" />
+                            <div className="text-box-wrapper">
+                                <span className="primary-text">
+                                    {l.frequent_access /* `Frequently accessed` */}
+                                </span>
+                            </div>
+                        </button>
+                        <button
+                            className={
+                                `nav-elem text-only full-width` +
+                                `${self.state.selectedTab === M.RootID ? ' active' : ''}`
+                            }
+                            onClick={() => self.handleTabChange(M.RootID)}>
+                            <i className="sprite-fm-mono icon-cloud-thin-outline" />
+                            <div className="text-box-wrapper">
+                                <span className="primary-text">
+                                    {l[164] /* `Cloud Drive` */}
+                                </span>
+                            </div>
+                        </button>
+                        {!self.props.hideIncoming &&
+                            <button
+                                className={
+                                    `nav-elem text-only full-width` +
+                                    `${self.state.selectedTab === 'shares' ? ' active' : ''}`
+                                }
+                                onClick={() => self.handleTabChange('shares')}>
+                                <i className="sprite-fm-mono icon-folder-users-thin-outline" />
+                                <div className="text-box-wrapper">
+                                    <span className="primary-text">
+                                        {l[5542] /* `Incoming Shares` */}
+                                    </span>
+                                </div>
+                            </button>
+                        }
+                        <button
+                            className={
+                                `nav-elem text-only full-width` +
+                                `${self.state.selectedTab === 's4' ? ' active' : ''}` +
+                                `${u_attr.s4 ? '' : ' hidden'}`
+                            }
+                            onClick={() => self.handleTabChange('s4')}>
+                            <i className="sprite-fm-mono icon-bucket-triangle-thin-outline" />
+                            <div className="text-box-wrapper">
+                                <span className="primary-text">
+                                    {l.obj_storage /* `S4 Object storage` */}
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                </section>
 
                 <section
                     ref={this.domRef}
                     className="content">
-                    <div className="content-block">
-                        <div className="fm-dialog-tabs">
-                            <div
-                                className={`
-                                    fm-dialog-tab cloud
-                                    ${self.state.selectedTab === M.RootID ? 'active' : ''}
-                                `}
-                                onClick={() => self.handleTabChange(M.RootID)}>
-                                {l[164] /* `Cloud Drive` */}
+                    <div className="content-block header">
+                        <h2>{self.props.title || l[8011]}</h2>
+                        {self.state.selectedTab !== 'quick-access' &&
+                            <div className="search-bar mega-input pm box-style">
+                                <i
+                                    className={self.getSearchIconClass()}
+                                    onClick={() => {
+                                        self.onSearchIconClick();
+                                    }}
+                                />
+                                <input
+                                    ref={(input) => {
+                                        this.searchInput = input;
+                                    }}
+                                    type="search"
+                                    placeholder={self.getSearchPlaceholder()}
+                                    value={self.state.searchText}
+                                    onChange={self.onSearchChange}
+                                    onBlur={() => {
+                                        self.onSearchBlur();
+                                    }}
+                                />
+                                {clearSearchBtn}
                             </div>
-                            <div
-                                className={`
-                                    fm-dialog-tab incoming
-                                    ${self.state.selectedTab === 'shares' ? 'active' : ''}
-                                `}
-                                onClick={() => self.handleTabChange('shares')}>
-                                {l[5542] /* `Incoming Shares` */}
-                            </div>
-                            <div
-                                className={`
-                                    fm-dialog-tab s4
-                                    ${self.state.selectedTab === 's4' ? 'active' : ''}
-                                    ${u_attr.s4 ? '' : 'hidden'}
-                                `}
-                                onClick={() => self.handleTabChange('s4')}>
-                                {l.obj_storage /* `S4 Object storage` */}
-                            </div>
-                            <div className="clear"></div>
-                        </div>
-                        <div className="fm-picker-header">
-                            <div className={self.getHeaderButtonsClass()}>
-                                <ViewModeSelector viewMode={viewMode} onChange={this.onViewModeSwitch} />
-                                <div className="fm-files-search">
-                                    <i
-                                        className={self.getSearchIconClass()}
-                                        onClick={() => {
-                                            self.onSearchIconClick();
-                                        }}
-                                    />
-                                    <input
-                                        ref={(input) => {
-                                            this.searchInput = input;
-                                        }}
-                                        type="search" placeholder={l[102]} value={self.state.searchText}
-                                        onChange={self.onSearchChange}
-                                        onBlur={() => {
-                                            self.onSearchBlur();
-                                        }}
-                                    />
-                                    {clearSearchBtn}
-                                </div>
-                                <div className="clear"></div>
-                            </div>
-                            {!isSearch &&
+                        }
+                    </div>
+
+                    <div className="content-block breadcrumbs">
+                        <div className="body">
+                            {breadcrumbPath.length > 0 &&
                                 <Breadcrumbs
                                     className="add-from-cloud"
                                     nodeId={entryId}
@@ -474,10 +517,16 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
                                     /* trigger re-render */
                                     highlighted={this.state.highlighted}
                                     currentlyViewedEntry={this.state.currentlyViewedEntry}
-                                />}
+                                />
+                            }
                         </div>
+                    </div>
 
+                    <div className="content-block folder-container">
                         <FMView
+                            ref={(fmView) => {
+                                this.fmView = fmView;
+                            }}
                             nodeLoading={this.state.nodeLoading}
                             sortFoldersFirst={true}
                             currentlyViewedEntry={this.state.currentlyViewedEntry}
@@ -490,32 +539,20 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
                             initialSelected={this.state.selected}
                             initialHighlighted={this.state.highlighted}
                             searchValue={this.state.searchValue}
+                            searchScope={this.state.selectedTab}
+                            showOwner={true}
+                            megaListItemHeight={34}
                             minSearchLength={MIN_SEARCH_LENGTH}
                             onExpand={this.onExpand}
-                            viewMode={viewMode}
+                            viewMode={0}
+                            shortGrid={this.props.shortGrid || true}
+                            hideIncoming={this.props.hideIncoming}
 
                             /* fmconfig.sortmodes integration/support */
                             initialSortBy={['name', 'asc']}
                             fmConfigSortEnabled={true}
                             fmConfigSortId="cbd"
                         />
-
-                        {isSearch && breadcrumbPath.length > 0 && <div className={`
-                            fm-breadcrumbs-wrapper add-from-cloud breadcrumbs-bottom
-                        `}>
-                            <div className="fm-breadcrumbs-block">
-                                <Breadcrumbs
-                                    nodeId={entryId}
-                                    path={breadcrumbPath}
-                                    onNodeClick={this.onBreadcrumbNodeClick}
-                                    isSearch={isSearch}
-                                    /* trigger re-render */
-                                    highlighted={this.state.highlighted}
-                                    currentlyViewedEntry={this.state.currentlyViewedEntry}
-                                />
-                                <div className="clear"></div>
-                            </div>
-                        </div>}
                     </div>
                 </section>
             </ModalDialogsUI.ModalDialog>

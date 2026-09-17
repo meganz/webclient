@@ -5,7 +5,7 @@ lazy(self, 'support', () => {
     let langGha, $deviceInput, $emailInput, acceptReadArticlesCheckbox, otpInputs,
         $defaultHiddenElements, $messageInputTextArea, successCtaContainer, supportType,
         $hideOnShowEmailVerifyForm, $hideOnEmailVerifyCall, submittedBlockPrimaryCta, submittedBlockSecondaryCta,
-        $s4ConnectionInfoInput, $s4RequestId, $s4LogsInput, $s4ResponseMessageInput, $s4MessageInput,
+        $s4ConnectionInfoInput, $s4RequestId, $s4ResponseMessageInput, $s4MessageInput,
         $s4StartDatePicker, $s4EndDatePicker, s4StartTimePicker, s4EndTimePicker, selectedCategory,
         tooManyOtpResendMsgReqTimer, s4SubFormReady;
     let prevSelectedCategory = null;
@@ -21,6 +21,58 @@ lazy(self, 'support', () => {
     const minLetters = 30;
     const undoHooksOnDiffSlugSelect = new Set();
     const s4EndpointCheckboxes = [];
+    const attachments = [];
+    const ATTACH_TOTAL_MAX = 10 * 1024 * 1024;
+    const ATTACH_MAX_FILES = 5;
+    const MIME_JPEG = 'image/jpeg';
+    const MIME_TEXT = 'text/plain';
+    const ATTACH_TYPES = Object.freeze([
+        MIME_JPEG,
+        'image/png',
+        'image/gif',
+        'image/webp',
+        'image/bmp',
+        'image/heic',
+        'image/heif',
+        'application/pdf',
+        'application/json',
+        'application/xml',
+        MIME_TEXT,
+        'text/csv'
+    ]);
+    const ATTACH_EXT_TYPES = Object.freeze({
+        bmp: 'image/bmp',
+        conf: MIME_TEXT,
+        csv: 'text/csv',
+        gif: 'image/gif',
+        heic: 'image/heic',
+        heif: 'image/heif',
+        ini: MIME_TEXT,
+        jfif: MIME_JPEG,
+        jpe: MIME_JPEG,
+        jpeg: MIME_JPEG,
+        jpg: MIME_JPEG,
+        json: 'application/json',
+        log: MIME_TEXT,
+        md: MIME_TEXT,
+        pdf: 'application/pdf',
+        pjp: MIME_JPEG,
+        pjpeg: MIME_JPEG,
+        png: 'image/png',
+        txt: MIME_TEXT,
+        webp: 'image/webp',
+        xml: 'application/xml'
+    });
+    const attachTotal = () => attachments.reduce((n, f) => n + f.size, 0);
+    const nameTaken = name => attachments.some(a => a.name === name);
+    const attachType = file => {
+        const type = String(file.type || '').toLowerCase();
+
+        if (ATTACH_TYPES.includes(type)) {
+            return type;
+        }
+        return ATTACH_EXT_TYPES[fileext(file.name)] || '';
+    };
 
     // lang setup start
 
@@ -114,6 +166,19 @@ lazy(self, 'support', () => {
     };
     const isEndpointsChecked = () => dom.$s4EndpointList.length &&
         $('.endpoint-checkbox input:checked', dom.$s4EndpointList).length;
+    const attachErr = msg => {
+        const {attachmentsError: err, dropzone} = dom;
+
+        if (err) {
+            if (msg) {
+                err.querySelector('span').textContent = msg;
+            }
+            err.classList.toggle('hidden', !msg);
+        }
+        if (dropzone) {
+            dropzone.classList.toggle('error-border', !!msg);
+        }
+    };
     const clearAllS4Errors = () => {
         if (!dom.$s4SubForm || !dom.$s4SubForm.length) {
             return;
@@ -124,23 +189,343 @@ lazy(self, 'support', () => {
         setFieldError(dom.$s4ConnectionError, boxOf($s4ConnectionInfoInput), false);
         setFieldError(dom.$s4RequestIdError, boxOf($s4RequestId), false);
         setFieldError(dom.$s4ResponseMessageError, dom.$s4ResponseMessageInfo, false);
-        setFieldError(dom.$s4LogsError, boxOf($s4LogsInput), false);
+        attachErr('');
         setFieldError(dom.$s4MessageError, dom.$s4Message, false);
     };
     const undoS4Handle = () => {
         $defaultHiddenElements = dom.$commonHidden;
         $defaultHiddenElements.toggleClass('hidden', !acceptReadArticlesCheckbox.checked);
-        dom.$s4SubForm.addClass('hidden');
+        dom.$s4Only.addClass('hidden');
         clearAllS4Errors();
         undoHooksOnDiffSlugSelect.delete(undoS4Handle);
     };
-    const S4_MAX_LEN = Object.freeze({connection: 400, requestId: 400, logs: 400, response: 2000, message: 5000});
+    const S4_MAX_LEN = Object.freeze({connection: 400, requestId: 400, response: 2000, message: 5000});
     const maxCharsError = max => l.support_max_chars_error.replace('%1', mega.intl.decimal.format(max));
     const showFieldError = ($err, $box, msg) => {
         if (msg) {
             $('span', $err).text(msg);
         }
         setFieldError($err, $box, !!msg);
+    };
+    const stopEv = ev => {
+        ev.preventDefault();
+        ev.stopPropagation();
+    };
+    const safeFileName = name => M.getSafeName(name || 'file');
+    const attachmentRow = (file, idx) => {
+        const name = safeFileName(file.name);
+        const li = mCreateElement('li', {class: 'attachment-row', 'data-idx': `${idx}`});
+        const slug = tryCatch(() => fileIcon({name}))() || 'generic';
+
+        mCreateElement('i', {class: `item-type-icon icon-${slug}-24`}, li);
+        mCreateElement('span', {class: 'attachment-name'}, li).textContent = name;
+        mCreateElement('span', {class: 'attachment-size'}, li).textContent = bytesToSize(file.size);
+
+        const btn = mCreateElement('button', {
+            type: 'button',
+            class: 'attachment-remove',
+            'aria-label': l.attachment_remove.replace('%1', name)
+        }, li);
+        mCreateElement('i', {class: `${mega.ui.sprites.mono} icon-dialog-close`}, btn);
+
+        return li;
+    };
+    const renderAttachments = () => {
+        const {attachmentList: list} = dom;
+
+        list.textContent = '';
+        for (let i = 0; i < attachments.length; ++i) {
+            list.appendChild(attachmentRow(attachments[i], i));
+        }
+        dom.dropzone.classList.toggle('populated', attachments.length > 0);
+    };
+    const attachNames = a => a.slice(0, 3).join(', ') + (a.length > 3 ? ', \u2026' : '');
+    const attachViolation = () => {
+        const huge = attachments.find(f => f.size > ATTACH_TOTAL_MAX);
+
+        if (huge) {
+            return l.attachment_file_size
+                .replace('%1', safeFileName(huge.name))
+                .replace('%2', bytesToSize(ATTACH_TOTAL_MAX, 0));
+        }
+        if (attachments.length > ATTACH_MAX_FILES) {
+            return l.attachment_max_files
+                .replace('%1', ATTACH_MAX_FILES)
+                .replace('%2', attachments.length - ATTACH_MAX_FILES);
+        }
+        if (attachTotal() > ATTACH_TOTAL_MAX) {
+            return l.attachment_total_size.replace('%1', bytesToSize(ATTACH_TOTAL_MAX, 0));
+        }
+        return '';
+    };
+    const attachRejectMsg = rejected => {
+        if (rejected.type.length) {
+            return rejected.type.length > 1
+                ? l.attachment_type_error_multi
+                : l.attachment_type_error.replace('%1', rejected.type[0]);
+        }
+        if (rejected.empty.length) {
+            return l.attachment_empty_error.replace('%1', attachNames(rejected.empty));
+        }
+        return '';
+    };
+    const syncAttachSubmit = () => {
+        if (dom.$submitButton) {
+            dom.$submitButton.toggleClass('disabled', !!attachViolation());
+        }
+    };
+
+    /**
+     * Re-render, then show whichever message applies.
+     *
+     * A blocking violation wins over add-time feedback: it is what stops submission and it has to
+     * survive later renders, whereas a turned-away file is one-shot feedback.
+     *
+     * @param {String} [transient] Message about files that were not accepted at all
+     * @returns {void}
+     */
+    const attachRefresh = transient => {
+        renderAttachments();
+        attachErr(attachViolation() || transient || '');
+        syncAttachSubmit();
+    };
+    const promptDuplicate = name => new Promise(resolve => {
+        let settled = false;
+        const settle = choice => {
+            if (!settled) {
+                settled = true;
+                resolve(choice);
+            }
+        };
+
+        const dialog = new MDialog({
+            dialogName: 'support-attachment-duplicate',
+            dialogClasses: 'support-attachment-duplicate',
+            icon: is_mobile ? `${mega.ui.sprites.mono} icon-alert-triangle-thin-outline` : undefined,
+            closeIcon: 'icon-dialog-close-thin',
+            ok: {label: l.attachment_replace, callback: () => settle('replace')},
+            cancel: {
+                label: l.attachment_keep_both,
+                // The close X routes through the cancel action as well, only with status === false --
+                // without this check, dismissing the dialog would silently keep both.
+                callback: status => settle(status === false ? 'skip' : 'both')
+            },
+            // Desktop: overlay click and Escape bypass the cancel action and land here.
+            // Mobile: reached after ok/cancel, which the settle() guard absorbs.
+            onclose: () => settle('skip'),
+            setContent() {
+                const p = document.createElement('p');
+                if (is_mobile) {
+                    p.className = 'px-6';
+                }
+                p.textContent = l[16486].replace('%1', name);
+                this.slot = p;
+            }
+        });
+
+        dialog.title = l[16485];
+        dialog.show();
+    });
+    const addAttachments = async files => {
+        const rejected = {type: [], empty: []};
+
+        for (let i = 0; i < files.length; ++i) {
+            const f = files[i];
+
+            // A drop bypasses the input's accept attribute, so the type has to be checked here regardless.
+            if (!attachType(f)) {
+                rejected.type.push(safeFileName(f.name));
+                continue;
+            }
+            if (!f.size) {
+                rejected.empty.push(safeFileName(f.name));
+                continue;
+            }
+
+            const clash = attachments.findIndex(a => a.name === f.name);
+
+            if (clash !== -1) {
+                const choice = await promptDuplicate(safeFileName(f.name));
+
+                if (choice === 'skip') {
+                    continue;
+                }
+                if (choice === 'replace') {
+                    attachments.splice(clash, 1, f);
+                    attachRefresh();
+                    continue;
+                }
+
+                let name = f.name;
+
+                do {
+                    name = fileconflict.getNewName(name);
+                } while (nameTaken(name));
+
+                Object.defineProperty(f, 'name', {value: name});
+            }
+
+            attachments.push(f);
+            attachRefresh();
+        }
+        attachRefresh(attachRejectMsg(rejected));
+    };
+    const removeAttachment = idx => {
+        attachments.splice(idx, 1);
+        // Re-validate rather than clear: removing one of six files still leaves five over the limit.
+        attachRefresh();
+
+        const rows = dom.attachmentList.children;
+        const next = rows[Math.min(idx, rows.length - 1)];
+        const focus = next
+            ? next.querySelector('.attachment-remove')
+            : dom.dropzone.querySelector('button.browse');
+
+        if (focus) {
+            focus.focus();
+        }
+    };
+    const bindDropzone = (zone, input) => {
+        zone.addEventListener('click', ev => {
+            const btn = ev.target.closest('.attachment-remove');
+
+            if (btn) {
+                removeAttachment(+btn.parentNode.dataset.idx);
+            }
+            else if (ev.target !== input && !ev.target.closest('.attachment-row')) {
+                // Covers a click anywhere on the box, a click on "browse", and Enter/Space on "browse"
+                // (keyboard activation dispatches a real bubbling click), plus tap-to-browse on mobile.
+                // Skipping ev.target === input keeps the synthetic click below from bouncing back here.
+                input.click();
+            }
+        });
+        input.addEventListener('change', () => {
+            addAttachments([...input.files]).catch(dump);
+            // Without this, re-picking a file that was removed fires no change event at all.
+            input.value = '';
+        });
+
+        let depth = 0;
+        const setDrag = on => zone.classList.toggle('dragging', on);
+
+        zone.addEventListener('dragenter', ev => {
+            stopEv(ev);
+            ++depth;
+            setDrag(true);
+        });
+        zone.addEventListener('dragover', ev => {
+            stopEv(ev);
+            if (ev.dataTransfer) {
+                ev.dataTransfer.dropEffect = 'copy';
+            }
+        });
+        zone.addEventListener('dragleave', ev => {
+            stopEv(ev);
+            if (--depth < 1) {
+                depth = 0;
+                setDrag(false);
+            }
+        });
+        zone.addEventListener('drop', ev => {
+            stopEv(ev);
+            // No dragleave fires after a drop, so reset the counter or the box stays in the drag-over state.
+            depth = 0;
+            setDrag(false);
+
+            if (M.checkFolderDrop(ev)) {
+                attachErr(l.attachment_folder_error);
+                return;
+            }
+            // Read dataTransfer directly rather than via factory('file-list'), which re-sorts by size and
+            // would scramble the order the files are listed in; its directory walk is moot as folders are
+            // rejected above.
+            addAttachments([...Object(ev.dataTransfer).files || []]).catch(dump);
+        });
+    };
+    const createDropzone = () => {
+        const zone = mCreateElement('div', {class: 'attachments-dropzone'}, dom.attachmentsHost);
+        const input = mCreateElement('input', {
+            type: 'file',
+            multiple: 'multiple',
+            // iOS resolves each accept entry to a UTI rather than matching filenames, so extensions it has no
+            // UTI for fall back to public.data and end up greyed out in the picker.
+            ...is_ios ? {} : {
+                accept: [
+                    ...ATTACH_TYPES,
+                    ...Object.keys(ATTACH_EXT_TYPES).map(e => `.${e}`)
+                ].join(',')
+            },
+            class: 'hidden',
+            id: 'attachments-input'
+        }, zone);
+        const prompt = mCreateElement('div', {class: 'prompt'}, zone);
+        const [pre, post] = is_mobile
+            ? ['', l.attachments_tap_prompt]
+            : l.attachments_drag_prompt.split(/\[A]|\[\/A]/).filter(Boolean);
+        prompt.appendChild(document.createTextNode(pre || ''));
+        mCreateElement('button', {
+            type: 'button',
+            class: 'link browse',
+            'aria-describedby': 'attachments-hint'
+        }, prompt).textContent = post || '';
+
+        mCreateElement('span', {
+            class: 'hint',
+            id: 'attachments-hint'
+        }, zone).textContent = l.attachments_max_size;
+
+        dom.attachmentList = mCreateElement('ul', {class: 'attachment-list'}, zone);
+        dom.dropzone = zone;
+
+        const addMore = mCreateElement('button', {
+            type: 'button',
+            class: 'attachments-add-more'
+        }, dom.attachmentsHost);
+        mCreateElement('i', {class: `${mega.ui.sprites.mono} icon-plus-thin-outline`}, addMore);
+        mCreateElement('span', {}, addMore).textContent = l.attachment_add_more;
+        addMore.addEventListener('click', () => input.click());
+
+        bindDropzone(zone, input);
+    };
+
+    /**
+     * Encode one attachment for the 'sse' `f` array.
+     *
+     * readAsDataURL is used rather than ab_to_base64() because the latter goes through ab_to_str(), which
+     * concatenates one String.fromCharCode per byte - a multi-second main thread stall for a 10MB file.
+     *
+     * @param {File} file The file to encode
+     * @returns {Promise<Object>} {n, t, d}, with n/d as unpadded base64url
+     */
+    const fileToPayload = async(file) => {
+        const url = await M.readBlob(file, 'readAsDataURL');
+
+        return {
+            n: base64urlencode(to8(safeFileName(file.name))),
+            // Unencoded. Resolved rather than taken raw so a .log admitted as text/plain sends that,
+            // instead of the empty File.type the browser gave it.
+            t: attachType(file),
+            // Single pass, matching base64urlencode()'s own transform. Padding only occurs at the end,
+            // so stripping '=' globally is equivalent and avoids a second scan of a ~13MB string.
+            d: url.slice(url.indexOf(',') + 1).replace(/[+/=]/g, c => c === '+' ? '-' : c === '/' ? '_' : '')
+        };
+    };
+    const attachFiles = async(requestOptions) => {
+
+        // Encoded together rather than one at a time: ATTACH_TOTAL_MAX and ATTACH_MAX_FILES cap this at
+        // ~10MB of reads plus ~13MB of base64, so holding them all at once is cheap and needs no chaining.
+        const out = await Promise.all(attachments.map(file => fileToPayload(file).catch(dump)));
+        const failed = out.findIndex(payload => !payload);
+
+        if (failed > -1) {
+            attachErr(l.attachment_read_error);
+            return false;
+        }
+
+        if (out.length) {
+            requestOptions.f = out;
+        }
+        return true;
     };
     const s4FieldError = {
         connection: live => {
@@ -157,10 +542,6 @@ lazy(self, 'support', () => {
             const v = $s4ResponseMessageInput.val();
             return v.length > S4_MAX_LEN.response ? maxCharsError(S4_MAX_LEN.response) : '';
         },
-        logs: () => {
-            const v = $s4LogsInput.val();
-            return v.length > S4_MAX_LEN.logs ? maxCharsError(S4_MAX_LEN.logs) : '';
-        },
         message: live => {
             const v = $s4MessageInput.val();
             const t = v.trim();
@@ -173,7 +554,6 @@ lazy(self, 'support', () => {
         connection: () => [dom.$s4ConnectionError, boxOf($s4ConnectionInfoInput)],
         requestId: () => [dom.$s4RequestIdError, boxOf($s4RequestId)],
         response: () => [dom.$s4ResponseMessageError, dom.$s4ResponseMessageInfo],
-        logs: () => [dom.$s4LogsError, boxOf($s4LogsInput)],
         message: () => [dom.$s4MessageError, dom.$s4Message],
     };
     const applyS4FieldError = (key, live) => {
@@ -251,7 +631,6 @@ lazy(self, 'support', () => {
         put('connection', $s4ConnectionInfoInput.val());
         put('request_id', $s4RequestId.val());
         put('response_message', $s4ResponseMessageInput.val());
-        put('logs', $s4LogsInput.val());
 
         return x;
     };
@@ -411,7 +790,7 @@ lazy(self, 'support', () => {
     const s4Handle = () => {
         undoHooksOnDiffSlugSelect.add(undoS4Handle);
         $defaultHiddenElements.addClass('hidden');
-        $defaultHiddenElements = dom.$s4SubForm.add(dom.$submitButton);
+        $defaultHiddenElements = dom.$s4Only.add(dom.$submitButton).add(dom.attachmentsWrapper);
 
         if (dom.$messageError) {
             dom.$messageError.addClass('hidden');
@@ -481,15 +860,6 @@ lazy(self, 'support', () => {
         }
         if (!$s4ResponseMessageInput) {
             $s4ResponseMessageInput = createTextareaInput(dom.$s4ResponseMessageInfo, s4ResponsePlaceholder);
-        }
-        if (!$s4LogsInput) {
-            const input = mCreateElement('input', {
-                type: 'text',
-                class: 'underlinedText no-title-top',
-                placeholder: l.s4_logs_placeholder,
-                'data-wrapper-class': 'box-style mobile'
-            }, dom.$s4Logs[0]);
-            $s4LogsInput = new mega.ui.MegaInputs($(input)).$input;
         }
         if (!$s4MessageInput) {
             $s4MessageInput = createTextareaInput(dom.$s4Message, l.s4_message_placeholder);
@@ -573,7 +943,6 @@ lazy(self, 'support', () => {
         $s4ConnectionInfoInput.rebind('input.s4err', () => applyS4FieldError('connection', true));
         $s4RequestId.rebind('input.s4err', () => applyS4FieldError('requestId', true));
         $s4ResponseMessageInput.rebind('input.s4err', () => applyS4FieldError('response', true));
-        $s4LogsInput.rebind('input.s4err', () => applyS4FieldError('logs', true));
         $s4MessageInput.rebind('input.s4err', () => applyS4FieldError('message', true));
 
         s4SubFormReady = true;
@@ -673,8 +1042,10 @@ lazy(self, 'support', () => {
         dom.$s4ConnectionInfo = $('.connection-info', dom.$s4SubForm);
         dom.$s4RequestIdInfo = $('.req-id-info', dom.$s4SubForm);
         dom.$s4ResponseMessageInfo = $('.response-message', dom.$s4SubForm);
-        dom.$s4Logs = $('.logs', dom.$s4SubForm);
-        dom.$s4Message = $('.s4-message', dom.$s4SubForm);
+        // The description and the S4 banner live outside .s4-issue-form so they can follow the
+        // attachments field, so they are scoped to the page and hidden via the .s4-only set.
+        dom.$s4Only = $('.s4-only', dom.$page);
+        dom.$s4Message = $('.s4-message', dom.$page);
         dom.$s4TimeInputs = $('.time-inputs', dom.$s4SubForm);
         dom.$s4StartDateInput = $('.time-input-row.start .date-input', dom.$s4TimeInputs);
         dom.$s4StartTimeInput = $('.time-input-row.start .time-input', dom.$s4TimeInputs);
@@ -689,11 +1060,13 @@ lazy(self, 'support', () => {
         dom.$s4ConnectionError = $('.connection-error', dom.$s4SubForm);
         dom.$s4RequestIdError = $('.req-id-error', dom.$s4SubForm);
         dom.$s4ResponseMessageError = $('.response-message-error', dom.$s4SubForm);
-        dom.$s4LogsError = $('.logs-error', dom.$s4SubForm);
-        dom.$s4MessageError = $('.s4-message-error', dom.$s4SubForm);
+        dom.attachmentsWrapper = dom.$submissionFlow[0].querySelector('.attachments-wrapper');
+        dom.attachmentsHost = dom.attachmentsWrapper.querySelector('.attachments');
+        dom.attachmentsError = dom.attachmentsWrapper.querySelector('.attachments-error');
+        dom.$s4MessageError = $('.s4-message-error', dom.$page);
         dom.$inputHosts = dom.$s4ConnectionInfo
             .add(dom.$s4RequestIdInfo)
-            .add(dom.$s4Logs)
+            .add(dom.attachmentsHost)
             .add(dom.$s4ResponseMessageInfo)
             .add(dom.$s4Message)
             .add(dom.$s4DateTimeInputs)
@@ -1104,6 +1477,19 @@ lazy(self, 'support', () => {
                 return false;
             }
 
+            // Count/size limits are validated rather than enforced on add, so this is what actually
+            // stops an over-limit set being sent. Kept as a hard guard, not just the disabled class.
+            const violation = attachViolation();
+
+            if (violation) {
+                attachErr(violation);
+                syncAttachSubmit();
+                if (dom.dropzone) {
+                    dom.dropzone.scrollIntoView({block: 'center'});
+                }
+                return false;
+            }
+
             const message = isS4Flow ? $s4MessageInput.val().trim() : $messageInputTextArea.val().trim();
 
             dom.$messageError.addClass('hidden');
@@ -1129,13 +1515,33 @@ lazy(self, 'support', () => {
                 requestOptions.d = base64urlencode(to8($deviceInput.val().trim()));
             }
             loadingDialog.show();
-            const response = await api.req(requestOptions).catch(ex => {
+
+            // Encoded here rather than on add: peak memory is the same either way, but at this point the
+            // loading dialog is up to account for the pause.
+            if (!await attachFiles(requestOptions)) {
+                loadingDialog.hide();
+                dom.$submitButton.removeClass('disabled');
+                return false;
+            }
+            const response = await api.req(requestOptions, {
+                // The payload can reach tens of MB; skip the JSON.stringify() dedup key that would retain
+                // another full copy of it.
+                dedup: false
+            }).catch(ex => {
                 if (ex === -6) {
                     msgDialog(
                         'warningb',
                         l[34],
                         l.too_many_support_requests,
                         l[253]
+                    );
+                }
+                else if (ex === -12) {
+                    msgDialog(
+                        'error',
+                        null,
+                        l[200],
+                        l.attachment_server_invalid_file
                     );
                 }
                 else {
@@ -1167,6 +1573,9 @@ lazy(self, 'support', () => {
                 acceptReadArticlesCheckbox.checked = false;
                 $deviceInput.val('');
                 $messageInputTextArea.val('').trigger('input');
+                attachments.length = 0;
+                renderAttachments();
+                attachErr('');
 
                 if (s4SubFormReady) {
                     dom.$s4SubForm[0].componentSelectorAll('.endpoint-checkbox').forEach(c => {
@@ -1175,7 +1584,6 @@ lazy(self, 'support', () => {
                     $s4ConnectionInfoInput.val('');
                     $s4RequestId.val('');
                     $s4ResponseMessageInput.val('');
-                    $s4LogsInput.val('');
                     $s4MessageInput.val('');
                     if (is_mobile) {
                         $s4StartDatePicker.value = '';
@@ -1218,6 +1626,11 @@ lazy(self, 'support', () => {
                 dom.$messageTxtAreaWrapper,
                 l.support_page_message_input_placeholder
             );
+        }
+
+        // create the attachments dropzone - built here, not in s4Handle(), as it serves both flows
+        if (!dom.dropzone) {
+            createDropzone();
         }
         // create accept checkbox
         if (!acceptReadArticlesCheckbox) {
@@ -1476,9 +1889,9 @@ lazy(self, 'support', () => {
         if (dom.$inputHosts && dom.$inputHosts.length) {
             dom.$inputHosts.empty();
         }
+        attachments.length = 0;
         $s4ConnectionInfoInput = null;
         $s4RequestId = null;
-        $s4LogsInput = null;
         $s4ResponseMessageInput = null;
         $s4MessageInput = null;
         $deviceInput = null;

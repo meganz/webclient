@@ -351,7 +351,8 @@ table tr.ui-selected .grid-file-request-manage {
 .grid-table.fm.v-versions [megatype="versions"],
 .grid-table.fm.v-playtime [megatype="playtime"],
 .grid-table.fm.v-extras [megatype="extras"],
-.grid-table.fm.v-fileLoc [megatype="fileLoc"] {
+.grid-table.fm.v-fileLoc [megatype="fileLoc"],
+.grid-table.fm.v-fru [megatype="fru"] {
     display: table-cell;
 }
 .grid-table.fm td.space-maintainer-start {
@@ -744,6 +745,7 @@ table.grid-table tbody i.icon-more-vertical-thin-outline:not(.verified-user-icon
     --icon-size: 16px;
     background-color: var(--mobile-page-background);
     border-radius: 2px;
+    box-sizing: content-box;
     padding: 4px;
     position: relative;
     cursor: pointer;
@@ -1327,11 +1329,9 @@ table.out-shares .fm-chat-users {
 .user-management-scroll.ps > .ps__rail-y {
     margin-top: 58px;
 }
-.contacts-list .grid-scrolling-table.ps > .ps__rail-y {
-    margin-top: 24px;
-}
-.add-from-cloud-dialog .grid-scrolling-table.ps > .ps__rail-y {
-    margin-top: 34px;
+.contacts-list .grid-scrolling-table.ps > .ps__rail-y,
+.attach-cloud-dialog .grid-scrolling-table.ps > .ps__rail-y {
+    margin-top: 60px;
 }
 
 /* ======================================== *\
@@ -1351,6 +1351,7 @@ table.out-shares .fm-chat-users {
 .arrow:not(.grid-header-star) {
     --icon-size: 16px;
     --mask-color: var(--mobile-icon-secondary);
+    box-sizing: content-box;
     cursor: pointer;
     display: block;
     width: 100%;

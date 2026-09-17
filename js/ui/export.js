@@ -11,7 +11,7 @@
  * algorithm || file/folder || public handle || salt || encrypted key || MAC tag
  *
  * algorithm = 1 byte - A byte to identify which algorithm was used (for future upgradability), initially is set to 0
- * file/folder = 1 byte - A byte to identify if the link is a file or folder link (0 = folder, 1 = file)
+ * file/folder/drop = 1 byte - A byte to identify if the link is a file or folder link (0 = folder, 1 = file, 2 = drop)
  * public handle = 6 bytes - The public folder/file handle
  * salt = 32 bytes - A 256 bit randomly generated salt
  * encrypted key = 16 or 32 bytes - The encrypted actual folder or file key
@@ -79,6 +79,7 @@ var exportPassword = {
      */
     LINK_TYPE_FOLDER: 0,    // 1 byte (0x00)
     LINK_TYPE_FILE: 1,      // 1 byte (0x01)
+    LINK_TYPE_DROP: 2,      // 1 byte (0x02)
 
 
     /**
@@ -267,7 +268,7 @@ var exportPassword = {
             // Construct URL: #P! for password link + encoded(alg + folder/file + handle + salt + encrypted key + mac)
             var protectedUrl = getBaseUrl() + '/#P!' + dataBase64UrlEncoded;
 
-            if (is_mobile) {
+            if (is_mobile && linkInfo.type !== exportPassword.LINK_TYPE_DROP) {
                 mobile.linkManagement.pwdProtectedLink = protectedUrl;
             }
             else {
@@ -462,9 +463,23 @@ var exportPassword = {
                 var handleBytes = dataToVerify.subarray(2, 8);
                 var handleUrlEncoded = exportPassword.base64UrlEncode(handleBytes);
                 var decryptedKeyUrlEncoded = exportPassword.base64UrlEncode(decryptedKey);
-                var folderIdentifier = (linkType === exportPassword.LINK_TYPE_FOLDER) ? 'F' : '';
 
-                const url = `${folderIdentifier ? '/folder/' : '/file/'}${handleUrlEncoded}#${decryptedKeyUrlEncoded}`;
+                let url = '';
+                if (linkType === exportPassword.LINK_TYPE_FOLDER) {
+                    url = `/folder/${handleUrlEncoded}#${decryptedKeyUrlEncoded}`;
+                }
+                else if (linkType === exportPassword.LINK_TYPE_FILE) {
+                    url = `/file/${handleUrlEncoded}#${decryptedKeyUrlEncoded}`;
+                }
+                else if (linkType === exportPassword.LINK_TYPE_DROP) {
+                    const handleLength = parseInt(handleUrlEncoded.substring(2), 10);
+                    const handle = exportPassword.base64UrlEncode(decryptedKey.subarray(0, handleLength));
+                    is_megadrop = handle;
+                    url = `/filerequest/${handle}`;
+                    if (mega.ui.header) {
+                        mega.ui.header.hide();
+                    }
+                }
 
                 // Add a log to see if the feature is used often
                 api_req({ a: 'log', e: 99633, m: 'Successfully decrypted password protected link on regular web' });

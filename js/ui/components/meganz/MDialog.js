@@ -7,6 +7,7 @@ class MDialog extends MComponent {
      * @param {String} [data.titleClasses] Additional classes for dialog
      * @param {String} [data.contentClasses] Additional classes for dialog content
      * @param {String} [data.icon] Classes for the side icon on the left
+     * @param {String} [data.closeIcon] Sprite class for the close button glyph, defaults to icon-dialog-close
      * @param {Function} [data.onclose] Callback to trigger when the dialog is closed
      * @param {Boolean} [data.dialogName] Unique name for the dialog
      * @param {Function} [data.setContent] Default content function
@@ -17,6 +18,7 @@ class MDialog extends MComponent {
         dialogClasses,
         contentClasses,
         icon,
+        closeIcon,
         onclose,
         dialogName,
         setContent,
@@ -33,6 +35,7 @@ class MDialog extends MComponent {
 
         this.onclose = onclose;
         this._dialogName = dialogName || 'm-dialog';
+        this._closeIcon = closeIcon || 'icon-dialog-close';
 
         if (icon) {
             this.icon = document.createElement('i');
@@ -239,7 +242,7 @@ class MDialog extends MComponent {
         this.el.appendChild(closeBtn);
 
         const closeIcon = document.createElement('i');
-        closeIcon.className = 'sprite-fm-mono icon-dialog-close';
+        closeIcon.className = `sprite-fm-mono ${this._closeIcon}`;
         closeBtn.appendChild(closeIcon);
 
         this.el.appendChild(this._title);

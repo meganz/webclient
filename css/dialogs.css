@@ -272,6 +272,40 @@ body.de .mega-dialog.contact-picker-widget {
 }
 /*end of New group chat dialog */
 
+.mega-dialog .fm-dialog-tabs::after {
+    display: block;
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 100%;
+    border-bottom: 1px solid var(--stroke-grey-2);
+}
+.fm-dialog-tabs {
+    border-bottom: 1px solid var(--stroke-grey-2);
+    padding: 26px 0 0 0;
+}
+.fm-dialog-tab {
+    position: relative;
+    cursor: pointer;
+    font: var(--text-h3);
+    color: var(--text-color-medium);
+    padding: 0 24px 0 24px;
+    border-bottom: 2px solid transparent;
+    float: left;
+    box-sizing: border-box;
+    height: 32px;
+    margin-bottom: -1px;
+    z-index: 1;
+}
+.rtl .fm-dialog-tab {
+    float: right;
+}
+.fm-dialog-tab.active {
+    border-color: var(--stroke-info);
+    color: var(--text-color-high);
+    cursor: default;
+}
+
 /* Delete message dialog */
 .message.body.dialog-wrapper {
     border: 1px solid rgba(0,0,0,0.05);

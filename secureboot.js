@@ -434,6 +434,9 @@ function getCleanSitePath(path) {
         if (path.mct) {
             window.uTagMCT = path.mct;
         }
+        if (path.mctp) {
+            window.uTagMCTP = path.mctp;
+        }
         if (path.miojid) {
             window.uTagMJID = path.miojid;
         }
@@ -2537,6 +2540,7 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
     jsl.push({f:'js/fm/linkinfohelper.js', n: 'fm_linkinfohelper_js', j: 1});
     jsl.push({f:'js/eaffiliate.js', n: 'eaffiliate_js', j: 1});
+    jsl.push({f:'js/utags.js', n: 'utags_js', j: 1});
     jsl.push({f:'js/ui/share-dialog.js', n: 'fm_share_js', j: 1});
     jsl.push({f:'js/ui/share-unverified-contacts-dialog.js', n: 'fm_share_unverified_contacts_js', j: 1});
     jsl.push({f:'js/ui/share-collaborators-dialog.js', n: 'fm_share_collaborators_js', j: 1});
@@ -4421,69 +4425,6 @@ mBroadcaster.once('startMega', function() {
         delete sessionStorage.sitet;
         onIdle(function() {
             M.transferFromMegaCoNz(data);
-        });
-    }
-
-    if (window.uTagMT) {
-        var mt = window.uTagMT;
-        delete window.uTagMT;
-
-        onIdle(function() {
-            api.req({a: 'mrt', t: mt}).dump('uTagMT');
-        });
-    }
-
-    if (window.uTagMCT) {
-        onIdle(function() {
-            eventlog(99988, window.uTagMCT);
-
-            var mctRec = tryCatch(function() {
-                if (localStorage.mctRec) {
-                    var stored = JSON.parse(localStorage.mctRec);
-                    if (Array.isArray(stored)) {
-                        return stored;
-                    }
-                }
-            }, false)() || [];
-
-            var tagEntry = null;
-
-            for (var i = 0; i < mctRec.length; i++) {
-                if (mctRec[i] && mctRec[i].tag === window.uTagMCT) {
-                    tagEntry = mctRec[i];
-                    break;
-                }
-            }
-
-            if (!tagEntry) {
-                tagEntry = {tag: window.uTagMCT};
-                mctRec.push(tagEntry);
-
-                if (mctRec.length > 20) {
-                    mctRec.shift();
-                }
-            }
-
-            if (!Array.isArray(tagEntry.ts)) {
-                tagEntry.ts = [];
-            }
-
-            tagEntry.ts.push(Date.now());
-
-            if (tagEntry.ts.length > 5) {
-                tagEntry.ts.shift();
-            }
-
-            localStorage.mctRec = JSON.stringify(mctRec);
-
-            delete window.uTagMCT;
-        });
-    }
-
-    if (window.uTagMJID && self.u_attr) {
-        onIdle(function() {
-            api.req({ a: 'log', e: 500674, j: window.uTagMJID }).dump('miojid');
-            delete window.uTagMJID;
         });
     }
 

@@ -784,8 +784,7 @@ MegaData.prototype.showPlanExpiringBanner = async function(data) {
     const today = new Date();
     if (today.getTime() > expiry * 1000) {
         M.delPersistentData('planexp-last').catch(nop);
-        data.slevel = data.slevel || slevel || account.slevel;
-        return M.showPlanExpiredBanner(data);
+        return M.showPlanExpiredBanner(slevel || account.slevel || u_attr.p);
     }
     if (account.nextplan || today.getTime() < (account.suntil - 4 * 86400) * 1000) {
         return;
@@ -797,6 +796,7 @@ MegaData.prototype.showPlanExpiringBanner = async function(data) {
 
     curr.shown = today.setDate(today.getDate() + 1);
     M.setPersistentData('planexp-last', curr).catch(dump);
+    eventlog(501419);
 
     const planName = pro.getProPlanName(slevel);
     const options = {
@@ -870,6 +870,7 @@ MegaData.prototype.showPaymentFailedBanner = async function() {
             break;
         }
     }
+    isCancelled = isCancelled || !expiry && !subs.some(({ next }) => next > unixtime());
     if (!renewPassed && !lastShow.id) {
         return;
     }
@@ -890,6 +891,7 @@ MegaData.prototype.showPaymentFailedBanner = async function() {
     };
     const planName = pro.getProPlanName(lastShow.al);
     if (isCancelled) {
+        eventlog(501418);
         options.title = l.payment_cancel_banner_title;
         options.msgText = l.payment_cancel_banner_text.replace('%s', planName);
         options.ctaText = l.upgrade_now;
@@ -898,6 +900,7 @@ MegaData.prototype.showPaymentFailedBanner = async function() {
         options.closeEvent = 500864;
     }
     else if (expiry) {
+        eventlog(501417);
         options.title = l[25049];
         options.ctaText = l.update_card;
         options.ctaHref = is_mobile ? '/fm/account/paymentcard' : '/fm/account/plan/account-card-info';
@@ -930,10 +933,10 @@ MegaData.prototype.showPaymentFailedBanner = async function() {
     }
 };
 
-MegaData.prototype.showPlanExpiredBanner = async function(data) {
+MegaData.prototype.showPlanExpiredBanner = async function(slevel) {
     'use strict';
 
-    const { slevel } = data;
+    eventlog(501416);
     const options = {
         type: 'error',
         title: l.plan_ended_banner_title.replace('%s', pro.getProPlanName(slevel)),
@@ -1390,7 +1393,12 @@ mBroadcaster.addListener('fm:initialized', () => {
         // Try showing this banner for users with a one-off plan/sub and are still pro, or that are no longer pro.
         tSleep(4 + Math.random())
             .then(() => u_attr.p ? M.showPlanExpiringBanner() : M.showPaymentFailedBanner())
-            .catch(dump);
+            .catch((ex) => {
+                if (ex < 0) {
+                    return;
+                }
+                reportError(ex);
+            });
 
         // Try showing converted Pro Flexi to Free account
         if (sessionStorage.cnv2free || fmconfig.cnv2free !== undefined) {

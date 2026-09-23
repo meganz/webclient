@@ -3508,21 +3508,21 @@ lazy(mega.gallery, 'sections', () => {
             path: 'photos',
             icon: 'photos',
             root: 'photos',
-            filterFn: () => true,
+            filterFn: (n) => M.isGalleryNode(n),
             title: l.gallery_all_locations
         },
         [mega.gallery.secKeys.cuphotos]: {
             path: mega.gallery.secKeys.cuphotos,
             icon: 'photos',
             root: 'photos',
-            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p),
+            filterFn: (n, cameraTree) => M.isGalleryNode(n) && cameraTree && cameraTree.includes(n.p),
             title: l.gallery_camera_uploads
         },
         [mega.gallery.secKeys.cdphotos]: {
             path: mega.gallery.secKeys.cdphotos,
             icon: 'photos',
             root: 'photos',
-            filterFn: (n, cameraTree) => !cameraTree || !cameraTree.includes(n.p),
+            filterFn: (n, cameraTree) => M.isGalleryNode(n) && (!cameraTree || !cameraTree.includes(n.p)),
             title: l.gallery_from_cloud_drive
         },
         images: {

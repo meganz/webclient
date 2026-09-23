@@ -103,22 +103,34 @@
         }
         .media-viewer .slideshow-caption {
             position: absolute;
-            bottom: 8px;
-            left: 8px;
             color: var(--mobile-text-on-color);
             border-radius: 12px;
-            max-width: 20%;
-            padding: 16px;
+            padding: 8px 12px;
             text-align: start;
             background: var(--mobile-surface-transparent);
             z-index: 10;
+            transform: translate(-100%, -100%);
+            transition: opacity 10ms ease-in-out;
+            opacity: 0;
+            width: max-content;
+            box-sizing: border-box;
+        }
+        .slideshow .media-viewer .slideshow-caption {
+            transition: opacity 900ms ease-in-out;
+        }
+        .media-viewer .slideshow-caption.no-fade {
+            transition: none;
+        }
+        .media-viewer .slideshow-caption.active {
+            opacity: 1;
         }
         .media-viewer .slideshow-caption .caption-name {
-            font: var(--mobile-font-caption-large-semibold);
+            font: var(--mobile-font-heading-h1);
+            font-weight: 400;
         }
         .media-viewer .slideshow-caption .caption-desc,
         .media-viewer .slideshow-caption .caption-date {
-            font: var(--mobile-font-caption-small-regular);
+            font: var(--mobile-font-copy-regular);
             margin-top: 4px;
         }
         .media-viewer-container:not(.fullscreen):not(.slideshow) .slideshow-caption {
@@ -490,4 +502,29 @@
         .exif-rotation-8 {
             transform: translateX(-100%) rotate(270deg);
             transform-origin: top right;
+        }
+
+        .autoplay-overlay {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1100;
+            background: var(--mobile-background-blur);
+        }
+        .autoplay-overlay i {
+            width: 64px;
+            height: 64px;
+            border-radius: 100%;
+            background: var(--mobile-page-background);
+            cursor: pointer;
+            margin: auto;
+            padding: 16px;
+            --icon-size: 64px;
+            --mask-color: var(--mobile-icon-primary);
+        }
+        .media-viewer-container.autoplay-overlayed {
+            filter: var(--mobile-background-blur-medium);
         }

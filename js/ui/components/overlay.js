@@ -242,8 +242,10 @@ class MegaOverlay extends MegaComponent {
                 delete this.addedClasses;
             }
 
-            // Do not remove Overlayed when closing the msg dialog if any dialog is open
-            if (!(this.name === 'msg-dialog' && $.dialog && !document.querySelector('.page-bound'))) {
+            // Do not remove Overlayed when closing the msg dialog if any dialog is open,
+            // nor when a sheet is still shown underneath
+            if (!(this.name === 'msg-dialog' && $.dialog && !document.querySelector('.page-bound'))
+                && !(mega.ui.sheet && mega.ui.sheet.visible)) {
                 mainlayout.classList.remove('fm-overlay', 'pm-dialog');
                 document.documentElement.classList.remove('overlayed');
             }

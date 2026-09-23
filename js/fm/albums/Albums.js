@@ -451,23 +451,6 @@ lazy(mega.gallery, 'albums', () => {
         });
     };
 
-    const storeLastActiveTab = () => {
-        const activeBtn = document.querySelector('.lp-content-wrap.library-panel > button.active');
-
-        if (!activeBtn) {
-            return;
-        }
-
-        const activeClass = [...activeBtn.classList].find(c => !!M.fmTabState[c]);
-
-        if (!activeClass) {
-            return;
-        }
-
-        M.fmTabState[activeClass].prev = M.currentdirid;
-        M.lastActiveTab = activeClass;
-    };
-
     /**
      * @param {String} text Text to use inside the toast
      * @returns {HTMLElement}
@@ -529,31 +512,6 @@ lazy(mega.gallery, 'albums', () => {
                 }
             }
         ];
-    };
-
-    /**
-     * Generating the download item for context menu
-     * @param {String[]} albumIds IDs of target albums
-     * @returns {Object.<String, any>}
-     */
-    const generateDownloadMenuItem = (albumIds) => {
-        return {
-            label: l.download_option,
-            icon: 'download-small',
-            click: () => {
-                if (M.isInvalidUserStatus()) {
-                    return;
-                }
-
-                const handles = scope.getAlbumsHandles(albumIds);
-
-                if (handles.length) {
-                    scope.reportDownload();
-                    M.addDownload(handles);
-                }
-            },
-            children: (isMSync()) ? undefined : generateDownloadOptions(albumIds)
-        };
     };
 
     const fillAlbumCell = (cell) => {
@@ -803,14 +761,6 @@ lazy(mega.gallery, 'albums', () => {
     };
 
     /**
-     * Checking if there is at least one active album available for the list
-     * @returns {Boolean}
-     */
-    const checkIfExpandable = () => Object
-        .values(scope.albums.store)
-        .some(album => scope.albumIsRenderable(album));
-
-    /**
      * Checking if the provided name is preserved by auto-generated albums
      * @param {String} name The name to check against system values
      * @returns {Boolean}
@@ -897,7 +847,7 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         get items_per_row() {
-            return scope.AlbumTimeline.zoomSteps[this.timeline.zoomStep];
+            return this.timeline.itemsPerRow;
         }
 
         clearSlideshowSelections() {
@@ -929,52 +879,6 @@ lazy(mega.gallery, 'albums', () => {
             }
 
             super.hide();
-        }
-    }
-
-    class ToCopyInput extends MComponent {
-        constructor(isKey) {
-            super();
-
-            this.copyResponse = (isKey)
-                ? mega.icu.format(l.toast_copy_key, 1)
-                : mega.icu.format(l.toast_copy_link, 1);
-
-            const inputIcon = document.createElement('i');
-            inputIcon.className = `sprite-fm-mono ${isKey ? 'icon-key' : 'icon-link'}`;
-            this.wrap.prepend(inputIcon);
-        }
-
-        get value() {
-            return this.input.value;
-        }
-
-        set value(value) {
-            this.input.value = value;
-        }
-
-        buildElement() {
-            this.el = document.createElement('div');
-            this.el.className = 'item-link link flex-1';
-
-            this.wrap = document.createElement('div');
-            this.wrap.className = 'input-wrap';
-
-            this.input = document.createElement('input');
-            this.input.type = 'text';
-            this.input.readOnly = true;
-            this.copyBtn = new MButton(
-                l[63],
-                null,
-                () => {
-                    copyToClipboard(this.input.value, this.copyResponse);
-                },
-                'mega-button positive copy current'
-            );
-
-            this.wrap.appendChild(this.input);
-            this.el.appendChild(this.wrap);
-            this.el.appendChild(this.copyBtn.el);
         }
     }
 
@@ -1034,292 +938,13 @@ lazy(mega.gallery, 'albums', () => {
         }
     };
 
-    class AlbumShareLinkBlock extends MComponent {
-        /**
-         * @param {HTMLElement} parent Parent DOM element
-         * @param {String} albumId Album id to build the data upon
-         * @param {Boolean} [amongOthers] Indicates if the link is in the list by itself or with others
-         * @param {Function?} [onRemoveClick] Callback to fire when the remove button is pressed
-         */
-        constructor(parent, albumId, amongOthers = false, onRemoveClick = null) {
-            super(parent);
-
-            this._separated = false;
-            this.amongOthers = amongOthers;
-            this.album = scope.albums.store[albumId];
-            this.onRemoveClick = onRemoveClick;
-        }
-
-        get linkString() {
-            return this.linkInput.value;
-        }
-
-        get keyString() {
-            return this.keyInput.value;
-        }
-
-        /**
-         * @param {Object.<String, any>} album Album to build link for
-         * @returns {void}
-         */
-        set album(album) {
-            this._album = album;
-
-            const { label, nodes } = this._album;
-
-            this.labelEl.textContent = label;
-            this.extrasEl.textContent = mega.icu.format(l.album_items_count, nodes.length);
-            this.updateInputValue();
-        }
-
-        /**
-         * @param {Boolean} status Whether the key should be separated or not
-         */
-        set keySeparated(status) {
-            if (this._separated === status) {
-                return;
-            }
-
-            this._separated = status;
-
-            if (status) {
-                if (this.keyInput) {
-                    return;
-                }
-
-                this.linkInput.el.classList.add('mr-4');
-                this.keyInput = new ToCopyInput(true);
-                this.keyInput.value = a32_to_base64(decrypt_key(u_k_aes, this._album.k));
-                this.flexContainer.appendChild(this.keyInput.el);
-                this.updateInputValue();
-            }
-            else {
-                if (!this.keyInput) {
-                    return;
-                }
-
-                this.keyInput.detachEl();
-                delete this.keyInput;
-                this.linkInput.el.classList.remove('mr-4');
-                this.updateInputValue();
-            }
-        }
-
-        updateInputValue() {
-            const {ph, k} = this._album;
-
-            let value = `${getBaseUrl()}/collection/${ph}`;
-
-            if (!this._separated) {
-                value += `#${a32_to_base64(decrypt_key(u_k_aes, k))}`;
-            }
-
-            this.linkInput.value = value;
-        }
-
-        buildElement() {
-            this.el = document.createElement('div');
-            this.el.className = 'bg-surface-main p-3 mt-2 rounded';
-
-            const headerContainer = document.createElement('div');
-            headerContainer.className = 'relative';
-            const header = document.createElement('div');
-            header.className = 'flex flex-row items-center max-w-full w-min-content mb-2 pr-28';
-
-            const icon = document.createElement('i');
-            icon.className = 'sprite-fm-mono icon-album icon-blue icon-size-5 mx-2';
-
-            const separator = document.createElement('i');
-            separator.className = 'sprite-fm-mono icon-dot icon-size-3 mt-1 mx-1';
-
-            this.labelEl = document.createElement('div');
-            this.labelEl.className = 'flex-1 text-ellipsis';
-            this.extrasEl = document.createElement('span');
-            this.extrasEl.className = 'white-space-nowrap';
-
-            header.appendChild(icon);
-            header.appendChild(this.labelEl);
-            header.appendChild(separator);
-            header.appendChild(this.extrasEl);
-            headerContainer.appendChild(header);
-
-            this.flexContainer = document.createElement('div');
-            this.flexContainer.className = 'flex flex-row';
-
-            this.linkInput = new ToCopyInput();
-
-            this.flexContainer.appendChild(this.linkInput.el);
-            this.el.appendChild(headerContainer);
-            this.el.appendChild(this.flexContainer);
-        }
-
-        dispose() {
-            if (this.keyInput) {
-                this.keyInput.detachEl();
-                delete this.keyInput;
-            }
-
-            this.linkInput.detachEl();
-            delete this.linkInput;
-
-            this.detachEl();
-        }
-    }
-
-    class AlbumShareLinksList extends MComponent {
-        /**
-         * @param {String[]} albumIds Album ids to insert into the list
-         * @param {Function} onDismiss Callback to fire when the list is not needed anymore
-         */
-        constructor(albumIds, onDismiss) {
-            super();
-
-            if (Array.isArray(albumIds) && albumIds.length) {
-                this.albumIds = albumIds;
-            }
-
-            this.onDismiss = onDismiss;
-        }
-
-        /**
-         * @param {String} albumIds The array of album ids to build links for
-         */
-        set albumIds(albumIds) {
-            this.clearList();
-
-            const { store } = scope.albums;
-            const ids = albumIds.filter(id => store[id] && !store[id].filterFn);
-            this.isMultiple = ids.length > 1;
-
-            for (let i = 0; i < ids.length; i++) {
-                this._shares.push(new AlbumShareLinkBlock(
-                    this.el.firstElementChild,
-                    ids[i],
-                    this.isMultiple,
-                    () => {
-                        if (!this.isMultiple && typeof this.onDismiss === 'function') {
-                            this.onDismiss();
-                        }
-                    }
-                ));
-            }
-
-            this._keysSeparated = false;
-            this.updateCopyButtons();
-        }
-
-        /**
-         * @param {Boolean} status Either shares keys should be separated or not
-         */
-        set keysSeparated(status) {
-            this._keysSeparated = status;
-
-            for (let i = 0; i < this._shares.length; i++) {
-                this._shares[i].keySeparated = status;
-            }
-
-            this.updateCopyButtons();
-        }
-
-        updateCopyButtons() {
-            if (this.isMultiple) {
-                const label = this._keysSeparated ? l[23625] : l[20840];
-
-                if (!this.copyLinksBtn) {
-                    const container = document.createElement('div');
-                    container.className = 'flex flex-row justify-end pt-4 gap-4 px-12';
-
-                    this.copyLinksBtn = new MButton(
-                        label,
-                        null,
-                        () => {
-                            copyToClipboard(
-                                this._shares.map(s => s.linkString).join("\n"),
-                                mega.icu.format(l.toast_copy_link, this._shares.length)
-                            );
-                        },
-                        'mega-button positive copy current'
-                    );
-
-                    container.appendChild(this.copyLinksBtn.el);
-                    this.el.appendChild(container);
-                }
-                else if (label !== this.copyLinksBtn.label) {
-                    this.copyLinksBtn.label = label;
-                }
-
-                if (this._keysSeparated) {
-                    if (!this.copyLinksBtn.el.nextElementSibling) {
-                        this.copyKeysBtn = new MButton(
-                            l[23624],
-                            null,
-                            () => {
-                                copyToClipboard(
-                                    this._shares.map(s => s.keyString).join("\n"),
-                                    mega.icu.format(l.toast_copy_key, this._shares.length)
-                                );
-                            },
-                            'mega-button positive copy current'
-                        );
-
-                        this.copyLinksBtn.el.insertAdjacentElement('afterend', this.copyKeysBtn.el);
-                    }
-                }
-                else if (this.copyLinksBtn.el.nextElementSibling) {
-                    this.copyLinksBtn.el.parentNode.removeChild(this.copyLinksBtn.el.nextElementSibling);
-                }
-            }
-            else {
-                this.clearCopyButtons();
-            }
-        }
-
-        clearCopyButtons() {
-            if (this.copyLinksBtn) {
-                this.copyLinksBtn.detachEl();
-                delete this.copyLinksBtn;
-
-                if (this.copyKeysBtn) {
-                    this.copyKeysBtn.detachEl();
-                    delete this.copyKeysBtn;
-                }
-            }
-        }
-
-        buildElement() {
-            this.el = document.createElement('div');
-
-            const scrollable = document.createElement('div');
-            scrollable.className = 'max-h-100 px-12 overflow-y-hidden';
-
-            this.el.appendChild(scrollable);
-
-            delay('share_dialog:apply_scrollable', () => {
-                applyPs(scrollable);
-            }, 100);
-        }
-
-        clearList() {
-            if (Array.isArray(this._shares) && this._shares.length) {
-                for (let i = 0; i < this._shares.length; i++) {
-                    this._shares[i].dispose();
-                }
-            }
-
-            this._shares = [];
-            this.clearCopyButtons();
-        }
-    }
-
-    class AlbumShareDialog extends MDialog {
+    class AlbumShareDialog {
         constructor(albumIds) {
-            super({
-                ok: false,
-                cancel: false,
-                dialogClasses: 'export-links-dialog'
-            });
+            this.albumIds = albumIds;
 
-            this.setContent(albumIds);
+            this.name = 'album-share-links-dialog';
+            this.settingsName = 'album-share-links-settings-dialog';
+            this.newValues = Object.create(null);
 
             this.unsubscribeFromShare = mega.sets.subscribe('ass', 'albumsShare', ({ s }) => {
                 if (albumIds.includes(s)) {
@@ -1328,54 +953,811 @@ lazy(mega.gallery, 'albums', () => {
             });
         }
 
-        setContent(albumIds) {
-            this.slot = document.createElement('div');
-            this.title = mega.icu.format(l.album_share_link, albumIds.length);
+        onKeyDown(evt) {
+            const { key, ctrlKey, metaKey } = evt;
 
-            const divTop = document.createElement('div');
-            divTop.className = 'pb-6 pt-2 px-12 flex flex-row';
-            const divBottom = document.createElement('div');
-            divBottom.className = 'py-6 bg-surface-grey-1';
+            if ((ctrlKey || metaKey) && key === 'a') {
+                evt.preventDefault();
 
-            const checkbox = new MCheckbox({
-                label: mega.icu.format(l.album_share_link_checkbox_label, albumIds.length),
-                id: 'album-link-export',
-                checked: false
+                const texts = mega.ui.sheet.contentNode.querySelectorAll('.select-text');
+                if (!(texts && texts.length)) {
+                    console.warn('.select-text gave nothing...');
+                    return;
+                }
+
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+
+                const range = document.createRange();
+                range.selectNodeContents(texts[0]);
+
+                if (texts.length > 1) {
+                    let i = 0;
+
+                    while (++i < texts.length) {
+                        range.setEndAfter(texts[i]);
+                    }
+                }
+
+                selection.addRange(range);
+            }
+        }
+
+        show(dialogOpts) {
+            dialogOpts = dialogOpts || Object.create(null);
+            const count = this.albumIds.length;
+            const addSettingsBtn = (parentNode) => new MegaButton({
+                parentNode,
+                text: l.link_settings,
+                componentClassname: 'text-icon font-600 underline-offset-4 whitespace-nowrap slim no-px',
+                type: 'button',
+            }).on('click.link-settings', () => {
+                this.hideView();
+                this.viewSettings();
+                eventlog(501395);
             });
 
-            const hint = new MHint({
-                title: l[1028],
-                text: mega.icu.format(l.export_link_decrypt_tip, albumIds.length),
-                img: 'illustration sprite-fm-illustration img-dialog-decryption-key',
-                link: `${l.mega_help_host}/security/data-protection/make-links-more-secure`,
-                classes: 'icon-size-6 cursor-pointer mx-2'
+            const linkTip = mCreateElement('div', { class: 'link-access-text text-left' });
+            const footerElement = mCreateElement('div', { class: 'flex flex-row-reverse' });
+            linkTip.textContent = mega.icu.format(l.link_access_explainer, count);
+
+            MegaButton.factory({
+                parentNode: footerElement,
+                text: count === 1 ? l.copy_link : l[23625],
+                componentClassname: 'slim',
+                type: 'button'
+            }).on('click.copyLinks', () => {
+                copyToClipboard(this.links.map(({ link }) => link).join('\n'));
+                mega.ui.toast.show(count === 1 ? l[1642] : l.links_copied, 4);
+                eventlog(501396);
             });
 
-            this.list = new AlbumShareLinksList(
-                albumIds,
-                () => {
+            if (dialogOpts.dec) {
+                MegaButton.factory({
+                    parentNode: footerElement,
+                    text: count === 1 ? l[17386] : l[23624],
+                    componentClassname: 'secondary mx-2 slim',
+                    type: 'normal'
+                }).on('click.copyKeys', () => {
+                    copyToClipboard(this.links.map(({ key }) => key).join('\n'));
+                    mega.ui.toast.show(count === 1 ? l.key_copied : l.keys_copied, 4);
+                    eventlog(501397);
+                });
+            }
+
+            const options = {
+                name: this.name,
+                classList: ['export-links-dialog', this.name],
+                contents: [mCreateElement('div', { class: 'relative' }, this.body(dialogOpts)), linkTip],
+                showClose: true,
+                footer: {
+                    slot: [footerElement]
+                },
+                header: mega.icu.format(l.share_link, count),
+                onShow: () => {
+                    const heading = mCreateElement('div');
+
+                    if (dialogOpts.isUpdated) {
+                        const banner = mCreateElement(
+                            'div',
+                            { class: 'mb-4 overflow-y-hidden max-h-100 transition-max-h' },
+                            heading
+                        );
+
+                        const bannerTxt = mCreateElement(
+                            'span',
+                            { class: 'font-body-1' }
+                        );
+                        mCreateElement(
+                            'div',
+                            { 'class': 'banner-wrap' },
+                            [
+                                mCreateElement(
+                                    'i',
+                                    { 'class': 'sprite-fm-mono icon-check-circle-thin-outline' }
+                                ),
+                                bannerTxt
+                            ],
+                            banner
+                        );
+                        bannerTxt.textContent = count === 1 ? l.link_updated : l.links_updated;
+
+                        mega.ui.sheet.contentNode.prepend(heading);
+
+                        tSleep(3).then(() => {
+                            banner.classList.remove('max-h-100');
+                            banner.classList.add('max-h-0');
+                        });
+                    }
+                    addSettingsBtn(
+                        this.albumIds.length === 1
+                            ? mega.ui.sheet.contentNode.querySelector('.node-link-block .block-naming')
+                            : mega.ui.sheet.headerTitleNode
+                    );
+
+                    document.addEventListener('keydown', this.onKeyDown, true);
+                },
+                onClose: () => {
                     this.hide();
                 }
-            );
+            };
+            mega.ui.sheet.show(options);
+        }
 
-            checkbox.onChange = (checked) => {
-                this.list.keysSeparated = checked;
+        body(opts) {
+            const { dec, autoplay } = opts;
+            const { store } = scope.albums;
+            const nodes = this.albumIds.filter(id => store[id] && !store[id].filterFn);
+            const items = new Array(nodes.length);
+            this.links = [];
+            for (let i = 0; i < nodes.length; i++) {
+                items[i] = this.linkRow(store[nodes[i]], dec, autoplay);
+            }
+            return items;
+        }
+
+        linkRow(item, keySeparated, autoplayOpts) {
+            const { ph, k, label, nodes, h } = item;
+            const fileUrlWithoutKey = `${getBaseUrl()}/collection/${ph}`;
+            const fileUrlKey = `#${a32_to_base64(decrypt_key(u_k_aes, k))}`;
+            autoplayOpts = mega.slideshow.utils.getAutoplayParam(autoplayOpts);
+            const fileUrl = fileUrlWithoutKey + autoplayOpts + (keySeparated ? '' : fileUrlKey);
+            this.links.push({ key: fileUrlKey.substring(1), link: fileUrl });
+
+            const ce = (n, t, a) => mCreateElement(n, a, t);
+            const addCopyRow = (text, parent, klass, simpletip, copiedMsg, copyEvtId) => {
+                const row = ce('div', parent, {class: `row ${klass || ''}`});
+                ce('span', row, { class: 'flex-1 text-ellipsis select-text' }).textContent = text;
+
+                MegaButton.factory({
+                    parentNode: row,
+                    icon: 'sprite-fm-mono icon-copy-thin-outline icon-size-20',
+                    componentClassname: 'transparent-icon text-icon copy-field simpletip secondary',
+                    type: 'icon',
+                    dataset: { simpletip }
+                }).on('click.copy', () => {
+                    copyToClipboard(text);
+                    mega.ui.toast.show(copiedMsg, 4);
+                    eventlog(copyEvtId);
+                });
+
+                return row;
             };
 
-            divTop.appendChild(checkbox.el);
-            divTop.appendChild(hint.el);
-            divBottom.appendChild(this.list.el);
+            const header = mCreateElement('div', { class: 'flex flex-row items-center mt-4 mb-2 block-naming' }, [
+                mCreateElement('i', {class: `sprite-fm-uni mime-image-stack-solid icon-size-8`})
+            ]);
+            const nameRow = ce('span', header, {class: 'text-ellipsis px-2 select-text' });
 
-            this.slot.appendChild(divTop);
-            this.slot.appendChild(divBottom);
+            nameRow.textContent = label;
+            const numFiles = nodes.length;
+            if (numFiles) {
+                ce('span', header, {
+                    class: 'text-color-medium separator-before px-2 flex-1 whitespace-nowrap'
+                }).textContent = mega.icu.format(l.album_items_count, numFiles);
+            }
+            else {
+                nameRow.classList.add('flex-1');
+            }
+
+            const block = ce('div', [header], {
+                class: 'node-link-block font-body-1',
+                'data-node-handle': h
+            });
+            const linkData = ce('div', block, { class: 'link-body' });
+
+            if (keySeparated) {
+                ce('span', linkData, { class: 'font-bold text-color-high' }).textContent = l.link;
+            }
+
+            addCopyRow(
+                fileUrl,
+                linkData,
+                'link-value',
+                l.copy_link,
+                l[1642],
+                501398
+            );
+
+            if (keySeparated) {
+                ce('hr', linkData);
+                ce('span', linkData, { class: 'font-bold text-color-high' }).textContent = l[1028];
+                addCopyRow(
+                    fileUrlKey.substring(1),
+                    linkData,
+                    'decr-key-value',
+                    l[17386],
+                    l.key_copied,
+                    501399
+                );
+            }
+
+            return block;
+        }
+
+        hideView() {
+            document.removeEventListener('keydown', this.onKeyDown, true);
+            this.hideSheet(this.name);
         }
 
         hide() {
-            this.list.clearList();
-            this.list.detachEl();
+            if (this.unsubscribeFromShare) {
+                this.unsubscribeFromShare();
+                delete this.unsubscribeFromShare;
+            }
 
-            this.unsubscribeFromShare();
-            super.hide();
+            this.hideView();
+            this.hideSettings();
+
+            delete this.links;
+            delete this.values;
+            this.newValues = Object.create(null);
+        }
+
+        hasChanges() {
+            const { autoplay, ...rest } = this.newValues;
+            const { getAutoplayParam } = mega.slideshow.utils;
+
+            return !!Object.keys(rest).length
+                || ('autoplay' in this.newValues
+                    && getAutoplayParam(autoplay) !== getAutoplayParam(this.values.autoplay));
+        }
+
+        viewSettings() {
+            const { sheet } = mega.ui;
+
+            if (!this.values) {
+                this.values = Object.create(null);
+                this.values.dec = false;
+                this.values.autoplay = null;
+            }
+
+            const onBack = (skipConfirm, isUpdated) => {
+                this.hideSettings();
+
+                const doLeave = () => {
+                    this.newValues = Object.create(null);
+                    mega.Dialog.ExportLink.settingsDiscard.hide();
+                    this.show({ ...this.values, isUpdated });
+                };
+
+                if (this.hasChanges() && !skipConfirm) {
+                    mega.Dialog.ExportLink.settingsDiscard.show(
+                        l.discard_changes,
+                        l.discard_changes_msg,
+                        doLeave,
+                        () => {
+                            mega.Dialog.ExportLink.settingsDiscard.hide();
+                            this.viewSettings();
+                        }
+                    );
+                }
+                else {
+                    doLeave();
+                }
+            };
+
+            const createContents = () => {
+                const createRow = (id, contentFn, checkFn, uncheckFn, options) => {
+                    const action = mCreateElement('div');
+                    const row = mCreateElement('div', { class: 'flex flex-row font-body-1 mt-4' }, [
+                        mCreateElement('div', { class: 'flex-1' }),
+                        action
+                    ]);
+
+                    const { checked } = options || {};
+                    MegaToggleButton.factory({
+                        parentNode: action,
+                        componentClassname: 'mega-toggle-button',
+                        disabled: false,
+                        value: id,
+                        id,
+                        checked: !!checked,
+                        role: 'switch',
+                        onChange() {
+                            if (this.checked) {
+                                checkFn(row);
+                            }
+                            else {
+                                uncheckFn(row);
+                            }
+                        }
+                    });
+
+                    contentFn(row);
+                    return row;
+                };
+
+                const decr = createRow(
+                    'link-dec-toggle',
+                    (row) => {
+                        const decrTxt = row.querySelector('.flex-1');
+                        mCreateElement('span', null, decrTxt).textContent = l.send_decryption_key_separately;
+                        const link = mCreateElement('a', {
+                            class: 'learn-more-text px-1',
+                            href: `${l.mega_help_host}/security/data-protection/make-links-more-secure`,
+                            target: '_blank',
+                            rel: 'noopener noreferrer'
+                        }, decrTxt);
+
+                        link.textContent = l[8742];
+                        link.addEventListener('click', () => eventlog(501400));
+                    },
+                    () => {
+                        this.newValues.dec = true;
+
+                        // Log to see if "export link decryption key separately" is used much
+                        eventlog(501401, '1');
+                    },
+                    () => {
+                        this.newValues.dec = false;
+                        eventlog(501401, '0');
+                    },
+                    { checked: !!this.values.dec }
+                );
+                decr.classList.add('items-center');
+
+                if (!this.albumIds.some((id) => scope.albums.store[id] && scope.albums.store[id].nodes.length)) {
+                    return mCreateElement('div', null, [decr]);
+                }
+
+                const autoplayInput = mCreateElement('div', { class: 'autoplay-input hidden mt-4 w-full' });
+                const autoplay = createRow(
+                    'link-autoplay-toggle',
+                    (row) => {
+                        const parent = row.querySelector(':scope > .flex-1');
+
+                        mCreateElement('p', { class: 'my-0' }, parent).textContent = l.autoplay_slideshow;
+                        mCreateElement(
+                            'p',
+                            { class: 'text-color-medium font-body-2 my-0' },
+                            parent
+                        ).textContent = l.autoplay_slideshow_desc;
+                    },
+                    () => { // Checked
+                        autoplayInput.classList.remove('hidden');
+                        this.viewAutoplaySettings();
+                        eventlog(501406, '1');
+                    },
+                    () => { // Unchecked
+                        autoplayInput.classList.add('hidden');
+                        this.newValues.autoplay = null;
+                        this.saveBtn.disabled = false;
+                        eventlog(501406, '0');
+                    },
+                    { checked: !!this.values.autoplay }
+                );
+
+                return mCreateElement('div', null, [
+                    decr,
+                    mCreateElement('hr', { class: 'border-b border-t-none border-x-none' }),
+                    autoplay,
+                    autoplayInput
+                ]);
+            };
+
+            const footer = mCreateElement('div', { class: 'flex flex-row' }, [
+                mCreateElement('div', { class: 'flex-1' })
+            ]);
+
+            MegaButton.factory({
+                parentNode: footer.querySelector(':scope > .flex-1'),
+                text: this.albumIds.length === 1 ? l[6821] : l[8735],
+                componentClassname: 'button-brand text-icon underline-offset-4 font-600 slim no-px'
+            }).on('click.remove', () => {
+                this.hideSettings();
+                removeShareWithConfirmation(this.albumIds);
+                eventlog(501402);
+            });
+
+            MegaButton.factory({
+                parentNode: footer,
+                text: l[822],
+                componentClassname: 'mx-2 secondary slim',
+                type: 'normal'
+            }).on('click.settingsBack', () => {
+                eventlog(501403);
+                onBack();
+            });
+
+            this.saveBtn = new MegaButton({
+                parentNode: footer,
+                text: l[19631],
+                componentClassname: 'slim',
+                type: 'button'
+            }).on('click.save', () => {
+                let linkUpdated = false;
+
+                if (this.hasChanges()) {
+                    if ('dec' in this.newValues) {
+                        linkUpdated = true;
+                        this.values.dec = this.newValues.dec;
+                    }
+
+                    if ('autoplay' in this.newValues) {
+                        linkUpdated = true;
+                        this.values.autoplay = this.newValues.autoplay;
+                    }
+
+                    this.newValues = Object.create(null);
+                }
+                eventlog(501404);
+                onBack(true, linkUpdated);
+            });
+
+            const options = {
+                name: this.settingsName,
+                classList: ['export-links-settings-dialog', this.settingsName],
+                contents: [createContents()],
+                showClose: true,
+                header: l.link_settings,
+                headerClassName: 'tittle-header',
+                footer: {
+                    slot: [footer]
+                },
+                onBack: () => {
+                    eventlog(501405);
+                    onBack();
+                },
+                onShow: () => {
+                    if (
+                        ('dec' in this.newValues && this.newValues.dec)
+                        || (!('dec' in this.newValues) && this.values.dec)) {
+                        sheet.contentNode.componentSelector('#link-dec-toggle').setButtonState(true);
+                    }
+
+                    const autoplayToggle = sheet.contentNode.componentSelector('#link-autoplay-toggle');
+                    if (
+                        autoplayToggle &&
+                        (('autoplay' in this.newValues && this.newValues.autoplay) ||
+                        (!('autoplay' in this.newValues) && this.values.autoplay))
+                    ) {
+                        autoplayToggle.setButtonState(true);
+                        sheet.contentNode.querySelector('.autoplay-input').classList.remove('hidden');
+                        this.viewAutoplaySettings();
+                    }
+                },
+                onClose: () => {
+                    if (this.hasChanges()) {
+                        mega.Dialog.ExportLink.settingsDiscard.show(
+                            l.discard_and_exit,
+                            l.discard_and_exit_msg,
+                            () => {
+                                mega.Dialog.ExportLink.settingsDiscard.hide();
+                                this.hide();
+                            },
+                            () => {
+                                mega.Dialog.ExportLink.settingsDiscard.hide();
+                                this.viewSettings();
+                            }
+                        );
+                    }
+                    else {
+                        this.hide();
+                    }
+                }
+            };
+
+            sheet.show(options);
+        }
+
+        viewAutoplaySettings() {
+            const { utils, settings } = mega.slideshow;
+            const { speedVals, orderVals } = utils;
+
+            if (!this.newValues.autoplay) {
+                this.newValues.autoplay = { ...this.values.autoplay || utils.parseAutoplayParam('') };
+            }
+
+            const { speed: speedSetting } = settings;
+            const speedText = (name) => speedSetting._getText(speedSetting._config[name]);
+            const speeds = [
+                { value: speedVals.slow, text: speedText('slow') },
+                { value: speedVals.normal, text: speedText('normal') },
+                { value: speedVals.fast, text: speedText('fast') }
+            ];
+            const orders = [
+                { value: orderVals.default, text: l.ss_settings_order_opt_def },
+                { value: orderVals.shuffle, text: l.ss_settings_order_opt_1 },
+                { value: orderVals.newest, text: l.ss_settings_order_opt_2 },
+                { value: orderVals.oldest, text: l.ss_settings_order_opt_3 }
+            ];
+
+            const setSelected = (select, values, value) => {
+                const selected = values.find((option) => option.value === value);
+                select.querySelector('span').textContent = selected ? selected.text : '';
+            };
+
+            if (!this.autoplaySettings) {
+                this.autoplaySettings = document.createElement('div');
+                this.autoplaySettings.className = 'autoplay-settings-block';
+
+                const buildRow = (label, desc) => {
+                    const rowBlock = document.createElement('div');
+                    rowBlock.className = 'autoplay-setting-row';
+                    rowBlock.appendChild(mCreateElement('div', { 'class': 'autoplay-info' }, [
+                        mCreateElement('span', { 'class': 'autoplay-label' }, [document.createTextNode(label)]),
+                        mCreateElement('span', { 'class': 'autoplay-desc' }, [document.createTextNode(desc)])
+                    ]));
+                    return rowBlock;
+                };
+
+                const buildSelect = (parentNode, name, values, getValue, onSelect) => {
+                    const select = mCreateElement('div', { 'class': 'autoplay-select box-style' }, parentNode);
+
+                    mCreateElement('span', null, select);
+                    mCreateElement('i', { 'class': 'sprite-fm-mono icon-chevron-down-thin-outline' }, select);
+
+                    const menu = mCreateElement('div', { 'class': `${name} picker-list-wrap` });
+                    const hideMenu = () => {
+                        mega.ui.menu.hide();
+                        mega.ui.menu.trigger('close');
+                    };
+                    const onClickAway = ({ target }) => {
+                        if (!select.contains(target) && !mega.ui.menu.domNode.contains(target)) {
+                            hideMenu();
+                        }
+                    };
+                    for (let i = 0; i < values.length; i++) {
+                        const { value, text } = values[i];
+                        const option = mCreateElement('div', { 'class': 'option', 'data-value': value }, menu);
+                        mCreateElement('span', null, option).textContent = text;
+                        mCreateElement('i', { 'class': 'checked sprite-fm-mono icon-check-thin-outline' }, option);
+                        option.addEventListener('click', () => {
+                            onSelect(value);
+                            setSelected(select, values, value);
+                            hideMenu();
+                        });
+                    }
+
+                    select.addEventListener('click', () => {
+                        if (mega.ui.menu.name === name) {
+                            hideMenu();
+                            return;
+                        }
+
+                        const options = menu.querySelectorAll('.option');
+                        for (let i = options.length; i--;) {
+                            options[i].querySelector('.checked')
+                                .classList.toggle('hidden', options[i].dataset.value !== String(getValue()));
+                        }
+
+                        mega.ui.menu.show({
+                            name,
+                            classList: [name, 'picker-dropdown'],
+                            event: { currentTarget: { domNode: select } },
+                            eventTarget: select,
+                            contents: [menu],
+                            resizeHandler: true,
+                            onClose: () => {
+                                document.removeEventListener('click', onClickAway, true);
+                                select.classList.remove('active');
+                            }
+                        });
+
+                        select.classList.add('active');
+                        document.addEventListener('click', onClickAway, true);
+                    });
+
+                    return select;
+                };
+
+                let row = buildRow(l.ss_settings_speed, l.ss_speed_desc);
+                this.speedDropdown = buildSelect(
+                    row,
+                    'picker-autoplay-speed',
+                    speeds,
+                    () => this.newValues.autoplay.speed,
+                    (value) => {
+                        this.newValues.autoplay.speed = value;
+                        eventlog(501407, String(value));
+                    }
+                );
+                this.autoplaySettings.appendChild(row);
+                row = buildRow(l.ss_settings_order, l.ss_order_desc);
+                this.orderDropdown = buildSelect(
+                    row,
+                    'picker-autoplay-order',
+                    orders,
+                    () => this.newValues.autoplay.order,
+                    (value) => {
+                        this.newValues.autoplay.order = value;
+                        eventlog(501408, String(value));
+                    }
+                );
+                this.autoplaySettings.appendChild(row);
+                row = buildRow(l.ss_settings_video, l.ss_video_desc);
+                this.videoSwitch = new MegaToggleButton({
+                    parentNode: row,
+                    componentClassname: 'mega-toggle-button',
+                    disabled: false,
+                    value: 'link-autoplay-video',
+                    id: 'link-autoplay-video',
+                    checked: !!this.newValues.autoplay.playVid,
+                    role: 'switch',
+                    onChange: () => {
+                        this.newValues.autoplay.playVid = this.videoSwitch.checked ? 1 : 0;
+                        eventlog(501409, String(this.newValues.autoplay.playVid));
+                    }
+                });
+                this.autoplaySettings.appendChild(row);
+                row = buildRow(l.ss_settings_caption, l.ss_caption_desc);
+                this.captionSwitch = new MegaToggleButton({
+                    parentNode: row,
+                    componentClassname: 'mega-toggle-button',
+                    disabled: false,
+                    value: 'link-autoplay-caption',
+                    id: 'link-autoplay-caption',
+                    checked: !!this.newValues.autoplay.caption,
+                    role: 'switch',
+                    onChange: () => {
+                        this.newValues.autoplay.caption = this.captionSwitch.checked ? 1 : 0;
+                        eventlog(501410, String(this.newValues.autoplay.caption));
+                    }
+                });
+                this.autoplaySettings.appendChild(row);
+                row = buildRow(l.ss_settings_start, l.ss_start_desc);
+                const tabWrap = mCreateElement('div', { 'class': 'mega-component tab-group tab-slider' });
+
+                const tabs = [
+                    {
+                        parentNode: tabWrap,
+                        text: l.ss_start_first,
+                        tabid: 'f',
+                        selected: true,
+                        onClick: () => {
+                            this.pickerRow.classList.add('hidden');
+                            delete this.newValues.autoplay.startHandle;
+                            delete this.newValues.autoplay.startRandom;
+                            this.saveBtn.disabled = false;
+                            eventlog(501411);
+                        }
+                    },
+                    {
+                        parentNode: tabWrap,
+                        text: l.ss_start_random,
+                        tabid: 'r',
+                        selected: false,
+                        onClick: () => {
+                            this.pickerRow.classList.add('hidden');
+                            delete this.newValues.autoplay.startHandle;
+                            this.newValues.autoplay.startRandom = 1;
+                            this.saveBtn.disabled = false;
+                            eventlog(501412);
+                        }
+                    }
+                ];
+                if (this.albumIds.length === 1) {
+                    tabs.splice(1, 0, {
+                        parentNode: tabWrap,
+                        text: l.ss_start_choose,
+                        tabid: 'p',
+                        selected: false,
+                        onClick: () => {
+                            const { autoplay } = this.newValues;
+                            const { eIds, at: { c } } = scope.albums.store[this.albumIds[0]];
+
+                            this.pickerRow.classList.remove('hidden');
+                            delete autoplay.startRandom;
+                            if (!autoplay.startHandle) {
+                                // Default to cover if it exists.
+                                autoplay.startHandle = c && eIds[c] && scope.getNodeCache(eIds[c]) ? eIds[c] : '';
+                            }
+                            this.saveBtn.disabled = !autoplay.startHandle;
+                            this.setPickerNode();
+                            eventlog(501413, autoplay.startHandle ? '1' : '0');
+                        }
+                    });
+                }
+
+                this.startTabs = new MegaTabGroup({
+                    tabs,
+                    slider: true,
+                });
+                this.pickerRow = document.createElement('div');
+                this.pickerRow.className = 'autoplay-picker-row hidden';
+                this.pickerThumb = mCreateElement('img', { 'class': 'picker-thumb' });
+                this.pickerName = mCreateElement('div', { 'class': 'picker-item-name' });
+                this.pickerRow.appendChild(this.pickerThumb);
+
+                this.pickerRow.appendChild(mCreateElement('div', { 'class': 'picker-info' }, [
+                    mCreateElement('div', undefined, [document.createTextNode(l.ss_opens_on)]),
+                    this.pickerName
+                ]));
+                MegaButton.factory({
+                    parentNode: this.pickerRow,
+                    text: l[1776],
+                    componentClassname: 'text-icon font-600 underline-offset-4 whitespace-nowrap',
+                    type: 'button',
+                    onClick: () => {
+                        this.viewPicker();
+                        eventlog(501414);
+                    }
+                });
+                row.appendChild(tabWrap);
+                this.autoplaySettings.appendChild(row);
+                this.autoplaySettings.appendChild(this.pickerRow);
+            }
+            mega.ui.sheet.contentNode.querySelector('.autoplay-input').appendChild(this.autoplaySettings);
+            const { speed, order, playVid, caption, startHandle, startRandom } = this.newValues.autoplay;
+            let startTab = 'f';
+            if (startRandom) {
+                startTab = 'r';
+            }
+            else if (startHandle) {
+                startTab = 'p';
+            }
+
+            setSelected(this.speedDropdown, speeds, speed);
+            setSelected(this.orderDropdown, orders, order);
+            this.videoSwitch.setButtonState(!!playVid);
+            this.captionSwitch.setButtonState(!!caption);
+            this.startTabs.selectTab(startTab);
+            this.pickerRow.classList.toggle('hidden', startTab !== 'p');
+            this.setPickerNode();
+        }
+
+        setPickerNode() {
+            const { startHandle } = this.newValues.autoplay;
+            const node = startHandle && scope.getNodeCache(startHandle);
+            this.pickerName.textContent = node ? node.name : '';
+            this.pickerThumb.removeAttribute('src');
+
+            if (node) {
+                this.pickerThumb.classList.remove('hidden');
+
+                MegaGallery.addThumbnails([{
+                    el: this.pickerThumb,
+                    node,
+                    setThumb: (dataUrl) => {
+                        this.pickerThumb.src = dataUrl;
+                    }
+                }]);
+            }
+            else {
+                this.pickerThumb.classList.add('hidden');
+            }
+        }
+
+        viewPicker() {
+            this.hideSettings();
+
+            const { autoplay } = this.newValues;
+            // eslint-disable-next-line no-use-before-define
+            const dlg = new AlbumCoverDialog(this.albumIds[0], {
+                dialogClasses: 'album-share-links-picker-dialog',
+                title: l.choose_file,
+                subtitle: l.ss_dlg_choose_desc,
+                okLabel: l.use_file,
+                cancelLabel: l[822],
+                itemsPerRow: 4,
+                columnGap: 2,
+                rowGap: 4,
+                sidePadding: 40,
+                preselect: autoplay.startHandle,
+                nodeFilter: (n) => !!autoplay.playVid || !M.isGalleryVideo(n),
+                onSelect: (h) => {
+                    autoplay.startHandle = h;
+                    this.viewSettings();
+                },
+                onBack: () => {
+                    this.viewSettings();
+                }
+            });
+            dlg.show();
+        }
+
+        hideSheet(name) {
+            if (mega.ui.sheet.name === name) {
+                mega.ui.sheet.hide();
+            }
+            if ($.dialog === name) {
+                delete $.dialog;
+            }
+        }
+
+        hideSettings() {
+            this.hideSheet(this.settingsName);
         }
     }
 
@@ -1683,41 +2065,69 @@ lazy(mega.gallery, 'albums', () => {
     }
 
     class AlbumCoverDialog extends TimelineDialog {
-        constructor(albumId) {
+        constructor(albumId, options) {
+            options = options || Object.create(null);
+
             super({
                 ok: {
-                    label: l.album_done,
+                    label: options.okLabel || l.album_done,
                     callback: () => {
                         if (this.timeline && this.timeline.selCount) {
-                            scope.albums.updateAlbumCover(
-                                scope.albums.store[this.albumId],
-                                Object.keys(this.timeline.selections)[0]
-                            );
+                            this.selectedHandle = Object.keys(this.timeline.selections)[0];
+                            if (!options.onSelect) {
+                                scope.albums.updateAlbumCover(
+                                    scope.albums.store[this.albumId],
+                                    this.selectedHandle
+                                );
+                            }
                         }
                     }
                 },
-                cancel: true,
-                dialogClasses: 'album-items-dialog',
+                cancel: options.cancelLabel ? { label: options.cancelLabel } : true,
+                dialogClasses: options.dialogClasses ?
+                    `album-items-dialog ${options.dialogClasses}` : 'album-items-dialog',
                 contentClasses: 'px-2 bg-mobile-surface-grey-1',
+                onback: options.onBack,
                 onclose: () => {
                     scope.reinitiateEvents();
                     delete $.timelineDialog;
+                    if (options.onSelect && this.selectedHandle) {
+                        options.onSelect(this.selectedHandle);
+                    }
+                    else if (options.onBack && !this.backed) {
+                        options.onBack();
+                    }
                 }
             });
 
-            this.setContent();
+            this.nodeFilter = options.nodeFilter;
+            this.itemsPerRow = options.itemsPerRow;
+            this.columnGap = options.columnGap;
+            this.rowGap = options.rowGap;
+            this.sidePadding = options.sidePadding;
+            this.preselect = options.preselect;
+            this.setContent(options.title, options.subtitle);
             this._title.classList.add('text-center');
             this.albumId = albumId;
             $.timelineDialog = this;
         }
 
-        setContent() {
+        get nodes() {
+            const { nodes } = scope.albums.store[this.albumId];
+            return this.nodeFilter ? nodes.filter(this.nodeFilter) : nodes;
+        }
+
+        setContent(title, subtitle) {
             this.slot = document.createElement('div');
-            this.title = l.set_album_cover;
+            this.title = title || l.set_album_cover;
+
+            if (subtitle) {
+                mCreateElement('div', { 'class': 'album-cover-subtitle' }, this.slot).textContent = subtitle;
+            }
         }
 
         onMDialogShown() {
-            let isLoaded = false;
+            let isLoaded = !!this.preselect;
 
             if (scope.albums.grid && scope.albums.grid.timeline && scope.albums.grid.timeline.dragSelect) {
                 scope.albums.grid.timeline.dragSelect.disabled = true;
@@ -1736,21 +2146,27 @@ lazy(mega.gallery, 'albums', () => {
                     }, 100);
                 },
                 containerClass: 'album-timeline-dialog px-6 py-4',
-                sidePadding: 8,
+                sidePadding: this.sidePadding || 8,
                 showMonthLabel: false,
                 skipGlobalZoom: true,
-                selectionLimit: 1
+                selectionLimit: 1,
+                itemsPerRow: this.itemsPerRow,
+                columnGap: this.columnGap,
+                rowGap: this.rowGap
             });
 
-            const { nodes, eIds, at: { c } } = scope.albums.store[this.albumId];
+            const { eIds, at: { c } } = scope.albums.store[this.albumId];
+            const { nodes } = this;
 
             if (nodes && nodes.length) {
                 const n = eIds[c] && scope.getNodeCache(eIds[c]);
+                const isCoverShown = c && n
+                    && M.getNodeRoot(n.p) !== M.RubbishID
+                    && (!this.nodeFilter || this.nodeFilter(n));
 
                 this.timeline.selectNode(
-                    (c && n && M.getNodeRoot(n.p) !== M.RubbishID)
-                        ? n
-                        : nodes[0]
+                    this.preselect && nodes.find(({ h }) => h === this.preselect)
+                        || (isCoverShown ? n : nodes[0])
                 );
             }
 
@@ -2331,19 +2747,6 @@ lazy(mega.gallery, 'albums', () => {
                 'mega-button large positive'
             );
             this.el.appendChild(button.el);
-        }
-    }
-
-    class AlbumOptionsContextMenu extends MMenuSelect {
-        constructor(options, parentButton) {
-            super();
-            this.options = options;
-            this.parentButton = parentButton;
-        }
-
-        hide(hideSiblings) {
-            super.hide(hideSiblings);
-            this.parentButton.classList.remove('active');
         }
     }
 
@@ -4483,7 +4886,7 @@ lazy(mega.gallery, 'albums', () => {
                     nodes = list.filter(mega.sensitives.shouldShowNode);
                 }
                 else if ($.timelineDialog instanceof AlbumCoverDialog) {
-                    nodes = scope.albums.store[$.timelineDialog.albumId].nodes;
+                    nodes = $.timelineDialog.nodes;
                 }
 
                 timeline.nodes = nodes;

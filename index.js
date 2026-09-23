@@ -606,9 +606,6 @@ function init_page() {
         pfhandle = false;
         pfcol = page.startsWith('collection/');
 
-        const linkParts = isPublicLink(page) || [];
-        const folderLinkOptions = linkParts[2] === 'folder' ? linkParts[4] : linkParts[2];
-
         if (page.length - phLen > 2) {
             if (possibleS === -1) {
                 phLen++;
@@ -702,45 +699,16 @@ function init_page() {
                 delete $.albumImport;
             }
 
-            const slideOpts = {};
-            if (folderLinkOptions) {
-                String(folderLinkOptions)
-                    .replace(/([\w-]{8})h$/, (m, h) => {
-                        slideOpts.h = h;
-                        return '';
-                    })
-                    .replace(/(\d+)([acorsv])/g, (m, v, k) => {
-                        slideOpts[k] = v | 0;
-                        return '';
-                    });
-            }
-
-            if (slideOpts.a) {
+            if (typeof window.autoplayOptions === 'string') {
                 const startFolderLinkSlideshow = () => {
-                    const {speed, order, repeat, playVid, caption} = mega.slideshow.settings;
-                    // Deterministic default options.
-                    const override = {
-                        speed: speed.getCfgByName('slow'),
-                        order: order.getCfgByName('oldest'),
-                        repeat: repeat.getDefaultCfg(),
-                        playVid: playVid.getDefaultCfg(),
-                        caption: caption.getDefaultCfg()
-                    };
-                    if (slideOpts.s) {
-                        override.speed = slideOpts.s;
+                    if (mega.slideshow.autoplayStarted) {
+                        return;
                     }
-                    if (slideOpts.o) {
-                        override.order = slideOpts.o;
-                    }
-                    if (slideOpts.v !== undefined) {
-                        override.playVid = slideOpts.v;
-                    }
-                    if (slideOpts.r !== undefined) {
-                        override.repeat = slideOpts.r;
-                    }
-                    if (slideOpts.c) {
-                        override.caption = slideOpts.c;
-                    }
+                    mega.slideshow.autoplayStarted = true;
+
+                    const { order } = mega.slideshow.settings;
+                    const { startHandle, startRandom, autoStart, ...override } =
+                        mega.slideshow.utils.parseAutoplayParam(window.autoplayOptions);
                     mega.slideshow.settings.override = override;
 
                     const orderedFirst = (nodes) => {
@@ -752,17 +720,15 @@ function init_page() {
                         return nodes[idx[0]];
                     };
 
+                    const filter = mega.slideshow.utils
+                        && mega.slideshow.utils.filterNodes(undefined, true) || M.isGalleryImage;
+                    const media = (M.v || []).filter(filter);
                     let firstNode;
-                    if (pfcol) {
-                        firstNode = slideOpts.h && M.d[slideOpts.h] || orderedFirst(M.v || []);
-                    }
-                    else {
-                        const filter = mega.slideshow.utils
-                            && mega.slideshow.utils.filterNodes(undefined, true) || M.isGalleryImage;
-                        const media = (M.v || []).filter(filter);
-                        if (media.length >= 2) {
-                            firstNode = slideOpts.h && M.d[slideOpts.h] || orderedFirst(media);
-                        }
+
+                    if (pfcol || media.length >= 2) {
+                        firstNode = startHandle && M.d[startHandle] ||
+                            startRandom && media[Math.floor(Math.random() * media.length)] ||
+                            orderedFirst(media);
                     }
 
                     if (!firstNode) {
@@ -772,13 +738,18 @@ function init_page() {
 
                     mBroadcaster.once('slideshow:close', () => {
                         delete mega.slideshow.settings.override;
+                        delete $.autoplayMuted;
                     });
 
-                    if (is_video(firstNode)) {
+                    if (autoStart && is_video(firstNode)) {
                         $.autoplay = firstNode.h;
+                        $.autoplayMuted = true;
                     }
                     slideshow(firstNode.h);
-                    delay('folderlink:slideshow', () => slideshow_playMode(true));
+                    delay('folderlink:slideshow', () => {
+                        slideshow_playMode(true, !autoStart);
+                        eventlog(501415, pfcol ? 'a' : 'f');
+                    });
                 };
 
                 if (pfcol) {

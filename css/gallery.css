@@ -732,6 +732,9 @@ body.rtl .gallery-view.gallery-type-m .gallery-date-block i::before {
     transition: background-image 1s ease;
     background-image: none;
 }
+.album-timeline-cell .video-thumb-details {
+    display: none;
+}
 .album-timeline-cell:not(.shimmer) {
     background-position: center;
     background-repeat: no-repeat;
@@ -1065,3 +1068,258 @@ body.rtl .gallery-view.gallery-type-m .gallery-date-block i::before {
         width: calc(100% - 33px);
     }
 }
+
+/* Albums export link dialog variant */
+
+.mega-component.album-share-links-dialog .header-title {
+    margin-bottom: 8px;
+}
+.mega-component.album-share-links-dialog .header-title h2,
+.mega-component.album-share-links-settings-dialog .header-title h2 {
+    font: var(--mobile-font-heading-h3);
+}
+.mega-component.album-share-links-dialog .content .banner-wrap {
+    display: flex;
+    align-items: center;
+    background: var(--mobile-notification-success);
+    padding: 16px 24px;
+    border-radius: 8px;
+    margin: 16px 0 8px;
+}
+.mega-component.album-share-links-dialog .content .banner-wrap i {
+    margin-inline-end: 8px;
+    --mask-color: var(--mobile-support-success);
+    --icon-size: 24px;
+}
+.mega-component.album-share-links-dialog .content .node-link-block .block-naming .select-text {
+    color: var(--mobile-text-primary);
+}
+.mega-component.album-share-links-dialog .content .node-link-block .block-naming .text-color-medium {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-small-regular);
+}
+.mega-component.album-share-links-dialog .content .node-link-block .block-naming button .primary-text {
+    font: var(--mobile-font-caption-large-semibold);
+}
+.mega-component.album-share-links-dialog .content .node-link-block .link-body .link-value {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-regular);
+}
+.mega-component.album-share-links-dialog .content .link-access-text {
+    font: var(--mobile-font-caption-large-regular);
+}
+.mega-component.album-share-links-dialog footer button .primary-text {
+    font: var(--mobile-font-caption-large-semibold);
+}
+.mega-component.album-share-links-settings-dialog .header-title {
+    margin-bottom: 0;
+}
+.mega-component.album-share-links-settings-dialog .content a.learn-more-text {
+    text-decoration: underline;
+}
+.mega-component.album-share-links-settings-dialog .content .text-color-medium {
+    color: var(--mobile-text-secondary);
+    margin-top: 8px;
+}
+.mega-component.album-share-links-settings-dialog .autoplay-settings-block {
+    padding: 16px 20px;
+    border-radius: 12px;
+    background: var(--mobile-surface-1);
+}
+.mega-component.album-share-links-settings-dialog .autoplay-setting-row {
+    display: flex;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: var(--mobile-border-strong) 1px solid;
+}
+.mega-component.album-share-links-settings-dialog .autoplay-setting-row:first-child {
+    padding-top: 0;
+}
+.mega-component.album-share-links-settings-dialog .autoplay-setting-row:nth-child(5) {
+    padding-bottom: 0;
+    border-bottom: none;
+}
+.mega-component.album-share-links-settings-dialog .autoplay-setting-row .autoplay-info {
+    display: flex;
+    flex-direction: column;
+    margin-inline-end: auto;
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-regular);
+    white-space: nowrap;
+}
+.mega-component.album-share-links-settings-dialog .autoplay-setting-row .autoplay-info .autoplay-desc {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-small-regular);
+}
+.mega-component.album-share-links-settings-dialog .autoplay-select {
+    align-items: center;
+    background: var(--mobile-page-background);
+    border: var(--mobile-border-strong) 1px solid;
+    border-radius: 8px;
+    color: var(--mobile-text-primary);
+    cursor: pointer;
+    display: flex;
+    height: 36px;
+    box-sizing: border-box;
+    padding: 12px;
+    font: var(--mobile-font-caption-large-regular);
+    --mask-color: var(--mobile-icon-primary);
+}
+.mega-component.album-share-links-settings-dialog .autoplay-select.active {
+    border-color: var(--mobile-border-strong-selected);
+}
+.mega-component.album-share-links-settings-dialog .autoplay-select i {
+    margin-inline-start: 8px;
+    --icon-size: 20px;
+}
+.mega-component.menu-container.picker-autoplay-speed,
+.mega-component.menu-container.picker-autoplay-order {
+    min-width: 188px;
+    width: auto;
+}
+.mega-component.album-share-links-settings-dialog .autoplay-picker-row {
+    border-top: 1px solid var(--mobile-border-strong);
+    padding-top: 16px;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+}
+.mega-component.album-share-links-settings-dialog .autoplay-picker-row img {
+    background: var(--image-background);
+    border-radius: 4px;
+    height: 56px;
+    width: 56px;
+    margin-inline-end: 12px;
+}
+.mega-component.album-share-links-settings-dialog .autoplay-picker-row .picker-info {
+    display: flex;
+    flex-direction: column;
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-small-regular);
+    margin-inline-end: auto;
+}
+.mega-component.album-share-links-settings-dialog .autoplay-picker-row .picker-item-name {
+    font: var(--mobile-font-caption-large-regular);
+}
+.mega-component.album-share-links-settings-dialog .autoplay-picker-row .picker-info + button .primary-text {
+    font: var(--mobile-font-caption-large-semibold);
+}
+.mega-component.album-share-links-settings-dialog footer button span {
+    font: var(--mobile-font-caption-large-semibold);
+}
+.mega-component.album-share-links-settings-dialog footer button.button-brand span {
+    color: var(--mobile-text-error);
+}
+.mega-dialog.album-share-links-picker-dialog {
+    background: var(--mobile-page-background);
+    width: 640px;
+}
+.mega-dialog.album-share-links-picker-dialog .m-dialog-back {
+    top: 20px;
+    left: 1.5rem;
+    --mask-color: var(--mobile-icon-primary);
+}
+.mega-dialog.album-share-links-picker-dialog .m-dialog-close {
+    --mask-color: var(--mobile-icon-secondary);
+}
+.mega-dialog.album-share-links-picker-dialog .m-dialog-close i {
+    opacity: 1;
+}
+.mega-dialog.album-share-links-picker-dialog h3 {
+    text-align: start;
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-heading-h3);
+    padding: 0 4rem;
+}
+.mega-dialog.album-share-links-picker-dialog .album-cover-subtitle {
+    margin-inline-start: 40px;
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-caption-large-regular);
+}
+.mega-dialog.album-share-links-picker-dialog .content > .bg-mobile-surface-grey-1 {
+    background: var(--mobile-page-background);
+    padding: 0;
+}
+.mega-dialog.album-share-links-picker-dialog .album-timeline-dialog {
+    padding: 44px 40px 0;
+}
+.mega-dialog.album-share-links-picker-dialog .album-timeline-cell {
+    margin: 2px 1px;
+}
+.mega-dialog.album-share-links-picker-dialog .album-timeline-cell .video-thumb-details {
+    align-items: center;
+    display: flex;
+    position: absolute;
+    top: auto;
+    bottom: 8px;
+    left: 8px;
+    background: var(--mobile-surface-transparent);
+    padding: 2px 4px;
+    color: var(--mobile-text-inverse-accent);
+    font: var(--mobile-font-caption-small-regular);
+    white-space: nowrap;
+    border-radius: 2px;
+    line-height: 14px;
+}
+.mega-dialog.album-share-links-picker-dialog .album-timeline-cell .video-thumb-details i {
+    margin-inline-end: 4px;
+    --mask-color: var(--mobile-text-inverse-accent);
+}
+.mega-dialog.album-share-links-picker-dialog .album-timeline-cell.ui-selected {
+    background: var(--mobile-surface-2);
+    border: 1px solid var(--mobile-border-brand);
+    border-radius: 0;
+    box-shadow: none;
+    box-sizing: border-box;
+}
+.mega-dialog.album-share-links-picker-dialog .album-timeline-cell.ui-selected > i {
+    display: none;
+}
+.mega-dialog.album-share-links-picker-dialog .album-timeline-cell.ui-selected img {
+    border-radius: 4px;
+    height: calc(100% - 16px);
+    left: 8px;
+    top: 8px;
+    width: calc(100% - 16px);
+}
+.mega-dialog.album-share-links-picker-dialog footer button {
+    align-items: center;
+    background: var(--mobile-button-secondary);
+    border: none;
+    border-radius: var(--mobile-border-radius-medium);
+    box-shadow: none;
+    box-sizing: border-box;
+    color: var(--mobile-text-primary);
+    display: inline-flex;
+    height: 36px;
+    justify-content: center;
+    padding: 0 24px;
+}
+.mega-dialog.album-share-links-picker-dialog footer button span {
+    font: var(--mobile-font-caption-large-semibold);
+    margin: 0;
+}
+.mega-dialog.album-share-links-picker-dialog footer button:hover {
+    background: var(--mobile-button-secondary-hover);
+}
+.mega-dialog.album-share-links-picker-dialog footer button:active {
+    background: var(--mobile-button-secondary-pressed);
+}
+.mega-dialog.album-share-links-picker-dialog footer button.positive {
+    background: var(--mobile-button-primary);
+    color: var(--mobile-text-inverse);
+}
+.mega-dialog.album-share-links-picker-dialog footer button.positive:hover {
+    background: var(--mobile-button-primary-hover);
+}
+.mega-dialog.album-share-links-picker-dialog footer button.positive:active {
+    background: var(--mobile-button-primary-pressed);
+}
+.mega-dialog.album-share-links-picker-dialog footer button.disabled,
+.mega-dialog.album-share-links-picker-dialog footer button.disabled:hover,
+.mega-dialog.album-share-links-picker-dialog footer button.disabled:active {
+    background: var(--mobile-button-disabled);
+    color: var(--mobile-text-disabled);
+}
+
+/* End Albums export link dialog variant */

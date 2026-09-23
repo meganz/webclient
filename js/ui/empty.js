@@ -99,9 +99,11 @@ lazy(mega.ui, 'empty', () => {
             }
         });
 
-        const container = mCreateElement('div', { class: 'empty-state flex-1 flex flex-column' }, [
-            dropContainer,
-            importArea
+        const container = mCreateElement('div', {class: 'empty-state flex-1 flex flex-column'}, [
+            mCreateElement('div', {class: 'flex-1 flex flex-column'}, [
+                dropContainer,
+                importArea
+            ])
         ]);
 
         $(container).rebind('contextmenu.fm', (e) => {

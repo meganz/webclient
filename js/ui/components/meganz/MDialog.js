@@ -9,6 +9,8 @@ class MDialog extends MComponent {
      * @param {String} [data.icon] Classes for the side icon on the left
      * @param {String} [data.closeIcon] Sprite class for the close button glyph, defaults to icon-dialog-close
      * @param {Function} [data.onclose] Callback to trigger when the dialog is closed
+     * @param {Function} [data.onback] Callback to trigger when the back button is used, it also adds the button,
+     * the closing flow sets `backed` while it is on its way, so onclose can tell the two apart
      * @param {Boolean} [data.dialogName] Unique name for the dialog
      * @param {Function} [data.setContent] Default content function
      */
@@ -20,6 +22,7 @@ class MDialog extends MComponent {
         icon,
         closeIcon,
         onclose,
+        onback,
         dialogName,
         setContent,
         titleClasses
@@ -34,6 +37,7 @@ class MDialog extends MComponent {
         this._title.className = `text-ellipsis ${titleClasses || ''}`;
 
         this.onclose = onclose;
+        this.onback = onback;
         this._dialogName = dialogName || 'm-dialog';
         this._closeIcon = closeIcon || 'icon-dialog-close';
 
@@ -138,6 +142,11 @@ class MDialog extends MComponent {
 
                 if (typeof this.onclose === 'function') {
                     this.onclose();
+                }
+
+                if (this.backed) {
+                    delete this.backed;
+                    this.onback();
                 }
             });
         });
@@ -244,6 +253,18 @@ class MDialog extends MComponent {
         const closeIcon = document.createElement('i');
         closeIcon.className = `sprite-fm-mono ${this._closeIcon}`;
         closeBtn.appendChild(closeIcon);
+
+        if (typeof this.onback === 'function') {
+            MegaButton.factory({
+                parentNode: this.el,
+                type: 'icon',
+                componentClassname: 'transparent-icon text-icon secondary m-dialog-back absolute',
+                icon: `sprite-fm-mono icon-arrow-left-regular-outline rtl-rot-180`
+            }).on('click.dialogBack', () => {
+                this.backed = true;
+                this.hide();
+            });
+        }
 
         this.el.appendChild(this._title);
 

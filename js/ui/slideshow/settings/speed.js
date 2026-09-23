@@ -60,6 +60,7 @@ lazy(mega.slideshow.settings, 'speed', () => {
                 }
                 else {
                     button.removeClass('active');
+                    $('i.icon-active', button).addClass('hidden');
                 }
                 $(`button.${k} span`, $options).safeHTML(this._getText(v));
                 button.rebind('click.slideshow-speed', () => clickHandler(k));

@@ -213,9 +213,15 @@ function u_checklogin3a(res, ctx) {
         }
 
         if (localStorage.mctRec) {
-            // Send MCT details if user logged in or registered
-            eventlog(501024, localStorage.mctRec);
+
+            // Send MCT details if user logged in or registered, eventlog() drops m over 666 chars
+            const rec = tryCatch(() => JSON.parse(localStorage.mctRec), false)();
+
             delete localStorage.mctRec;
+
+            while (Array.isArray(rec) && rec.length) {
+                eventlog(501024, JSON.stringify(rec.splice(0, 5)));
+            }
         }
 
         // Notify session resumption.

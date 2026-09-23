@@ -178,7 +178,16 @@ window.toastRack = (() => {
             toast.appendChild(span);
         }
         else if (content instanceof HTMLElement) {
-            toast.appendChild(content);
+            const invalid = parseHTML.getOuterHTML(content)
+                .replace(/<\/?span[^>]*>/gi, '')
+                .match(/[<>]/);
+
+            if (invalid) {
+                console.error(`Invalid toast content`, content);
+            }
+            else {
+                toast.appendChild(content);
+            }
         }
 
         // set buttons
@@ -1100,11 +1109,6 @@ function showToast(
 
     const icons = typeof iconEquivalents[type] === 'string' ? [iconEquivalents[type]] : iconEquivalents[type];
 
-    // content
-    const span = document.createElement('span');
-    span.className = 'message';
-    $(span).safeHTML(content);
-
     if (typeof firstButtonText === 'number') {
         timeout = firstButtonText;
         firstButtonText = 0;
@@ -1129,7 +1133,7 @@ function showToast(
     }
 
     window.toaster.main.show({
-        content: span,
+        content,
         icons,
         buttons,
         hasClose: true,

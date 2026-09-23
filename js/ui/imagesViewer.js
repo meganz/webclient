@@ -278,7 +278,10 @@ var slideshowid;
                 }
             }
 
-            if (!$overlay.is('.video-theatre-mode')) {
+            if ($overlay.hasClass('video-theatre-mode')) {
+                mega.slideshow.settings.caption.position();
+            }
+            else {
                 slideshow_imgPosition($overlay);
             }
 
@@ -780,6 +783,7 @@ var slideshowid;
         const $img = $('img.active', $overlay);
 
         if ($img.length === 0) {
+            mega.slideshow.settings.caption.position();
             return false;
         }
 
@@ -833,6 +837,7 @@ var slideshowid;
         if (is_mobile && mega.ui.viewerOverlay) {
             mega.ui.viewerOverlay.zoom = imgWidth / origImgWidth * devicePixelRatio * 100;
         }
+        mega.slideshow.settings.caption.positionTo($img);
     }
 
     function detectEdgesViaCenter(img, container, buffer = 0.05) {
@@ -1669,7 +1674,7 @@ var slideshowid;
         slideshow_timereset(rv);
     }
 
-    function slideshow_playMode(isAuto) {
+    function slideshow_playMode(isAuto, isPaused) {
         if (!isAuto) {
             delete mega.slideshow.settings.override;
         }
@@ -1708,6 +1713,42 @@ var slideshowid;
         $slideshowControlsUpper.removeClass('hidden');
         $prevNextButtons.addClass('hidden');
         $repeatButton.addClass('disabled').attr('disabled', 'disabled');
+        mega.slideshow.settings.caption.position();
+
+        if (isPaused) {
+            const play = mCreateElement('i', { 'class': 'sprite-fm-mono icon-play-thin-solid' });
+            const overlay = mCreateElement('div', { 'class': 'autoplay-overlay theme-dark-forced' }, [
+                play
+            ]);
+            const blockTyping = (ev) => {
+                ev.stopPropagation();
+                if (ev.key === 'Enter' || ev.key === ' ') {
+                    ev.preventDefault();
+                    play.click();
+                }
+            };
+            const dismiss = () => {
+                overlay.remove();
+                document.removeEventListener('keydown', blockTyping, true);
+                $overlay.removeClass('autoplay-overlayed');
+            };
+            play.addEventListener('click', () => {
+                dismiss();
+                slideshow_toggle_pause($('.sl-btn.playpause', $slideshowControls));
+
+                if (fullScreenManager) {
+                    fullScreenManager.enterFullscreen();
+                }
+                if (is_video(slideshow_node(slideshow_handle()))) {
+                    $('.play-video-button', $overlay).trigger('click');
+                }
+            });
+            mBroadcaster.once('slideshow:close', dismiss);
+            document.addEventListener('keydown', blockTyping, true);
+            document.body.appendChild(overlay);
+            $overlay.addClass('autoplay-overlayed');
+            slideshow_toggle_pause($('.sl-btn.playpause', $slideshowControls));
+        }
 
         if (zoomPan) {
             zoomPan.reset();
@@ -2130,8 +2171,13 @@ var slideshowid;
         $content.removeClass('hidden');
         $('.viewer-pending', $content).addClass('hidden');
 
+        const { caption } = mega.slideshow.settings;
+        const media = MediaAttribute(n).data;
+        caption.positionTo($video, media);
+        $video.rebind('loadedmetadata.caption', () => caption.positionTo($video));
+
         if (n.name) {
-            var c = MediaAttribute.getCodecStrings(n);
+            var c = media && MediaAttribute.getCodecStrings(media);
             if (c) {
                 $('header .file-name', $overlay).attr('title', c);
             }
@@ -2161,6 +2207,19 @@ var slideshowid;
         previews[id].poster = previews[id].poster || '';
 
         if ($.autoplay === id) {
+            if ($.autoplayMuted) {
+                const video = $video[0];
+                video.muted = true;
+                if (!video.autoplayUnmuteBound) {
+                    video.autoplayUnmuteBound = true;
+                    video.addEventListener('volumechange', (ev) => {
+                        if (!ev.currentTarget.muted) {
+                            delete $.autoplayMuted;
+                        }
+                    });
+                }
+            }
+
             queueMicrotask(() => {
                 $playVideoButton.trigger('click');
             });

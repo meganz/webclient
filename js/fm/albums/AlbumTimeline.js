@@ -24,6 +24,9 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             const icon = document.createElement('i');
             icon.className = 'video-thumb-play sprite-fm-mono icon-play-circle';
             el.appendChild(icon);
+            const duration = mCreateElement('div', { 'class': 'video-thumb-details' }, el);
+            mCreateElement('i', { 'class': 'sprite-fm-mono icon-play-thin-outline' }, duration);
+            mCreateElement('span', null, duration).textContent = el.dataset.videoDuration;
         }
     };
 
@@ -293,6 +296,10 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
          * @param {Boolean} [options.interactiveCells] Whether cells should react to context menu and selections
          * @param {Boolean} [options.selectionLimit] Whether a multiple selection is allowed or not
          * @param {Boolean} [options.skipGlobalZoom] Whether to use global zoom or the locally created one
+         * @param {Number} [options.itemsPerRow] Cells per row to use instead of the zoom based amount,
+         * it is ignored without skipGlobalZoom, as the zoom controls would not be able to change it
+         * @param {Number} [options.columnGap] Space to leave between the cells of a row, in pixels
+         * @param {Number} [options.rowGap] Space to leave between the rows, in pixels, defaults to the column one
          */
         constructor({
             onSelectToggle,
@@ -302,7 +309,10 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             showMonthLabel,
             interactiveCells,
             selectionLimit,
-            skipGlobalZoom
+            skipGlobalZoom,
+            itemsPerRow,
+            columnGap,
+            rowGap
         }) {
             super(null, false);
 
@@ -327,6 +337,9 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             this.interactiveCells = interactiveCells;
             this.skipGlobalZoom = skipGlobalZoom;
             this.selectionLimit = selectionLimit || 0;
+            this._itemsPerRow = skipGlobalZoom && itemsPerRow || 0;
+            this.columnGap = columnGap || scope.cellMargin * 2;
+            this.rowGap = rowGap || this.columnGap;
 
             this._zoomStep = skipGlobalZoom ? defZoomStep : globalZoomStep;
             this._limitReached = false;
@@ -347,6 +360,18 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
         get zoomStep() {
             return this._zoomStep;
+        }
+
+        get itemsPerRow() {
+            return this._itemsPerRow || AlbumTimeline.zoomSteps[this._zoomStep];
+        }
+
+        get columnMargin() {
+            return this.columnGap / 2;
+        }
+
+        get rowMargin() {
+            return this.rowGap / 2;
         }
 
         get limitReached() {
@@ -460,7 +485,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                         monthLabel
                     });
                 }
-                else if (lastEl.list.length % AlbumTimeline.zoomSteps[this.zoomStep] === 0) {
+                else if (lastEl.list.length % this.itemsPerRow === 0) {
                     ids.push(lastIndex.toString());
                     lastIndex++;
 
@@ -506,7 +531,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 ? 44
                 : 0;
 
-            return this.cellSize + scope.cellMargin * 2 + headerHeight;
+            return this.cellSize + this.rowGap + headerHeight;
         }
 
         findMiddleImage() {
@@ -616,10 +641,10 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                     const isInArea = scope.isInSelectArea(
                         {
                             offsetLeft: Math.floor(
-                                this.cellSize * j + scope.cellMargin * (j * 2 + 1)
+                                this.cellSize * j + this.columnMargin * (j * 2 + 1)
                             ),
                             offsetTop: Math.floor(
-                                this.dynamicList._offsets[i.toString()] + scope.cellMargin
+                                this.dynamicList._offsets[i.toString()] + this.rowMargin
                             ),
                             offsetWidth: this.cellSize,
                             offsetHeight: this.cellSize
@@ -786,7 +811,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
                         if (inRowIndex < 0) {
                             rowIndex--;
-                            inRowIndex = AlbumTimeline.zoomSteps[this.zoomStep] - 1;
+                            inRowIndex = this.itemsPerRow - 1;
                         }
 
                         if (rowIndex < 0 && !shiftKey && !isCtrl) {
@@ -989,7 +1014,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             else {
                 const bottomOverflow = newOffsetTop
                     + this.getRowHeight(rowIndex)
-                    + scope.cellMargin
+                    + this.rowMargin
                     - (scrollTop + this.el.clientHeight);
 
                 if (bottomOverflow > 0) {
@@ -1230,12 +1255,10 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
         }
 
         setCellSize() {
-            const gap = 8;
-
             this.cellSize = (this.el.offsetWidth
-                - gap * AlbumTimeline.zoomSteps[this.zoomStep] // Cell margins
+                - this.columnGap * this.itemsPerRow // Cell margins
                 - this.sidePadding * 2) // Horizontal padding
-                / AlbumTimeline.zoomSteps[this.zoomStep]; // Columns
+                / this.itemsPerRow; // Columns
         }
 
         /**

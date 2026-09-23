@@ -94,6 +94,8 @@ lazy(mega.slideshow.settings, 'order', () => {
                 }
                 else {
                     button.removeClass('active');
+                    $('i:last', $button).removeClass(v.icon);
+                    $('i.icon-active', button).addClass('hidden');
                 }
                 $(`button.${k} i:first`, $options).addClass(v.icon);
                 button.rebind('click.slideshow-order', () => clickHandler(k));

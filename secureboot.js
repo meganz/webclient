@@ -339,9 +339,25 @@ function getCleanSitePath(path) {
     if (path === undefined) {
         path = getSitePath();
 
-        if (location.search && path.indexOf('#') < 0) {
-            location.search.replace(/\w+=[^&]+/g, function(m) {
-                path += '/' + m;
+        var search = location.search;
+        var query = self.hashLogic ? path.search(/\?\w+=/) : -1;
+
+        if (query > 0) {
+            var hash = path.indexOf('#', query);
+
+            search = hash < 0 ? path.substr(query) : path.substring(query, hash);
+            path = path.substr(0, query) + (hash < 0 ? '' : path.substr(hash));
+        }
+
+        if (search) {
+            // parameters honoured even when the URL holds a fragment, such as a public-link key
+            var hashedSearchParams = ['autoplay'];
+            var hashless = !path.includes('#');
+
+            search.replace(/(\w+)=[^&]+/g, function(m, name) {
+                if (hashless || hashedSearchParams.includes(name)) {
+                    path += '/' + m;
+                }
             });
         }
     }
@@ -448,6 +464,10 @@ function getCleanSitePath(path) {
         }
         if (path.kbCatId) {
             window.kbCatId = path.kbCatId;
+        }
+
+        if (path.autoplay !== undefined) {
+            window.autoplayOptions = String(path.autoplay).replace(/[^\w,=-]/g, '').substr(0, 100);
         }
 
         if (path.next) {
@@ -1226,14 +1246,17 @@ var isStaticPage = function(page) {
 
 if (hashLogic) {
     // legacy support:
-    page = getCleanSitePath(document.location.hash);
+    page = getCleanSitePath();
+    if (window.autoplayOptions !== undefined) {
+        pushHistoryState(true, {subpage: page, autoplay: window.autoplayOptions});
+    }
 }
 else if ((page = isPublicLink())) {
     // folder or file link: always keep the hash URL to ensure that keys remain client side
     // history.replaceState so that back button works in new URL paradigm
     dl_res = !!page.dl;
     page = String(page.link || page);
-    pushHistoryState(true, page);
+    pushHistoryState(true, {subpage: page, autoplay: window.autoplayOptions});
 }
 else {
     if (document.location.hash.length > 0) {
@@ -4201,6 +4224,10 @@ function pushHistoryState(page, state) {
         state = Object.assign({}, page, state);
         page = state.subpage || state.fmpage || location.hash;
 
+        if (state.autoplay === undefined && Object(history.state).subpage === state.subpage) {
+            state.autoplay = Object(history.state).autoplay;
+        }
+
         if (page.substr(0, 9) === 'fm/search') {
             state.searchString = page.substr(9) || state.searchString;
 
@@ -4217,7 +4244,16 @@ function pushHistoryState(page, state) {
             console.warn('duplicate push state attempt.');
         }
 
-        history[method](state, '', (self.hashLogic || page[1] === '!' ? '#' : '/') + page);
+        var prefix = self.hashLogic || page[1] === '!' ? '#' : '/';
+
+        if (typeof state.autoplay === 'string') {
+            var hash = page.indexOf('#');
+            var param = '?autoplay=' + state.autoplay;
+
+            page = hash < 0 ? page + param : page.substr(0, hash) + param + page.substr(hash);
+        }
+
+        history[method](state, '', prefix + page);
     }
     catch (ex) {
         console.warn(ex);

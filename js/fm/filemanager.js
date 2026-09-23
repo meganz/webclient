@@ -2333,6 +2333,9 @@ FileManager.prototype.initUIKeyEvents = function() {
                         $elm.trigger('click').trigger('dblclick');
                     }
                     else {
+                        if (is_video(n)) {
+                            $.autoplay = n.h;
+                        }
                         slideshow($.selected[0]);
                     }
                 }

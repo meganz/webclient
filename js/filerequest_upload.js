@@ -225,6 +225,24 @@ lazy(mega, 'fileRequestUpload', () => {
                 entries.filter((c) => c.found),
                 (entry, name) => {
                     entry.skip = !name;
+                },
+                (entry) => {
+                    // This should be rare i.e: the client could manipulate file names into the same in the drop
+                    const prior = entries.slice(0, entries.indexOf(entry))
+                        .find((e) => !e.skip && e.target === entry.target && e.file.name === entry.name);
+                    if (prior) {
+                        return () => {
+                            prior.skip = true;
+                        };
+                    }
+
+                    // Typical path to find in already queued uploads. Don't consider prior batches.
+                    const queued = fileconflict.locateFileInUploadQueue(entry.target, entry.name);
+                    const gid = queued && `ul_${queued.id}`;
+                    if (!gid || uploadPage.rows[gid] !== `#${gid}`) {
+                        return null;
+                    }
+                    return () => uploadPage.removeItem(gid);
                 }
             );
 
@@ -1046,13 +1064,14 @@ lazy(mega, 'fileRequestUpload', () => {
             }
         }
 
-        async resolveClashes(clashes, done) {
+        async resolveClashes(clashes, done, locate) {
             let repeatOp = null;
 
             for (let i = 0; i < clashes.length; i++) {
                 const { file, name, found, target } = clashes[i];
+                const swap = locate && locate(clashes[i]);
                 const res = await this
-                    .resolveName(file, name, found, target, clashes.length - i - 1, repeatOp)
+                    .resolveName(file, name, found, target, clashes.length - i - 1, repeatOp, swap)
                     .catch(dump);
 
                 if (res && res.repeat) {
@@ -1143,8 +1162,12 @@ lazy(mega, 'fileRequestUpload', () => {
             return `${id}/${from.slice(0, MAX_TAG_LENGTH - id.length - 1)}`;
         }
 
-        async resolveName(file, name, found, target, remaining, repeat) {
-            if (repeat) {
+        async resolveName(file, name, found, target, remaining, repeat, swap) {
+            if (repeat === fileconflict.REPLACE && swap) {
+                swap();
+                return { name: this.reserveName(file, name, target), repeat };
+            }
+            if (repeat && repeat !== fileconflict.REPLACE) {
                 return {
                     name: repeat === fileconflict.KEEPBOTH
                         && this.reserveName(file, this.findName(name, target), target),
@@ -1158,15 +1181,23 @@ lazy(mega, 'fileRequestUpload', () => {
             return new Promise((resolve) => {
                 fileconflict.prompt('upload', queued, found, remaining, target)
                     .always((res, chosen, action, checked) => {
+                        if (action === fileconflict.REPLACE) {
+                            swap();
+                        }
                         resolve({
-                            name: action === fileconflict.KEEPBOTH && this.reserveName(file, chosen, target),
+                            name: (action === fileconflict.REPLACE || action === fileconflict.KEEPBOTH)
+                                && this.reserveName(file, chosen, target),
                             repeat: checked && action
                         });
                     });
 
                 // Forcibly hide dialog section and update with non-reserved name
                 const $dialog = fileconflict.getDialog();
-                $('.action-block.a1', $dialog).addClass('hidden');
+                const $a1 = $('.action-block.a1', $dialog).toggleClass('hidden', !swap);
+                if (swap) {
+                    $('.red-header', $a1).text(l.fr_replace_title);
+                    $('.light-grey:not(.file-size)', $a1).text(l.fr_replace_text);
+                }
                 const $a3 = $('.action-block.a3', $dialog);
                 $('.file-name', $a3).text(suggestion);
                 fileconflict.customNames($a3[0]);

@@ -673,6 +673,7 @@ lazy(mega, 'fileRequestUpload', () => {
                 .removeClass('transfer-started transfer-error')
                 .addClass('transfer-completed');
             $itemElement.progress.css('width', `100%`);
+            $itemElement.size.text(bytesToSize(item.totalSize, 1));
             item.completed = true;
             item.error = false;
             $('.item-details i', $itemElement.element)
@@ -719,6 +720,11 @@ lazy(mega, 'fileRequestUpload', () => {
             $item.currentSize = loaded;
             $item.percent = $item.totalSize ? Math.min(loaded / $item.totalSize * 100, 100) : perc;
             $item.$.progress.css('width', `${$item.percent}%`);
+            $item.$.size.text(
+                l.tfw_byte_progress
+                    .replace('%2', bytesToSize($item.totalSize, 1))
+                    .replace('%1', bytesToSize($item.currentSize))
+            );
 
             if ($item.$.element) {
                 $item.$.element.removeClass('transfer-initiliazing transfer-queued');

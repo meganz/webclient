@@ -195,6 +195,12 @@ mobile.fileRequestManagement = {
             });
             this.frLinkInput.value = mega.fileRequest.generator.generateUrl(this.puHandleObject.p);
             this.frLinkInput.readOnly = true;
+            mCreateElement('i', {
+                class: 'sprite-fm-mono icon-qr-thin-outline action-icon show-qrcode'
+            }, this.frLinkInput.input.parentNode).addEventListener('click', ev => {
+                ev.stopPropagation();
+                MegaQrPopup.showSheet(this.frLinkInput.value);
+            });
             MegaButton.factory({
                 parentNode: this.container,
                 text: l.link_settings,
@@ -375,6 +381,13 @@ mobile.fileRequestManagement = {
 
         const frLinkMegaInput = new mega.ui.MegaInputs($(frLinkInput), {
             copyToastText: l.file_request_link_copied,
+        });
+        mCreateElement('i', {
+            class: 'sprite-fm-mono icon-qr-thin-outline action-icon show-qrcode'
+        }, frLinkInput.parentNode).addEventListener('click', ev => {
+            ev.stopPropagation();
+            mega.ui.sheet.hide();
+            MegaQrPopup.showSheet(frLink, () => this.showFRUpdatedSheet(isUpdated));
         });
 
         mega.ui.sheet.show({

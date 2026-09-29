@@ -2378,6 +2378,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/checkbox-group.js', n: 'checkbox_select_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/radial.js', n: 'radial_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/tooltip.js', n: 'tooltip_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/qr-popup.js', n: 'qr_popup_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/tabgroup.js', n: 'tabgroup_js', j: 1, w: 1});
     jsl.push({f:'css/components/tabgroup.css', n: 'tabgroup_css', j: 2, w: 5});
 
@@ -2609,6 +2610,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/components/radial.css', n: 'radial_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/textarea.css', n: 'comp_textarea_css', j:2, w:1});
     jsl.push({f:'css/components/tooltip.css', n: 'tooltip_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/components/qr-popup.css', n: 'qr_popup_css', j:2, w:1});
     jsl.push({f:'css/components/banner.css', n: 'banner_css', j:2, w:30, c:1, d:1, cache:1});
 
     // Load files common to all mobile pages

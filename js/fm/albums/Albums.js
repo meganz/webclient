@@ -1037,6 +1037,13 @@ lazy(mega.gallery, 'albums', () => {
                         tSleep(3).then(() => {
                             banner.classList.remove('max-h-100');
                             banner.classList.add('max-h-0');
+                            tSleep(0.3).then(() => {
+                                const activeQR = document.componentSelector('.qrcode-popup:not(.hidden)');
+
+                                if (activeQR) {
+                                    activeQR.position();
+                                }
+                            });
                         });
                     }
                     addSettingsBtn(
@@ -1089,6 +1096,35 @@ lazy(mega.gallery, 'albums', () => {
                     copyToClipboard(text);
                     mega.ui.toast.show(copiedMsg, 4);
                     eventlog(copyEvtId);
+                });
+
+                // Decryption key row doesn't need a QR code button
+                if (klass === 'decr-key-value') {
+                    return row;
+                }
+
+                let qrPopup;
+
+                MegaButton.factory({
+                    parentNode: row,
+                    icon: 'sprite-fm-mono icon-qr-thin-outline icon-size-20',
+                    componentClassname: 'transparent-icon text-icon show-qrcode simpletip secondary',
+                    type: 'icon',
+                    dataset: {simpletip: l[17754]}
+                }).on('click.qrcode', function() {
+
+                    if (qrPopup && qrPopup.visible) {
+                        qrPopup.hide();
+                        return;
+                    }
+
+                    qrPopup = qrPopup || new MegaQrPopup({
+                        parentNode: mega.ui.sheet.contentNode,
+                        targetNode: this.domNode,
+                        link: text,
+                        fileName: label
+                    });
+                    qrPopup.show();
                 });
 
                 return row;

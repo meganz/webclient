@@ -2506,58 +2506,8 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
 /* QR code popup */
 
     body.web-desktop .mega-sheet.export-links-dialog .node-link-block button.copy-field,
-    .mega-sheet.export-links-dialog .qrcode-container {
+    .mega-sheet.export-links-dialog .link-body button.show-qrcode {
         margin-inline-start: 4px;
-    }
-    .mega-sheet.export-links-dialog .qrcode-container button.active {
-        background-color: var(--mobile-button-secondary-pressed);
-    }
-    .mega-sheet.export-links-dialog .qrcode-popup {
-        position: fixed;
-        z-index: 1001;
-        background: var(--mobile-surface-2);
-        padding: 12px;
-        border-radius: 8px;
-        font: var(--mobile-font-caption-large-bold);
-    }
-    .rtl .mega-sheet.export-links-dialog .qrcode-popup {
-        transform: translateX(-100%);
-    }
-    .mega-sheet.export-links-dialog .qrcode-popup::after {
-        content: "";
-        position: absolute;
-        top: 29px;
-        left: -11px;
-        width: 0;
-        height: 0;
-        border-top: 9px solid transparent;
-        border-bottom: 9px solid transparent;
-        border-right: 11px solid var(--mobile-surface-2);
-    }
-    .rtl .mega-sheet.export-links-dialog .qrcode-popup::after {
-        left: auto;
-        right: -11px;
-        border-left: 11px solid var(--mobile-surface-2);
-        border-right: 0;
-    }
-    .mega-sheet.export-links-dialog .qrcode-popup .close-qrcode {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        padding: 0;
-    }
-    .rtl .mega-sheet.export-links-dialog .qrcode-popup .close-qrcode {
-        left: 12px;
-        right: auto;
-    }
-    .mega-sheet.export-links-dialog .qrcode-popup .qrcode-popup-content-body {
-        padding: 16px;
-        background-color: rgb(255, 255, 255, 1);
-        border-radius: 8px;
-        margin-top: 12px;
-    }
-    .mega-sheet.export-links-dialog .qrcode-popup .qrcode-popup-content-body > canvas {
-        display: block;
     }
 
     /* end QR code popup */
@@ -7290,8 +7240,8 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
         box-sizing: border-box;
         padding-inline-end: 10px;
     }
-    .mega-dialog.group-chat-link .chat-link-input i,
-    .mega-dialog.invite-meeting .chat-link-input i {
+    .mega-dialog.group-chat-link .chat-link-input > i,
+    .mega-dialog.invite-meeting .chat-link-input > i {
         position: absolute;
         left: 5px;
         top: 50%;
@@ -7299,8 +7249,8 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
         --icon-size: 28px;
         --mask-color: var(--icon-rest);
     }
-    .rtl .mega-dialog.group-chat-link .chat-link-input i,
-    .rtl .mega-dialog.invite-meeting .chat-link-input i {
+    .rtl .mega-dialog.group-chat-link .chat-link-input > i,
+    .rtl .mega-dialog.invite-meeting .chat-link-input > i {
         left: unset;
         right: 5px;
     }
@@ -7317,6 +7267,19 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
         border-radius: 12px;
         background: var(--surface-grey-1);
         color: var(--text-color-medium);
+    }
+    .mega-dialog.group-chat-link .chat-link-input input {
+        padding-inline-end: 44px;
+    }
+    .mega-dialog.group-chat-link .chat-link-input .show-qrcode {
+        position: absolute;
+        top: 50%;
+        right: 16px;
+        transform: translateY(-50%);
+    }
+    .rtl .mega-dialog.group-chat-link .chat-link-input .show-qrcode {
+        left: 16px;
+        right: auto;
     }
     .mega-dialog.group-chat-link.requires-topic {
         width: 450px;
@@ -10593,57 +10556,6 @@ body.web-desktop .mega-dialog.s4-setup-dialog {
 }
 .mega-dialog.file-request .content-block.secondary .form-row .file-request-input.input-share > :last-child {
     margin-inline-end: 12px;
-}
-.mega-dialog.file-request .qrcode-popup {
-    position: fixed;
-    z-index: 1001;
-    background: var(--mobile-surface-2);
-    padding: 12px;
-    border-radius: 8px;
-    font: var(--mobile-font-caption-large-bold);
-}
-.rtl .mega-dialog.file-request .qrcode-popup {
-    transform: translateX(-100%);
-}
-.mega-dialog.file-request .qrcode-popup::after {
-    content: "";
-    position: absolute;
-    top: 29px;
-    left: -11px;
-    width: 0;
-    height: 0;
-    border-top: 9px solid transparent;
-    border-bottom: 9px solid transparent;
-    border-right: 11px solid var(--mobile-surface-2);
-}
-.rtl .mega-dialog.file-request .qrcode-popup::after {
-    left: auto;
-    right: -11px;
-    border-left: 11px solid var(--mobile-surface-2);
-    border-right: 0;
-}
-.mega-dialog.file-request .qrcode-popup .qrcode-popup-content-header {
-    color: var(--mobile-text-primary);
-}
-.mega-dialog.file-request .qrcode-popup .close-qrcode {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    padding: 0;
-    --mask-color: var(--mobile-icon-primary);
-}
-.rtl .mega-dialog.file-request .qrcode-popup .close-qrcode {
-    left: 12px;
-    right: auto;
-}
-.mega-dialog.file-request .qrcode-popup .qrcode-popup-content-body {
-    padding: 16px;
-    background-color: rgb(255, 255, 255, 1);
-    border-radius: 8px;
-    margin-top: 12px;
-}
-.mega-dialog.file-request .qrcode-popup .qrcode-popup-content-body > canvas {
-    display: block;
 }
 .rtl .mega-dialog.file-request .content-block .form-row.create-success .file-request-input .input-wrapper i {
     right: 10px;

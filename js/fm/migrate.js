@@ -284,7 +284,18 @@ lazy(mega, 'migrate', () => {
 
                             const warning = ce('div', cn, {class: 'banner'});
                             ce('i', warning, {class: 'sprite-fm-mono icon-info-thin-outline'});
-                            ce('span', warning).textContent = l.mig_ongoing;
+                            const [before, link = '', after = ''] = l.mig_ongoing_history.split(/\[A]|\[\/A]/);
+                            const historyPage = 'fm/account/transfers/migrate-cloud-provider-settings';
+                            const linkNode = ce('a', null, {href: `/${historyPage}`});
+
+                            linkNode.textContent = link;
+                            linkNode.addEventListener('click', (ev) => {
+                                ev.preventDefault();
+                                navigate.hide();
+                                loadSubPage(historyPage);
+                            });
+
+                            ce('span', warning).append(before, linkNode, after);
                         }
 
                         renderServiceGuides(cn, providers);

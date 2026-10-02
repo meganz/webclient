@@ -970,7 +970,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         return freeze({
             destroy,
             get isVisible() {
-                return $.dialog === 'subtitles-dialog' || menu.classList.contains('visible');
+                return $.dialog === 'add-subtitles-dialog' || menu.classList.contains('visible');
             },
             fire(ev) {
                 if (ev.type === 'mouseup') {

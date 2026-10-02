@@ -385,7 +385,7 @@ mBroadcaster.once('boot_done', () => {
             '.fm-blocks-view.fm .file-block-scrolling'
         ],
         'subtitles': [
-            '.mega-dialog .grid-table'
+            '.add-subtitles-dialog .grid-table'
         ],
         'migration': [
             '.mega-sheet.journey.migrate-dialog table',

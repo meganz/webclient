@@ -651,7 +651,7 @@ ClassFile.prototype.run = function(task_done) {
             error = true;
         }
         else if (error) {
-            var fatal = (error === EBLOCKED || error === ETOOMANY);
+            var fatal = error === EBLOCKED || error === ETOOMANY || error === ENOENT || error === EACCESS;
 
             this.dlGetUrlErrors = (this.dlGetUrlErrors | 0) + 1;
 

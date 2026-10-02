@@ -1215,6 +1215,8 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
             tfsheadupdate({t: gid});
 
             if (is_megadrop) {
+                const remainingTime = bps > 1000 ? (bt - bl) / bps : -1;
+                mega.fileRequestUpload.onItemUploadProgress(ul, bps, remainingTime, perc, bl);
                 return;
             }
             mega.tpw.updateDownloadUpload(mega.tpw.UPLOAD, gid, perc, bl, bt, bps, ul.pos, ul.starttime);

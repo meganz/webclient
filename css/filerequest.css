@@ -338,6 +338,7 @@
     margin-inline-end: 8px;
     width: fit-content;
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
 }
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item.transfer-oversize .item-name,
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item.transfer-oversize .item-size {

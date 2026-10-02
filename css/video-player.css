@@ -734,16 +734,33 @@
         z-index: 10;
     }
 
-    .border-top {
-        border-top: 1px solid var(--surface-grey-2);
+    body.web-desktop .mega-sheet.add-subtitles-dialog .sheet {
+        border: 1px solid var(--mobile-border-strong);
+        height: 95%;
+        max-height: 460px;
+        max-width: 642px;
     }
-    .border-bottom {
-        border-bottom: 1px solid var(--surface-grey-2);
-    }
+
     .add-subtitles-dialog .files-grid-view {
-        overflow: visible;
-        border-top: none;
+        height: 100%;
+        min-height: auto;
+        overflow: hidden;
     }
+
+    .add-subtitles-dialog .content {
+        flex: 1 1 auto;
+        min-height: 160px;
+        overflow: hidden;
+    }
+
+    .add-subtitles-dialog .files-grid-view .grid-scrolling-table {
+        height: 100%;
+        background: no-repeat center 36px linear-gradient(90deg, var(--stroke-grey-2), var(--stroke-grey-2));
+        background-size: 100% 1px;
+        min-height: 60px;
+        padding: 0;
+    }
+
     .counter-location {
         padding-bottom: 1rem;
         margin-top: 0;
@@ -757,11 +774,6 @@
         font-size: 14px;
         line-height: 20px;
         padding: 2px 12px;
-    }
-    .subtitles-grid-table {
-        height: 300px;
-        background: no-repeat center 36px linear-gradient(90deg, var(--stroke-grey-2), var(--stroke-grey-2));
-        background-size: 100% 1px;
     }
     .subtitles-grid-table .grid-table thead th:hover::after,
     .subtitles-grid-table .grid-table thead th:hover::before,
@@ -831,11 +843,11 @@
         --icon-size: 16px;
     }
     .empty-subtitles {
-        text-align: center;
-        height: 300px;
         align-items: center;
         display: flex;
         flex-direction: column;
+        height: 100%;
+        text-align: center;
     }
     .empty-subtitles-wrapper {
         margin: auto;
@@ -844,6 +856,7 @@
         --icon-size: 104px;
         --mask-color: var(--secondary-grey);
         display: inline-block;
+        margin: 20px 0 0;
     }
     .empty-subtitles-txt {
         margin-top: 12px;

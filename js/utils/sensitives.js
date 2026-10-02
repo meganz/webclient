@@ -97,33 +97,27 @@ function resetSensitives() {
          * @returns {Promise<-1|1>}
          */
         const sensitivesConfirmationDialog = (dialogName, title, txt) => new Promise((resolve, reject) => {
-            const dialog = new MDialog({
-                dialogName,
-                ok: {
-                    label: l[507],
-                    callback: () => {
-                        resolve(mega.sensitives.SAFE_TO_SHARE);
-                    },
-                    classes: ['mega-button', 'branded-green']
-                },
-                cancel: {
-                    label: l.msg_dlg_cancel,
-                    callback: () => {
-                        reject(EBLOCKED);
-                    }
-                },
-                icon: 'sprite-fm-uni icon-info icon-size-16',
-                setContent() {
-                    const p = document.createElement('p');
-                    p.className = 'px-6';
-                    p.textContent = txt;
-
-                    this.slot = p;
+            const callback = (res) => {
+                // confirmation and warningb use opposite values to indicate confirmation
+                if (is_mobile ? !res : res || res === null) {
+                    reject(EBLOCKED);
+                    return;
                 }
-            });
 
-            dialog.title = title;
-            dialog.show();
+                resolve(mega.sensitives.SAFE_TO_SHARE);
+            };
+
+            // Mobile uses the visible title as the second argument; desktop uses the dialog name
+            if (is_mobile) {
+                msgDialog(
+                    `*confirmation:!^${l[507]}!${l.msg_dlg_cancel}`, title, txt, null, callback
+                );
+            }
+            else {
+                msgDialog(
+                    `*warningb:!^${l[507]}!${l.msg_dlg_cancel}`, dialogName, title, txt, callback
+                );
+            }
         });
 
         /**

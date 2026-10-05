@@ -1848,17 +1848,28 @@ scparser.$add('_fm', function() {
 scparser.$add('ssc', process_businessAccountSubUsers_SC);
 
 // business account change which requires reload (such as payment against expired account)
-scparser.$add('ub', function() {
+scparser.$add('ub', (a) => {
     "use strict";
     if (!folderlink && !addressDialog.paymentInProcess) {
+
+        // Reloading would restart from that same tree and replay it again.
+        if (loadfm.loading && u_attr && u_attr.b && u_attr.b.s === a.s && Boolean(u_attr.b.m) === Boolean(a.m)) {
+            return;
+        }
         scfullreload = 'ub-business';
     }
 });
 
 // Pro Flexi account change which requires reload (such as payment against expired account)
-scparser.$add('upf', () => {
+scparser.$add('upf', (a) => {
     "use strict";
     if (!folderlink && !addressDialog.paymentInProcess) {
+        const pf = u_attr && u_attr.pf;
+
+        // As for 'ub'. s is 1 when the account is now Pro Flexi, 0 when that was removed.
+        if (loadfm.loading && (a.s === 1 && pf && pf.s === pro.ACCOUNT_STATUS_ENABLED || a.s === 0 && !pf)) {
+            return;
+        }
         scfullreload = 'upf-proflexi';
     }
 });

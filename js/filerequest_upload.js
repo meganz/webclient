@@ -1602,6 +1602,7 @@ lazy(mega, 'fileRequestUpload', () => {
             this.uploadPage.initLanguage();
 
             this.uploadPage.showEmpty();
+            this.uploadPage.uNameInput.disabled = true;
         }
 
         handle(puPageObject, puPagePublicHandle) {

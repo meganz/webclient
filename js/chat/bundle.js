@@ -10412,34 +10412,12 @@ class CloudBrowserDialog extends modalDialogs.A.SafeShowDialogController {
         highlighted
       } = this.state;
       const className = `${share && share.down ? 'disabled' : ''}`;
-      const highlightedNode = highlighted && highlighted.length && highlighted[0];
+      highlighted && highlighted.length && highlighted[0];
       const allowAttachFolders = this.props.allowAttachFolders && !isIncomingShare && !isS4Cn;
-      buttons.push({
-        label: this.props.openLabel,
-        key: 'select',
-        className: `${className} ${highlighted.length > 1 ? 'disabled' : ''}`,
-        defaultClassname: 'nav-elem normal button action',
-        onClick: e => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (highlighted.length > 1) {
-            return;
-          }
-          this.setState({
-            currentlyViewedEntry: highlightedNode
-          });
-          this.clearSelectionAndHighlight();
-          this.setState({
-            selected: [],
-            searchValue: '',
-            searchText: '',
-            highlighted: []
-          });
-        }
-      }, allowAttachFolders ? {
+      buttons.push(allowAttachFolders ? {
         label: l[8023],
         key: 'attach',
-        defaultClassname: 'nav-elem normal button action secondary',
+        defaultClassname: 'nav-elem normal button action',
         className,
         onClick: () => {
           this.props.onClose();
@@ -10483,12 +10461,18 @@ class CloudBrowserDialog extends modalDialogs.A.SafeShowDialogController {
         }
       } : null);
     }
-    if (!folderIsHighlighted || this.props.folderSelectable && (!this.props.noShareFolderAttach || !(isIncomingShare && folderIsHighlighted))) {
+    const {
+      folderSelectable,
+      noShareFolderAttach,
+      showDisabledSelect,
+      selectLabel
+    } = this.props;
+    if (showDisabledSelect || !folderIsHighlighted || folderSelectable && (!noShareFolderAttach || !(isIncomingShare && folderIsHighlighted))) {
       buttons.push({
-        label: this.props.selectLabel,
+        label: selectLabel,
         key: 'select',
         defaultClassname: 'nav-elem normal button action',
-        className: this.state.selected.length === 0 || share && share.down || isS4Cn ? "disabled" : "",
+        className: this.state.selected.length === 0 || share && share.down || isS4Cn ? 'disabled' : '',
         onClick: e => {
           if (this.state.selected.length > 0) {
             this.props.onSelected(this.state.selected);
@@ -10509,6 +10493,19 @@ class CloudBrowserDialog extends modalDialogs.A.SafeShowDialogController {
       });
     }
     const breadcrumbPath = M.getPath(entryId);
+    const renderTab = (tab, icon, label) => {
+      const selected = self.state.selectedTab === tab;
+      return REaCt()().createElement("button", {
+        className: `nav-elem text-only full-width${selected ? ' active' : ''}`,
+        onClick: () => self.handleTabChange(tab)
+      }, REaCt()().createElement("i", {
+        className: `sprite-fm-mono ${icon}-${selected ? 'solid' : 'outline'}`
+      }), REaCt()().createElement("div", {
+        className: "text-box-wrapper"
+      }, REaCt()().createElement("span", {
+        className: "primary-text"
+      }, label)));
+    };
     return REaCt()().createElement(modalDialogs.A.ModalDialog, {
       className: `${classes} ${this.dialogName}`,
       onClose: () => {
@@ -10523,43 +10520,7 @@ class CloudBrowserDialog extends modalDialogs.A.SafeShowDialogController {
       className: "left-panel"
     }, REaCt()().createElement("div", {
       className: "fm-picker-dialog-tree-panel"
-    }, REaCt()().createElement("button", {
-      className: `nav-elem text-only full-width` + `${self.state.selectedTab === 'quick-access' ? ' active' : ''}`,
-      onClick: () => self.handleTabChange('quick-access')
-    }, REaCt()().createElement("i", {
-      className: "sprite-fm-mono icon-clock-thin-solid"
-    }), REaCt()().createElement("div", {
-      className: "text-box-wrapper"
-    }, REaCt()().createElement("span", {
-      className: "primary-text"
-    }, l.frequent_access))), REaCt()().createElement("button", {
-      className: `nav-elem text-only full-width` + `${self.state.selectedTab === M.RootID ? ' active' : ''}`,
-      onClick: () => self.handleTabChange(M.RootID)
-    }, REaCt()().createElement("i", {
-      className: "sprite-fm-mono icon-cloud-thin-outline"
-    }), REaCt()().createElement("div", {
-      className: "text-box-wrapper"
-    }, REaCt()().createElement("span", {
-      className: "primary-text"
-    }, l[164]))), !self.props.hideIncoming && REaCt()().createElement("button", {
-      className: `nav-elem text-only full-width` + `${self.state.selectedTab === 'shares' ? ' active' : ''}`,
-      onClick: () => self.handleTabChange('shares')
-    }, REaCt()().createElement("i", {
-      className: "sprite-fm-mono icon-folder-users-thin-outline"
-    }), REaCt()().createElement("div", {
-      className: "text-box-wrapper"
-    }, REaCt()().createElement("span", {
-      className: "primary-text"
-    }, l[5542]))), REaCt()().createElement("button", {
-      className: `nav-elem text-only full-width` + `${self.state.selectedTab === 's4' ? ' active' : ''}` + `${u_attr.s4 ? '' : ' hidden'}`,
-      onClick: () => self.handleTabChange('s4')
-    }, REaCt()().createElement("i", {
-      className: "sprite-fm-mono icon-bucket-triangle-thin-outline"
-    }), REaCt()().createElement("div", {
-      className: "text-box-wrapper"
-    }, REaCt()().createElement("span", {
-      className: "primary-text"
-    }, l.obj_storage))))), REaCt()().createElement("section", {
+    }, renderTab('quick-access', 'icon-clock-thin', l.frequent_access), renderTab(M.RootID, 'icon-cloud-thin', l[164]), !self.props.hideIncoming && renderTab('shares', 'icon-folder-users-thin', l[5542]), u_attr.s4 && renderTab('s4', 'icon-bucket-triangle-thin', l.obj_storage))), REaCt()().createElement("section", {
       ref: this.domRef,
       className: "content"
     }, REaCt()().createElement("div", {

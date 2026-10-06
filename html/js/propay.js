@@ -4312,6 +4312,13 @@ pro.propay = {
         };
     },
 
+    /**
+     * Find the regular plan a targeted discount applies to (its discounted price is in the dci).
+     * @param {Number} al Account level
+     * @param {Number} [m] Months, default 12; falls back to the level's 1-month plan
+     * @returns {Promise<Array|undefined>} utqa plan array for pro.getPlanObj, or undefined when this country
+     * has no plan at that level (e.g. Pro Lite where it is not sold)
+     */
     async getDiscountedPlanInfo(al, m) {
         'use strict';
 
@@ -4457,7 +4464,7 @@ pro.propay = {
         for (let i = 0; i < dcis.length; i++) {
             const dci = dcis[i];
             const matchedPlan = await pro.propay.getDiscountedPlanInfo(dci.al, dci.m);
-            const matchedPlanObj = pro.getPlanObj(matchedPlan);
+            const matchedPlanObj = matchedPlan && pro.getPlanObj(matchedPlan);
 
             if (matchedPlanObj) {
                 offers.push({ dci, matchedPlanObj });

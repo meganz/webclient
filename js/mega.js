@@ -4072,7 +4072,7 @@ function loadfm_done(mDBload) {
         }
 
         // Check Business (or Pro Flexi) account is expired on initial phase in desktop web
-        if (!pfid && !is_mobile && u_attr && (u_attr.b || u_attr.pf)) {
+        if (!pfid && !is_mobile && u_attr && (u_attr.b || u_attr.pf) && u_type) {
 
             M.require('businessAcc_js', 'businessAccUI_js').done(() => {
 

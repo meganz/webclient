@@ -719,7 +719,7 @@ function sc_packet(a) {
 function sc_node(n) {
     "use strict";
 
-    crypto_rsacheck(n);
+    // crypto_rsacheck(n);
 
     if (!decWorkerPool.ok) {
         crypto_decryptnode(n);
@@ -2313,17 +2313,29 @@ function tree_node(node) {
                 allowNullKeys: self.allowNullKeys
             });
         }
-        else {
-            crypto_setsharekey2(node.h, base64_to_a32(pfkey));
-        }
 
         M.RootID = node.h;
+
+        // Ensure the link is decryptable before passing through workers all its nodes.
+        crypto_setsharekey2(node.h, base64_to_a32(pfkey));
+
+        const n = crypto_decryptnode({...node});
+
+        if (!n.k || typeof n.k === 'string' || n.k.length !== 4) {
+            (missingkeys = (missingkeys || {}))[n.h] = {[n.h]: true};
+
+            api.reset();
+            decWorkerPool.kill();
+            self.folderreqerr = dump;
+            return loadfm_callback(false);
+        }
     }
-    else if (M.d[node.h] && (M.d[node.h].name || M.d[node.h].k === undefined)) {
+    else if (M.d[node.h] && (M.d[node.h].name || M.d[node.h].k === undefined) || missingkeys[M.RootID]) {
         // already decrypted
         return;
     }
 
+    /**
     if (!mega.keyMgr.secure) {
         crypto_rsacheck(node);
 
@@ -2332,6 +2344,7 @@ function tree_node(node) {
             rsasharekeys[node.h] = true;
         }
     }
+     **/
 
     // children inherit their parents' worker bindings; unbound inshare roots receive a new binding
     // unbound nodes go to a random worker (round-robin assignment)
@@ -2555,7 +2568,7 @@ function loadfm(force) {
             // is this a folder link? or do we have no valid cache for this session?
             if (pfid) {
                 fmdb = false;
-                fetchfm(false).catch(folderreqerr);
+                fetchfm(false).catch((ex) => folderreqerr(ex));
             }
             else if (!u_k_aes) {
                 console.error('No master key found... please contact support@mega.io');

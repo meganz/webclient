@@ -70,6 +70,7 @@ Object.defineProperty(mega, 'halt', {
 
             getsc.stop = nop;
             getsc.validate = nop;
+            waitsc.setURL = nop;
 
             // shutdown chat..
             if (self.megaChatIsReady) {

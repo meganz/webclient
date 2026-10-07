@@ -1633,12 +1633,76 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
 }
 
 /* Recover account */
-.mega-dialog.improved-recovery-steps .recover-paste-block h5.main-italic-header {
-    display: block;
-    text-align: start;
+.mega-component.mega-sheet.recovery-key-dialog .sheet {
+    max-width: 640px;
 }
-.mega-dialog.improved-recovery-steps .recover-paste-block {
-    margin: 30px auto 0;
+.mega-sheet.recovery-key-dialog .icon-recovery-key-3d {
+    background-image: url('../images/mega/icons-3d/icon-recovery-key-3d.png');
+    background-size: contain;
+    height: 96px;
+    margin: 0 0 8px;
+    width: 96px;
+}
+.mega-sheet.recovery-key-dialog .content .recovery-key-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.mega-sheet.recovery-key-dialog .content .recovery-key-title button {
+    padding: 4px;
+}
+.mega-sheet.recovery-key-dialog .content .recovery-key-title h3 {
+    margin: 0;
+    font: var(--mobile-font-heading-h3);
+    color: var(--mobile-text-primary);
+}
+.mega-sheet.recovery-key-dialog .content .recovery-key-title .back-btn:not(.hidden) + h3 {
+    margin-inline: 12px;
+}
+.mega-sheet.recovery-key-dialog .content .recovery-key-info > div:not(:last-child) {
+    margin-bottom: 16px;
+}
+.mega-sheet.recovery-key-dialog .content .recovery-key-info a {
+    text-decoration: underline;
+}
+.mega-sheet.recovery-key-dialog .content .recovery-key-block {
+    margin: 24px 0;
+    border-radius: 8px;
+    background: var(--mobile-surface-1);
+    padding: 16px;
+}
+.mega-sheet.recovery-key-dialog .content .recovery-key-block .recovery-key-label {
+    font: var(--mobile-font-copy-semibold);
+    margin: 4px 0 6px;
+}
+.mega-sheet.recovery-key-dialog .content .recovery-key-block .recovery-key-input {
+    display: flex;
+    font: var(--mobile-font-copy-regular);
+    align-items: center;
+    max-width: 100%;
+}
+.mega-sheet.recovery-key-dialog .content .recovery-key-block .recovery-key-input .recovery-key-text {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.mega-sheet.recovery-key-dialog .content .recovery-key-block .recovery-key-input button.copy-btn {
+    margin-inline: auto 16px;
+}
+.mega-sheet.recovery-key-dialog .content .recovery-key-block .recovery-key-input .download-button .primary-text {
+    font: var(--mobile-font-caption-large-semibold);
+}
+.mega-sheet.recovery-key-dialog .sheet .actions {
+    align-items: flex-start;
+    margin-top: 0;
+}
+.mega-sheet.recovery-key-dialog .actions .button {
+    height: 36px;
+    width: auto;
+    padding: 0;
+}
+.mega-sheet.recovery-key-dialog .actions .button .primary-text {
+    font: var(--mobile-font-caption-large-semibold);
+    text-decoration: underline;
 }
 /* end of Recover account */
 
@@ -7011,241 +7075,110 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
 
 /* end park-account-dialog */
 
-/* two-factor-dialog shared styles: setup-two-factor-verify, setup-two-factor-backup-key, two-factor-verify-action, setup-two-factor */
+/* two-factor dialogs */
 
-    /* shared styles */
+/* twofa-verify */
 
-        .mega-dialog.two-factor-dialog {
-            width: 520px;
-        }
-        .mega-dialog.two-factor-dialog .two-factor-content-block {
-            position: relative;
-            height: auto;
-            padding: 24px 30px 0 30px;
-        }
-        .mega-dialog.two-factor-dialog .two-factor-content-block.verify-tfactor {
-            margin: 10px 18px 0;
-        }
-        .mega-dialog.two-factor-dialog .two-factor-qr-code {
-            width: 244px;
-            height: 244px;
-            background-color: #f2f2f2;
-            margin: 24px auto 48px;
-            position: relative;
-            padding: 10px;
-            border-radius: 10px;
-        }
-        .mega-dialog.two-factor-dialog .fm-account-input input {
-            box-sizing: border-box;
-            border-radius: 3px;
-            background-color: var(--text-grey-1);
-            line-height: 36px;
-            padding: 0;
-            text-align: center;
-            height: 36px;
-        }
-        .mega-dialog.two-factor-dialog .fm-account-input {
-            height: 38px;
-            margin: 24px auto 16px;
-        }
-        .mega-dialog.two-factor-dialog .finish-button {
-            width: initial;
-            min-width: 120px;
-        }
-        .mega-dialog.two-factor-dialog .dialog-body-subheader {
-            width: 300px;
-            color: var(--text-color-high);
-            font: var(--text-h2);
-            font-family: var(--text-font-family);
-            font-weight: 600;
-            text-align: center;
-            margin: 0 auto 32px;
-        }
-        .mega-dialog.two-factor-dialog .dialog-body-centre-text {
-            width: 384px;
-            text-align: center;
-            margin: 16px auto 24px;
-        }
-        .auth-app-select-tooltip {
-            background: var(--surface-main);
-            box-shadow: 0 2px 10px 0 rgba(0,0,0,0.15);
-            border-radius: 12px;
-            margin: 5px;
-            position: absolute;
-            width: 376px;
-            z-index: 1300;
-        }
-        .auth-app-select-tooltip .dropdown-white-arrow {
-            display: block;
-        }
-        .auth-app-select-tooltip .explanation {
-            color: var(--text-color-high);
-            font: var(--text-body1);
-            margin: 24px 20px 20px 20px;
-        }
-        .auth-app-select-tooltip .app-link {
-            cursor: pointer;
-            display: block;
-            border: 1px solid var(--stroke-grey-2);
-            border-radius: 4px;
-            margin: 4px 20px 0 20px;
-            position: relative;
-            transition: all 200ms ease-in-out;
-        }
-        .auth-app-select-tooltip .app-link:hover {
-            background: var(--surface-grey-1);
-        }
-        .auth-app-select-tooltip .app-link:last-child {
-            margin-bottom: 20px;
-        }
-        .auth-app-select-tooltip .app-link-icon {
-            background: url(../images/mega/2fa-auth-apps.png);
-            background-repeat: no-repeat;
-            display: inline-block;
-            height: 32px;
-            position: absolute;
-            left: 14px;
-            top: 12px;
-            width: 32px;
-        }
-        .rtl .auth-app-select-tooltip .app-link-icon {
-            left: auto;
-            right: 14px;
-        }
-        .auth-app-select-tooltip .authy .app-link-icon {
-            background-position: -2px -2px;
-        }
-        .auth-app-select-tooltip .duomobile .app-link-icon {
-            background-position: -38px -2px;
-        }
-        .auth-app-select-tooltip .googleauthenticator .app-link-icon {
-            background-position: -2px -38px;
-        }
-        .auth-app-select-tooltip .microsoftauthenticator .app-link-icon {
-            background-position: -38px -38px;
-        }
-        .auth-app-select-tooltip .app-link-text {
-            color: var(--text-color-medium);
-            display: block;
-            font-size: 14px;
-            line-height: 56px;
-            margin-inline-start: 64px;
-        }
-        .auth-app-select-tooltip .app-arrow {
-            --icon-size: 24px;
-            right: 25px;
-            position: absolute;
-            top: 15px;
-            --mask-color: var(--text-color-medium);
-        }
-        .rtl .auth-app-select-tooltip .app-arrow {
-            right: auto;
-            left: 25px;
-            transform: rotate(180deg);
-        }
+.mega-component.mega-sheet.twofa-verify .sheet {
+    max-width: 640px;
+}
+.mega-sheet.twofa-verify .icon-numpad-3d {
+    background-image: url('../images/mega/icons-3d/icon-numpad-3d.png');
+    background-size: contain;
+    height: 120px;
+    width: 120px;
+    margin-top: 4px;
+}
+.mega-sheet.twofa-verify .title {
+    margin-bottom: 12px;
+}
+.mega-sheet.twofa-verify .twofa-verify-body .code-container {
+    margin: 32px 0 40px;
+}
+.mega-sheet.twofa-verify .twofa-verify-body .twofa-verify-actions {
+    display: flex;
+    align-items: center;
+}
+.mega-sheet.twofa-verify .twofa-verify-actions button {
+    height: 36px;
+}
+.mega-sheet.twofa-verify .twofa-verify-actions button .primary-text {
+    font: var(--mobile-font-caption-large-semibold);
+}
+.mega-sheet.twofa-verify .twofa-verify-actions .lost-device-btn {
+    padding: 0;
+}
+.mega-sheet.twofa-verify .twofa-verify-actions .lost-device-btn .primary-text {
+    text-decoration: underline;
+}
+.mega-sheet.twofa-verify .twofa-verify-actions .cancel-verify {
+    margin-inline: auto 8px;
+}
 
-        .es .mega-dialog.two-factor-verify-action .pin-input,
-        .es .mega-dialog.setup-two-factor-verify .pin-input {
-            font: var(--text-h3);
-        }
-        .mega-dialog.two-factor-verify-action .warning-text-field {
-            background: var(--banner-background-error);
-            border: 1px solid var(--banner-border-error);
-            border-radius: 2px;
-            box-sizing: border-box;
-            color: var(--banner-text-error);
-            font: var(--text-body1);
-            margin: 0 auto;
-            padding: 4px 0;
-            text-align: start;
-            width: 302px;
-        }
+/* twofa-setup */
 
-    /* two-factor-verify-action */
+.mega-component.mega-sheet.twofa-setup .sheet {
+    max-width: 680px;
+}
+.mega-sheet.twofa-setup .twofa-setup-body .twofa-setup-instructions {
+    display: flex;
+    margin-top: 24px;
+}
+.mega-sheet.twofa-setup .twofa-setup-body .twofa-setup-qrcode {
+    background: var(--mobile-surface-1);
+    padding: 8px;
+    height: 148px;
+    width: 148px;
+    margin-inline-end: 24px;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+.mega-sheet.twofa-setup .twofa-setup-body .instruction-list > div {
+    margin-bottom: 8px;
+}
+.mega-sheet.twofa-setup .twofa-setup-body .seed-key-block {
+    margin: 24px 0;
+    border-radius: 8px;
+    background: var(--mobile-surface-1);
+    padding: 16px;
+}
+.mega-sheet.twofa-setup .twofa-setup-body .seed-key-label {
+    font: var(--mobile-font-copy-semibold);
+    margin: 4px 0 6px;
+}
+.mega-sheet.twofa-setup .twofa-setup-body .seed-key-input {
+    display: flex;
+    font: var(--mobile-font-copy-regular);
+    align-items: center;
+    max-width: 100%;
+}
+.mega-sheet.twofa-setup .twofa-setup-body .seed-text {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.mega-sheet.twofa-setup .twofa-setup-body .seed-key-input button {
+    margin-inline-start: auto;
+}
+.mega-sheet.twofa-setup .twofa-setup-body .code-label {
+    font: var(--mobile-font-copy-semibold);
+    margin-bottom: 4px;
+}
+.mega-sheet.twofa-setup .twofa-setup-body .two-factor-setup-actions {
+    display: flex;
+    align-items: center;
+    margin-top: 24px;
+}
+.mega-sheet.twofa-setup .two-factor-setup-actions button {
+    height: 36px;
+}
+.mega-sheet.twofa-setup .two-factor-setup-actions button .primary-text {
+    font: var(--mobile-font-caption-large-semibold);
+}
+.mega-sheet.twofa-setup .two-factor-setup-actions button:first-child {
+    margin-inline: auto 8px;
+}
 
-        .mega-dialog.two-factor-verify-action .lost-authenticator-button {
-            cursor: pointer;
-        }
-        .mega-dialog.two-factor-verify-action .lost-authenticator-button:hover {
-            text-decoration: underline;
-        }
-        .mega-dialog.two-factor-verify-action .pin-input {
-            color: var(--text-color-high);
-            font: var(--text-h3);
-            text-align: center;
-        }
-
-    /* setup-two-factor */
-
-        .mega-dialog.setup-two-factor .no-auth-app-button {
-            color: var(--text-color-success);
-            cursor: pointer;
-            display: inline-block;
-            margin-top: 12px;
-        }
-
-    /* setup-two-factor-verify */
-
-        .mega-dialog.setup-two-factor-verify .pin-input {
-            color: var(--text-color-high);
-            font: var(--text-h3);
-            text-align: center;
-        }
-
-    /* setup-two-factor-backup-key */
-
-        .mega-dialog.setup-two-factor-backup-key .content-block {
-            margin-top: 16px;
-            padding-bottom: 24px;
-        }
-        .mega-dialog.setup-two-factor-backup-key .recovery-key-container .recovery-key-icon {
-            height: 48px;
-            width: 48px;
-            margin: 8px 0 8px 0;
-            margin-inline-start: 12px;
-            margin-inline-end: 8px;
-            display: inline-block;
-        }
-        .mega-dialog.setup-two-factor-backup-key .information-highlight.warning {
-            width: 100%;
-            margin: 12px auto 16px;
-        }
-        .mega-dialog.setup-two-factor-backup-key .recovery-key-container {
-            box-sizing: border-box;
-            height: 66px;
-            border: 1px solid var(--stroke-grey-2);
-            border-radius: 4px;
-        }
-        .mega-dialog.setup-two-factor-backup-key .recovery-key-container .recovery-key-button {
-            float: right;
-            margin-top: 16px;
-            margin-inline-end: 12px;
-        }
-        .rtl .mega-dialog.setup-two-factor-backup-key .recovery-key-container .recovery-key-button {
-            float: left;
-        }
-        .mega-dialog.setup-two-factor-backup-key .recovery-key-info-block {
-            display: inline-block;
-            vertical-align: top;
-            margin-top: 15px;
-        }
-        .mega-dialog.setup-two-factor-backup-key .recovery-key-info-block .recovery-key-name {
-            height: 18px;
-            width: 210px;
-            color: var(--text-color-high);
-            font-size: 14px;
-            line-height: 18px;
-        }
-        .mega-dialog.setup-two-factor-backup-key .recovery-key-info-block .recovery-key-size {
-            color: var(--text-color-low);
-            font-size: 13px;
-            line-height: 17px;
-        }
-        .mega-dialog.setup-two-factor-backup-key .dialog-body-centre-text {
-            margin: 24px auto 0;
-        }
-
-/* end two-factor-dialog shared styles */
+/* end two-factor dialogs */
 
 /* qr-contact dialog */
 
@@ -7644,54 +7577,6 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
     color: var(--text-color-high);
 }
 /* end voucher-info-redeem dialog */
-
-/* recovery-key-dialog */
-
-    .mega-dialog.recovery-key-dialog {
-        width: 680px;
-    }
-    .mega-dialog.recovery-key-dialog header .graphic {
-        height: 80px;
-    }
-    .mega-dialog.recovery-key-dialog .content-block.dialog-bottom {
-        padding-bottom: 48px;
-    }
-    .mega-dialog.recovery-key-dialog .recover-paste-block button {
-        display: inline-flex;
-    }
-    .mega-dialog.recovery-key-dialog aside {
-        margin-top: 24px;
-    }
-    .mega-dialog.recovery-key-dialog aside p {
-        padding: 0;
-    }
-    .mega-dialog.recovery-key-dialog .recover-paste-block .right-section > button:not(.hidden) {
-        min-width: auto;
-    }
-    .mega-dialog.recovery-key-dialog i {
-        --mask-color: var(--text-color-medium);
-    }
-    .mega-dialog.recovery-key-dialog i.shiny {
-        --mask-color: var(--label-yellow);
-    }
-    .mega-dialog.recovery-key-dialog .account.input-wrapper input {
-        vertical-align: middle;
-    }
-    .mega-dialog.recovery-key-dialog i {
-        top: 0;
-        left: 0;
-        display: inline-block;
-        vertical-align: middle;
-        position: static;
-    }
-    .mega-dialog.recovery-key-dialog .backup-key-header {
-        font: var(--text-h3);
-        color: var(--text-color-high);
-        text-align: start;
-        margin: 0;
-    }
-
-/* end recovery-key-dialog */
 
 /* user-management-add-user-dialog */
 
@@ -8931,16 +8816,73 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
 
 /* recovery-key-info */
 
-    .mega-dialog.recovery-key-info .illustration-block {
-        height: 64px;
-        margin: 0 auto 12px;
-        width: 64px;
-        --width: 64px;
-    }
-    .mega-dialog.recovery-key-info {
-        width: 640px;
-        height: initial;
-    }
+.mega-dialog.recovery-key-info {
+    background: var(--mobile-page-background);
+    width: 600px;
+}
+.mega-dialog.recovery-key-info button.close {
+    top: 16px;
+}
+.mega-dialog.recovery-key-info button.close i {
+    opacity: 1;
+    --mask-color: var(--mobile-icon-primary);
+}
+.mega-dialog.recovery-key-info header {
+    padding: 40px 40px 16px;
+}
+.mega-dialog.recovery-key-info header h2 {
+    text-align: start;
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-heading-h2);
+}
+.mega-dialog.recovery-key-info .content-block {
+    padding: 0 40px;
+    color: var(--mobile-text-primary);
+    background: transparent;
+}
+.mega-dialog.recovery-key-info .content-block > p {
+    font: var(--mobile-font-copy-regular);
+    text-align: start;
+}
+.mega-dialog.recovery-key-info .content-block > p b {
+    font: var(--mobile-font-copy-bold);
+}
+.mega-dialog.recovery-key-info .backup-key-info {
+    margin-top: 24px;
+}
+.mega-dialog.recovery-key-info .col-3 {
+    background: var(--mobile-surface-1);
+    border-radius: 16px;
+    padding: 12px 22px;
+    height: 232px;
+}
+.mega-dialog.recovery-key-info .col-3 + div {
+    width: 12px;
+}
+.mega-dialog.recovery-key-info .col-3 .backup-key-info-text {
+    color: var(--mobile-text-primary);
+}
+.mega-dialog.recovery-key-info .col-3 .backup-key-info-text b {
+    font: var(--mobile-font-caption-large-bold);
+}
+.mega-dialog.recovery-key-info .illustration-block {
+    height: 120px;
+    width: 120px;
+    background-size: contain;
+    margin-bottom: 12px;
+}
+.mega-dialog.recovery-key-info .illustration-block.recovery-img-printed {
+    background-image: url("../images/mega/dialog-access.png");
+}
+.mega-dialog.recovery-key-info .illustration-block.recovery-img-pwm {
+    background-image: url("../images/mega/dialog-pwm.png");
+}
+.mega-dialog.recovery-key-info .illustration-block.recovery-img-usb {
+    background-image: url("../images/mega/dialog-usb.png");
+}
+.mega-dialog.recovery-key-info footer .footer-container {
+    padding: 40px;
+}
 
 /* end recovery-key-info */
 

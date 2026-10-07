@@ -104,10 +104,6 @@ html.dark-mode .qr-settings .settings-left-block.slide-in-out .content-txt {
     top: 178px;
     width: 235px;
 }
-html.dark-mode .mega-dialog.two-factor-dialog .two-factor-qr-code {
-    filter: invert(1);
-    padding: 5px;
-}
 /* Overrides to prevent inverting (inverts again back to normal) */
 html.dark-mode .logo,
 html.dark-mode .browsers.icon.medium,

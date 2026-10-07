@@ -1,9 +1,8 @@
 import React from 'react';
-import {MegaRenderMixin} from './../mixins';
-
-var DropdownsUI = require('./../../ui/dropdowns.jsx');
-var ContactsUI = require('./../ui/contacts.jsx');
-var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
+import { MegaRenderMixin } from '../mixins.js';
+import { DropdownItem } from '../../ui/dropdowns.jsx';
+import { ContactCard } from './contacts.jsx';
+import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 
 class ParticipantsList extends MegaRenderMixin {
     domRef = React.createRef();
@@ -218,7 +217,7 @@ class ParticipantsListInner extends MegaRenderMixin {
 
                 if (room.iAmOperator() && contactHash !== u_handle) {
                     dropdownRemoveButton.push(
-                        <DropdownsUI.DropdownItem className="red"
+                        <DropdownItem className="red"
                             key="remove" icon="sprite-fm-mono icon-disabled-filled" label={l[8867]}
                             onClick={onRemoveClicked.bind(this, contactHash)}/>
                     );
@@ -233,7 +232,7 @@ class ParticipantsListInner extends MegaRenderMixin {
                     );
 
                     dropdowns.push(
-                        <DropdownsUI.DropdownItem
+                        <DropdownItem
                             key="privOperator"
                             icon="sprite-fm-mono icon-admin-outline"
                             label={l[8875]}
@@ -247,7 +246,7 @@ class ParticipantsListInner extends MegaRenderMixin {
                     );
 
                     dropdowns.push(
-                        <DropdownsUI.DropdownItem
+                        <DropdownItem
                             key="privFullAcc"
                             icon="sprite-fm-mono icon-chat"
                             className={`
@@ -261,7 +260,7 @@ class ParticipantsListInner extends MegaRenderMixin {
                     );
 
                     dropdowns.push(
-                        <DropdownsUI.DropdownItem
+                        <DropdownItem
                             key="privReadOnly"
                             icon="sprite-fm-mono icon-read-only"
                             className={`
@@ -292,7 +291,7 @@ class ParticipantsListInner extends MegaRenderMixin {
                 }
 
                 contactsList.push(
-                    <ContactsUI.ContactCard
+                    <ContactCard
                         key={contact.u}
                         contact={contact}
                         chatRoom={room}

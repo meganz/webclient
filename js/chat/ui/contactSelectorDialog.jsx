@@ -75,9 +75,4 @@ class ContactSelectorDialog extends MegaRenderMixin {
     }
 }
 
-
-window.ContactSelectorDialogUI = {
-    ContactSelectorDialog
-};
-
 export default ContactSelectorDialog;

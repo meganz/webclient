@@ -5,7 +5,7 @@
   "maxSize": "340kb",
   "format": ["javascript", "jsx"],
   "reporters": ["console", "badge"],
-  "ignore": ["**/node_modules/**", "**/tests/**", "**/vendor/**", "**/**/bundle.js"],
+  "ignore": ["**/node_modules/**", "**/tests/**", "**/vendor/**", "**/**/bundle.js", "**/bundle.*.js"],
   "tokensToSkip": ["comment", "empty", "new_line", "ignore"],
   "gitignore": true
 }

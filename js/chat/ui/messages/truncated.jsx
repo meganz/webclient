@@ -1,7 +1,7 @@
-var React = require("react");
-var ContactsUI = require('./../contacts.jsx');
-var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
+import React from 'react';
 import { Emoji } from '../../../ui/utils.jsx';
+import { Avatar, ContactButton } from '../contacts.jsx';
+import { ConversationMessageMixin } from './mixin.jsx';
 
 class TruncatedMessage extends ConversationMessageMixin {
     render() {
@@ -32,7 +32,7 @@ class TruncatedMessage extends ConversationMessageMixin {
             cssClasses += " grouped";
         }
         else {
-            avatar = <ContactsUI.Avatar contact={contact}
+            avatar = <Avatar contact={contact}
                 className="message avatar-wrapper small-rounded-avatar"
                 chatRoom={chatRoom} />;
             datetime = <div className="message date-time simpletip"
@@ -45,7 +45,7 @@ class TruncatedMessage extends ConversationMessageMixin {
                 {avatar}
 
                 <div className="message content-area small-info-txt selectable-txt">
-                    <ContactsUI.ContactButton
+                    <ContactButton
                         contact={contact}
                         className="message"
                         label={<Emoji>{displayName}</Emoji>}

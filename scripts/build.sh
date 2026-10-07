@@ -36,8 +36,8 @@ else
     SED_BINARY="sed"
 fi
 
-cat $build_file \
-    | $SED_BINARY -E 's!_babel_runtime_helpers_(\w+)__WEBPACK_IMPORTED_MODULE_!_\1!g' \
+optimize_bundle() {
+    $SED_BINARY -E 's!_babel_runtime_helpers_(\w+)__WEBPACK_IMPORTED_MODULE_!_\1!g' \
     | $SED_BINARY 's!__WEBPACK_IMPORTED_MODULE_!!g' \
     | $SED_BINARY 's!__unused_webpack_module!_!g' \
     | $SED_BINARY 's!__unused_webpack_!!g' \
@@ -50,21 +50,43 @@ cat $build_file \
     | $SED_BINARY -E 's!_?assertThisInitialized(_default|[0-9]+)\(\)!!g' \
     | $SED_BINARY -E 's!(cache__\s*=|exports\s*:)\s*\{\}!\1Object.create(null)!g' \
     | $SED_BINARY -E 's!/\*+\*/\s?!!g' \
-    | $SED_BINARY -E 's!/\*[^*]+\*/\s*!!g' > $temp_file1
-[[ $? -ne 0 ]] && exit 15
+    | $SED_BINARY -E 's!/\*[^*]+\*/\s*!!g' \
+    | $SED_BINARY -E 's/(REaCt\(\)|react[0-9_]+(___default\(\)|__))\.createElement/JSX_/g'
+}
 
+echo "Processing $build_file..."
+cat $build_file | optimize_bundle \
+    | $SED_BINARY $'s!// webpackBootstrap!// webpackBootstrap\
+    window.JSX_=React.createElement;!' > $temp_file1
+[[ $? -ne 0 ]] && exit 15
 mv $temp_file1 $build_file
 [[ $? -ne 0 ]] && exit 23
+
+for chunk_file in js/chat/bundle.*.js; do
+    echo "Processing $chunk_file..."
+    chunk_name=$(echo "$chunk_file" | $SED_BINARY -E 's/.*bundle\.([^.]+)\.js/\1/' | tr '-' '_')
+    if ! grep -q "chat:${chunk_name}_js" secureboot.js; then
+      echo "WARNING: No 'jsl2' entry for $chunk_file (chat:${chunk_name}_js)"
+    fi
+    cat $chunk_file | optimize_bundle > $temp_file1
+    [[ $? -ne 0 ]] && exit 16
+    mv $temp_file1 $chunk_file
+done
 
 echo -n "Applying ESLint fixes, please be patient..."
 time ./node_modules/.bin/eslint --no-eslintrc --quiet --fix --no-ignore --env es2018 \
     --rule "object-shorthand:2,dot-notation:2,no-var:2,no-extra-parens:2" \
     --rule "prefer-const:2,prefer-arrow-callback:2,prefer-destructuring:2" \
     --rule "prefer-spread:2,prefer-template:2,no-unneeded-ternary:2" \
-    ./$build_file >/dev/null
+    ./js/chat/bundle*.js >/dev/null
+
+chunk_count=$(ls js/chat/bundle.*.js 2>/dev/null | wc -l | tr -d ' ')
+echo "Processed main bundle + $chunk_count chunks:"
+ls -lh js/chat/bundle.js js/chat/bundle.*.js 2>/dev/null | awk '{print $5 "\t" $9}'
+du -ch js/chat/bundle.js js/chat/bundle.*.js 2>/dev/null | tail -n 1 | awk '{print $1 "    total"}' # TODO: drop `du` usage
 
 if [[ "$1" == "--fix" ]]; then
-    git commit -a -m "chat/bundle.js update"
+    git commit -a -m "chat bundle files update"
     git push $remote $(git symbolic-ref --short -q HEAD)
 fi
 

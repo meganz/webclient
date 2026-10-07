@@ -1,3 +1,5 @@
+import React, { Suspense } from 'react';
+import Fallback from './ui/fallback.jsx';
 
 export async function prepareExportIo(dl) {
     const { zname, size } = dl;
@@ -62,3 +64,13 @@ export function prepareExportStreams(attachNodes, onEmpty) {
         };
     });
 }
+
+export const withSuspense = (Component) => {
+    const Wrapped = (props) => (
+        <Suspense fallback={<Fallback />}>
+            <Component {...props} />
+        </Suspense>
+    );
+    Wrapped.displayName = `withSuspense(${Component.displayName || Component.name || 'Component'})`;
+    return Wrapped;
+};

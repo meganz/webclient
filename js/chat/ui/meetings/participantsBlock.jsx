@@ -3,8 +3,8 @@ import { MegaRenderMixin } from '../../mixins.js';
 import { LocalVideoHiResCloned, LocalVideoThumb, PeerVideoHiResCloned, PeerVideoThumb, PeerVideoThumbFixed }
     from './videoNode.jsx';
 import Button from './button.jsx';
-import { MODE } from './call.jsx';
-import { chunkNodes, filterAndSplitSources, PAGINATION } from './stream.jsx';
+import { MODE, PAGINATION } from './utils.jsx';
+import { chunkNodes, filterAndSplitSources } from './stream.jsx';
 
 const MAX_STREAMS_PER_PAGE = 10;
 const SIMPLE_TIP = { position: 'top', offset: 5, className: 'theme-dark-forced' };

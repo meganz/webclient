@@ -5,7 +5,7 @@ import Preview from './preview.jsx';
 import Link from '../../link.jsx';
 import { Emoji } from '../../../../ui/utils';
 
-export class Start extends React.Component {
+export default class Start extends React.Component {
     static NAMESPACE = 'start-meeting';
     static dialogName = `${Start.NAMESPACE}-dialog`;
 
@@ -166,7 +166,3 @@ export class Start extends React.Component {
         );
     }
 }
-
-window.StartMeetingDialogUI = {
-    Start
-};

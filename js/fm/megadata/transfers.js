@@ -612,8 +612,10 @@ MegaData.prototype.dlerror = function(dl, error) {
             errorstr = l[20705];
             break;
         case ETOOMANY:
-        case EACCESS:
             errorstr = l[20228];
+            break;
+        case EACCESS:
+            errorstr = l[23];
             break;
         case ENOENT:
             errorstr = l[22];

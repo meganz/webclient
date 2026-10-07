@@ -3183,6 +3183,55 @@ var addressDialog = {
             });
     },
 
+    /**
+     * Check whether a saved-card sale the API reported as failed has since completed.
+     * The API retries a failed saved-card charge through the Stripe webhook that follows moments
+     * later, so inviting an immediate retry can charge the user twice.
+     * utd replies with the sale handle once granted, ENOENT while incomplete, EARGS if malformed.
+     * @param {String|Array} saleId Sale ID(s) returned by the uts call
+     * @returns {Promise<Boolean>} True when the sale completed and the success screen was shown
+     */
+    async recoverSavedCardSale(saleId) {
+        'use strict';
+
+        const s = Array.isArray(saleId) ? saleId : [saleId];
+        const startTime = performance.now();
+        const elapsed = () => Math.round(performance.now() - startTime);
+
+        for (let i = 0; i < 4; i++) {
+            await tSleep(i + 1);
+
+            if (!pro.propay.onPropayPage()) {
+                pro.log('savedCardRecoveryLeft', JSON.stringify({polls: i, elapsed: elapsed()}));
+                return false;
+            }
+
+            const res = await api.screq({a: 'utd', s}).then(({result}) => result).catch(echo);
+
+            if (typeof res === 'string') {
+                pro.log('savedCardRecovered', JSON.stringify({polls: i + 1, elapsed: elapsed()}));
+                eventlog(501393);
+
+                this.showPaymentSuccess();
+
+                if (pro.propay.skItems.continueBtn) {
+                    pro.propay.skItems.continueBtn.endLoad('purchase');
+                }
+                return true;
+            }
+
+            // ENOENT only means the sale has not landed yet; any other error will not change
+            if (res !== ENOENT) {
+                pro.log('savedCardRecoveryError', JSON.stringify({polls: i + 1, res: String(res)}));
+                return false;
+            }
+        }
+
+        pro.log('savedCardRecoveryTimeout', JSON.stringify({polls: 4, elapsed: elapsed()}));
+
+        return false;
+    },
+
     stripeFrameHandler: function(event) {
         'use strict';
         if (d) {
@@ -3532,6 +3581,27 @@ var addressDialog = {
             utcResult.EUR = false;
         }
 
+        const failSale = () => {
+            // Hidden here rather than at entry, so the recovery check below keeps the spinner up.
+            const fail = () => {
+                pro.propay.hideLoadingOverlay();
+                this.showError(utcResult);
+            };
+            if (saleId && pro.propay.onPropayPage() && !pro.propay.shouldShowTrial()
+                && pro.propay.usedSavedCard()) {
+                // catch before then, so a check that errors still ends in the failure dialog
+                this.recoverSavedCardSale(saleId)
+                    .catch(dump)
+                    .then((recovered) => {
+                        if (!recovered && pro.propay.onPropayPage()) {
+                            fail();
+                        }
+                    });
+                return;
+            }
+            fail();
+        };
+
         if (isStripe && !((typeof utcResult.EUR === 'object') && utcResult.EUR.error)) {
             this.stripeSaleId = null;
             if (utcResult.EUR) {
@@ -3693,16 +3763,14 @@ var addressDialog = {
                 });
             }
             else {
-                this.showError(utcResult);
+                failSale();
             }
         }
         else {
             if (utcResult.EUR.url) {
                 return this.redirectToSite(utcResult, isStripe);
             }
-            // Hide the loading animation and show the error
-            pro.propay.hideLoadingOverlay();
-            this.showError(utcResult);
+            failSale();
         }
     },
 

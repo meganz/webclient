@@ -288,26 +288,10 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
             );
 
             buttons.push(
-                {
-                    label: this.props.openLabel,
-                    key: 'select',
-                    className: `${className} ${highlighted.length > 1 ? 'disabled' : ''}`,
-                    defaultClassname: 'nav-elem normal button action',
-                    onClick: e => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (highlighted.length > 1) {
-                            return;
-                        }
-                        this.setState({ currentlyViewedEntry: highlightedNode });
-                        this.clearSelectionAndHighlight();
-                        this.setState({ selected: [], searchValue: '', searchText: '', highlighted: [] });
-                    }
-                },
                 allowAttachFolders ? {
                     label: l[8023],
                     key: 'attach',
-                    defaultClassname: 'nav-elem normal button action secondary',
+                    defaultClassname: 'nav-elem normal button action',
                     className,
                     onClick: () => {
                         this.props.onClose();
@@ -367,15 +351,17 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
             );
         }
 
-        if (!folderIsHighlighted || this.props.folderSelectable &&
-            (!this.props.noShareFolderAttach || !(isIncomingShare && folderIsHighlighted))
+        const {folderSelectable, noShareFolderAttach, showDisabledSelect, selectLabel} = this.props;
+
+        if (showDisabledSelect || !folderIsHighlighted || folderSelectable &&
+            (!noShareFolderAttach || !(isIncomingShare && folderIsHighlighted))
         ) {
             buttons.push({
-                label: this.props.selectLabel,
+                label: selectLabel,
                 key: 'select',
                 defaultClassname: 'nav-elem normal button action',
                 className: this.state.selected.length === 0
-                    || share && share.down || isS4Cn ? "disabled" : "",
+                    || share && share.down || isS4Cn ? 'disabled' : '',
                 onClick: e => {
                     if (this.state.selected.length > 0) {
                         this.props.onSelected(this.state.selected);
@@ -403,6 +389,21 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
 
         let breadcrumbPath = M.getPath(entryId);
 
+        const renderTab = (tab, icon, label) => {
+            const selected = self.state.selectedTab === tab;
+
+            return (
+                <button
+                    className={`nav-elem text-only full-width${selected ? ' active' : ''}`}
+                    onClick={() => self.handleTabChange(tab)}>
+                    <i className={`sprite-fm-mono ${icon}-${selected ? 'solid' : 'outline'}`} />
+                    <div className="text-box-wrapper">
+                        <span className="primary-text">{label}</span>
+                    </div>
+                </button>
+            );
+        };
+
         return (
             <ModalDialogsUI.ModalDialog
                 className={`${classes} ${this.dialogName}`}
@@ -417,61 +418,14 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
 
                 <section className="left-panel">
                     <div className="fm-picker-dialog-tree-panel">
-                        <button
-                            className={
-                                `nav-elem text-only full-width` +
-                                `${self.state.selectedTab === 'quick-access' ? ' active' : ''}`
-                            }
-                            onClick={() => self.handleTabChange('quick-access')}>
-                            <i className="sprite-fm-mono icon-clock-thin-solid" />
-                            <div className="text-box-wrapper">
-                                <span className="primary-text">
-                                    {l.frequent_access /* `Frequently accessed` */}
-                                </span>
-                            </div>
-                        </button>
-                        <button
-                            className={
-                                `nav-elem text-only full-width` +
-                                `${self.state.selectedTab === M.RootID ? ' active' : ''}`
-                            }
-                            onClick={() => self.handleTabChange(M.RootID)}>
-                            <i className="sprite-fm-mono icon-cloud-thin-outline" />
-                            <div className="text-box-wrapper">
-                                <span className="primary-text">
-                                    {l[164] /* `Cloud Drive` */}
-                                </span>
-                            </div>
-                        </button>
+                        {renderTab('quick-access', 'icon-clock-thin', l.frequent_access)}
+                        {renderTab(M.RootID, 'icon-cloud-thin', l[164])}
                         {!self.props.hideIncoming &&
-                            <button
-                                className={
-                                    `nav-elem text-only full-width` +
-                                    `${self.state.selectedTab === 'shares' ? ' active' : ''}`
-                                }
-                                onClick={() => self.handleTabChange('shares')}>
-                                <i className="sprite-fm-mono icon-folder-users-thin-outline" />
-                                <div className="text-box-wrapper">
-                                    <span className="primary-text">
-                                        {l[5542] /* `Incoming Shares` */}
-                                    </span>
-                                </div>
-                            </button>
+                            renderTab('shares', 'icon-folder-users-thin', l[5542])
                         }
-                        <button
-                            className={
-                                `nav-elem text-only full-width` +
-                                `${self.state.selectedTab === 's4' ? ' active' : ''}` +
-                                `${u_attr.s4 ? '' : ' hidden'}`
-                            }
-                            onClick={() => self.handleTabChange('s4')}>
-                            <i className="sprite-fm-mono icon-bucket-triangle-thin-outline" />
-                            <div className="text-box-wrapper">
-                                <span className="primary-text">
-                                    {l.obj_storage /* `S4 Object storage` */}
-                                </span>
-                            </div>
-                        </button>
+                        {u_attr.s4 &&
+                            renderTab('s4', 'icon-bucket-triangle-thin', l.obj_storage)
+                        }
                     </div>
                 </section>
 

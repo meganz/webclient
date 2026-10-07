@@ -319,6 +319,16 @@ pro.propay = {
     },
 
     /**
+     * Whether the purchase in flight charges the saved card, i.e. the utc call carries extra.pmid
+     * @returns {Boolean} True when the saved card is the selected payment method
+     */
+    usedSavedCard() {
+        'use strict';
+
+        return !!(this.useSavedCard && this.savedCard.id && !this.paymentButton);
+    },
+
+    /**
      * Get the expiry state of the saved card
      * @returns {Object|false} {text, expired, expiringSoon}, or false if the card has no usable expiry date
      */
@@ -764,7 +774,7 @@ pro.propay = {
                 pro.lastPaymentProviderId = addressDialog.gatewayId_stripe;
 
                 // Do not set pmid if user is not using a saved card
-                if (this.useSavedCard && this.savedCard.id && !this.paymentButton) {
+                if (this.usedSavedCard()) {
                     extra.pmid = this.savedCard.id;
                 }
                 if (!this.currentGateway.supportsRecurring) {
@@ -775,6 +785,9 @@ pro.propay = {
 
             return true;
         };
+
+        // Set once the utc call carries a pmid, so the catch below can confirm a reported failure
+        let savedCardSaleId = null;
 
         // Setup the 'uts' API request
         api.screq(utsRequest)
@@ -800,6 +813,10 @@ pro.propay = {
 
                 // If saleId is already an array of sale IDs use that, otherwise add to an array
                 const saleIdArray = Array.isArray(saleId) ? saleId : [saleId];
+
+                if (extra.pmid) {
+                    savedCardSaleId = saleIdArray;
+                }
 
                 extra.taxCode = pro.propay.billing.getTaxNumberForApiReq();
 
@@ -871,7 +888,22 @@ pro.propay = {
             })
             .catch((ex) => {
 
+                if (savedCardSaleId) {
+                    return addressDialog.recoverSavedCardSale(savedCardSaleId)
+                        .catch(() => {
+                            throw ex;
+                        })
+                        .then((recovered) => {
+                            if (!recovered && this.onPropayPage()) {
+                                throw ex;
+                            }
+                        });
+                }
+                throw ex;
+            })
+            .catch((ex) => {
                 console.error(ex);
+
                 // Default error is "Something went wrong. Try again later..."
                 let errorMessage;
 
@@ -4081,7 +4113,7 @@ pro.propay = {
         extra.b2b = pro.propay.billing.isBusinessUse ? 1 : 0;
         extra.inv = ['business', 'invoice'].includes(pro.propay.billing.getBillingType()) ? 1 : 0;
 
-        if (this.useSavedCard && this.savedCard.id && !this.paymentButton) {
+        if (this.usedSavedCard()) {
             extra.pmid = this.savedCard.id;
         }
 
@@ -4312,6 +4344,13 @@ pro.propay = {
         };
     },
 
+    /**
+     * Find the regular plan a targeted discount applies to (its discounted price is in the dci).
+     * @param {Number} al Account level
+     * @param {Number} [m] Months, default 12; falls back to the level's 1-month plan
+     * @returns {Promise<Array|undefined>} utqa plan array for pro.getPlanObj, or undefined when this country
+     * has no plan at that level (e.g. Pro Lite where it is not sold)
+     */
     async getDiscountedPlanInfo(al, m) {
         'use strict';
 
@@ -4457,7 +4496,7 @@ pro.propay = {
         for (let i = 0; i < dcis.length; i++) {
             const dci = dcis[i];
             const matchedPlan = await pro.propay.getDiscountedPlanInfo(dci.al, dci.m);
-            const matchedPlanObj = pro.getPlanObj(matchedPlan);
+            const matchedPlanObj = matchedPlan && pro.getPlanObj(matchedPlan);
 
             if (matchedPlanObj) {
                 offers.push({ dci, matchedPlanObj });

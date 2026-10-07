@@ -384,7 +384,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
         showImage() {
             this.showMime();
-            getImage(this.node)
+            const {node} = this;
+            const type = fileIcon(node) === 'audio' && !String(node.fa).includes(':0*') ? 1 : 0;
+            getImage(node, type)
                 .then(url => {
                     if (url) {
                         this.showMime(true);
@@ -1455,6 +1457,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
     function hasThumbnail(node) {
         const nodeIcon = fileIcon(node);
+        if (nodeIcon === 'audio') {
+            return /:[01]\*/.test(node.fa);
+        }
         return ['image', 'video', 'raw', 'photoshop', 'vector'].includes(nodeIcon) &&
             (is_image3(node) || nodeIcon === 'video' && M.isGalleryVideo(node));
     }

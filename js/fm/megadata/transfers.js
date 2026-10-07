@@ -612,8 +612,10 @@ MegaData.prototype.dlerror = function(dl, error) {
             errorstr = l[20705];
             break;
         case ETOOMANY:
-        case EACCESS:
             errorstr = l[20228];
+            break;
+        case EACCESS:
+            errorstr = l[23];
             break;
         case ENOENT:
             errorstr = l[22];
@@ -1215,6 +1217,8 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
             tfsheadupdate({t: gid});
 
             if (is_megadrop) {
+                const remainingTime = bps > 1000 ? (bt - bl) / bps : -1;
+                mega.fileRequestUpload.onItemUploadProgress(ul, bps, remainingTime, perc, bl);
                 return;
             }
             mega.tpw.updateDownloadUpload(mega.tpw.UPLOAD, gid, perc, bl, bt, bps, ul.pos, ul.starttime);

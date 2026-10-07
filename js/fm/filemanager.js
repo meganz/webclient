@@ -2050,15 +2050,16 @@ FileManager.prototype.initFileAndFolderSelectDialog = async function(type) {
     const diag = freeze({
         'create-new-link': {
             title: l[20667],
-            selectLabel: l[1523],
+            selectLabel: l.create_link_lbl,
             folderSelectable: true,
             hideIncoming: true,
         },
         'open-file': {
-            title: l[22666],
-            selectLabel: l[865],
+            title: l.select_txt_file_hdr,
+            selectLabel: l.open_txt_file_lbl,
             folderSelectNotAllowed: true,
             folderSelectable: false, // Can select folder(s)
+            showDisabledSelect: true, // Show Select button event if action is disabled
             hideIncoming: true,
             customFilterFn(node) {
                 if (node.t) {

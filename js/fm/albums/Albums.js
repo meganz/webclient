@@ -882,48 +882,6 @@ lazy(mega.gallery, 'albums', () => {
         }
     }
 
-    class RemoveShareDialog extends MDialog {
-        constructor(albumIds) {
-            super({
-                ok: {
-                    label: albumIds.length > 1 ? l[8735] : l[6821],
-                    callback: () => {
-                        scope.albums.removeShare(albumIds);
-                    },
-                    classes: ['mega-button', 'branded-green']
-                },
-                cancel: {
-                    label: l.msg_dlg_cancel
-                },
-                dialogClasses: null,
-                icon: 'sprite-fm-uni icon-question icon-size-16'
-            });
-
-            this.setContent(albumIds);
-            this.addConfirmationCheckbox(
-                () => mega.config.get('nowarnpl'),
-                (val) => {
-                    const currentVal = !!mega.config.get('nowarnpl');
-
-                    if (val !== currentVal) {
-                        mega.config.setn('nowarnpl', val ? 1 : undefined);
-                    }
-                },
-                l.do_not_show_this_again
-            );
-        }
-
-        setContent(albumIds) {
-            const p = document.createElement('p');
-            p.className = 'px-6';
-
-            p.textContent = mega.icu.format(l.plink_remove_dlg_text_album, albumIds.length);
-
-            this.slot = p;
-            this.title = mega.icu.format(l.plink_remove_dlg_title_album, albumIds.length);
-        }
-    }
-
     const removeShareWithConfirmation = (albumIds) => {
         if (M.isInvalidUserStatus()) {
             return;
@@ -931,11 +889,23 @@ lazy(mega.gallery, 'albums', () => {
 
         if (mega.config.get('nowarnpl')) {
             scope.albums.removeShare(albumIds);
+            return;
         }
-        else {
-            const dialog = new RemoveShareDialog(albumIds);
-            dialog.show();
-        }
+
+        const okLabel = albumIds.length > 1 ? l[8735] : l[6821];
+
+        msgDialog(
+            `>*remove:!^${okLabel}!${l.msg_dlg_cancel}`,
+            false,
+            mega.icu.format(l.plink_remove_dlg_title_album, albumIds.length),
+            mega.icu.format(l.plink_remove_dlg_text_album, albumIds.length),
+            (res) => {
+                if (res === true) {
+                    scope.albums.removeShare(albumIds);
+                }
+            },
+            'nowarnpl'
+        );
     };
 
     class AlbumShareDialog {

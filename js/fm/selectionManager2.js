@@ -1407,6 +1407,14 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                     __hideButton('delete');
                 }
             }
+
+            // A share or link change on a folder being imported into would break or leak the import
+            if (mega.migrate.isImporting($.selected)) {
+                __hideButton('link');
+                __hideButton('copy-link');
+                __hideButton('remove-link');
+                __hideButton('share');
+            }
         }
         else {
             M.dyh('required-links')

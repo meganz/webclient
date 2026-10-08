@@ -108,6 +108,22 @@ class MegaMobileFooter extends MegaComponent {
                 }
             },
         ];
+
+        if (mega.flags.ff_mis || localStorage.ff_mis) {
+            this.menuItems.push({
+                text: l.import_from_another,
+                icon: 'sprite-fm-mono icon-cloud-upload-thin-outline',
+                binding: () => {
+                    if (!validateUserAction()) {
+                        return false;
+                    }
+
+                    mega.migrate.showDialog().catch(tell);
+                    eventlog(501420);
+                }
+            });
+        }
+
         // if (mega.flags.ab_ads) {
             mega.commercials.init();
         // }

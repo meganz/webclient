@@ -37,7 +37,7 @@ lazy(mega.ui, 'notifyUtils', () => {
                             label: l[164],
                             classes: ['notification-filter'],
                             get data() {
-                                return ['share', 'd', 'dshare', 'put', 'ph', 'puu', 'ls'];
+                                return ['share', 'd', 'dshare', 'put', 'ph', 'puu', 'ls', 'msc'];
                             },
                         },
                         {
@@ -586,8 +586,13 @@ var notify = {
         'use strict';
 
         // We should not show notifications if we haven't yet done the initial notifications load yet
-        if (!notify.initialLoadComplete || notify.isUnwantedNotification(actionPacket) || actionPacket.mid) {
+        if (!notify.initialLoadComplete || notify.isUnwantedNotification(actionPacket)) {
             return false;
+        }
+
+        // Uploads from a cloud import
+        if (actionPacket.mid) {
+            return mega.migrate.notifyProgress(actionPacket.mid);
         }
 
         // Construct the notification object
@@ -800,6 +805,15 @@ var notify = {
     combineNewNotificationWithPrevious: function(currentNotification) {
 
         'use strict';
+
+        // A cloud import keeps one notification per folder, from progress to result
+        if (currentNotification.type === 'msc') {
+            const i = notify.notifications.findIndex(n => n.type === 'msc' && n.data.n === currentNotification.data.n);
+
+            if (i >= 0) {
+                notify.notifications.splice(i, 1);
+            }
+        }
 
         // If there are no previous notifications, nothing can be combined,
         // so add it to start of the list without modification and exit
@@ -1556,7 +1570,7 @@ var notify = {
 
         // Notifications having a custom avatar instead of the regular user one
         const customIconNotifications = [
-            'psts', 'pses', 'ph', 'puu', 'dynamic', 'psts_v2', 'share', 'd', 'put', 'dynamic'];
+            'psts', 'pses', 'ph', 'puu', 'dynamic', 'psts_v2', 'share', 'd', 'put', 'dynamic', 'msc'];
 
         // If a contact action packet
         if (typeof userHandle !== 'string') {
@@ -1653,6 +1667,8 @@ var notify = {
             }
             case 'puu':
                 return notify.renderFileRequestUpload($notificationHtml, notification, displayName);
+            case 'msc':
+                return notify.renderImportFinished($notificationHtml, notification);
             default:
                 return false;   // If it's a notification type we do not recognise yet
         }
@@ -2555,6 +2571,54 @@ var notify = {
         $notificationHtml.addClass('nt-new-files nt-file-request');
 
         const notifIcon = '<i class="item-type-icon icon-folder-public-24"></i>';
+        $('.notification-avatar-custom', $notificationHtml).safeHTML(notifIcon);
+
+        return $notificationHtml;
+    },
+
+    /**
+     * Render cloud import progress or result notification
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification Notification data
+     * @returns {Object} The HTML to be rendered for the notification
+     */
+    renderImportFinished($notificationHtml, notification) {
+        'use strict';
+
+        const {n, p, s, fp, ft} = notification.data;
+        const node = this.ndm.getNode(n);
+        const provider = mega.migrate.knownProviders[p];
+
+        if (s === mega.migrate.states.SUCCESS) {
+            this.renderNotificationTitle($notificationHtml, l.mig_import_complete);
+
+            if (node && node.name) {
+                $('.notification-info', $notificationHtml)
+                    .safeHTML(l.mig_find_import.replace('%1', this.shortenNodeName(node.name)));
+            }
+        }
+        else if (s === mega.migrate.states.IN_PROGRESS) {
+            this.renderNotificationTitle($notificationHtml, l.mig_import_ongoing);
+
+            if (ft) {
+                $('.notification-info', $notificationHtml)
+                    .text(mega.icu.format(l.mig_import_progress, ft).replace('%1', fp));
+            }
+        }
+        else if (s === mega.migrate.states.CANCELLED) {
+            this.renderNotificationTitle($notificationHtml, l.mig_cancelled);
+            $('.notification-info', $notificationHtml).text(l.mig_cancelled_desc);
+        }
+        else {
+            this.renderNotificationTitle($notificationHtml, l.mig_fail);
+            $('.notification-info', $notificationHtml).text(l.mig_error);
+        }
+
+        if (node) {
+            $notificationHtml.addClass('nt-new-files clickable').attr('data-folder-handle', n);
+        }
+
+        const notifIcon = `<i class="${provider ? provider.icon : 'item-type-icon icon-folder-24'}"></i>`;
         $('.notification-avatar-custom', $notificationHtml).safeHTML(notifIcon);
 
         return $notificationHtml;

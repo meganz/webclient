@@ -10411,7 +10411,7 @@ class CloudBrowserDialog extends modalDialogs.A.SafeShowDialogController {
       const {
         highlighted
       } = this.state;
-      const className = `${share && share.down ? 'disabled' : ''}`;
+      const className = `${share && share.down || mega.migrate.isImporting(highlighted) ? 'disabled' : ''}`;
       highlighted && highlighted.length && highlighted[0];
       const allowAttachFolders = this.props.allowAttachFolders && !isIncomingShare && !isS4Cn;
       buttons.push(allowAttachFolders ? {

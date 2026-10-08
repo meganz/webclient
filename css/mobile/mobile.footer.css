@@ -28,6 +28,7 @@
 
 .general-actions .nav-elem {
     padding: 0;
+    text-align: start;
 }
 
 .general-actions .nav-elem span {

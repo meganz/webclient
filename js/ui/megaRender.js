@@ -1294,7 +1294,7 @@ mBroadcaster.once('boot_done', () => {
 
                 if (aExtendedInfo !== false) {
 
-                    if (share) {
+                    if (share && !mega.migrate.isImportFolder(aNode)) {
                         props.linked = true;
                         props.classNames.push('linked');
                     }

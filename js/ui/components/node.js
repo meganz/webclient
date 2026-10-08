@@ -447,8 +447,8 @@ class MegaNodeComponent extends MegaComponent {
 
     static updateLinkIcon(component) {
 
-        const {linked, domNode} = component;
-        const classname = linked ? linked.down ? 'taken-down' : 'linked' : '';
+        const {linked, domNode, node} = component;
+        const classname = linked && !mega.migrate.isImportFolder(node) ? linked.down ? 'taken-down' : 'linked' : '';
 
         if (classname) {
             domNode.classList.add(classname);

@@ -591,7 +591,6 @@ lazy(mega.ui, 'dlPage', () => {
             const {dlPage} = this.data;
             const textCn = dlPage.querySelector('.js-text-viewer');
             const loaderCn = textCn.querySelector('.viewer-pending');
-            const icon = dlPage.querySelector('.js-text-viewer-icon');
 
             const handleLoader = (show) => loaderCn
                 && loaderCn.classList[show ? 'remove' : 'add']('hidden');
@@ -652,12 +651,18 @@ lazy(mega.ui, 'dlPage', () => {
                     }
                 })
                 .catch((ex) => {
-                    if (icon) {
-                        icon.classList.remove('hidden');
+                    if (ex === EOVERQUOTA || Object(ex.target).status === 509) {
+                        dlmanager.setUserFlags();
+                        dlmanager.showOverQuotaDialog();
                     }
-                    if (d) {
+                    else if (d) {
                         console.error('Failed to read as text from buffer.', ex);
                     }
+                    if (window.textConIsDl) {
+                        return;
+                    }
+                    textCn.classList.add('hidden');
+                    this.updateUI(false);
                 })
                 .finally(handleLoader);
         },

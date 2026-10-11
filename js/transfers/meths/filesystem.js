@@ -507,7 +507,7 @@
                                             api_req({a: 'log', e: 99657, m: 'Out of HTML5 Offline Storage space.'});
                                         }
 
-                                        msgDialog('warningb:' + l[103],
+                                        msgDialog(`warningb:!^${l.ok_button}!${l[103]}`,
                                             WRITERR_DIAGTITLE,
                                             l[20817],
                                             str_mtrunc(dl_filename), function(cancel) {

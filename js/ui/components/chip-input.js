@@ -56,6 +56,7 @@ class MegaChip {
             e.preventDefault();
             e.stopPropagation();
 
+            this.editor.focus(true);
             this.editor.select(this);
         });
     }
@@ -159,6 +160,15 @@ class MegaChipEditor extends MegaComponent {
         this.editor.addEventListener('keydown', this._onKeyDown.bind(this));
         this.editor.addEventListener('beforeinput', this._onBeforeInput.bind(this));
         this.editor.addEventListener('input', this._onInput.bind(this));
+        this.editor.addEventListener('mousedown', e => {
+
+            const last = this.chips[this.chips.length - 1];
+
+            if (e.target === this.editor && last && e.clientX < last.node.getBoundingClientRect().right) {
+                e.preventDefault();
+                this.focus();
+            }
+        });
 
         this.editor.addEventListener('click', () => {
             if (this.selectedChip) {
@@ -296,9 +306,9 @@ class MegaChipEditor extends MegaComponent {
         this.selectedChip = null;
     }
 
-    focus() {
-        this.editor.focus();
-        this._placeCaretEnd();
+    focus(preventScroll) {
+        this.editor.focus({preventScroll});
+        this._placeCaretEnd(!preventScroll);
     }
 
     validate(value) {
@@ -354,11 +364,9 @@ class MegaChipEditor extends MegaComponent {
         this.textNode = document.createTextNode(this.chipZwsp);
 
         this.editor.appendChild(this.textNode);
-
-        this._scrollCaretIntoView();
     }
 
-    _placeCaretEnd() {
+    _placeCaretEnd(scroll = true) {
         const selection = window.getSelection();
 
         if (!selection) {
@@ -369,7 +377,9 @@ class MegaChipEditor extends MegaComponent {
             this.textNode, this.textNode.length
         ))();
 
-        this._scrollCaretIntoView();
+        if (scroll) {
+            this._scrollCaretIntoView();
+        }
     }
 
     _scrollCaretIntoView() {

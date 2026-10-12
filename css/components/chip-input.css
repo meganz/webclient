@@ -35,16 +35,13 @@
 }
 
 .mega-component.chip-input .chip-editor {
-    align-items: center;
     box-sizing: border-box;
     caret-color: var(--mobile-text-primary);
     color: var(--mobile-text-primary);
     cursor: text;
-    display: grid;
+    display: block;
     font: var(--mobile-font-caption-large-regular);
-    gap: 8px;
-    grid-auto-columns: max-content;
-    grid-auto-flow: column;
+    line-height: 24px;
     min-height: 38px;
     outline: none;
     overflow-x: auto;
@@ -62,7 +59,6 @@
 .mega-component.chip-input .chip-editor.is-empty {
     caret-color: var(--mobile-text-placeholder);
     color: var(--mobile-text-placeholder);
-    display: block;
 }
 
 .mega-component.chip-input .chip-editor.is-empty::before {
@@ -91,8 +87,10 @@
     display: inline-flex;
     font: var(--mobile-font-caption-large-regular);
     height: 24px;
+    margin-inline-end: 8px;
     max-width: 220px;
     padding: 0 12px;
+    vertical-align: top;
     white-space: nowrap;
     user-select: none;
 }

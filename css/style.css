@@ -2,36 +2,19 @@ body, td, th {
     font: var(--text-body1);
     color: var(--text-color-medium);
 }
+
 body.dragging * {
-    cursor: url(../images/mega/cursor1.png), auto !important;
+    cursor: no-drop !important;
 }
-body.dndc-warning * {
-    cursor: url(../images/mega/cursor1.png), auto !important;
-}
+
 body.dndc-copy * {
-    cursor: url(../images/mega/cursor2.png), auto !important;
+    cursor: copy !important;
 }
-body.dndc-download * {
-    cursor: url(../images/mega/cursor3.png), auto !important;
-}
+
 body.dndc-move * {
-    cursor: url(../images/mega/cursor4.png), auto !important;
+    cursor: move !important;
 }
-body.dndc-to-shared * {
-    cursor: url(../images/mega/cursor5.png), auto !important;
-}
-body.dndc-to-contacts * {
-    cursor: url(../images/mega/cursor6.png), auto !important;
-}
-body.dndc-to-conversations * {
-    cursor: url(../images/mega/cursor7.png), auto !important;
-}
-body.dndc-to-rubbish * {
-    cursor: url(../images/mega/cursor8.png), auto !important;
-}
-body.dndc-sort * {
-    cursor: url(../images/mega/cursor9.png), auto !important;
-}
+
 body * {
     -webkit-touch-callout: none;
     user-select: none;

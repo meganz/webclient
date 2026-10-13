@@ -704,6 +704,62 @@ FileManager.prototype.initFileManagerUI = function() {
         $('.fm-products-nav').text('');
     }
 
+
+    /**
+     * Expand collapsed items in the left panel
+     *
+     * @param {Element} target The element under the pointer
+     * @param {String} id Its id, to tell whether the pointer is still there
+     * @returns {void}
+     */
+    const expandOnHover = (target, id) => {
+        if ($.currentOver !== id) {
+            return;
+        }
+        if (id.startsWith('treea_')) {
+            M.onTreeUIExpand(id.replace('treea_', ''), 1);
+        }
+        else if ($(target).hasClass('nw-conversations-item') || $(target).is('ul.conversations-pane > li')) {
+            $(target).click();
+        }
+        else {
+            M.expandTreeSection(target);
+        }
+    };
+
+    /**
+     * Clearing a tree target left by the pointer
+     *
+     * Tree rows can extend beyond the panel, causing jQ UI to keep them active.
+     * Called from drag() to detect this on every move
+     *
+     * @param {Event} e The drag event
+     * @returns {void}
+     */
+    $.ddReleaseTreeTarget = function(e) {
+        if (!String($.currentOver).startsWith('treea_')) {
+            return;
+        }
+        const {top, right, bottom, left} = mega.ui.topmenu.menuNode.getBoundingClientRect();
+
+        if (e.clientX >= left && e.clientX <= right && e.clientY >= top && e.clientY <= bottom) {
+            return;
+        }
+        const node = document.getElementById($.currentOver);
+        const inst = node && $(node).data('ui-droppable');
+
+        if (inst) {
+            // it latches, and would never report an entry again without this
+            inst.isover = false;
+            inst.isout = true;
+        }
+        $(node).removeClass('dragover ui-droppable-hover');
+        $('body').removeClassWith('dndc-');
+        $.draggingClass = false;
+        $.currentOver = false;
+        clearTimeout($.liTimerK);
+    };
+
     $.doDD = function(e, ui, a, type) {
 
         // Prevent drop behavior for the `FloatingVideo` component
@@ -756,19 +812,26 @@ FileManager.prototype.initFileManagerUI = function() {
             // tree dropped:
             c = $(e.target).attr('class');
 
-            // If this is a tree item but it is overflowed from container
+            // Tree rows can extend beyond the panel, causing false intersections
+            // Reset the droppable state when the pointer is outside the tree
             if (c && c.includes('nw-fm-tree-item')) {
-                const treeBound = mega.ui.topmenu.menuNode.getBoundingClientRect();
+                const {top, right, bottom, left} = mega.ui.topmenu.menuNode.getBoundingClientRect();
 
-                if (ui.offset.top < treeBound.top || ui.offset.top > treeBound.bottom ||
-                    ui.offset.left > treeBound.right || ui.offset.top > treeBound.bottom) {
-                    $(e.target).removeClass('dragover');
+                if (e.clientX < left || e.clientX > right || e.clientY < top || e.clientY > bottom) {
+                    const inst = $(e.target).data('ui-droppable');
+
+                    if (inst) {
+                        inst.isover = false;
+                        inst.isout = true;
+                    }
+                    $(e.target).removeClass('dragover ui-droppable-hover');
                     return false;
                 }
             }
-            if (c && c.indexOf('menu-item') > -1 && a === 'drop') {
+
+            // Resolve menu items as drop targets during dragover
+            if (c && c.indexOf('menu-item') > -1) {
                 if (c.indexOf('cloud-drive') > -1) {
-                    // Drag and drop to the cloud drive in the file manager left panel
                     t = M.RootID;
                 }
                 else if (c.includes('s4') && M.tree.s4) {
@@ -783,13 +846,8 @@ FileManager.prototype.initFileManagerUI = function() {
                     }
                 }
                 else if (c.indexOf('rubbish-bin') > -1) {
-                    // Drag and drop to the rubbish bin in the file manager left panel
                     t = M.RubbishID;
                 }
-            }
-            else if (c && c.indexOf('menu-item') > -1 && c.indexOf('cloud-drive') > -1 && a === 'over') {
-                // Drag and over the cloud drive in the file manager left panel
-                t = M.RootID;
             }
             else if (c && c.indexOf('nw-fm-tree-item') > -1 && !$(e.target).visible(!0)) {
                 dd = 'download';
@@ -854,12 +912,22 @@ FileManager.prototype.initFileManagerUI = function() {
                 clearTimeout($.liTimerK);
             }
             $('body').removeClassWith('dndc-');
+            $.draggingClass = false;
             $('.hide-settings-icon').removeClass('hide-settings-icon');
+
+            if (a === 'drop') {
+                $('body').removeClass('dragging');
+            }
         }
         setDDType();
 
         if (a === 'drop' || a === 'out' || a === 'noop') {
             $(e.target).removeClass('dragover');
+
+            if (a !== 'noop') {
+                // Clear stale state to avoid suppressing the next drag's first leave
+                $.currentOver = false;
+            }
             // if (a !== 'noop') $('.dragger-block').addClass('drag');
         }
         else if (a === 'over') {
@@ -870,60 +938,24 @@ FileManager.prototype.initFileManagerUI = function() {
             }
 
             $.currentOver = id;
-            setTimeout(function() {
-                if ($.currentOver === id) {
-                    var h;
-                    if (id.indexOf('treea_') > -1) {
-                        h = id.replace('treea_', '');
-                    }
-                    else {
-                        c = $(id).attr('class');
-                        if (c && c.indexOf('cloud-drive-item') > -1) {
-                            h = M.RootID;
-                        }
-                        else if (c && c.indexOf('recycle-item') > -1) {
-                            h = M.RubbishID;
-                        }
-                        else if (c && c.indexOf('contacts-item') > -1) {
-                            h = 'contacts';
-                        }
-                    }
-                    if (h) {
-                        M.onTreeUIExpand(h, 1);
-                    }
-                    else if ($(e.target).hasClass('nw-conversations-item')) {
-                        $(e.target).click();
-                    }
-                    else if ($(e.target).is('ul.conversations-pane > li')) {
-                        $(e.target).click();
-                    }
-                }
-            }, 890);
+            $.liTimerK = setTimeout(() => expandOnHover(e.target, id), 890);
 
-            if (dd === 'move') {
-                $.draggingClass = ('dndc-move');
-            }
-            else if (dd === 'copy') {
-                $.draggingClass = ('dndc-copy');
-            }
-            else if (dd === 'download') {
-                $.draggingClass = ('dndc-download');
-            }
-            else if (dd === 'chat-attach') {
-                $.draggingClass = ('dndc-to-conversations');
-            }
-            else if (dd === 'album') {
-                $.draggingClass = ('dndc-copy');
-            }
-            else {
-                const {type} = M.isCustomView(t) || {};
-                $.draggingClass = M.getNodeByHandle(t) || type === 's4' || type === mega.devices.rootId
-                || M.onDeviceCenter && !mega.devices.ui.canMove(ids)
-                    ? 'dndc-warning' :
-                    'dndc-move';
-            }
+            const draggingClasses = {
+                album: 'dndc-copy',
+                'chat-attach': 'dndc-copy',
+                copy: 'dndc-copy',
+                copydel: 'dndc-move',
+                download: 'dndc-move',
+                move: 'dndc-move'
+            };
 
-            $('body').addClass($.draggingClass);
+            // Use the tree row as a fallback for folders not yet in M.d
+            $.draggingClass = draggingClasses[dd]
+                || (t && M.getTreeRowHandle(e.target, t) && !M.getNodeByHandle(t) ? 'dndc-move' : '');
+
+            if ($.draggingClass) {
+                $('body').addClass($.draggingClass);
+            }
 
             $(e.target).addClass('dragover');
             if ($(e.target).hasClass('folder')) {
@@ -2932,6 +2964,8 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 $.dragSelected = clone($.selected);
             },
             drag(e, ui) {
+                $.ddReleaseTreeTarget(e);
+
                 if (ui.position.top + $.draggerHeight - 28 > $(window).height()) {
                     ui.position.top = $(window).height() - $.draggerHeight + 26;
                 }
@@ -2958,6 +2992,8 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 $.gridDragging = $.draggingClass = false;
 
                 $('body').removeClass('dragging').removeClassWith("dndc-");
+                $.currentOver = false;
+                clearTimeout($.liTimerK);
 
                 const ddTables = document.querySelectorAll('.grid-table');
                 for (let i = 0; i < ddTables.length; i++) {

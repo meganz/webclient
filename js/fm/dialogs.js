@@ -2192,19 +2192,28 @@
      * A version of the Copy dialog used when uploading.
      * @param {Array} files The files being uploaded.
      * @param {Object} [emptyFolders] Empty folders to create hierarchy for.
+     * @param {Object} [dropTarget] {tab, dir} specifying the destination to open (see filedrag.js)
      * @global
      */
-    global.openCopyUploadDialog = function openCopyUploadDialog(files, emptyFolders) {
+    global.openCopyUploadDialog = function openCopyUploadDialog(files, emptyFolders, dropTarget) {
         // Is allowed chats
         if (isUserAllowedToOpenDialogs()) {
             M.safeShowDialog('copy', function() {
-                var tab = M.chat ? 'conversations' : M.currentrootid === 'shares' ?
-                    'shared-with-me' : M.currentrootid === 's4' ? 's4' : 'cloud-drive';
-                var dir = M.currentdirid;
+                var tab;
+                var dir;
+
+                if (dropTarget) {
+                    ({tab, dir} = dropTarget);
+                }
+                else {
+                    tab = M.chat ? 'conversations' : M.currentrootid === 'shares' ?
+                        'shared-with-me' : M.currentrootid === 's4' ? 's4' : 'cloud-drive';
+                    dir = M.currentdirid;
+                }
                 if (tab === 'conversations' && $.dialogSelChats) {
                     delete $.dialogSelChats;
                 }
-                if (M.isGalleryPage() || M.isAlbumsPage()) {
+                if (!dropTarget && (M.isGalleryPage() || M.isAlbumsPage())) {
                     // Gallery/album views are not a valid upload target
                     dir = M.RootID;
                 }

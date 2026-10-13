@@ -623,6 +623,9 @@ function getID3CoverArt(entry) {
                         result = u8.slice(--offset, frame.size);
                         break;
                     }
+                    if (!(frame.size > 9)) {
+                        break;
+                    }
                     offset += frame.size;
                 }
             }

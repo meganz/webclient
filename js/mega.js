@@ -1423,6 +1423,19 @@ scparser.$add('ua', (a) => {
     }
 });
 
+scparser.$add('ute', (a) => {
+    'use strict';
+
+    // `taxnum` is not an attribute, so no `ua` carries it - only a fresh ug has the new value.
+    // Read now, not after that ug: by then the save that caused this has finished and cleared it.
+    const local = a.st === api.currst || !!Object(mega.buinsessController).savingProfile;
+
+    // Caught before the broadcast: a failed refresh still has to reach the open page.
+    M.getAccountDetails()
+        .catch(dump)
+        .then(() => mBroadcaster.sendMessage('business:subuserUpdate', {external: !local}));
+});
+
 scparser.$add('sd', {
     b: function() {
         "use strict";

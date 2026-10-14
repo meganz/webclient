@@ -91,7 +91,8 @@ lazy(T.ui, 'viewFilesLayout', () => {
                 stop(ev);
                 if (!ev.target.classList.contains('disabled')) {
 
-                    T.core.zipDownload(self.xhid).catch(tell);
+                    T.core.zipDownload(self.xhid)
+                        .catch((ex) => Number(ex) !== self.EROLLEDBACK && tell(ex));
                 }
             },
             dom: new IWeakSet()

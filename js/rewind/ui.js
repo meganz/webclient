@@ -2769,8 +2769,8 @@ lazy(mega, 'rewindUi', () => {
             this.$title.safeHTML(escapeHTML(l.rewind_restore_progress_title)
                 .replaceAll('[STEXT]', '<span class="medium-color">')
                 .replaceAll('[/STEXT]', '</span>')
-                .replace('[SFOLDER/]', `<span class="folder">${folder}</span>`)
-                .replace('[SDATE/]', `<span class="date">${date}</span>`));
+                .replace('[SFOLDER/]', `<span class="folder">${escapeHTML(folder)}</span>`)
+                .replace('[SDATE/]', `<span class="date">${escapeHTML(date)}</span>`));
 
             this.$main.removeClass('hidden');
         }

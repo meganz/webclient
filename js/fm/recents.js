@@ -839,7 +839,7 @@ RecentsRender.prototype.getActionUserString = function(action) {
         else if (action.path[0].h === M.cf.h) {
             str += `${dot}<span>${l.chat_folder}</span>`;
         }
-        else if (action.path[1].s4Root) {
+        else if (action.path.length > 1 && action.path[1].s4Root) {
             str += `${dot}<span>${l.s4_bucket_type}</span>`;
         }
         else if (mega.fileRequest && mega.fileRequest.publicFolderExists(action.path[0].h)) {

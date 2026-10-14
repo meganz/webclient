@@ -124,6 +124,7 @@ export default class BrowserEntries extends MegaRenderMixin {
         return e.target && (
             e.target.tagName === 'INPUT' ||
             e.target.tagName === 'BUTTON' ||
+            e.target.isContentEditable ||
             (e.target.tagName === 'TEXTAREA' && !e.target.classList.contains('messages-textarea')) ||
             e.target.tagName === 'SELECT');
     }

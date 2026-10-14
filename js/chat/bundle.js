@@ -35398,7 +35398,7 @@ class BrowserEntries extends mixins.w9 {
     }
   }
   _invalidKeydownTarget(e) {
-    return e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'TEXTAREA' && !e.target.classList.contains('messages-textarea') || e.target.tagName === 'SELECT');
+    return e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.isContentEditable || e.target.tagName === 'TEXTAREA' && !e.target.classList.contains('messages-textarea') || e.target.tagName === 'SELECT');
   }
   _isNavigationKeyDown(e, keyCode) {
     const {

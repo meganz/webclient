@@ -1659,11 +1659,13 @@
     z-index: 12;
 }
 
-/* Skeleton loading for the addressDialog (registerb / recurring sub / propay-bitcoin).
+/* Skeleton loading for the addressDialog (registerb / recurring sub / propay-bitcoin) and the
+   business profile Save button.
    Mirrors the propay-page rules above but scoped to the dialog so the price + Pay button
    can use `pro.propay.sk.startLoad` while the dialog lives outside `#propay`. */
 .payment-address-dialog .sk-active.sk-pro,
-.payment-address-dialog .sk-active .sk-pro {
+.payment-address-dialog .sk-active .sk-pro,
+.user-management-account-settings .sk-active.sk-pro {
     position: relative;
     border: 0;
     overflow: hidden;
@@ -1676,7 +1678,8 @@
     min-height: 32px;
 }
 .payment-address-dialog .sk-active.sk-pro::after,
-.payment-address-dialog .sk-active .sk-pro::after {
+.payment-address-dialog .sk-active .sk-pro::after,
+.user-management-account-settings .sk-active.sk-pro::after {
     position: absolute;
     overflow: hidden;
     background-image: linear-gradient(90deg, var(--mobile-surface-2) 50px,

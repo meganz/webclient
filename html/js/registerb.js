@@ -1015,6 +1015,18 @@ BusinessRegister.prototype.processPayment = function(payDetails, businessPlan) {
         }
     }).catch((ex) => {
 
+        if (page === 'repay') {
+            // ENOENT here is a sale with no invoice, which no retry fixes.
+            const detail = Number(ex) === ENOENT ? l.repay_no_invoice : ex < 0 ? api_strerror(ex) : ex;
+
+            msgDialog('warninga', '', l[19511], detail, () => {
+                addressDialog.closeDialog();
+                page = '';
+                loadSubPage('repay');
+            });
+            return;
+        }
+
         msgDialog('warninga', '', l[19511], ex < 0 ? api_strerror(ex) : ex, () => addressDialog.closeDialog());
 
     }).finally(() => loadingDialog.hide());

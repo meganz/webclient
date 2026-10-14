@@ -2280,6 +2280,7 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/propay-signup.js', n: 'propay_signup_js', j:1});
     jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
     jsl.push({f:'html/js/propay-billing.js', n: 'propay_billing_js', j:1});
+    jsl.push({f:'html/js/tax-handling.js', n: 'taxhandling_js', j:1});
     jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
 
     // Plan pages for features

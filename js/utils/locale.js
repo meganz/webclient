@@ -1493,6 +1493,9 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.no_payment_providers = escapeHTML(l.no_payment_providers)
         .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
+    l.tax_price_rise_declined = escapeHTML(l.tax_price_rise_declined)
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>');
     l.agree_s4_tos = escapeHTML(l.agree_s4_tos)
         .replace('[A]', '<a class="clickurl green" target="_blank" href="https://mega.io/terms#S4">')
         .replace('[/A]', '</a>');

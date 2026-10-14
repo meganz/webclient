@@ -2,36 +2,19 @@ body, td, th {
     font: var(--text-body1);
     color: var(--text-color-medium);
 }
+
 body.dragging * {
-    cursor: url(../images/mega/cursor1.png), auto !important;
+    cursor: no-drop !important;
 }
-body.dndc-warning * {
-    cursor: url(../images/mega/cursor1.png), auto !important;
-}
+
 body.dndc-copy * {
-    cursor: url(../images/mega/cursor2.png), auto !important;
+    cursor: copy !important;
 }
-body.dndc-download * {
-    cursor: url(../images/mega/cursor3.png), auto !important;
-}
+
 body.dndc-move * {
-    cursor: url(../images/mega/cursor4.png), auto !important;
+    cursor: move !important;
 }
-body.dndc-to-shared * {
-    cursor: url(../images/mega/cursor5.png), auto !important;
-}
-body.dndc-to-contacts * {
-    cursor: url(../images/mega/cursor6.png), auto !important;
-}
-body.dndc-to-conversations * {
-    cursor: url(../images/mega/cursor7.png), auto !important;
-}
-body.dndc-to-rubbish * {
-    cursor: url(../images/mega/cursor8.png), auto !important;
-}
-body.dndc-sort * {
-    cursor: url(../images/mega/cursor9.png), auto !important;
-}
+
 body * {
     -webkit-touch-callout: none;
     user-select: none;
@@ -9554,6 +9537,15 @@ div.camera-bottom-txt {
     margin-inline-end: 12px;
     margin-top: 12px;
 }
+.user-management-account-settings .profile button.saving-btn-profile.sk-active {
+    background: none;
+    box-shadow: none;
+    opacity: 1;
+}
+.user-management-account-settings button.saving-btn-profile.sk-active::after {
+    border-radius: inherit;
+    width: calc(100% + 2px);
+}
 .user-management-account-settings .bus-input-block {
     box-sizing: border-box;
     display: inline-block;
@@ -9561,28 +9553,48 @@ div.camera-bottom-txt {
     vertical-align: top;
     width: 50%;
 }
+.user-management-account-settings .state-ddl.hidden + .mega-input.halfSize-r {
+    float: none;
+    width: 100%;
+}
+.user-management-account-settings .profile .dropdown-input.disabled::before {
+    display: block;
+}
+.user-management-account-settings .profile .mega-input.disabled:not(.dropdown-input) input,
+.user-management-account-settings .profile .mega-input.disabled:not(.dropdown-input) input::placeholder,
+.user-management-account-settings .profile .mega-input.disabled:not(.dropdown-input) .mega-input-title {
+    color: var(--mobile-text-disabled);
+}
+.user-management-account-settings .profile .mega-input.disabled:not(.dropdown-input)::before {
+    border-color: var(--mobile-text-disabled);
+    display: block;
+}
+.user-management-account-settings .profile .profile-locked {
+    margin: 24px 24px 0;
+}
+.user-management-account-settings .profile .profile-locked .cell {
+    padding: 8px 0;
+    text-align: start;
+}
+.user-management-account-settings .profile-locked:not(.hidden) ~ .option-containers .dropdown-input > span,
+.user-management-account-settings .profile-locked:not(.hidden) ~ .option-containers .dropdown-input .mega-input-title {
+    color: var(--mobile-text-disabled);
+}
+.user-management-account-settings .profile-locked:not(.hidden) ~ .option-containers .dropdown-input::before {
+    border-color: var(--mobile-text-disabled);
+}
+.user-management-account-settings .profile-locked:not(.hidden) ~ .option-containers .dropdown-input i {
+    --mask-color: var(--icon-inactive);
+}
+.user-management-account-settings .profile-locked:not(.hidden) ~ .option-containers .mega-input,
+.user-management-account-settings .profile-locked:not(.hidden) ~ .option-containers .mega-input input {
+    cursor: default;
+}
 .user-management-account-settings .bus-input-block .taxcode-invoice-note {
     color: var(--text-color-medium);
     font: var(--text-body2);
     margin-top: -12px;
     text-align: start;
-}
-/* Temporarily invalidated for the first step of invoicing-changes.
-   To revert later once api support added. */
-.user-management-account-settings .profile .mega-input.disabled input,
-.user-management-account-settings .profile .mega-input.disabled input::placeholder,
-.user-management-account-settings .profile .mega-input.disabled .mega-input-title,
-.user-management-account-settings .profile .mega-input.disabled > span {
-    color: var(--mobile-text-disabled);
-    cursor: default;
-}
-.user-management-account-settings .profile .mega-input.disabled:hover > span ~ i,
-.user-management-account-settings .profile .mega-input.disabled:hover > input ~ i {
-    --mask-color: var(--icon-inactive);
-}
-.user-management-account-settings .profile .mega-input.disabled::before {
-    border-color: var(--mobile-text-disabled);
-    display: block;
 }
 
 .user-management-account-settings .setting-block {

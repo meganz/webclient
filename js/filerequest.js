@@ -60,6 +60,7 @@ lazy(mega, 'fileRequest', () => {
             this.puPagePublicHandle = null;
             this.puPageLink = null;
             this.linkUpdated = false;
+            this.linkBannerTimer = null;
 
             this.$dialog = $('.file-request', document.body);
             this.dialogClassBackup = this.$dialog.prop('class');
@@ -417,6 +418,10 @@ lazy(mega, 'fileRequest', () => {
             // Reset section
             this.$sectionSecondary.addClass('hidden');
             this.linkBanner.classList.add('hidden');
+            if (this.linkBannerTimer) {
+                this.linkBannerTimer.abort();
+                this.linkBannerTimer = null;
+            }
 
             // Footer
             this.$previewButtonFooter.getInput().addClass('hidden');
@@ -520,6 +525,16 @@ lazy(mega, 'fileRequest', () => {
         setSectionSecondary() {
             this.$sectionSecondary.removeClass('hidden');
             this.linkBanner.classList.toggle('hidden', !this.linkUpdated);
+            if (this.linkBannerTimer) {
+                this.linkBannerTimer.abort();
+                this.linkBannerTimer = null;
+            }
+            if (this.linkUpdated) {
+                (this.linkBannerTimer = tSleep(8)).then(() => {
+                    this.linkBannerTimer = null;
+                    this.linkBanner.classList.add('hidden');
+                });
+            }
             this.linkUpdated = false;
         }
 
@@ -1080,7 +1095,6 @@ lazy(mega, 'fileRequest', () => {
         }
 
         async saveSettings() {
-            const previousLink = this.commonDialog.puPageLink;
             const password = this.passwordSwitch.checked && this.validatePassword()
                 ? this.passwordInput.value
                 : '';
@@ -1092,7 +1106,7 @@ lazy(mega, 'fileRequest', () => {
                 password,
             });
 
-            this.commonDialog.linkUpdated = this.commonDialog.puPageLink !== previousLink;
+            this.commonDialog.linkUpdated = true;
 
             this.puHandleObject =
                 mega.fileRequest.storage.getPuHandleByNodeHandle(this.puHandleObject.h) || this.puHandleObject;

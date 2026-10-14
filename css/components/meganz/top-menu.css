@@ -90,6 +90,7 @@
     transform: rotateZ(-90deg);
     cursor: pointer;
     height: auto;
+    z-index: 2;
 }
 .mega-top-menu nav.menu :not(.js-s4-tree-panel) button.tree-expander.icon-only {
     display: none;

@@ -2276,12 +2276,21 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
     this.URLchanger('account');
     loadingDialog.pshow();
 
+    // The rules name the tax field and gate its validation, so render once they are in hand.
+    if (!pro.taxHandling.tngrLoaded) {
+        // Only while they are still on Profile, or this would pull them back to it.
+        pro.taxHandling.tngrReady
+            .then(() => page === 'fm/user-management/account' && mySelf.viewBusinessAccountPage())
+            .finally(() => loadingDialog.phide());
+        return;
+    }
+
     var $businessAccountContainer = $('.files-grid-view.user-management-view', 'body');
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
     var $profileContainer = $('.profile', $accountContainer);
     var $invoiceContainer = $('.invoice', $accountContainer);
     var $countriesSelect = $('.cnt-ddl', $profileContainer);
-    var $countriesSelectScroll = $('.dropdown-scroll', $profileContainer).text('');
+    var $countriesSelectScroll = $('.dropdown-scroll', $countriesSelect).text('');
 
     // If Pro Flexi, show the different breadcrumbs for Invoices
     const $breadcrumbsClass = (u_attr.pf) ? 'pro-iv-invoices' : 'account';
@@ -2300,9 +2309,9 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
 
         // if we dont find essential business attrs --> get them
         if (!u_attr['%name'] && !u_attr['%phone']) {
-            mySelf.business.updateSubUserInfo(u_attr.b.bu, ['%name', '%phone',
-                '%email', '%taxnum', '%address1', '%address2', '%city', '%state',
-                '%country', '%zip']);
+            mySelf.business.updateSubUserInfo(u_attr.b.bu, [
+                '%name', '%phone', '%email', '%address1', '%address2', '%city', '%state', '%country', '%zip'
+            ]);
             return;
         }
 
@@ -2397,20 +2406,38 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
 
     var setPostCodeOnUI = function(countryCode) {
         var postCode = getPostCodeName(countryCode);
-        $profileContainer.find('input#prof-zip').prop('placeholder', postCode);
+        const $zipInput = $('input#prof-zip', $profileContainer).prop('placeholder', postCode);
+        const megaInput = $zipInput.data('MegaInputs');
+
+        // Once MegaInputs has run, the label is a title element rather than the placeholder.
+        if (megaInput) {
+            megaInput.updateTitle(postCode);
+        }
     };
 
     setPostCodeOnUI(cCountry);
 
-    var setTaxName = function(countryCode) {
-        var taxName = mySelf.business.getTaxCodeName(countryCode);
+    // The state's own rule first, as propay does, then the country-wide one.
+    var setTaxName = function(countryCode, state) {
+        var taxName = pro.taxHandling.getTngrTaxName(countryCode, state)
+            || mySelf.business.getTaxCodeName(countryCode);
         if (taxName) {
-            $('input#prof-vat', $profileContainer).attr("placeholder", taxName);
+            const example = pro.taxHandling.getExampleTaxNumber(countryCode, state);
+            const $input = $('input#prof-vat', $profileContainer)
+                .attr('title', taxName)
+                .attr('placeholder', example || '');
+            const megaInput = $input.data('MegaInputs');
+
+            // .has-placeholder pins the title up so the example stays readable, as propay does.
+            $input.closest('.mega-input').toggleClass('has-placeholder', !!example);
+
+            // Once MegaInputs has run, the label is a title element rather than the placeholder.
+            if (megaInput) {
+                megaInput.updateTitle(taxName);
+            }
             $('.taxcode-invoice-note', $profileContainer).text(l.taxcode_note.replace('%s', taxName));
         }
     };
-
-    setTaxName(cCountry);
 
     var $cNameInput = $('input#prof-cname', $profileContainer).val(cName);
     var $cTelInput = $('input#prof-phone', $profileContainer).val(cTel);
@@ -2419,13 +2446,15 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
     var $cAddressInput = $('input#prof-addr1', $profileContainer).val(cAddress);
     var $cAddress2Input = $('input#prof-addr2', $profileContainer).val(cAddress2);
     var $cCityInput = $('input#prof-city', $profileContainer).val(cCity);
-    var $cStateInput = $('input#prof-state', $profileContainer).val(cState);
+    var $cStateSelect = $('.state-ddl', $profileContainer);
+
+    var cStateNorm = pro.taxHandling.stateKey(cCountry, cState);
     var $cZipInput = $('input#prof-zip', $profileContainer).val(cZip);
     var $cCountrySelect = $('.cnt-ddl', $profileContainer);
     var $cCountryOption = $('.option[data-value="' + cCountry + '"]', $cCountrySelect);
 
     var inputs = [$cNameInput, $cTelInput, $cEmailInput, $cVatInput, $cAddressInput,
-        $cAddress2Input, $cCityInput, $cStateInput, $cZipInput];
+                  $cAddress2Input, $cCityInput, $cZipInput];
 
     var addCorrectValClass = function ($item) {
         $item.parent().removeClass('error');
@@ -2458,6 +2487,74 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
         checkChange($(e.target).attr('data-value'), cCountry, 'cCountry');
         return false;
     });
+
+    const getState = () => getDropdownValue($cStateSelect);
+
+    // The dropdown is not a MegaInputs, so this makes room for the message the way MegaInputs does.
+    const showStateError = (msg) => {
+        const $msg = $('.message-container', $cStateSelect).text(msg);
+
+        $cStateSelect.addClass('error msg').css('margin-bottom', '');
+        $cStateSelect.css('margin-bottom', parseInt($cStateSelect.css('margin-bottom')) + $msg.outerHeight() + 9);
+    };
+    const hideStateError = () => $cStateSelect.removeClass('error msg').css('margin-bottom', '');
+
+    // In grace period or expired, the next invoice has to carry the details of the overdue one.
+    const overdue = !!u_attr.b && pro.isExpiredOrInGracePeriod(u_attr.b.s);
+
+    // Out of tnp attempts: the field stays shut until they reset, then opens by itself.
+    const applyTaxLock = () => {
+        const wait = pro.taxHandling.lockedUntil - unixtime();
+
+        if (wait > 0 && !overdue) {
+            $cVatInput.prop('disabled', true).megaInputsShowError(l.tax_attempts_try_later);
+            $cVatInput.closest('.mega-input').addClass('disabled');
+
+            delay('busprofile:taxlock', () => {
+                $cVatInput.prop('disabled', false).megaInputsHideError();
+                $cVatInput.closest('.mega-input').removeClass('disabled');
+            }, wait * 1000);
+        }
+    };
+
+    // Rebuilt per country, and hidden where the country has no states of its own.
+    const loadStates = (countryCode, selected) => {
+        const states = M.getStates();
+        const items = Object.create(null);
+
+        hideStateError();
+
+        for (const code of Object.keys(states)) {
+            if (code.split('-')[0] === countryCode) {
+                items[code] = states[code];
+            }
+        }
+
+        pro.propay.initSyncedDropdown({
+            $dropdowns: $cStateSelect,
+            items,
+            selected: items[selected] ? selected : '',
+            placeholder: l.select_state,
+            namespace: 'busstate',
+            onChange: (value) => {
+                hideStateError();
+
+                // Whatever the tax field showed was for the previous state, as propay clears it.
+                $cVatInput.megaInputsHideError();
+                applyTaxLock();
+                setTaxName(countryCode, value);
+                checkChange(value, cStateNorm, 'cState');
+            },
+        });
+
+        $cStateSelect.toggleClass('hidden', !Object.keys(items).length);
+    };
+
+    loadStates(cCountry, cStateNorm);
+
+    // What each field holds as saved, which Save compares against; a successful save moves it on.
+    const drawn = Object.create(null);
+
     inputs.forEach(function($input) {
         var megaInput = new mega.ui.MegaInputs($input);
         addCorrectValClass($input);
@@ -2466,19 +2563,39 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
         if (megaInput.updateTitle && ($input.is($cZipInput) || $input.is($cVatInput))) {
             megaInput.updateTitle();
         }
-        const origVal = $input.val();
+        drawn[$input.attr('id')] = $input.val();
         $input.rebind('keyup.businessacc', () => {
-            checkChange($input.val().trim(), origVal, $input.attr('id'));
+            checkChange($input.val().trim(), drawn[$input.attr('id')], $input.attr('id'));
             return false;
         });
     });
 
-    // Temporarily invalidated for the first step of invoicing-changes.
-    // To revert later once api support added.
-    $cCountrySelect.addClass('disabled').attr('disabled', 'disabled');
-    $cVatInput.prop('disabled', true).closest('.mega-input').addClass('disabled');
-    $cStateInput.prop('disabled', true).closest('.mega-input').addClass('disabled');
-    $('.taxcode-invoice-note', $profileContainer).addClass('hidden');
+    // The fields outlive a render, so this also has to undo the lock once it is paid.
+    for (const $input of inputs) {
+        $input.prop('disabled', overdue).closest('.mega-input').toggleClass('disabled', overdue);
+    }
+    $cCountrySelect.add($cStateSelect).toggleClass('disabled', overdue);
+    $('.profile-locked', $profileContainer).toggleClass('hidden', !overdue);
+
+    if (overdue) {
+        delay.cancel('busprofile:taxlock');
+    }
+
+    // The .mega-input wrapper only exists once MegaInputs has run.
+    setTaxName(cCountry, getState());
+
+    // Edits made while a save is in flight would be overwritten or never sent.
+    const setSaving = (saving) => {
+        pro.propay.sk[saving ? 'startLoad' : 'endLoad']($saveButton[0]);
+        for (const $input of inputs) {
+            $input.prop('disabled', saving);
+        }
+        $cCountrySelect.add($cStateSelect).toggleClass('disabled', saving);
+
+        if (!saving) {
+            applyTaxLock();
+        }
+    };
 
     $saveButton.rebind(
         'click.suba',
@@ -2526,20 +2643,20 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
                     attrsToChange.push({ key: '%email', val: $cEmailInput.val().trim() });
                 }
             }
-            if ($cVatInput.val().trim() !== cVat) {
-                const newTaxCode = $cVatInput.val().trim();
-                const cc = $selectedCountry.attr('data-value');
+            const taxNumber = $cVatInput.val().trim();
+            const taxCountry = $selectedCountry.attr('data-value') || cCountry;
+            const taxState = getState();
+            const hasStates = !$cStateSelect.hasClass('hidden');
+            const stateUpdate = pro.taxHandling.stateUpdate(cState, taxState, hasStates);
+
+            // What tnp accepted, which can differ from what was typed.
+            let acceptedTaxNumber = taxNumber;
+
+            // An empty field removes the number, so it is a change like any other.
+            if (taxNumber !== cVat) {
                 $('.taxcode-invoice-note', $profileContainer).removeClass('hidden');
-                if (!newTaxCode) {
-                    $cVatInput.megaInputsShowError(l[20953]);
-                    $cVatInput.focus();
-                    valid = false;
-                }
-                else {
-                    $cVatInput.megaInputsHideError();
-                    attrsToChange.push({ key: '%taxnum', val: newTaxCode });
-                    isTaxChanged = true;
-                }
+                $cVatInput.megaInputsHideError();
+                isTaxChanged = true;
             }
             if ($cAddressInput.val().trim() !== cAddress) {
                 attrsToChange.push({ key: '%address1', val: $cAddressInput.val().trim() });
@@ -2550,8 +2667,8 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
             if ($cCityInput.val().trim() !== cCity) {
                 attrsToChange.push({ key: '%city', val: $cCityInput.val().trim() });
             }
-            if ($cStateInput.val().trim() !== cState) {
-                attrsToChange.push({ key: '%state', val: $cStateInput.val().trim() });
+            if (typeof stateUpdate === 'string') {
+                attrsToChange.push({ key: '%state', val: stateUpdate });
             }
             if ($selectedCountry.attr('data-value') !== cCountry) {
                 attrsToChange.push({ key: '%country', val: $selectedCountry.attr('data-value') });
@@ -2561,7 +2678,32 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
             }
 
 
-            var settingResultHandler = function (st) {
+            // The normalised state here: this asks whether the pair tnp checks against has moved.
+            const taxDetailsChanged = taxNumber !== cVat
+                || taxCountry !== cCountry
+                || taxState !== cStateNorm;
+
+            // Checked with the other fields, so neither reaches tnpcc or tnp.
+            if (taxDetailsChanged && !taxState && hasStates) {
+                showStateError(taxNumber ? l.tax_state_required : l.select_state);
+                valid = false;
+            }
+            else if (stateUpdate === null) {
+                showStateError(l.select_state);
+                valid = false;
+            }
+            else if (taxNumber && taxDetailsChanged
+                && !pro.taxHandling.matchesTaxNumberFormat(taxNumber, taxCountry, taxState)) {
+
+                $cVatInput.megaInputsShowError(l[20953]);
+                $cVatInput.focus();
+                valid = false;
+            }
+
+            const settingResultHandler = (st, code) => {
+                mySelf.business.savingProfile = false;
+                setSaving(false);
+
                 if (st) {
                     $saveButton.removeClass('active').addClass('disabled');
                     toaster.main.neutral(
@@ -2576,38 +2718,27 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
                             $('.user-management-able-user-dialog.mig-success.user-management-dialog');
                         $('.yes-answer', $dialog).off('click.suba').on('click.suba', closeDialog);
                         var msg = l[20954];
-                        if (attrsToChange.length === 1 && attrsToChange[0].key === '%phone') {
+                        if (attrsToChange.length === 1 && attrsToChange[0].key === '%phone' && !isTaxChanged) {
                             msg = l.busProfileUpdatePhone;
                         }
 
-                        if (isTaxChanged) {
-                            var myNow = new Date();
-
-                            if (u_attr && (myNow.getTime() - (u_attr.since * 1000) < 2592e6)) {
-                                // if difference is less than one month
-                                msg += ' ' + l[20955];
-                            }
-                            else if (M && M.account && M.account.purchases && M.account.purchases.length) {
-                                // get first business purchase
-                                var firstPurchase = null;
-                                for (var pur = 0; pur < M.account.purchases.length; pur++) {
-                                    if (M.account.purchases[pur][1] && M.account.purchases[pur][5]) {
-                                        if (M.account.purchases[pur][5] === 100) {
-                                            firstPurchase = M.account.purchases[pur];
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                if (myNow.getTime() - (firstPurchase[1] * 1000) < 2592e6) {
-                                    msg += ' ' + l[20955];
-                                }
-                            }
+                        if (isTaxChanged && !taxNumber) {
+                            msg += ' ' + l.tax_number_removed;
                         }
                         $dialog.find('.dialog-text-one').text(msg);
 
                         return $dialog;
                     });
+
+                    // Keep the ug copy in step until the next one.
+                    if (isTaxChanged) {
+                        u_attr.taxnum = acceptedTaxNumber;
+
+                        // Save compares against these from now on: no `ua` comes back to redraw for `taxnum`.
+                        cVat = acceptedTaxNumber;
+                        drawn[$cVatInput.attr('id')] = acceptedTaxNumber;
+                        delete changes[$cVatInput.attr('id')];
+                    }
 
                     // we will clean up cached data of invoices to insure updating if needed
                     if (mega && mega.buinsessAccount && mega.buinsessAccount.invoicesList
@@ -2636,17 +2767,130 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
                 }
                 else {
                     $saveButton.addClass('active').removeClass('disabled');
+
+                    const sentTaxNumber = taxDetailsChanged ? taxNumber : '';
+
+                    if (pro.taxHandling.isTaxNumberRejection(code, sentTaxNumber, attrsToChange)) {
+
+                        // tnp accepted it but upb did not, so the next save has to ask tnp again.
+                        pro.taxHandling.forgetTaxNumber(acceptedTaxNumber, taxCountry, taxState);
+                        $cVatInput.megaInputsShowError(l[20953]);
+                        msgDialog('warninga', '', l[20953], '', () => $cVatInput.focus());
+                        return;
+                    }
+
                     msgDialog('warningb', '', l[19528]);
                 }
             };
 
-            if (valid) {
-                var settingPromise = mySelf.business.updateBusinessAttrs(attrsToChange);
-                settingPromise.always(settingResultHandler);
-            }
-            else {
+            if (!valid) {
+                // If it is not valid, then we will show error message, and allow user to continue interaction with UI
                 $saveButton.addClass('active').removeClass('disabled');
+                return;
             }
+
+            // A throw in either chain below would otherwise leave Save disabled for good.
+            const saveFailed = (ex) => {
+                dump(ex);
+                setSaving(false);
+                $saveButton.addClass('active').removeClass('disabled');
+                msgDialog('warningb', '', l[19528]);
+            };
+
+            // Nothing is loading while the user decides; proceed restarts it.
+            const confirmPriceRise = (message, proceed) => {
+                setSaving(false);
+
+                msgDialog(
+                    `confirmation:!^${l.tax_price_rise_confirm}!${l.mig_go_back}`,
+                    '',
+                    l.tax_price_rise_title,
+                    message,
+                    (yes) => {
+                        if (yes) {
+                            proceed();
+                            return;
+                        }
+                        $saveButton.addClass('active').removeClass('disabled');
+                        msgDialog('warninga', '', l.tax_price_rise_declined);
+                    }
+                );
+            };
+
+            const save = (priceAccepted) => {
+                const fields = Object.create(null);
+
+                // `taxnum` is reserved, so it goes top-level rather than as a %attribute, and an
+                // empty one removes the stored number.
+                if (taxDetailsChanged) {
+                    fields.taxnum = acceptedTaxNumber ? base64urlencode(to8(acceptedTaxNumber)) : '';
+                }
+
+                if (priceAccepted) {
+                    fields.pwarn = 1;
+                }
+
+                // The `ute` packet this save triggers comes back here too.
+                mySelf.business.savingProfile = true;
+
+                setSaving(true);
+                mySelf.business.updateBusinessAttrs(attrsToChange, fields).always((st, code) => {
+
+                    // tnpcc could not price it, so upb is the first to say the price rises.
+                    if (pro.taxHandling.isPriceRiseRejection(code, fields)) {
+                        mySelf.business.savingProfile = false;
+                        confirmPriceRise(pro.taxHandling.priceRiseMessage(), () => save(true));
+                        return;
+                    }
+
+                    settingResultHandler(st, code);
+                });
+            };
+
+            // Removal has no number for tnp to check.
+            const validateTaxNumber = async() => {
+                if (!taxNumber) {
+                    return true;
+                }
+
+                const res = await pro.taxHandling.checkTaxNumber(taxNumber, taxCountry, taxState);
+
+                if (!res.valid) {
+                    setSaving(false);
+                    $saveButton.addClass('active').removeClass('disabled');
+                    $cVatInput.megaInputsShowError(res.message);
+                    return false;
+                }
+
+                acceptedTaxNumber = res.taxNumber;
+                $cVatInput.val(acceptedTaxNumber);
+
+                return true;
+            };
+
+            // tnpcc only prices a number tnp has already accepted.
+            const checkPriceThenSave = async() => {
+                const res = await pro.taxHandling
+                    .checkBusTaxPriceChange(acceptedTaxNumber, taxCountry, taxState);
+
+                if (!res || !res.increased) {
+                    save();
+                    return;
+                }
+
+                confirmPriceRise(pro.taxHandling.priceRiseMessage(res.prices), () => save(true));
+            };
+
+            if (!taxDetailsChanged) {
+                save();
+                return;
+            }
+
+            setSaving(true);
+
+            validateTaxNumber()
+                .then((valid) => valid && checkPriceThenSave())
+                .catch(saveFailed);
         }
     );
 
@@ -2661,15 +2905,32 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
         }
     });
 
+    let shownCountry = cCountry;
+
     // event handler for country select changing
-    $('.cnt-ddl .option', $profileContainer).rebind('click.suba',
-        function countrySelectChangingHandler(se) {
+    $('.cnt-ddl .option', $profileContainer).rebind('click.suba', function countrySelectChangingHandler() {
 
-            var value = $(this).attr('data-value');
+        var value = $(this).attr('data-value');
 
-            setPostCodeOnUI(value);
-            setTaxName(value);
-        });
+        if (value === shownCountry) {
+            return;
+        }
+        shownCountry = value;
+
+        setPostCodeOnUI(value);
+        // Only the country it was stored under can restore the state; any other clears it.
+        loadStates(value, value === cCountry ? cStateNorm : '');
+        checkChange(getState(), cStateNorm, 'cState');
+        setTaxName(value, getState());
+
+        // A number is only valid for the country that issued it, so the same rule applies.
+        const vat = value === cCountry ? cVat : '';
+
+        $cVatInput.val(vat).megaInputsHideError();
+        $cVatInput.parent().toggleClass('correctinput', !!vat);
+        applyTaxLock();
+        checkChange(vat, cVat, $cVatInput.attr('id'));
+    });
 
     // event handler for clicking left panel
     $('.user-management-tree-panel-header', '.fm-left-panel.user-management').rebind('click.subuser', function() {
@@ -2677,6 +2938,9 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
     });
 
     unhideSection();
+
+    // MegaInputs makes room for the message by its height, which reads 0 while the section is hidden.
+    applyTaxLock();
 });
 
 
@@ -4352,6 +4616,17 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
     else if (!$('.files-grid-view.user-management-view .user-management-account-settings')
         .hasClass('hidden')) {
         if (!subuser.u) { // dummy attr
+            if (subuser.external && !this.business.savingProfile) {
+
+                // Invoices share this container, and Profile reads the new details when opened.
+                if (page === 'fm/user-management/account') {
+                    msgDialog('warninga', '', l.business_profile_refreshed, '', () => {
+                        new BusinessAccountUI().viewBusinessAccountPage();
+                    });
+                }
+                return;
+            }
+
             // safe to create new object.
             var busUI2 = new BusinessAccountUI();
             busUI2.viewBusinessAccountPage();

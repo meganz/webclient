@@ -1267,7 +1267,7 @@ var addressDialog = {
                 if (prefilled && prefilled !== self.businessRegPage.lastPricedCountry) {
                     pro.propay.billing.country = prefilled;
                     if (selectedState) {
-                        pro.propay.billing.state = `${prefilled}-${selectedState}`;
+                        pro.propay.billing.state = pro.taxHandling.stateKey(prefilled, selectedState);
                     }
                     pro.propay.billing.refreshPricingForPage().catch(dump);
                 }
@@ -2150,6 +2150,10 @@ var addressDialog = {
                     const attributes = ["address1", "address2", "city", "state", "country", "postcode"];
 
                     businessInfo = businessInfo || Object.create(null);
+
+                    // %state is the bare code, and the state dropdown is keyed `CC-SS`.
+                    businessInfo['%state'] = pro.taxHandling.stateKey(businessInfo['%country'], businessInfo['%state']);
+
                     for (var i = 0; i < attributes.length; i++) {
                         var attr = attributes[i];
                         var battr = attr === "postcode" ? '%zip' : '%' + attr;
@@ -3853,10 +3857,19 @@ var addressDialog = {
             pro.propay.skItems.continueBtn.endLoad('purchase');
         }
 
-        // Propay renders billing inline, so reopening the legacy address dialog is wrong here.
-        const fallback = pro.propay.onPropayPage()
-            ? addressDialog.closeDialog.bind(addressDialog)
-            : addressDialog.showDialog.bind(addressDialog);
+        // Only registerb still has a dialog to send the user back to.
+        let fallback = addressDialog.showDialog.bind(addressDialog);
+
+        if (page === 'repay') {
+            // On mobile the page was parsed away to pay, so rebuild it.
+            callbackFn = () => {
+                page = '';
+                loadSubPage('repay');
+            };
+        }
+        else if (pro.propay.onPropayPage()) {
+            fallback = addressDialog.closeDialog.bind(addressDialog);
+        }
         msgDialog('warninga', l[7235], message, '', callbackFn || fallback);
     },
 

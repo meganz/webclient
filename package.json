@@ -78,7 +78,7 @@
     "grunt-contrib-concat": "2.1.0",
     "grunt-posthtml": "0.5.2",
     "htmlnano": "3.4.0",
-    "postcss": "8.5.28",
+    "postcss": "8.5.29",
     "postcss-url": "10.1.4",
     "posthtml": "0.16.7",
     "posthtml-urls": "1.0.0",

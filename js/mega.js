@@ -885,42 +885,9 @@ scparser.$add('s', {
                         console.assert(a.a === 's2', `INVALID SHARE, missing user-handle for ${a.n}`, a);
                     }
                 }
-                else if (M.su[a.n] && M.su[a.n].has(a.u) || a.ha === crypto_handleauth(a.n)) {
-
-                    // I updated or created my share
-                    const k = decrypt_key(u_k_aes, base64_to_a32(a.ok));
-
-                    if (k) {
-                        crypto_setsharekey(a.n, k);
-
-                        if (d) {
-                            console.assert(a.u || a.a === 's2', 'INVALID SHARE, missing user handle', a);
-                        }
-
-                        if (a.u) {
-                            M.nodeShare(a.n, {h: a.n, r: a.r, u: a.u, ts: a.ts});
-                        }
-                        else if (a.a === 's2' && fmdb) {
-                            // this must be a pending share, store ownerkey
-                            fmdb.add('ok', {h: a.n, d: {k: a.ok, ha: a.ha}});
-                        }
-                    }
-                }
             }
         }
         else {
-            if (a.n && typeof a.k !== 'undefined' && !u_sharekeys[a.n] && !self.secureKeyMgr) {
-                if (Array.isArray(a.k)) {
-                    // a.k has been processed by the worker
-                    crypto_setsharekey(a.n, a.k);
-                    prockey = true;
-                }
-                else if (d) {
-                    // XXX: misdirected actionpackets?
-                    console.warn('Got share action-packet with invalid key, wait for it.', a.n, a.k, [a]);
-                }
-            }
-
             if (a.u === 'EXP') {
 
                 mega.Share.ExportLink.pullShareLink(a.h, true).catch(dump);
@@ -998,7 +965,6 @@ scparser.$add('s', {
                         scinshare.skip = false;
                         scinshare.h = a.n;
                         scinshare.r = a.r;
-                        scinshare.sk = a.k;
                         scinshare.su = a.o;
 
                         if (!folderlink && fminitialized) {

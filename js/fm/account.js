@@ -1809,7 +1809,7 @@ accountUI.account = {
                                 if (result) {
 
                                     // Show the verify 2FA dialog to collect the user's PIN
-                                    return twofactor.verifyActionDialog.init();
+                                    return twofactor.verifyActionDialog.init(l.twofa_verify_delete);
                                 }
                             })
                             .then((twoFactorPin) => continueCancelAccount(twoFactorPin || null))

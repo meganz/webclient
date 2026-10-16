@@ -567,133 +567,154 @@ MegaData.prototype.getUserPlanInfo = async function(callback) {
 
 /**
  * Show the Master/Recovery Key dialog
- * @param {Number} [version] Dialog version, 1: post-register, otherwise default one.
+ * @param {Number} [version] Dialog version, 1: Lost 2FA authenticator (default), 2: Download key, 3: 2FA setup download
  */
 MegaData.prototype.showRecoveryKeyDialog = function(version) {
     'use strict';
 
-    var $dialog = $('.mega-dialog.recovery-key-dialog').removeClass('post-register');
-    $('i.js-key', $dialog).removeClass('shiny');
+    version = version < 4 && version > 0 ? version : 1;
+    const key = a32_to_base64(u_k);
+    const keyBlock = mCreateElement('div', { 'class': 'recovery-key-input selectable-txt' }, [
+        mCreateElement('div', { 'class': 'recovery-key-text'}, [document.createTextNode(key)])
+    ]);
 
-    // TODO: Implement this on mobile
-    if (!$dialog.length) {
-        if (d) {
-            console.debug('recovery-key-dialog not available...');
+    keyBlock.addEventListener('copy', () => {
+        if (!document.getSelection().toString().includes(key)) {
+            return;
         }
-        return;
+
+        mBroadcaster.sendMessage('keyexported');
+        if (!localStorage.recoverykey) {
+            localStorage.recoverykey = 1;
+            document.body.classList.add('rk-saved');
+        }
+    });
+    const paras = {
+        1: {
+            1: l[19852],
+            2: l.twofa_acc_recovery_warn,
+            3: l[19854],
+        },
+        2: {
+            1: l.dl_recovery_key_para1,
+            2: l.dl_recover_key_para2,
+        },
+        3: {
+            1: l.twofa_setup_recovery_step,
+        }
+    };
+    MegaButton.factory({
+        parentNode: keyBlock,
+        type: 'icon',
+        icon: 'sprite-fm-mono icon-copy-thin-outline',
+        componentClassname: 'transparent-icon text-icon secondary copy-btn',
+        onClick: () => {
+            u_exportkey();
+            mega.ui.toast.show(l[6040]);
+        }
+    });
+    MegaButton.factory({
+        parentNode: keyBlock,
+        type: 'normal',
+        text: l[58],
+        componentClassname: 'download-button',
+        onClick: () => {
+            u_savekey();
+            mega.ui.toast.show(l[8922]);
+            eventlog(500314);
+            if (version !== 2) {
+                return;
+            }
+
+            mega.ui.sheet.hide();
+            M.safeShowDialog('recovery-key-info', () => {
+                // Show user recovery key info warning
+                const $dialog = $('.mega-dialog.recovery-key-info');
+
+                // On button click close dialog
+                $('.close-dialog, button.js-close', $dialog).rebind('click', closeDialog);
+
+                return $dialog;
+            });
+        }
+    });
+    const titleRow = version === 1 ? mCreateElement('div', { 'class': 'recovery-key-title' }) : null;
+    if (titleRow) {
+        if (twofactor.verifyActionDialog.resolve) {
+            MegaButton.factory({
+                parentNode: titleRow,
+                type: 'icon',
+                icon: 'sprite-fm-mono icon-arrow-left-thin-solid',
+                componentClassname: 'transparent-icon text-icon secondary back-btn',
+                onClick: () => {
+                    mega.ui.sheet.hide();
+                    twofactor.verifyActionDialog.show();
+                }
+            });
+        }
+        mCreateElement('h3', undefined, [document.createTextNode(l[19826])], titleRow);
     }
 
-    M.safeShowDialog('recovery-key-dialog', () => {
+    const body = mCreateElement('div', { 'class': 'recovery-key-body' }, [
+        titleRow,
+        mCreateElement('div', { 'class': 'recovery-key-info' }, Object.values(paras[version]).map(
+            (para) => mCreateElement('div', undefined, [
+                parseHTML(
+                    escapeHTML(para)
+                        .replace(
+                            '[A]',
+                            '<a href="https://help.mega.io/accounts/password-management/recovery-key" ' +
+                            'target="_blank" rel="noopener noreferrer">'
+                        )
+                        .replace('[/A]', '</a>')
+                        .replace('[B]', '<b>')
+                        .replace('[/B]', '</b>')
+                )
+            ])
+        )),
+        mCreateElement('div', { 'class': 'recovery-key-block' }, [
+            mCreateElement('div', { 'class': 'recovery-key-label' }, [
+                document.createTextNode(version === 2 ? l[8839] : l[8963])
+            ]),
+            keyBlock,
+        ])
+    ]);
 
-        $('.skip-button, button.js-close', $dialog).removeClass('hidden').rebind('click', closeDialog);
-        $('.copy-recovery-key-button', $dialog).removeClass('hidden').rebind('click', () => {
-            // Export key showing a toast message
-            u_exportkey(l[6040]);
-        });
-        $('footer', $dialog).removeClass('hidden');
-        $('.content-block', $dialog).removeClass('dialog-bottom');
-        $('header.graphic', $dialog).removeClass('hidden');
+    mega.ui.sheet.show({
+        name: 'recovery-key-dialog',
+        title: version !== 1 && (version === 2 ? l.logout_recovery_key_download : l[8963]),
+        icon: 'icon-recovery-key-3d',
+        showClose: true,
+        contents: [body],
+        actions: version === 1 && [{
+            type: 'text',
+            text: l.twofa_recovery_pass_reset,
+            onClick: () => {
+                mega.ui.sheet.hide();
+                loadingDialog.show();
 
-        switch (version) {
-            case 1:
-                $('.skip-button', $dialog).removeClass('hidden');
-                $('button.js-close', $dialog).addClass('hidden');
-                $('.copy-recovery-key-button', $dialog).addClass('hidden');
-                $('i.js-key', $dialog).addClass('shiny');
-                $dialog.addClass('post-register').rebind('dialog-closed', () => {
-                    eventlog(localStorage.recoverykey ? 99718 : 99719);
-                    $dialog.unbind('dialog-closed');
-                });
-                break;
-            case 2:
-                $('.skip-button', $dialog).addClass('hidden');
-                $('button.js-close', $dialog).removeClass('hidden');
-                $('.copy-recovery-key-button', $dialog).addClass('hidden');
-                $('footer', $dialog).addClass('hidden');
-                $('.content-block', $dialog).addClass('dialog-bottom');
-                $('i.js-key', $dialog).addClass('shiny');
-                $('header.graphic', $dialog).addClass('hidden');
-                $dialog.addClass('post-register');
-                break;
-        }
-
-        $('.save-recovery-key-button', $dialog).rebind('click', () => {
-            if ($dialog.hasClass('post-register')) {
-                M.safeShowDialog('recovery-key-info', () => {
-                    // Show user recovery key info warning
-                    $dialog.addClass('hidden').removeClass('post-register');
-                    $dialog = $('.mega-dialog.recovery-key-info');
-
-                    // On button click close dialog
-                    $('.close-dialog, button.js-close', $dialog).rebind('click', closeDialog);
-
-                    return $dialog;
-                });
+                api.req({a: 'erm', m: u_attr.email, t: 9})
+                    .then(({result}) => {
+                        assert(result === 0);
+                        if (is_mobile) {
+                            msgDialog('info', '', l[735]);
+                        }
+                        else {
+                            fm_showoverlay();
+                            $('.mega-dialog.account-reset-confirmation').removeClass('hidden');
+                        }
+                    })
+                    .catch((ex) => {
+                        if (ex === ENOENT) {
+                            return msgDialog('warningb', l[1513], l[1946]);
+                        }
+                        tell(ex);
+                    })
+                    .finally(() => {
+                        loadingDialog.hide();
+                    });
             }
-
-            // Save Recovery Key to disk.
-            u_savekey();
-
-            // Show toast message.
-            showToast('recoveryKey', l[8922]);
-
-            eventlog(500314);
-        });
-
-        // Automatically select all string when key is clicked.
-        $('#backup_keyinput_2fa', $dialog).rebind('click.backupRecoveryKey', function() {
-            this.select();
-        });
-
-        // Update localStorage.recoveryKey when user copied his/her key.
-        $('#backup_keyinput_2fa', $dialog).rebind('copy.backupRecoveryKey', function() {
-
-            var selection = document.getSelection();
-
-            // If user is fully selected key and copy it completely.
-            if (selection.toString() === this.value) {
-
-                mBroadcaster.sendMessage('keyexported');
-
-                if (!localStorage.recoverykey) {
-                    localStorage.recoverykey = 1;
-                    $('body').addClass('rk-saved');
-                }
-            }
-
-        });
-
-        $('a.toResetLink', $dialog).rebind('click', () => {
-            closeDialog();
-            loadingDialog.show();
-
-            api.req({a: 'erm', m: u_attr.email, t: 9})
-                .then(({result}) => {
-                    assert(result === 0);
-                    if (is_mobile) {
-                        msgDialog('info', '', l[735]);
-                    }
-                    else {
-                        fm_showoverlay();
-                        $('.mega-dialog.account-reset-confirmation').removeClass('hidden');
-                    }
-                })
-                .catch((ex) => {
-                    if (ex === ENOENT) {
-                        return msgDialog('warningb', l[1513], l[1946]);
-                    }
-                    tell(ex);
-                })
-                .finally(() => {
-                    loadingDialog.hide();
-                });
-
-            return false;
-        });
-
-        $('.recovery-key.input-wrapper input', $dialog).val(a32_to_base64(u_k));
-
-        return $dialog;
+        }],
     });
 };
 

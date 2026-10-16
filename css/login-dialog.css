@@ -90,7 +90,9 @@ body.mobile .twofa-login-overlay .twofactor-shared-verification {
     margin: 0 0 16px;
     text-align: start;
 }
-.twofa-login-overlay .twofactor-shared-verification .code-container {
+.twofa-login-overlay .twofactor-shared-verification .code-container,
+.twofa-verify .twofactor-shared-verification .code-container,
+.twofa-setup .twofactor-shared-verification .code-container {
     border: 0;
     display: grid;
     grid-template-columns: repeat(6, 42px) 24px;
@@ -115,7 +117,9 @@ body.mobile .twofa-login-overlay .twofactor-shared-verification .code-container.
     grid-row: 2;
     justify-self: center;
 }
-.twofa-login-overlay .twofactor-shared-verification .mega-input.box-style {
+.twofa-login-overlay .twofactor-shared-verification .mega-input.box-style,
+.twofa-verify .twofactor-shared-verification .mega-input.box-style,
+.twofa-setup .twofactor-shared-verification .mega-input.box-style {
     margin: 0;
     width: 42px;
     min-width: auto;
@@ -124,20 +128,36 @@ body.mobile .twofa-login-overlay .twofactor-shared-verification .code-container.
 body.mobile .twofa-login-overlay .twofactor-shared-verification .code-container {
     grid-template-columns: repeat(6, 42px);
 }
-.twofa-login-overlay .twofactor-shared-verification .mega-input.box-style .message-container {
+.twofa-login-overlay .twofactor-shared-verification .mega-input.box-style .message-container,
+.twofa-verify .twofactor-shared-verification .mega-input.box-style .message-container,
+.twofa-setup .twofactor-shared-verification .mega-input.box-style .message-container {
     width: auto;
     white-space: nowrap;
 }
-.twofa-login-overlay .twofactor-shared-verification .mega-input.box-style .message-container > i {
+.rtl .twofa-login-overlay .twofactor-shared-verification .mega-input.box-style .message-container,
+.rtl .twofa-verify .twofactor-shared-verification .mega-input.box-style .message-container,
+.rtl .twofa-setup .twofactor-shared-verification .mega-input.box-style .message-container {
+    left: auto;
+    right: 0;
+}
+.twofa-login-overlay .twofactor-shared-verification .mega-input.box-style .message-container > i,
+.twofa-verify .twofactor-shared-verification .mega-input.box-style .message-container > i,
+.twofa-setup .twofactor-shared-verification .mega-input.box-style .message-container > i {
     --icon-size: 16px;
     --mask-color: var(--mobile-text-error);
 }
-.twofa-login-overlay .twofactor-shared-verification .code-container input {
+.twofa-login-overlay .twofactor-shared-verification .code-container input,
+.twofa-verify .twofactor-shared-verification .code-container input,
+.twofa-setup .twofactor-shared-verification .code-container input {
     padding: 0;
     text-align: center;
 }
 .twofa-login-overlay .twofactor-shared-verification .code-container input::-webkit-outer-spin-button,
-.twofa-login-overlay .twofactor-shared-verification .code-container input::-webkit-inner-spin-button {
+.twofa-login-overlay .twofactor-shared-verification .code-container input::-webkit-inner-spin-button,
+.twofa-verify .twofactor-shared-verification .code-container input::-webkit-outer-spin-button,
+.twofa-verify .twofactor-shared-verification .code-container input::-webkit-inner-spin-button,
+.twofa-setup .twofactor-shared-verification .code-container input::-webkit-outer-spin-button,
+.twofa-setup .twofactor-shared-verification .code-container input::-webkit-inner-spin-button {
     appearance: none;
     margin: 0;
 }

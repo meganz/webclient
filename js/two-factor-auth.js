@@ -35,6 +35,78 @@ var twofactor = {
 
         // Make Multi-Factor Auth Get request
         return (await api.req({a: 'mfag', e: u_attr.email})).result === 1;
+    },
+
+    buildCodeInput(parentNode) {
+        'use strict';
+
+        const fieldset = mCreateElement('fieldset', {'class': 'code-container'}, parentNode);
+        for (let i = 1; i <= twofactor.loginDialog.pinLength; i++) {
+            mCreateElement('input', {
+                class: 'pmText no-title-top',
+                'data-number': i,
+                maxlength: 1,
+                type: 'number'
+            }, fieldset);
+        }
+        return fieldset;
+    },
+
+    initCodeInput(fieldset, onFilled, onSubmit) {
+        'use strict';
+
+        const $inputs = $('input', fieldset);
+        const $newInputs = $inputs.filter(':not(.megaInputs)');
+        if ($newInputs.length) {
+            mega.ui.MegaInputs($newInputs);
+        }
+
+        fieldset.classList.remove('error');
+        for (let i = 0; i < $inputs.length; i++) {
+            const input = $inputs[i];
+            input.dataset.pinIndex = i;
+            $(input).val('').megaInputsHideError();
+        }
+
+        $inputs.rebind('keydown.verifyPin', e => {
+            const i = Number(e.currentTarget.dataset.pinIndex) || 0;
+            if (e.keyCode === 8 && !e.target.value) {
+                $inputs.eq(Math.max(0, i - 1)).focus();
+            }
+            if (e.keyCode === 13) {
+                onSubmit();
+            }
+        });
+
+        $inputs.rebind('focus.selectValue', e => {
+            e.target.select();
+        });
+
+        $inputs.rebind('input.fieldsetAction', e => {
+            const i = Number(e.currentTarget.dataset.pinIndex) || 0;
+            const [first, ...rest] = e.target.value.replace(/\D/g, '');
+
+            fieldset.classList.remove('error');
+            for (let j = 0; j < $inputs.length; j++) {
+                $($inputs[j]).megaInputsHideError();
+            }
+
+            e.target.value = first || '';
+
+            if (first !== undefined && i !== $inputs.length - 1) {
+                $inputs.eq(i + 1).focus();
+
+                if (rest.length) {
+                    $inputs.eq(i + 1).val(rest.join('')).trigger('input.fieldsetAction');
+                    return;
+                }
+            }
+
+            const value = $inputs.toArray().map((input) => input.value).join('').trim();
+            onFilled(value.length === twofactor.loginDialog.pinLength);
+        });
+
+        return $inputs;
     }
 };
 
@@ -100,16 +172,7 @@ twofactor.loginDialog = {
         });
         this.msgNode = mCreateElement('div', {'class': 'form-info'}, this.domNode);
 
-        const setNode = mCreateElement('fieldset', {'class': 'code-container'}, this.domNode);
-
-        for (let i = 1; i <= this.pinLength; i++) {
-            mCreateElement('input', {
-                class: 'pmText no-title-top',
-                'data-number': i,
-                maxlength: 1,
-                type: 'number'
-            }, setNode);
-        }
+        twofactor.buildCodeInput(this.domNode);
 
         this.lostDeviceButton = new MegaLink({
             parentNode: this.domNode,
@@ -178,62 +241,15 @@ twofactor.loginDialog = {
         'use strict';
 
         this.fieldset = this.domNode.querySelector('fieldset');
-        this.pinInputs = $('input', this.fieldset);
-        const $newInputs = this.pinInputs.filter(':not(.megaInputs)');
-
-        if ($newInputs.length) {
-            mega.ui.MegaInputs($newInputs);
-        }
-
-        this.fieldset.classList.remove('error');
-        for (let i = 0; i < this.pinInputs.length; i++) {
-            const input = this.pinInputs[i];
-            input.dataset.pinIndex = i;
-            $(input).val('').megaInputsHideError();
-        }
-
-        this.pinInputs.rebind('keydown.verifyPin', e => {
-            const i = Number(e.currentTarget.dataset.pinIndex) || 0;
-
-            if (e.keyCode === 8 && e.target.value === '') {
-                this.pinInputs.eq(Math.max(0, i - 1)).focus();
-            }
-
-            if (e.keyCode === 13) {
-                this.verifyTwoFA();
-            }
-        });
-
-        this.pinInputs.rebind('focus.selectValue', e => {
-            e.target.select();
-        });
-
-        this.pinInputs.rebind('input.fieldsetAction', e => {
-            const i = Number(e.currentTarget.dataset.pinIndex) || 0;
-            const [first, ...rest] = e.target.value.replace(/\D/g, '');
-
-            this.fieldset.classList.remove('error');
-            for (let j = 0; j < this.pinInputs.length; j++) {
-                $(this.pinInputs[j]).megaInputsHideError();
-            }
-
-            e.target.value = first || '';
-
-            if (first !== undefined && i !== this.pinInputs.length - 1) {
-                this.pinInputs.eq(i + 1).focus();
-
-                if (rest.length) {
-                    this.pinInputs.eq(i + 1).val(rest.join('')).trigger('input.fieldsetAction');
-                    return;
+        this.pinInputs = twofactor.initCodeInput(
+            this.fieldset,
+            (filled) => {
+                if (filled) {
+                    this.verifyTwoFA();
                 }
-            }
-
-            const value = $.trim(this.pinInputs.toArray().map((input) => input.value).join(''));
-
-            if (value.length === this.pinLength) {
-                this.verifyTwoFA();
-            }
-        });
+            },
+            () => this.verifyTwoFA()
+        );
     },
 
     verifyTwoFA() {
@@ -482,7 +498,7 @@ twofactor.account = {
             // If 2FA is enabled
             if ($button.hasClass('enabled')) {
                 // Show the verify 2FA dialog to collect the user's PIN
-                twofactor.verifyActionDialog.init()
+                twofactor.verifyActionDialog.init(l.twofa_verify_disable)
                     .then((twoFactorPin) => {
                         // Disable 2FA
                         loadingDialog.show();
@@ -567,9 +583,6 @@ twofactor.account = {
  */
 twofactor.setupDialog = {
 
-    /** jQuery selector for this dialog */
-    $dialog: null,
-
     /**
      * Intialise the dialog
      */
@@ -577,30 +590,179 @@ twofactor.setupDialog = {
 
         'use strict';
 
-        // Cache selector
-        this.$dialog = $('.two-factor-dialog.setup-two-factor');
+        if (!this.domNode) {
+            this.buildDom();
+        }
 
-        // Setup functionality
+        this.show();
         this.getSharedSecret();
-        this.initNextButton();
-        this.initCloseButton();
-        this.initNoAuthenticatorAppButton();
+    },
 
-        // Show the dialog
-        this.$dialog.removeClass('hidden');
-        fm_showoverlay();
+    buildDom() {
+        'use strict';
+
+        this.domNode = document.createElement('div');
+        this.domNode.className = 'twofa-setup-body twofactor-shared-verification';
+        const message = document.createElement('div');
+        message.textContent = l.twofa_setup_dlg_subtitle;
+        this.domNode.appendChild(message);
+        const qrBlock = document.createElement('div');
+        qrBlock.className = 'twofa-setup-instructions';
+        this.qrcode = document.createElement('div');
+        this.qrcode.className = 'twofa-setup-qrcode';
+        qrBlock.appendChild(this.qrcode);
+        qrBlock.appendChild(mCreateElement('div', { 'class': 'instruction-list' }, [
+            mCreateElement('div', undefined, [document.createTextNode(l.twofa_setup_step1)]),
+            mCreateElement('div', undefined, [document.createTextNode(l.twofa_setup_step2)]),
+            mCreateElement('div', undefined, [document.createTextNode(l.twofa_setup_step3)])
+        ]));
+        this.domNode.appendChild(qrBlock);
+        this.seedNode = document.createTextNode('');
+        this.keyBlock = mCreateElement('div', { 'class': 'seed-key-input selectable-txt' }, [
+            mCreateElement('div', { 'class': 'seed-text' }, [this.seedNode])
+        ]);
+        MegaButton.factory({
+            parentNode: this.keyBlock,
+            type: 'icon',
+            icon: 'sprite-fm-mono icon-copy-thin-outline',
+            componentClassname: 'transparent-icon text-icon secondary',
+            onClick: () => {
+                copyToClipboard(this.seedNode.textContent);
+                mega.ui.toast.show(l[371]);
+            }
+        });
+        const seedBlock = mCreateElement('div', { 'class': 'seed-key-block' }, [
+            mCreateElement('div', { 'class': 'seed-key-label' }, [document.createTextNode(l.twofa_seedkey)]),
+            this.keyBlock
+        ]);
+        this.domNode.appendChild(seedBlock);
+        mCreateElement('div', { 'class': 'code-label' }, [document.createTextNode(l.twofa_authcode)], this.domNode);
+        this.fieldSet = twofactor.buildCodeInput(this.domNode);
+        const actions = document.createElement('div');
+        actions.className = 'two-factor-setup-actions';
+        MegaButton.factory({
+            parentNode: actions,
+            type: 'normal',
+            text: l[82],
+            componentClassname: 'secondary',
+            onClick: () => {
+                this.closeDialog();
+            }
+        });
+        this.submitButton = new MegaButton({
+            parentNode: actions,
+            type: 'normal',
+            text: l.s4_key_enable,
+            componentClassname: 'primary',
+            onClick: () => {
+                this.enableTwoFA();
+            }
+        });
+        this.domNode.appendChild(actions);
+    },
+
+    show() {
+        'use strict';
+
+        this.pinInputs = twofactor.initCodeInput(
+            this.fieldSet,
+            (filled) => {
+                this.submitButton.disabled = !filled;
+            },
+            () => this.enableTwoFA()
+        );
+        this.resetState();
+
+        mega.ui.sheet.show({
+            name: 'twofa-setup',
+            showClose: true,
+            title: l[19289],
+            contents: [this.domNode]
+        });
+    },
+
+    resetState() {
+        'use strict';
+
+        this.seedNode.textContent = '';
+        this.qrcode.textContent = '';
+        this.submitButton.disabled = true;
+        this.submitButton.loading = false;
+    },
+
+    /**
+     * Verify the entered code to activate 2FA, then prompt to save the recovery key
+     * @returns {void}
+     */
+    enableTwoFA() {
+        'use strict';
+
+        if (this.submitButton.loading) {
+            return;
+        }
+
+        // Get the Google Authenticator PIN code from the user
+        const pinCode = this.pinInputs.toArray().map((input) => input.value).join('');
+
+        if (!new RegExp(`^\\d{${twofactor.loginDialog.pinLength}}$`).test(pinCode)) {
+            return;
+        }
+
+        this.submitButton.loading = true;
+
+        // Run Multi-Factor Auth Setup (mfas) request
+        api.req({a: 'mfas', mfa: pinCode})
+            .then((res) => {
+                console.info(res);
+
+                // 2FA is activated, load the recovery key dialog to back it up
+                this.closeDialog();
+                M.showRecoveryKeyDialog(3);
+            })
+            .catch((ex) => {
+
+                // If the Two-Factor has already been setup, show a warning dialog
+                if (ex === EEXIST) {
+                    msgDialog('warninga', l[19219], l['2fa_already_enabled'], null, () => {
+                        // Close the dialog on click of OK button
+                        this.closeDialog();
+                    });
+                }
+                else {
+                    console.error(ex);
+
+                    // If there was an error, show message that the code was incorrect and clear the inputs
+                    this.fieldSet.classList.add('error');
+                    for (let i = 0; i < this.pinInputs.length; i++) {
+                        const $input = $(this.pinInputs[i]).val('');
+                        if (i === 0) {
+                            $input.megaInputsShowError(
+                                '<i class="sprite-fm-mono icon-alert-triangle-thin-outline"></i>' +
+                                `<span>${escapeHTML(l.incorrect_twofa_code)}</span>`
+                            );
+                        }
+                        else {
+                            $input.megaInputsShowError();
+                        }
+                    }
+                    this.submitButton.disabled = true;
+
+                    // Put the focus back in the first PIN input
+                    this.pinInputs.eq(0).focus();
+                }
+            })
+            .finally(() => {
+                this.submitButton.loading = false;
+                twofactor.account.init();
+            });
     },
 
     /**
      * Setup the Two-Factor Authentication by getting a shared secret from the API
      */
-    getSharedSecret: function() {
+    getSharedSecret() {
 
         'use strict';
-
-        // Cache selectors
-        var $seedInput = this.$dialog.find('.two-factor-qr-seed');
-        var $qrCode = this.$dialog.find('.two-factor-qr-code');
 
         // Run Multi-Factor Auth Setup (mfas) request
         api.send('mfas')
@@ -608,13 +770,13 @@ twofactor.setupDialog = {
                 assert(res && typeof res === 'string');
 
                 // Set Base32 seed into text box
-                $seedInput.val(res);
+                this.seedNode.textContent = res;
 
                 // Configure the QR code rendering library
                 // Appears as: MEGA (name@email.com) in authenticator app
                 var options = {
-                    width: 224,
-                    height: 224,
+                    width: 132,
+                    height: 132,
                     correctLevel: QRErrorCorrectLevel.H,    // High
                     background: '#f2f2f2',
                     foreground: '#151412',
@@ -622,7 +784,7 @@ twofactor.setupDialog = {
                 };
 
                 // Render the QR code
-                $qrCode.text('').qrcode(options);
+                $(this.qrcode).text('').qrcode(options);
 
             })
             .catch((ex) => {
@@ -640,396 +802,15 @@ twofactor.setupDialog = {
     },
 
     /**
-     * Initialise the Next button to go to the Verify Setup dialog
-     */
-    initNextButton: function() {
-
-        'use strict';
-
-        // On button click
-        this.$dialog.find('.two-factor-next-btn').rebind('click', function() {
-
-            // Close the current dialog and open the verify dialog
-            twofactor.setupDialog.closeDialog();
-            twofactor.verifySetupDialog.init();
-        });
-    },
-
-    /**
-     * Initialise the close icon in the header to close the dialog
-     */
-    initCloseButton: function() {
-
-        'use strict';
-
-        // On button click, close the dialog
-        this.$dialog.find('button.js-close').rebind('click', function() {
-
-            twofactor.setupDialog.closeDialog();
-        });
-    },
-
-    /**
      * Closes the dialog
      */
-    closeDialog: function() {
+    closeDialog() {
 
         'use strict';
 
-        // Hide the dialog and background
-        this.$dialog.addClass('hidden');
-        fm_hideoverlay();
-    },
-
-    /**
-     * Initialise the Don't have an authenticator app? button to open the Select Authenticator App tooltip
-     */
-    initNoAuthenticatorAppButton: function() {
-
-        'use strict';
-
-        var $noAuthAppButton = this.$dialog.find('.no-auth-app-button');
-        var $authAppSelectDialog = $('.auth-app-select-tooltip');
-
-        // On button click
-        $noAuthAppButton.rebind('click', function() {
-
-            // Get the absolute position of the button, the width of the button and dialog
-            var buttonOffset = $noAuthAppButton.offset();
-            var buttonWidth = $noAuthAppButton.width();
-            var dialogWidth = $authAppSelectDialog.outerWidth();
-
-            // Put the dialog in the middle of the button horizontally
-            var offsetMiddleOfButton = buttonOffset.left + (buttonWidth / 2);
-            var leftOffset = offsetMiddleOfButton - (dialogWidth / 2);
-
-            // Move the dialog down below the button text (14px text height + 10px top margin)
-            var topOffset = buttonOffset.top + 14 + 10;
-
-            // Show the tooltip above the Select Authenticator app dialog and below the button
-            $authAppSelectDialog.css({ top: topOffset, left: leftOffset }).removeClass('hidden');
-
-            // Initialise the handler to close the tooltip
-            twofactor.setupDialog.initTooltipClose();
-
-            // Prevent click closing the tooltip straight away
-            return false;
-        });
-    },
-
-    /**
-     * Initialise the click handler to close the tooltip if they click anywhere in or out of the tooltip or press the
-     * Esc key. The authenticator app buttons/hyperlinks should still open the link in a new tab/window regardless.
-     */
-    initTooltipClose: function() {
-
-        'use strict';
-
-        // If there is a click anywhere on the page
-        $(document).rebind('click.closeauthapptooltip', function() {
-
-            // Close the tooltip
-            $('.auth-app-select-tooltip').addClass('hidden');
-
-            // Remove the click handler
-            $(document).off('click.closeauthapptooltip');
-        });
-
-        // If there is a keypress
-        $(document).rebind('keyup.closeauthapptooltip', function(event) {
-
-            // If the Esc key was pressed
-            if (event.keyCode === 27) {
-
-                // Close the tooltip
-                $('.auth-app-select-tooltip').addClass('hidden');
-
-                // Remove the keyup handler
-                $(document).off('keyup.closeauthapptooltip');
-            }
-        });
-    }
-};
-
-
-/**
- * The dialog to verify the 2FA activation process was set up correctly
- */
-twofactor.verifySetupDialog = {
-
-    /** jQuery selector for this dialog */
-    $dialog: null,
-
-    /**
-     * Intialise the dialog
-     */
-    init: function() {
-
-        'use strict';
-
-        // Cache selector
-        this.$dialog = $('.two-factor-dialog.setup-two-factor-verify');
-
-        // Setup functionality
-        this.resetToDefault();
-        this.initCloseButton();
-        this.initKeyupFunctionality();
-        this.initBackButton();
-        this.initNextButton();
-
-        // Show the dialog
-        this.$dialog.removeClass('hidden');
-        fm_showoverlay();
-
-        // Put the focus in the PIN input field after its visible
-        this.$dialog.find('.pin-input').trigger('focus');
-    },
-
-    /**
-     * Reset the dialog to default state if it is re-opened
-     */
-    resetToDefault: function() {
-
-        'use strict';
-
-        var $pinCode = this.$dialog.find('.pin-input');
-        var $warningText = this.$dialog.find('.information-highlight.failed');
-        var $warningText2 = this.$dialog.find('.information-highlight.empty');
-        var $successText = this.$dialog.find('.information-highlight.success');
-        var $closeButton = this.$dialog.find('button.js-close');
-
-        // Clear the text input, remove the warning/success boxes, unhide the close button
-        $pinCode.val('');
-        $warningText.addClass('hidden');
-        $warningText2.addClass('hidden');
-        $successText.addClass('hidden');
-        $closeButton.removeClass('hidden');
-    },
-
-    /**
-     * Initialise the close icon in the header to close the dialog
-     */
-    initCloseButton: function() {
-
-        'use strict';
-
-        // On button click, close the dialog
-        this.$dialog.find('button.js-close').rebind('click', function() {
-
-            twofactor.verifySetupDialog.closeDialog();
-        });
-    },
-
-    /**
-     * Closes the dialog
-     */
-    closeDialog: function() {
-
-        'use strict';
-
-        // Hide the dialog and background
-        this.$dialog.addClass('hidden');
-        fm_hideoverlay();
-    },
-
-    /**
-     * Initialises keyup/blur functionality on the input field to check the PIN as it's being entered
-     */
-    initKeyupFunctionality: function() {
-
-        'use strict';
-
-        // Cache selectors
-        var $pinCodeInput = this.$dialog.find('.pin-input');
-        var $warningText = this.$dialog.find('.information-highlight.failed');
-        var $warningText2 = this.$dialog.find('.information-highlight.empty');
-        var $verifyButton = this.$dialog.find('.next-button');
-
-        // On keyup or clicking out of the text field
-        $pinCodeInput.rebind('keyup blur', function(event) {
-
-            // Hide previous warnings for incorrect PIN codes
-            $warningText.addClass('hidden');
-            $warningText2.addClass('hidden');
-
-            // If Enter key is pressed, verify the code
-            if (event.keyCode === 13) {
-                $verifyButton.trigger('click');
-            }
-        });
-    },
-
-    /**
-     * Initalises the back button to go back to the QR code/seed dialog
-     */
-    initBackButton: function() {
-
-        'use strict';
-
-        var $backButton = this.$dialog.find('.back-button');
-
-        // On button click
-        $backButton.removeClass('disabled').rebind('click', function() {
-
-            // Don't let them go back if they already activated 2FA, they need to go forward
-            if ($(this).hasClass('disabled')) {
-                return false;
-            }
-
-            twofactor.verifySetupDialog.closeDialog();
-            twofactor.setupDialog.init();
-        });
-    },
-
-    /**
-     * Initialise the Next button to verify the code
-     */
-    initNextButton: function() {
-
-        'use strict';
-
-        // Cache selectors
-        var $pinCodeInput = this.$dialog.find('.pin-input');
-        var $backButton = this.$dialog.find('.back-button');
-        var $closeButton = this.$dialog.find('button.js-close');
-        var $verifyButton = this.$dialog.find('.next-button');
-        var $warningText = this.$dialog.find('.information-highlight.failed');
-        var $successText = this.$dialog.find('.information-highlight.success');
-        var $warningText2 = this.$dialog.find('.information-highlight.empty');
-
-        // On button click
-        $verifyButton.rebind('click', function() {
-
-            if ($verifyButton.hasClass('disabled')) {
-                return false;
-            }
-            $verifyButton.addClass('disabled');
-
-            // Hide old warning
-            $warningText.addClass('hidden');
-            $warningText2.addClass('hidden');
-
-            // If the operation hasn't succeeded yet
-            if ($successText.hasClass('hidden')) {
-
-                // Get the Google Authenticator PIN code from the user
-                var pinCode = $.trim($pinCodeInput.val());
-
-                if (pinCode === '' || pinCode.length !== 6 || Number.isInteger(pinCode)) {
-                    $warningText2.removeClass('hidden');
-                    $verifyButton.removeClass('disabled');
-                    return;
-                }
-
-                // Run Multi-Factor Auth Setup (mfas) request
-                api.req({a: 'mfas', mfa: pinCode})
-                    .then((res) => {
-                        console.info(res);
-
-                        // Disable the back button and hide the close button to force them to go to the next step
-                        // to backup their Recovery Key. Also now that 2FA is activated, show the success message
-                        $backButton.addClass('disabled');
-                        $closeButton.addClass('hidden');
-                        $successText.removeClass('hidden');
-
-                    })
-                    .catch((ex) => {
-
-                        // If the Two-Factor has already been setup, show a warning dialog
-                        if (ex === EEXIST) {
-                            msgDialog('warninga', l[19219], l['2fa_already_enabled'], null, () => {
-                                // Close the dialog on click of OK button
-                                twofactor.verifySetupDialog.closeDialog();
-                            });
-                        }
-                        else {
-                            console.error(ex);
-
-                            // If there was an error, show message that the code was incorrect and clear the text field
-                            $warningText.removeClass('hidden');
-                            $pinCodeInput.val('');
-
-                            // Put the focus back in the PIN input field
-                            $pinCodeInput.trigger('focus');
-                        }
-                    })
-                    .finally(() => {
-                        $verifyButton.removeClass('disabled');
-                        twofactor.account.init();
-                    });
-            }
-            else {
-                // If the operation to activate succeeded, load next dialog to backup the recovery key
-                twofactor.verifySetupDialog.closeDialog();
-                twofactor.backupKeyDialog.init();
-            }
-        });
-    }
-};
-
-
-/**
- * The dialog to verify the 2FA activation process was set up correctly
- */
-twofactor.backupKeyDialog = {
-
-    /** jQuery selector for this dialog */
-    $dialog: null,
-
-    /**
-     * Intialise the dialog
-     */
-    init: function() {
-
-        'use strict';
-
-        // Cache selectors
-        this.$dialog = $('.two-factor-dialog.setup-two-factor-backup-key');
-
-        // Setup functionality
-        this.initCloseButton();
-        this.initSaveRecoveryKeyButton();
-
-        // Show the dialog
-        this.$dialog.removeClass('hidden');
-        fm_showoverlay();
-    },
-
-    /**
-     * Initialise the button to save the Recovery Key to a file
-     */
-    initSaveRecoveryKeyButton: function() {
-
-        'use strict';
-        this.$dialog.find('.recovery-key-button').rebind('click', u_savekey);
-    },
-
-    /**
-     * Initialise the close and finish buttons to close the dialog
-     */
-    initCloseButton: function() {
-
-        'use strict';
-
-        // On button click, close the dialog
-        this.$dialog.find('button.js-close').rebind('click', function() {
-
-            // Close the dialog and refresh the status of 2FA in the background
-            twofactor.backupKeyDialog.closeDialog();
-            twofactor.account.init();
-        });
-    },
-
-    /**
-     * Closes the dialog
-     */
-    closeDialog: function() {
-
-        'use strict';
-
-        // Hide the dialog and background
-        this.$dialog.addClass('hidden');
-        fm_hideoverlay();
+        if (mega.ui.sheet.visible && mega.ui.sheet.name === 'twofa-setup') {
+            mega.ui.sheet.hide();
+        }
     }
 };
 
@@ -1040,140 +821,116 @@ twofactor.backupKeyDialog = {
  */
 twofactor.verifyActionDialog = {
 
-    /** jQuery selector for this dialog */
-    $dialog: null,
-
     /**
      * Intialise the dialog
+     * @param {String} [msg] Description of the action being verified, defaults to the generic prompt
      * @returns {Promise<String>} 2-fa pin code.
      */
-    init: function() {
+    init(msg) {
 
         'use strict';
         return new Promise((resolve, reject) => {
-
-            // Cache selectors
-            this.$dialog = $('.mega-dialog.two-factor-verify-action');
+            this.resolve = resolve;
             this.reject = reject;
 
-            // Initialise functionality
-            this.resetState();
-            this.initKeyupFunctionality();
-            this.initSubmitButton(resolve);
-            this.initLostAuthenticatorDeviceButton();
-            this.initCloseButton();
+            if (!this.domNode) {
+                this.buildDom();
+            }
 
-            // Show the modal dialog
-            this.$dialog.removeClass('hidden');
-            fm_showoverlay();
-
-            // Put the focus in the PIN input field after its visible
-            this.$dialog.find('.pin-input').trigger('focus');
+            this.message.textContent = msg || l.enter_two_fa_code;
+            this.show();
         });
     },
 
-    /**
-     * Initialises keyup/blur functionality on the input field to check the PIN as it's being entered
-     */
-    initKeyupFunctionality: function() {
+    buildDom() {
 
         'use strict';
 
-        // Cache selectors
-        var $pinCodeInput = this.$dialog.find('.pin-input');
-        var $submitButton = this.$dialog.find('.submit-button');
-        var $warningText = this.$dialog.find('.information-highlight.warning');
+        this.domNode = document.createElement('div');
+        this.domNode.className = 'twofa-verify-body twofactor-shared-verification';
+        this.message = document.createElement('div');
+        this.domNode.appendChild(this.message);
+        this.fieldSet = twofactor.buildCodeInput(this.domNode);
 
-        // On keyup or clicking out of the text field
-        $pinCodeInput.off('keyup blur').on('keyup blur', function(event) {
-
-            $warningText.addClass('hidden');
-
-            // If Enter key is pressed, submit the login code
-            if (event.keyCode === 13) {
-                $submitButton.trigger('click');
+        const actions = document.createElement('div');
+        actions.className = 'twofa-verify-actions';
+        MegaButton.factory({
+            parentNode: actions,
+            type: 'text',
+            text: l[19215],
+            componentClassname: 'lost-device-btn',
+            onClick: () => {
+                M.showRecoveryKeyDialog(1);
             }
-
-            // Trim whitespace from the ends of the PIN entered
-            var pinCode = $pinCodeInput.val();
-            var trimmedPinCode = $.trim(pinCode);
-
-            // If empty, grey out the button so it appears unclickable
-            if (trimmedPinCode === '' || trimmedPinCode.length !== 6 || Number.isInteger(trimmedPinCode)) {
-                $submitButton.removeClass('active');
+        });
+        MegaButton.factory({
+            parentNode: actions,
+            type: 'normal',
+            text: l[82],
+            componentClassname: 'secondary cancel-verify',
+            onClick: () => {
+                this.closeDialog();
             }
-            else {
-                // Otherwise how the button as red/clickable
-                $submitButton.addClass('active');
+        });
+        this.submitButton = new MegaButton({
+            parentNode: actions,
+            type: 'normal',
+            text: l[1694],
+            componentClassname: 'primary',
+            onClick: () => {
+                this.verifyTwoFA();
             }
+        });
+        this.submitButton.disabled = true;
+        this.domNode.appendChild(actions);
+    },
+
+    show() {
+        'use strict';
+
+        this.initPinInputs();
+        this.resetState();
+
+        mega.ui.sheet.show({
+            name: 'twofa-verify',
+            safeShow: false,
+            icon: 'icon-numpad-3d',
+            classList: ['twofa-verify'],
+            title: l[19191],
+            showClose: true,
+            contents: [this.domNode],
+            onShow: () => {
+                onIdle(() => {
+                    this.pinInputs[0].focus();
+                });
+            },
+            onClose: () => this.closeDialog(),
         });
     },
 
-    /**
-     * Initialise the Submit button
-     * @param {Function} completeCallback The callback to run after 2FA verify
-     */
-    initSubmitButton: function(completeCallback) {
+    initPinInputs() {
 
         'use strict';
 
-        // Cache selectors
-        var $pinCodeInput = this.$dialog.find('.pin-input');
-        var $submitButton = this.$dialog.find('.submit-button');
-        var $warningText = this.$dialog.find('.information-highlight.warning');
-
-        // On Submit button click/tap
-        $submitButton.rebind('click', function() {
-
-            // Get the Google Authenticator PIN code from the user
-            var pinCode = $.trim($pinCodeInput.val());
-
-            if (pinCode === '' || pinCode.length !== 6 || Number.isInteger(pinCode)) {
-                $warningText.removeClass('hidden');
-                $pinCodeInput.trigger('focus');
-            }
-            else {
-                // Close the modal dialog
-                twofactor.verifyActionDialog.closeDialog();
-
-                // Send the PIN code to the callback
-                completeCallback(pinCode);
-            }
-        });
+        this.pinInputs = twofactor.initCodeInput(
+            this.fieldSet,
+            (filled) => {
+                this.submitButton.disabled = !filled;
+            },
+            () => this.verifyTwoFA()
+        );
     },
 
-    /**
-     * Initialise the Lost Authenticator Device button
-     */
-    initLostAuthenticatorDeviceButton: function() {
+    verifyTwoFA() {
 
         'use strict';
 
-        // Cache selectors
-        var $lostDeviceButton = this.$dialog.find('.lost-authenticator-button');
-
-        // On button click
-        $lostDeviceButton.rebind('click', function() {
-            twofactor.verifyActionDialog.closeDialog();
-            M.showRecoveryKeyDialog();
-        });
-    },
-
-    /**
-     * Initialise the Close buttons to close the overlay
-     */
-    initCloseButton: function() {
-
-        'use strict';
-
-        var $closeButton = this.$dialog.find('button.js-close');
-
-        // On click of the close and back buttons
-        $closeButton.rebind('click', function() {
-
-            // Close the modal dialog
-            twofactor.verifyActionDialog.closeDialog();
-        });
+        const value = this.pinInputs.toArray().map((input) => input.value).join('').trim();
+        if (!new RegExp(`^\\d{${twofactor.loginDialog.pinLength}}$`).test(value)) {
+            return;
+        }
+        this.resolve(value);
+        this.closeDialog();
     },
 
     /**
@@ -1188,10 +945,11 @@ twofactor.verifyActionDialog = {
             onIdle(() => reject(EBLOCKED));
             delete this.reject;
         }
+        delete this.resolve;
 
-        // Hide the dialog and background
-        this.$dialog.addClass('hidden');
-        fm_hideoverlay();
+        if (mega.ui.sheet.visible && mega.ui.sheet.name === 'twofa-verify') {
+            mega.ui.sheet.hide();
+        }
     },
 
     /**
@@ -1202,13 +960,10 @@ twofactor.verifyActionDialog = {
 
         'use strict';
 
-        var $pinCodeInput = this.$dialog.find('.pin-input');
-        var $submitButton = this.$dialog.find('.submit-button');
-        var $warningText = this.$dialog.find('.information-highlight.warning');
-
-        // Hide loading spinner and clear the text input
-        $submitButton.removeClass('active');
-        $pinCodeInput.val('');
-        $warningText.addClass('hidden');
+        this.fieldSet.classList.remove('error');
+        for (let i = 0; i < this.pinInputs.length; i++) {
+            $(this.pinInputs[i]).val('').megaInputsHideError();
+        }
+        this.submitButton.disabled = true;
     }
 };

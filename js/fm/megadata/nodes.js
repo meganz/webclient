@@ -1077,8 +1077,8 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree, extra) {
     }
 
     if (tree.opSize) {
-
-        await this.checkGoingOverStorageQuota(tree.opSize)
+        // as with upload and import, going over quota is allowed, only block if already full
+        await this.checkGoingOverStorageQuota(1)
             .catch((ex) => {
                 if (ex === EGOINGOVERQUOTA) {
                     // don't show an additional dialog for this error

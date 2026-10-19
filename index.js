@@ -1595,6 +1595,7 @@ function init_page() {
     // New multi-discount handling with discount promotion page e.g.
     // /discountpromoJ2iPNEWqiTM-yhsuGkOToh or short sale URLs e.g. /s/blackfriday
     else if (page.substr(0, 13) === 'discountpromo' || page.substr(0, 2) === 's/') {
+        DiscountPromo.initTheme();
         return new DiscountPromo();
     }
 
@@ -1605,6 +1606,9 @@ function init_page() {
         if (is_mobile) {
             parsepage(pages.mobile);
         }
+
+        // After parsepage, which forces light on every page it does not list
+        DiscountPromo.initTheme();
         return pro.proplan.handleDiscount(page);
     }
 
@@ -3089,7 +3093,8 @@ function parsepage(pagehtml) {
 
     // if this is bottom page & not Download Page we have to enforce light mode for now.
     if (page === 'download' || pfid ||
-        page === 'login' || page.substring(0, 8) === 'register' || page === 'recovery' || page === 'support') {
+        page === 'login' || page.substring(0, 8) === 'register' || page === 'recovery' || page === 'support'
+        || page === 'pro' || page.startsWith('propay_')) {
 
         mega.ui.setTheme();
         document.body.classList.add('bottom-pages');

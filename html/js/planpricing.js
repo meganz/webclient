@@ -579,18 +579,20 @@ lazy(pro, 'proplan2', () => {
             loadSubPage('register');
             delay('pricing.free' + 99880, eventlog.bind(null, 99880 + idShift));
         });
+        // Smooth lands short while the pages-menu header is still retracting, so every jump on
+        // this page is instant
         $('button.pro', $tableContainer).rebind('click', () => {
             changeIndividualTeamTab($('.individual-team-tab-container #pr-individual-tab', $page)[0]);
-            $('.pricing-pg.pro-plans-cards-container', $page)[0].scrollIntoView({behavior: 'smooth'});
+            $('.pricing-pg.pro-plans-cards-container', $page)[0].scrollIntoView({behavior: 'instant'});
             delay('pricing.pro' + 99882, eventlog.bind(null, 99882 + idShift));
         });
         $('button.pro-flexi', $tableContainer).rebind('click', () => {
-            $('.pricing-pg.pricing-flexi-container', $page)[0].scrollIntoView({behavior: 'smooth'});
+            $('.pricing-pg.pricing-flexi-container', $page)[0].scrollIntoView({behavior: 'instant'});
             delay('pricing.pro-flexi' + 99884, eventlog.bind(null, 99884 + idShift));
         });
         $('button.pro-business', $tableContainer).rebind('click', () => {
             changeIndividualTeamTab($('.individual-team-tab-container #pr-business-tab', $page)[0]);
-            $('.pricing-pg.pricing-business-plan-container', $page)[0].scrollIntoView({behavior: 'smooth'});
+            $('.pricing-pg.pricing-business-plan-container', $page)[0].scrollIntoView({behavior: 'instant'});
             delay('pricing.pro-business' + 99886, eventlog.bind(null, is_mobile ? 99886 : 99904));
         });
 
@@ -632,6 +634,10 @@ lazy(pro, 'proplan2', () => {
             }
 
             $showBtnTxt.text(btnTxt);
+
+            if (!is_mobile) {
+                initPerfectScrollbar($('#startholder .bottom-page.pricing-pg'));
+            }
 
             return false;
         });
@@ -1171,8 +1177,8 @@ lazy(pro, 'proplan2', () => {
                     .safeAppend($answerPart.prop('outerHTML'))
                     .toggleClass('hidden', !isFirstFaq);
                 $('.faq-item-title i', $faqItem)
-                    .toggleClass('minus-icon', isFirstFaq)
-                    .toggleClass('grey-medium-plus small-icon', !isFirstFaq);
+                    .toggleClass('icon-minus-thin-outline', isFirstFaq)
+                    .toggleClass('icon-plus-thin-outline', !isFirstFaq);
             }
 
             $faqContent.safeAppend($faqItem.prop('outerHTML'));
@@ -1183,7 +1189,7 @@ lazy(pro, 'proplan2', () => {
                     window.getSelection().removeAllRanges();
                 }
                 $('.faq-item-answer', $qaRebind).toggleClass('hidden');
-                $('.faq-item-title i', $qaRebind).toggleClass(['minus-icon', 'grey-medium-plus', 'small-icon']);
+                $('.faq-item-title i', $qaRebind).toggleClass(['icon-minus-thin-outline', 'icon-plus-thin-outline']);
 
                 const visibility = $('.faq-item-answer', $qaRebind).hasClass('hidden') ? 'hidden' : 'shown';
                 eventlog(faqQuestions[faq].eventId, `${faq} ${visibility}`);
@@ -1407,6 +1413,11 @@ lazy(pro, 'proplan2', () => {
         $(window).rebind('resize.pricing-page', SoonFc(100, () => {
             resizePlansSection();
             resizeRecommendSection();
+
+            // Stale scrollbar rails prop up scrollHeight, leaving blank scrollable space below the page
+            if (!is_mobile) {
+                Ps.update(document.querySelector('#startholder .bottom-page.pricing-pg'));
+            }
         }));
 
         mBroadcaster.once('pagechange', () => {
@@ -1757,8 +1768,7 @@ lazy(pro, 'proplan2', () => {
         if (showFlexi) {
 
             $('#try-flexi', $fillCards).rebind('click.pricing', () => {
-                // behavior not supported in Safari.
-                $proflexiBlock[0].scrollIntoView({ behavior: "smooth" });
+                $proflexiBlock[0].scrollIntoView({behavior: 'instant'});
                 eventlog(500338);
             });
 
@@ -2504,7 +2514,7 @@ lazy(pro, 'proplan2', () => {
             loadingDialog.hide('pricingReady');
 
             if (sessionStorage.mScrollTo === 'flexi' && ProFlexiFound) {
-                $proflexiBlock[0].scrollIntoView({behavior: 'smooth'});
+                $proflexiBlock[0].scrollIntoView({behavior: 'instant'});
                 delete sessionStorage.mScrollTo;
             }
 
@@ -2520,6 +2530,10 @@ lazy(pro, 'proplan2', () => {
                 delete window.pickedPlan;
 
                 showRegisterDialog();
+            }
+
+            if (!is_mobile) {
+                initPerfectScrollbar($('#startholder .bottom-page.pricing-pg'));
             }
         }
 

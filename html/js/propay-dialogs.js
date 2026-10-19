@@ -25,12 +25,24 @@ var closeStripeDialog = (blockPaymentRefresh, skipCloseFunc) => {
 var resizeDlgScrollBar = function($targetDialog) {
     'use strict';
 
-    const $contentSection = $('section.content', $targetDialog);
-    if ($contentSection.is('.ps')) {
-        Ps.update($contentSection[0]);
+    const [contentSection] = $('section.content', $targetDialog);
+
+    if (!contentSection) {
+        return;
+    }
+
+    // Rounding can leave a pixel or two of overflow, which does not warrant a scrollbar
+    if (contentSection.scrollHeight - contentSection.clientHeight <= 2) {
+        Ps.destroy(contentSection);
+        return;
+    }
+
+    if (contentSection.classList.contains('ps')) {
+        Ps.update(contentSection);
     }
     else {
-        Ps.initialize($contentSection[0]);
+        // Suppressing X stops the content sliding sideways when a dropdown overhangs it
+        Ps.initialize(contentSection, {suppressScrollX: true});
     }
 };
 
@@ -1581,7 +1593,19 @@ var addressDialog = {
             });
         }
         else {
-            bindDropdownEvents($select, undefined, !is_mobile && this.$dialog);
+            // Suppressing X stops the list sliding sideways once scrolled to the bottom
+            bindDropdownEvents($select, undefined, !is_mobile && this.$dialog, {suppressScrollX: true});
+
+            // Otherwise scrolling the open list carries on into the dialog behind it
+            const [contentSection] = $('section.content', this.$dialog);
+
+            $('.mega-input-dropdown', $select)
+                .rebind('mouseenter.lockDlgScroll', () => Ps.disable(contentSection))
+                .rebind('mouseleave.lockDlgScroll', () => Ps.enable(contentSection));
+
+            // Closing hides the list under the pointer, and not every browser then sends its
+            // mouseleave - without this the dialog stays unscrollable for the rest of the session
+            $select.rebind('mouseleave.lockDlgScroll', () => Ps.enable(contentSection));
         }
     },
 
@@ -2330,6 +2354,9 @@ var addressDialog = {
             this.$dialog.removeClass('active').addClass('hidden');
         }
         $('.tax-validation-popover', this.$dialog).addClass('hidden');
+
+        Ps.enable($('section.content', this.$dialog)[0]);
+
         if (typeof callback === 'function') {
             callback();
         }
@@ -2942,6 +2969,72 @@ var addressDialog = {
         return $(`footer.${isWide ? 'desktop' : 'mobile'} .stripe-button`, pro.propay.$page);
     },
 
+    resizeStripeIframe(height) {
+        'use strict';
+
+        const $stripeDialog = addressDialog.getStripeDialog();
+        const $stripeIframe = $('.iframe-container', $stripeDialog);
+        if (!$stripeIframe.length) {
+            return;
+        }
+
+        const delta = height - $stripeIframe.height();
+        const node = pro.propay.getScrollBlock();
+
+        // Measure before the resize, or the box has already moved
+        const boxTop = node
+            ? $stripeIframe[0].getBoundingClientRect().top - node.getBoundingClientRect().top
+            : 0;
+
+        $stripeIframe.css('height', `${height}px`);
+
+        // The iframe sits in the scrollable propay page, so PS has to be told it moved
+        if (node && node.Ps) {
+            node.scrollTop += addressDialog.scrollShiftForResize(boxTop, delta);
+            Ps.update(node);
+        }
+    },
+
+    /**
+     * Only growth above the fold moves what the user is looking at. Compensating for a box whose
+     * top is still on screen is what jumps the page on the gateway's first 0 -> full-height message.
+     *
+     * @param {Number} boxTop The box's top edge, relative to the scroll container's visible top
+     * @param {Number} delta How much the box grew, negative when it shrank
+     * @returns {Number} The scroll adjustment to apply
+     */
+    scrollShiftForResize(boxTop, delta) {
+        'use strict';
+
+        return boxTop < 0 ? delta : 0;
+    },
+
+    /**
+     * The gateway reads its palette from the `dark` search param once, at load, so a theme switch
+     * needs a reload. Guarded on the flag moving, because the reload clears anything typed in.
+     * @returns {void}
+     */
+    rethemeStripeIframe() {
+        'use strict';
+
+        const frame = document.getElementById('stripe-widget');
+
+        if (!frame || !addressDialog.stripeIframeSrc) {
+            return;
+        }
+
+        // Absent on the registerb/repay flows, which never asked for a theme in the first place
+        const src = addressDialog.stripeIframeSrc
+            .replace(/([&?]dark=)[01]/, `$1${mega.ui.isDarkTheme() ? '1' : '0'}`);
+
+        if (src === addressDialog.stripeIframeSrc) {
+            return;
+        }
+
+        addressDialog.stripeIframeSrc = src;
+        frame.src = src;
+    },
+
     showPaymentSuccess() {
         'use strict';
 
@@ -3359,12 +3452,7 @@ var addressDialog = {
                     return;
                 }
                 if (eventData.type === 'resize') {
-                    // Resize the stripe iframe
-                    const $stripeDialog = addressDialog.getStripeDialog();
-                    const $stripeIframe = $('.iframe-container', $stripeDialog);
-                    if ($stripeIframe) {
-                        $stripeIframe.css('height', eventData.height + 'px');
-                    }
+                    addressDialog.resizeStripeIframe(eventData.height);
                 }
                 if (eventData.type === 'loading' && eventData.action === 'end') {
                     if (addressDialog.stripeStartTime && pro.propay.onPropayPage() && pro.propay.currentGateway) {
@@ -3672,6 +3760,7 @@ var addressDialog = {
                     // rtc (returnToClient): Have client handle stripe success/failure
                     if (pro.propay.onPropayPage()) {
                         iframeSrc += `&v=2`;
+                        iframeSrc += `&dark=${mega.ui.isDarkTheme() ? '1' : '0'}`;
                     }
                     iframeSrc += `&rtc=${(d && localStorage.rtc) || 0}`;
                 }
@@ -3738,6 +3827,13 @@ var addressDialog = {
                 $stripeIframe.src = iframeSrc;
                 $stripeIframe.id = 'stripe-widget';
 
+                addressDialog.stripeIframeSrc = iframeSrc;
+
+                if (!addressDialog.themeChangeHandler) {
+                    addressDialog.themeChangeHandler =
+                        mBroadcaster.addListener('theme:changed', () => addressDialog.rethemeStripeIframe());
+                }
+
                 if (!pro.propay.useSavedCard) {
                     pro.propay.hideLoadingOverlay();
                     loadingDialog.hide();
@@ -3795,6 +3891,12 @@ var addressDialog = {
             mBroadcaster.removeListener(addressDialog.iframePageChangeHandler);
             delete addressDialog.iframePageChangeHandler;
         }
+
+        if (addressDialog.themeChangeHandler) {
+            mBroadcaster.removeListener(addressDialog.themeChangeHandler);
+            delete addressDialog.themeChangeHandler;
+        }
+        delete addressDialog.stripeIframeSrc;
     },
 
     /**

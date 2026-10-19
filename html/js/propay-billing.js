@@ -2177,14 +2177,20 @@ pro.propay.billing = {
                     text: l.personal_use,
                     tabid: 'personal',
                     selected: !businessSelected,
-                    onClick: () => this.applyPersonalUse(),
+                    onClick: () => {
+                        pro.propay.scrollToTop();
+                        return this.applyPersonalUse();
+                    },
                 },
                 {
                     parentNode: tabGroupWrap,
                     text: l.business_use,
                     tabid: 'business',
                     selected: businessSelected,
-                    onClick: () => this.applyBusinessUse(),
+                    onClick: () => {
+                        pro.propay.scrollToTop();
+                        return this.applyBusinessUse();
+                    },
                 },
             ],
         });

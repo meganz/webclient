@@ -480,7 +480,7 @@ i.pricing-sprite,
 .payment-page .free-trial-container {
     height: calc(100% - 24px);
     display: flex;
-    background: var(--surface-main);
+    background: transparent;
     max-width: 444px;
     margin: 24px 0 0;
 }
@@ -1374,6 +1374,14 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     padding: 8px;
     border-radius: 4px;
     position: fixed;
+}
+.dark-direct-tooltip.simpletip-tooltip.pricing-tip:not(.propay) {
+    background-color: var(--color-primary-black-800);
+    --mask-color: var(--color-primary-black-800);
+
+}
+.dark-direct-tooltip.simpletip-tooltip.pricing-tip:not(.propay) i {
+    --mask-color: inherit;
 }
 .dark-direct-tooltip.pricing-tip.transformed u {
     text-decoration: none;

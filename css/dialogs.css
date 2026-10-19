@@ -5162,8 +5162,11 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
     .mega-dialog.payment-address-dialog .states {
         margin-bottom: 20px;
     }
+    .mega-dialog.payment-address-dialog .states .mega-input-dropdown {
+        margin-top: -10px;
+    }
     .mega-dialog.payment-address-dialog .states .mega-input-dropdown .dropdown-scroll {
-        max-height: 160px;
+        max-height: 143px;
     }
     .mega-dialog.payment-address-dialog > footer .footer-container {
         padding-top: 0;

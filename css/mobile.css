@@ -10083,6 +10083,7 @@ code, c {
 }
 .dark-direct-tooltip.simpletip-tooltip {
     background-color: var(--surface-grey-1-inverted);
+    color: var(--text-color-high-inverted);
     display: block;
     position: absolute;
     z-index: 1200;

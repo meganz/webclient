@@ -1299,9 +1299,8 @@ lazy(mega, 'keyMgr', () => {
             }
 
             if (!this.manualVerification) {
-                // if no manual verification required, still check Ed25519 public key is SEEN
-
-                return ed && ed.method >= authring.AUTHENTICATION_METHOD.SEEN;
+                return ed && ed.method >= authring.AUTHENTICATION_METHOD.SEEN
+                    && cu && cu.method >= authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
             }
 
             return cu && cu.method >= authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED

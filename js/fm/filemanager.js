@@ -1645,6 +1645,24 @@ FileManager.prototype.initShortcutsAndSelection = function(container, aUpdate, r
                     if (mega.ui.secondaryNav) {
                         mega.ui.secondaryNav.handleNodeSelection(container);
                     }
+
+                    if (M.isGalleryPage() || M.isAlbumsPage(2)) {
+                        delay('gallery-hydrate:selection', () => {
+
+                            if (!selected_list.length) {
+                                return;
+                            }
+
+                            mega.gallery.hydrateSelection(selected_list).then(() => {
+                                mega.ui.mInfoPanel.eventuallyUpdateSelected();
+
+                                // The bar is on a shorter timer, so it had read those rows already
+                                if (window.selectionManager) {
+                                    selectionManager.showRequiredLinks();
+                                }
+                            }).catch(nop);
+                        });
+                    }
                 }
             }
         ).reinitialize();

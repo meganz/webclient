@@ -742,6 +742,7 @@ var mega = {
     ui: {},
     state: 0,
     utils: {},
+    gallery: {},
     slideshow: {settings: {}},
     devices: {rootId: 'device-centre', sections: {}, uiElems: {}},
     uaoref: window.uaoref,

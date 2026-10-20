@@ -12,7 +12,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
      * @param {MegaNode} node Node to fetch the label from
      * @returns {String}
      */
-    const getMonthLabel = ({ mtime }) => GalleryNodeBlock.getTimeString(mtime || 0, 3);
+    const getMonthLabel = (node) => GalleryNodeBlock.getTimeString(Math.floor(M.getNodeMediaTs(node) / 1000), 3);
 
     let globalZoomStep = defZoomStep;
 
@@ -49,7 +49,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 }
             };
 
-            this.el.setAttribute('title', node.name);
+            this.el.setAttribute('title', node.name || '');
             this.el.setAttribute('id', node.h);
 
             this._active = true;
@@ -280,6 +280,12 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
             if (this.el.classList.contains('shimmer')) {
                 scope.unsetShimmering(this.el);
+            }
+
+            const {ref} = this.el;
+
+            if (!(ref.node instanceof GalleryNode)) {
+                this.el.setAttribute('title', ref.node.name);
             }
         }
     }

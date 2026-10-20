@@ -1,7 +1,7 @@
 (() => {
     'use strict';
 
-    const DB_VER = 1;
+    const DB_VER = 2;
     const DB_RESET_QUERIES = `
         PRAGMA writable_schema = 1;
         DELETE FROM sqlite_master;
@@ -792,9 +792,13 @@
             const typeMap = freeze({
                 s: 'INTEGER',
                 t: 'INTEGER',
-                ts: 'INTEGER'
+                mts: 'INTEGER',
+                ts: 'INTEGER',
             });
+
             assert(this._schemaDef);
+
+            const index = [];
 
             for (const [t, def] of Object.entries(this._schemaDef)) {
 
@@ -826,16 +830,25 @@
                 for (const c of idxCols) {
                     cols.push(`${c} ${typeMap[c] || 'TEXT'}`);
                 }
+
                 cols.push('d TEXT');
 
-                let sql = `CREATE TABLE IF NOT EXISTS ${t} (${cols.join(',')});`;
+                await this.exec(`CREATE TABLE IF NOT EXISTS ${t} (${cols.join(',')});`);
+
                 for (let i = 0; i < idxCols.length; i++) {
-                    sql += `CREATE INDEX IF NOT EXISTS idx_${idxCols[i]} ON ${t} (${idxCols[i]});`;
+                    index.push(`CREATE INDEX IF NOT EXISTS idx_${t}_${idxCols[i]} ON ${t} (${idxCols[i]});`);
                 }
 
-                await this.exec(sql);
-
                 this[t] = this._tables[t] = new FMDBSQLiteTable(this, t, pk, idxCols, [...idxCols, 'd']);
+            }
+
+            const [seeded] = await this.exec('SELECT 1 FROM f LIMIT 1;');
+
+            if (seeded) {
+
+                // Media booster index
+                index.push('CREATE INDEX IF NOT EXISTS idx_fa_media ON fa (mts, ts, h, p, t, ext, s);');
+                await this.exec(index.join('')).catch(dump);
             }
 
             // Restore readonly for non-master roles now that schema setup is done.
@@ -1032,12 +1045,19 @@
         async init(wipe) {
             return this.setup(wipe)
                 .catch((ex) => {
-                    this.logger.error('SQLite adapter failed, disabling SQLite and reloading...', ex);
+                    this.logger.warn('SQLite adapter failed, disabling SQLite and reloading...', ex);
+
+                    this.crashed = 2;
                     M.sqliteCheck.lock7days();
 
                     loadingDialog.show('sqlite', l[1141]);
                     return mega.halt('sqlite')
-                        .then(() => location.reload());
+                        .then(() => {
+                            location.reload();
+
+                            // return never fulfilled promise to not proceed to fetchfm
+                            return new Promise(nop);
+                        });
                 });
         }
 
@@ -1205,14 +1225,20 @@
             });
         }
 
-        media() {
+        /**
+         * @param {String} [sortBy] Which timestamp to order by, 'ts' for the node's own one,
+         * the media timestamp otherwise, i.e. the name derived one falling back to the former
+         * @returns {Promise<Array>} {@link GalleryNode} rows
+         */
+        async media(sortBy) {
+            const order = sortBy === 'ts' ? 'ts' : 'mts';
 
-            return this.getbykey('f', {
-                query(t) {
-                    return t._db.exec('SELECT f.* FROM f JOIN fa USING(h) WHERE f.s > 0');
-                },
-                include: n => !!n.fa && n.s > 0
-            });
+            return this.mediaRows(await this.getbykey('fa', {
+                query: t => t._db.exec(`SELECT h, ts AS mtime, p, t, ext, s, mts,
+                    CASE WHEN t & ${M.IS_VIDEO} THEN d END AS d FROM ${t.name}
+                    WHERE s > 0 AND t & ${M.IS_VIDEO | M.IS_IMAGE} ORDER BY ${order} DESC`),
+                include: row => row.s > 0 && (row.t & (M.IS_VIDEO | M.IS_IMAGE)) > 0
+            }));
         }
     }
 

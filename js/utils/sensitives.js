@@ -293,8 +293,13 @@ function resetSensitives() {
             }
 
             if (sensitiveStatusCache[n.p] === undefined) {
-                const parent = M.getNodeByHandle(n.p);
-                sensitiveStatusCache[n.p] = parent.sen === 1 || isSensitiveInherited(parent);
+                // M.tree keys its folders by parent, so they are gathered by their own handle, flagged in t
+                sensitiveStatusCache.tree = sensitiveStatusCache.tree
+                    || Object.values(M.tree).reduce((t, s) => Object.assign(t, s), Object.create(null));
+
+                const parent = sensitiveStatusCache.tree[n.p] || M.getNodeByHandle(n.p);
+                sensitiveStatusCache[n.p] = parent.sen === 1 || !!(parent.t & M.IS_SEN)
+                    || isSensitiveInherited(parent);
             }
 
             return sensitiveStatusCache[n.p];
@@ -800,10 +805,10 @@ function resetSensitives() {
                             continue;
                         }
 
-                        const eHandles = Object.keys(album.eHandles);
+                        const nodes = await dbfetch.node(Object.keys(album.eHandles)).catch(dump) || [];
 
-                        for (let i = 0; i < eHandles.length; i++) {
-                            const n = M.d[eHandles[i]];
+                        for (let i = 0; i < nodes.length; i++) {
+                            const n = nodes[i];
 
                             if (
                                 n

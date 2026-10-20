@@ -604,6 +604,13 @@ function crypto_procattr(n, key) {
                 tryCatch(() => decode_coords(n, o))();
             }
 
+            if (n.fa && n.name) {
+                n.mts = getMediaTSFromFilename(n.name);
+                if (n.mts < 1e3) {
+                    delete n.mts;
+                }
+            }
+
             n.k = key;
             n.ar = o;
             delete n.a;
@@ -650,6 +657,83 @@ function decode_coords(n, o) {
         }
     }
 }
+
+/**
+ * Compute the media timestamp of a node, same as SDK
+ * @param {String} name The node's file name
+ * @returns {Number} Milliseconds since the Unix epoch or ENOENT to use the fallbacks
+ * @name getMediaTSFromFilename
+ * @global
+ */
+self.getMediaTSFromFilename = (() => {
+    'use strict';
+
+    // YYYY MM DD HH MM SS, starting at the first digit and allowing non-digits in between the groups
+    const DATE = /^\D*(\d{4})\D*(\d\d)\D*(\d\d)\D*(\d\d)\D*(\d\d)\D*(\d\d)/;
+    const ENOENT = self.ENOENT || -9;
+
+    // Fractional seconds, separated by either '.' or '_'
+    const FRACTION = /^[._](\d+)/;
+
+    // The +HHMM/-HHMM offset, being looked for within a short window only, so that unrelated
+    // +/- characters deeper in the filename suffix are not being matched
+    const TZ = /^[^+-]{0,5}([+-])(\d\d)(\d\d)/;
+
+    // Extract and validate filename against a proper date.
+    const extract = (name) => {
+        const date = DATE.exec(name);
+        if (!date) {
+            return false;
+        }
+
+        const [year, month, day, hour, minute, second] = date.slice(1).map(Number);
+        if (year < 1970 || month < 1 || month > 12 || day < 1 || hour > 23 || minute > 59 || second > 59) {
+            return false;
+        }
+
+        return {date: date[0], year, month, day, hour, minute, second};
+    };
+
+    return (name) => {
+
+        const dot = name.lastIndexOf('.');
+        const stem = dot > 0 ? name.substring(0, dot) : name;
+
+        const {date, year, month, day, hour, minute, second} = extract(stem);
+        if (!date) {
+            return ENOENT;
+        }
+
+        const tail = stem.substring(date.length);
+        const fraction = FRACTION.exec(tail);
+
+        // Up to 3 digits, right-padded to milliseconds, i.e. "1" -> 100, "12" -> 120
+        const ms = fraction ? parseInt(`${fraction[1]}00`.slice(0, 3), 10) : 0;
+        const utcMs = Date.UTC(year, month - 1, day, hour, minute, second, ms);
+
+        // Reject overflowing days, such as the 30th of February, plus the exact epoch,
+        // which the SDK is treating as no result at all
+        if (!utcMs || new Date(utcMs).getUTCDate() !== day) {
+            return ENOENT;
+        }
+
+        const tz = TZ.exec(fraction ? tail.substring(fraction[0].length) : tail);
+        let offset = 0;
+
+        if (tz) {
+            const tzHours = Number(tz[2]);
+            const tzMinutes = Number(tz[3]);
+            // Offsets are capped at 14:00 and are a quarter of an hour at the very least
+            if (tzHours <= 14 && (tzHours < 14 || tzMinutes === 0) && [0, 15, 30, 45].includes(tzMinutes)) {
+                offset = (tzHours * 60 + tzMinutes) * (tz[1] === '-' ? -1 : 1);
+            }
+        }
+
+        // UTC = local - offset
+        const adjusted = utcMs - offset * 60000;
+        return adjusted > 0 ? adjusted : ENOENT;
+    };
+})();
 
 // encrypt/decrypt 4- or 8-element 32-bit integer array
 function encrypt_key(cipher, a) {
@@ -1169,6 +1253,12 @@ class MegaNode {
 
 Object.setPrototypeOf(MegaNode.prototype, null);
 
+class GalleryNode extends MegaNode {
+    get [Symbol.toStringTag]() {
+        return 'GalleryNode';
+    }
+}
+
 class TransferNode extends MegaNode {
     constructor(n, value) {
         if (n.a) {
@@ -1200,7 +1290,7 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
     /** @class decWorkerPool */
     return new class extends Array {
         get url() {
-            const WORKER_VERSION = 15;
+            const WORKER_VERSION = 16;
             return `${window.is_extension || window.is_karma ? '' : '/'}nodedec.js?v=${WORKER_VERSION}`;
         }
 

@@ -259,7 +259,7 @@ lazy(self.T, 'core', () => {
 
     return freeze({
         get apipath() {
-            return xapipath || 'https://bt7.api.mega.co.nz/';
+            return xapipath || 'https://g.api.mega.co.nz/';
         },
         wkpool: [],
 

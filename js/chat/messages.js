@@ -312,6 +312,7 @@ Message.prototype._onAttachmentReceived = function(data) {
 
         n.ch = n.m + '!' + n.h;
         n.co = this.orderValue;
+        n.mu = this.userId;
 
         if (M.getNodeShare(n.h).down) {
             this.chatRoom.logger.warn(`Taken-down node ${n.h}`, n);
@@ -402,11 +403,12 @@ Message.prototype._onAttachmentRevoked = function(h, thisMsg) {
     var chatRoom = this.chatRoom;
     var roomId = chatRoom.roomId;
     var msgId = this.messageId;
+    const {userId} = this;
 
     // Revoke all room attachments matching the same handle/message
     var a = Object.values(M.chc[roomId] || {})
         .filter(function(n) {
-            return thisMsg ? n.m === msgId : n.h === h;
+            return thisMsg ? n.m === msgId : n.h === h && n.mu === userId;
         });
 
     // Get a list of affected messages

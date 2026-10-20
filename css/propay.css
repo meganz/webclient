@@ -1,20 +1,44 @@
+/* Shares classes with the pricing page, so undo its 100vh scroller as propay scrolls the page */
+.bottom-page.propay .bottom-page.pricing-pg {
+    background: var(--mobile-page-background);
+    height: auto;
+    overflow: visible;
+}
+.bottom-page.propay .mobile.fm-header {
+    background: var(--mobile-page-background);
+}
 /* General page stylings */
 #propay {
     font: var(--text-copy-medium-pricing);
-    color: var(--text-color-high);
+    color: var(--mobile-text-primary);
     display: flex;
     flex-direction: row;
-    background-color: var(--surface-grey-2);
+    --propay-background-direction: to right;
+    background: linear-gradient(var(--propay-background-direction), var(--mobile-page-background) var(--left-panel-width), var(--mobile-surface-2) var(--left-panel-width));
     min-height: 100vh;
     --left-panel-width: 58%;
     --right-panel-width: 42%;
     --plan-card-left-gap: 88px;
-    --color-warning-orange: rgba(181, 84, 7, 1);
-    --text-color-secondary: rgba(97, 99, 102, 1);
 
     --font-inter-r: "Inter", sans-serif;
     --font-i-14-600: normal 600 var(--font-copy-medium) var(--font-inter-r);
     --font-i-16-400: normal 400 var(--font-copy-small) var(--font-inter-r);
+}
+.rtl #propay {
+    --propay-background-direction: to left;
+}
+
+.web-desktop .bottom-page.propay > .bottom-page.content {
+    height: 100vh;
+}
+
+/* Would otherwise clip the page height, leaving the scroll container nothing to scroll */
+.web-desktop .bottom-page.propay .bottom-page.full-block {
+    overflow: visible;
+}
+.bottom-page.propay .mega-input .mega-input-dropdown {
+    position: absolute;
+    min-width: calc(100% + 16px);
 }
 #propay .bold {
     font: inherit;
@@ -30,6 +54,7 @@
 }
 #propay h1 {
     font: var(--text-poppins-600-24);
+    color: var(--mobile-text-primary);
     margin-block-start: 0;
     margin-block-end: 0;
     margin-inline-start: 0;
@@ -37,6 +62,7 @@
 }
 #propay h2 {
     font: var(--text-h6-pricing);
+    color: var(--mobile-text-primary);
     text-align: start;
     margin-bottom: 16px;
     margin-top: 0;
@@ -80,34 +106,37 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    border: 1px solid var(--color-disabled);
+    border: 1px solid var(--mobile-border-strong);
     border-radius: 8px;
     font: var(--text-copy-medium-pricing);
     padding: 16px 24px;
     cursor: pointer;
 }
-#propay .duration-option div.radio{
+#propay div.radio {
     flex-shrink: 0;
+    background: var(--mobile-surface-1);
+    box-shadow: inset 0 0 0 1px var(--mobile-border-strong-selected);
 }
 #propay .duration-option.selected {
     border: 1px solid var(--text-color-high);
     font-weight: 700;
 }
 #propay div.radioOn::before{
-    background: var(--text-color-high);
+    background: var(--mobile-text-primary);
     height: 10px;
     width: 10px;
     margin: 4px;
 }
 #propay div.radioOn::after {
     display: flex;
-    box-shadow: inset 0 0 0 1px var(--text-color-high);
+    box-shadow: inset 0 0 0 1px var(--mobile-text-primary);
 }
 #propay div.radio.radioOff::after {
     display: none;
 }
 #propay .radio-txt {
     font: var(--text-copy-medium-pricing);
+    color: var(--mobile-text-primary);
 }
 #propay .radio-txt .card-brand {
     font: var(--text-copy-medium-bold-pricing);
@@ -127,7 +156,7 @@
 }
 #propay .saved-card .card-expiry {
     align-items: center;
-    color: var(--text-color-secondary);
+    color: var(--mobile-text-secondary);
     display: flex;
     font: var(--text-copy-small-pricing);
     margin-top: 2px;
@@ -137,7 +166,7 @@
     margin-inline-start: -3px;
 }
 #propay .saved-card .card-expiry.warning {
-    color: var(--color-warning-orange);
+    color: var(--mobile-text-warning);
 }
 #propay .saved-card .card-expiry.expired {
     color: var(--text-color-error);
@@ -159,11 +188,22 @@
     top: 40px;
     left: 0;
 }
+#propay .mega-input-dropdown {
+    background: var(--mobile-page-background);
+}
 #propay .mega-input.dropdown-input > span {
     font: var(--text-copy-medium-pricing);
 }
+#propay .mega-input.dropdown-input.selected > span {
+    color: var(--mobile-text-primary);
+}
 #propay .mega-input-dropdown .option {
     font: var(--text-copy-medium-pricing);
+    background: var(--mobile-page-background);
+    color: var(--mobile-text-primary);
+}
+#propay .mega-input-dropdown .option:hover {
+    background: var(--mobile-surface-2);
 }
 #propay .mega-input-dropdown .option span {
     display: contents;
@@ -175,7 +215,7 @@
     box-sizing: border-box;
     flex: 1;
     font: var(--text-body1);
-    color: var(--text-color-high);
+    color: var(--mobile-text-primary);
     cursor: text;
     overflow: hidden;
     padding: 2px 8px;
@@ -195,7 +235,7 @@
 #propay .error .error-message {
     margin-top: 6px;
     display: flex;
-    color: var(--banner-text-error);
+    color: var(--mobile-text-error);
     font: var(--text-copy-small-pricing);
     align-items: center;
     z-index: 12;
@@ -238,14 +278,14 @@
     margin-top: 6px;
     display: flex;
     align-items: center;
-    color: var(--text-color-secondary);
+    color: var(--mobile-text-secondary);
     font: var(--text-copy-small-pricing);
     z-index: 15;
     transform: translateZ(1px);
 }
 #propay .taxCode-input-wrapper.taxCode-status-exhausted .error-message i {
     margin-inline-end: 8px;
-    --mask-color: var(--text-color-secondary);
+    --mask-color: var(--mobile-text-secondary);
 }
 #address-dialog-taxcode::placeholder {
     color: var(--text-color-low);
@@ -276,7 +316,7 @@
     background: var(--banner-background-error);
 }
 .mega-dialog.payment-address-dialog .states.tax-hint:not(.error) ~ .state-message-container {
-    color: var(--text-color-secondary);
+    color: var(--mobile-text-secondary);
     border-color: var(--surface-grey-3);
     background: var(--surface-grey-2);
 }
@@ -293,19 +333,19 @@
     font: var(--text-copy-small-pricing);
 }
 .mobile.payment-address-dialog .states.tax-hint:not(.error) ~ .state-message-container {
-    color: var(--text-color-secondary);
+    color: var(--mobile-text-secondary);
 }
 #propay .taxCode-input-wrapper.taxCode-status-loading .error-message,
 #propay .taxCode-input-wrapper.taxCode-status-info .error-message {
     margin-top: 6px;
     display: flex;
     align-items: center;
-    color: var(--text-color-secondary);
+    color: var(--mobile-text-secondary);
     font: var(--text-copy-small-pricing);
 }
 #propay .taxCode-input-wrapper.taxCode-status-loading .error-message i {
     margin-inline-end: 8px;
-    --mask-color: var(--text-color-secondary);
+    --mask-color: var(--mobile-text-secondary);
     animation: rotate 1s linear infinite;
 }
 #propay .taxCode-input-wrapper.taxCode-status-info .error-message i {
@@ -412,6 +452,13 @@
 .mobile .tax-validation-popover-arrow {
     border-bottom: 8px solid var(--surface-black);
 }
+.theme-dark.mobile #propay .tax-validation-popover {
+    background: var(--surface-grey-1-inverted);
+    color: var(--text-color-high-inverted);
+}
+.theme-dark.mobile #propay .tax-validation-popover-arrow {
+    border-bottom-color: var(--surface-grey-1-inverted);
+}
 .tax-validation-popover-close {
     cursor: pointer;
     inset-inline-end: 12px;
@@ -448,7 +495,7 @@
 }
 #propay .tax-validation-popover-action {
     font: var(--text-body1-bold);
-    color: var(--text-color-white-high);
+    color: inherit;
     display: flex;
     width: 100%;
     justify-content: flex-start;
@@ -465,14 +512,14 @@
 
 /* Checkbox */
 #propay .checkboxOn {
-    background: var(--text-color-high);
+    background: var(--mobile-text-primary);
 }
 #propay .checkbox-item.checkboxOn::before {
     background-image: none;
 }
 #propay .checkboxOff {
     background: var(--surface-grey-1);
-    box-shadow: inset 0 0 0 1px var(--text-color-high);
+    box-shadow: inset 0 0 0 1px var(--mobile-text-primary);
 }
 #propay .checkbox-item {
     border-radius: 2px;
@@ -480,25 +527,27 @@
 }
 #propay .checkbox-item i {
     display: none;
-    color: var(--text-color-white-high);
+    --mask-color: var(--mobile-icon-inverse-accent);
 }
 #propay .checkbox-item.checkboxOn i {
     display: flex;
 }
 /* mega input overrides */
 #propay .mega-input::before {
-    background: var(--surface-main)
+    background: var(--mobile-page-background);
 }
 #propay .left-block .mega-input input:-webkit-autofill {
     margin: 0 1px;
-    box-shadow: 0 0 0 50px var(--surface-main) inset;
+    box-shadow: 0 0 0 50px var(--mobile-page-background) inset;
 }
 /* Main page elements */
 #propay .left-block-wrapper {
     display: flex;
     width: var(--left-panel-width);
     justify-content: flex-end;
-    background-color: var(--surface-main);
+    background-color: var(--mobile-page-background);
+    min-height: 100vh;
+    height: fit-content;
 }
 #propay .left-block {
     display: flex;
@@ -531,7 +580,7 @@
 }
 #propay .left-block .create-account-wrapper .title .number,
 #propay .left-block .create-account.title .number {
-    border: 1px solid var(--stroke-mid-grey);
+    border: 1px solid var(--mobile-border-strong);
     border-radius: 100%;
     aspect-ratio: 1 / 1;
     height: 100%;
@@ -542,13 +591,13 @@
 }
 #propay .left-block .create-account-wrapper .login {
     font: var(--text-inter-400-16);
-    color: var(--color-copy-secondary);
+    color: var(--mobile-text-secondary);
     margin-bottom: 24px;
 }
 #propay .left-block .create-account-wrapper .login .login-link {
     text-decoration: underline;
     font: var(--text-inter-600-16);
-    color: var(--text-color-high);
+    color: var(--mobile-text-primary);
 }
 #propay .left-block .create-account-wrapper label {
     display: flex;
@@ -561,15 +610,18 @@
 #propay .left-block .create-account-wrapper .password-strength {
     display: flex;
     flex-direction: row;
-    color: var(--text-color-error);
+    color: var(--mobile-text-error);
     border-radius: 8px;
     margin-top: 8px;
 }
 #propay .left-block .create-account-wrapper .password-wrapper {
     font: var(--text-inter-400-14);
 }
+#propay .left-block .create-account-wrapper .password-wrapper i {
+    cursor: pointer;
+}
 #propay .left-block .create-account-wrapper .password-wrapper .password-info {
-    color: var(--text-color-secondary);
+    color: var(--mobile-text-primary);
     margin-top: 12px;
 }
 #propay .left-block .create-account-wrapper .password-wrapper .pass-incr-strength {
@@ -601,7 +653,7 @@
 #propay .left-block .create-account-wrapper .password-strength.good4,
 #propay .left-block .create-account-wrapper .password-strength.good5,
 #propay .left-block .create-account-wrapper .password-strength.good6 {
-    color: var(--text-color-success);
+    color: var(--mobile-text-success);
 }
 #propay .left-block .create-account-wrapper .password-strength i {
     margin: 0 8px 0 0;
@@ -672,7 +724,7 @@
     border: 0;
 }
 #propay .left-block .mega-input::before {
-    border: 1px solid var(--stroke-mid-grey);
+    border: 1px solid var(--mobile-border-disabled);
     border-radius: 8px;
 }
 #propay .left-block .mega-input:focus-within::before,
@@ -680,10 +732,10 @@
     border: 1px solid var(--text-color-high);
 }
 #propay .left-block .mega-input.error::before {
-    border: 1px solid var(--input-text-underline-error);
+    border: 1px solid var(--mobile-support-error);
 }
 #propay .left-block .error .mega-input::before {
-    border: 1px solid var(--input-text-underline-error);
+    border: 1px solid var(--mobile-support-error);
 }
 #propay .left-block .back-header-wrapper {
     display: flex;
@@ -709,11 +761,12 @@
 .rtl #propay .left-block .back-header-wrapper .back-button i {
     transform: rotate(180deg);
 }
+
 #propay .left-block h1.plan-name {
     display: inline-block;
 }
 #propay .left-block .plan-name span {
-    color: var(--color-primary-red-500);
+    color: var(--mobile-text-brand);
 }
 #propay .left-block .option {
     cursor: pointer;
@@ -723,7 +776,7 @@
     height: 52px;
     margin: 0;
     padding: 0 16px;
-    color: var(--text-color-high);
+    color: var(--mobile-text-primary);
 }
 #propay .left-block .option .provider-icon {
     margin-inline-start: 2px;
@@ -733,7 +786,7 @@
     display: none;
 }
 #propay .left-block .option.selected {
-    background: var(--surface-grey-2);
+    background: var(--mobile-surface-2);
 }
 #propay .left-block .option.selected .tick {
     display: flex;
@@ -741,6 +794,8 @@
 }
 #propay .left-block .option .simpletip {
     margin-inline-start: 10px;
+    --icon-size: 16px;
+    --mask-color: var(--mobile-text-primary);
 }
 #propay .left-block .option .label-wrapper {
     display: flex;
@@ -778,6 +833,7 @@
     margin: 32px 16px 0 0;
     margin-inline-end: 16px;
     cursor: pointer;
+    color: var(--mobile-text-primary);
 }
 #propay .left-block .payment-method .see-all-btn i {
     margin-right: 8px;
@@ -788,7 +844,7 @@
 #propay .left-block .payment-method .free-trial-unsupported {
     display: flex;
     font: var(--text-copy-small-pricing);
-    color: var(--color-warning-orange);
+    color: var(--mobile-text-warning);
     margin-top: 6px;
 }
 #propay .left-block .payment-method .free-trial-unsupported i {
@@ -797,7 +853,7 @@
 #propay .left-block .payment-method .gateway-country-unsupported {
     display: flex;
     font: var(--text-copy-small-pricing);
-    color: var(--color-warning-orange);
+    color: var(--mobile-text-warning);
     margin-top: 6px;
 }
 #propay .left-block .payment-method .gateway-country-unsupported i {
@@ -807,7 +863,7 @@
     color: var(--banner-text-error);
 }
 #propay .left-block .duration-note.promo-ends-info {
-    color: var(--text-color-secondary);
+    color: var(--mobile-text-secondary);
 }
 #propay .left-block .duration .options-wrapper {
     display: flex;
@@ -833,7 +889,7 @@
     border: 1px solid var(--secondary-red);
 }
 #propay .left-block .duration .duration-head .duration-savings.popular {
-    background-color: var(--secondary-red);
+    background-color: var(--mobile-brand-default);
     color: var(--secondary-white);
 }
 #propay .left-block .duration .duration-option .monthly-price {
@@ -893,7 +949,6 @@
 #propay .left-block .billing-wrapper .require-invoice-wrapper label {
     cursor: pointer;
     font: var(--text-inter-400-14);
-    margin-bottom: 4px;
 }
 #propay .left-block .billing-wrapper .require-invoice-note {
     display: flex;
@@ -901,7 +956,7 @@
     justify-content: flex-start;
     margin-top: 16px;
     margin-bottom: 16px;
-    color: var(--text-color-secondary);
+    color: var(--mobile-text-secondary);
 }
 #propay .left-block .billing-wrapper .require-invoice-note span {
     margin-top: 1px;
@@ -928,7 +983,7 @@
     text-decoration: underline;
 }
 #propay .left-block .duration .duration-note.one-off-payment-info {
-    color: var( --color-warning-orange);
+    color: var(--mobile-text-warning);
 }
 #propay .left-block .billing-address .billing-info .empty,
 #propay .left-block .billing-address .billing-info .filled {
@@ -957,7 +1012,7 @@
     font: var(--text-copy-medium-bold-pricing);
 }
 #propay .left-block .billing-address .info {
-    color: var(--color-copy-secondary);
+    color: var(--mobile-text-primary);
 }
 #propay .left-block .billing-address .info .name {
     font: var(--text-copy-medium-bold-pricing);
@@ -981,7 +1036,7 @@
     font: var(--text-copy-secondary-pricing)
 }
 #propay .right-block {
-    background-color: var(--surface-grey-2);
+    background-color: var(--mobile-surface-2);
     display: flex;
     align-items: flex-end;
     padding: 70px 0;
@@ -993,7 +1048,7 @@
 }
 #propay .right-block .plan-card {
     display: flex;
-    background-color: var(--surface-main);
+    background-color: var(--mobile-page-background);
     flex-direction: column;
     min-width: 369px;
     max-width: calc(100vw - 48px);
@@ -1036,16 +1091,16 @@
     min-height: 22px;
     padding: 8px;
     font: var(--text-copy-medium-bold-pricing);
-    background-color: var(--color-primary-red-500);
-    color: var(--text-color-white-high);
+    background-color: var(--mobile-brand-default);
+    color: var(--mobile-text-on-color);
     border-start-start-radius: 16px;
     border-start-end-radius: 16px;
     border-end-start-radius: 0;
     border-end-end-radius: 0;
 }
 #propay .right-block .plan-card .discount-header.annual-discount {
-    background-color: #E4E4E5;
-    color: var(--color-discount-secondary-text);
+    background-color: var(--mobile-surface-3);
+    color: var(--mobile-text-primary);
 }
 #propay .right-block .plan-card .plan-name.title {
     font: var(--text-h5-pricing);
@@ -1091,7 +1146,7 @@
     pointer-events: none;
 }
 #propay .right-block .plan-card .duration-options-wrapper .duration-option.selected  {
-    background: var(--surface-main);
+    background: var(--mobile-page-background);
     border: none;
 }
 #propay .right-block .plan-card .duration-options-wrapper .duration-option.selected .duration  {
@@ -1132,12 +1187,12 @@
     display: flex;
     align-items: flex-start;
     margin-top: 12px;
-    color: var(--color-warning-orange);
+    color: var(--mobile-text-warning);
     font: var(--text-inter-600-14);
 }
 #propay .right-block .plan-card .duration-warning i {
     --icon-size: 16px;
-    --mask-color: var(--color-warning-orange);
+    --mask-color: var(--mobile-text-warning);
     flex-shrink: 0;
     margin-top: 2px;
     margin-inline-end: 8px;
@@ -1162,7 +1217,7 @@
 #propay .right-block .plan-card .includes {
     margin-top: 24px;
     font: var(--text-inter-600-14);
-    color: var(--text-color-secondary);
+    color: var(--mobile-text-secondary);
 }
 #propay .right-block .plan-card .includes .includes-content {
     display: flex;
@@ -1225,12 +1280,12 @@
 }
 #propay .right-block .plan-card .pricing .pricing-element .price {
     font: var(--text-poppins-600-24);
-    color: var(--text-color-high);
+    color: var(--mobile-text-primary);
     display: flex;
 }
 #propay .right-block .plan-card .pricing .pricing-element .price span.currency {
     font: var(--text-inter-400-14);
-    color: var(--text-color-secondary);
+    color: var(--mobile-text-secondary);
     padding-bottom: 2px;
     align-self: flex-end;
     margin-inline-start: 4px;
@@ -1251,8 +1306,8 @@
     border-radius: 8px;
     padding: 14px 24px;
     cursor: pointer;
-    background-color: var(--color-primary-red-500);
-    color: var(--color-grey-50);
+    background-color: var(--mobile-button-brand);
+    color: var(--mobile-text-on-color);
     border: none;
     font: var(--text-h3-bold);
 }
@@ -1266,15 +1321,21 @@
     color: var(--mobile-text-on-color-disabled);
     opacity: 1;
 }
+#propay:not(.mobile-device) button.continue:hover:not(.continue-to-payment):not(.disabled):not([disabled]) {
+    background-color: var(--mobile-button-brand-hover);
+}
 #propay .stripe-button.payment-stripe-dialog {
     position: relative;
     height: 90px;
+    overflow: hidden;
 }
 #propay .stripe-button.payment-stripe-dialog .loader {
     position: absolute;
     width: 100%;
-    height: 90px;
+    height: 92px;
+    min-height: 100%;
     min-width: 300px;
+    background-color: var(--mobile-page-background);
 }
 #propay .stripe-button.payment-stripe-dialog .loader i {
     margin-top: 16px;
@@ -1288,7 +1349,7 @@
     position: relative;
 }
 #propay .specific-payment-info > *:not(.payment-stripe-dialog) {
-    background: var(--surface-main);
+    background: var(--mobile-page-background);
 }
 #propay .specific-payment-info .payment-loading-spinner {
     left: 50%;
@@ -1377,31 +1438,37 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    height: max-content;
     margin-right: 24px;
+    border: none;
 }
 #propay .specific-payment-info .voucher-block .redeem-voucher .fm-account-input input {
     width: 100%;
     height: 44px;
-    border: 1px solid var(--text-color-low);
+    border: 1px solid var(--mobile-border-strong);
     border-radius: 8px;
     padding-left: 12px;
-    background-color: var(--surface-main);
+    background-color: var(--mobile-page-background);
+    color: var(--mobile-text-primary);
+}
+#propay .specific-payment-info .voucher-block .redeem-voucher .fm-account-input input:focus {
+    border-color: var(--mobile-border-strong-selected);
 }
 #propay .specific-payment-info .voucher-block .redeem-voucher button {
     flex-shrink: 0;
     height: 48px;
-    background: var(--surface-main);
-    border: 2px solid var(--text-color-high);
+    background: var(--mobile-page-background);
+    border: 1px solid var(--mobile-border-strong-selected);
     border-radius: 8px;
-    color: var(--text-color-high);
+    color: var(--mobile-text-primary);
     font: var(--text-copy-medium-bold-pricing);
 }
 #propay .specific-payment-info .voucher-block .insufficient-balance,
 #propay .specific-payment-info .voucher-block .insufficient-balance-redeemed {
-    color: var(--color-warning-orange);
+    color: var(--mobile-text-warning);
 }
 #propay .specific-payment-info .voucher-block .redeemed {
-    color: var(--color-text-success);
+    color: var(--mobile-text-success);
 }
 #propay .specific-payment-info .voucher-block .info > * {
     display: flex;
@@ -1437,6 +1504,19 @@
     margin-top: 16px;
 }
 
+/* sheet.css only colours these under body.web-desktop, so mobile web falls through to the
+   unreadable browser default once these pages can be dark */
+body.propay-page .mega-sheet .sheet .title a,
+body.propay-page .mega-sheet .sheet .content a,
+body.discount-page .mega-sheet .sheet .title a,
+body.discount-page .mega-sheet .sheet .content a {
+    color: var(--mobile-link-primary);
+}
+body.propay-page .mega-sheet .sheet .content a.text-only,
+body.discount-page .mega-sheet .sheet .content a.text-only {
+    color: var(--mobile-text-primary);
+}
+
 #propay .propay-dialog {
     position: fixed;
     top: 50%;
@@ -1449,6 +1529,20 @@
     max-width: 560px;
     max-height: 100%;
     overflow: auto;
+    background: var(--mobile-page-background);
+    border: 1px solid var(--mobile-border-strong);
+}
+
+.web-desktop #propay .payment-address-dialog {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* min-height lets it shrink past its content, which is what the scrollbar needs */
+.web-desktop #propay .payment-address-dialog > section.content {
+    flex: 1;
+    min-height: 0;
 }
 #propay .payment-address-dialog section.content {
     padding: 0 48px;
@@ -1465,14 +1559,23 @@
     flex-direction: column;
     margin-top: 20px;
 }
+#propay .payment-address-dialog .input-block select {
+    background-color: transparent;
+    color: var(--mobile-text-primary);
+    outline: 0;
+}
+#propay .payment-address-dialog .input-block select.disabled {
+    color: var(--mobile-text-disabled);
+}
 #propay .payment-address-dialog .input-block > span,
 #propay .payment-address-dialog .input-block > span > .taxcode-title {
     font: var(--text-copy-medium-bold-pricing);
-    color: var(--text-color-high);
+    color: var(--mobile-text-primary);
     margin-top: 2px;
 }
 #propay .payment-address-dialog .input-block span.optional {
     font: var(--text-copy-medium-pricing);
+    color: var(--mobile-text-secondary);
 }
 #propay .payment-address-dialog .input-block .mega-input {
     margin: 0;
@@ -1480,6 +1583,9 @@
 #propay .payment-address-dialog .input-block .mega-input::before {
     border-width: 1px;
     border-radius: 8px;
+}
+#propay .payment-address-dialog .input-block .mega-input.active::before {
+    border-color: var(--mobile-border-strong-selected);
 }
 #propay .payment-address-dialog .input-block .taxcode-invoice-note {
     color: var(--mobile-text-secondary);
@@ -1522,11 +1628,12 @@
     margin-top: 5px;
 }
 #propay .payment-address-dialog footer button {
-    background: var(--surface-black);
+    background: var(--mobile-button-primary);
     border-radius: 8px;
 }
 #propay .payment-address-dialog footer button span {
     margin: 0 auto;
+    color: var(--mobile-text-inverse-accent);
 }
 .pricing-pg.bottom-page .payment-result.main-block {
     width: 100%;
@@ -1557,12 +1664,12 @@
     --floating-header-direction: to left;
     padding-inline-end: 31px;
     background: linear-gradient(var(--floating-header-direction),
-        var(--surface-grey-2) 0%,
-        var(--surface-grey-2) 40%,
+        var(--mobile-surface-2) 0%,
+        var(--mobile-surface-2) 40%,
         transparent 40%,
         transparent 44%,
-        var(--surface-main) 44%,
-        var(--surface-main) 100%);
+        var(--mobile-page-background) 44%,
+        var(--mobile-page-background) 100%);
 }
 .rtl .bottom-page.propay .top-head.floating {
     --floating-header-direction: to right;
@@ -1582,7 +1689,7 @@
 }
 #propay .fixed-continue-btn .pricing-note-fixed-txt .tax {
     font: var(--text-inter-400-14);
-    color: var(--text-color-secondary);
+    color: var(--mobile-text-secondary);
 }
 
 
@@ -1624,8 +1731,11 @@
 #propay .sk-stripe-loading {
     position: absolute;
     width: 100%;
-    background: var(--surface-main);
-    margin-top: 26px;
+    background: var(--mobile-page-background);
+    padding-top: 28px;
+    padding-bottom: 10px;
+    height: max-content;
+    border-radius: 0;
 }
 #propay .sk-stripe-loading div.sk-pro {
     min-height: 48px;
@@ -1637,9 +1747,14 @@
 #propay .sk-stripe-loading div.no-sk div.sk-pro {
     width: calc(50% - 12px);
 }
-#propay .right-block .sk-card-loading {
+/* .plan-card keeps this ahead of the generic .sk-pro min-height, which would collapse the card */
+#propay .right-block .plan-card.sk-card-loading {
     min-height: 431px;
     min-width: 371px;
+}
+/* The shimmer is 2px wider than its box, so the loading card would scroll itself */
+#propay .sk-active .plan-card.fixed.sk-pro {
+    overflow: hidden;
 }
 #propay .sk-active.sk-pro::after,
 #propay .sk-active .sk-pro::after {
@@ -1747,19 +1862,19 @@
 @media only screen and (max-width: 1079px) {
     #propay {
         flex-direction: column;
-        margin-top: 50px;
-        background-color: var(--surface-main);
+        background: var(--mobile-page-background);
     }
     #propay .mobile {
         display: flex;
         flex-direction: column;
-        background: var(--surface-main);
+        background: var(--mobile-page-background);
     }
     #propay .desktop {
         display: none;
     }
     #propay .left-block-wrapper {
         width: auto;
+        min-height: auto;
     }
     #propay .left-block {
         width: calc(100% - 48px);
@@ -1770,11 +1885,8 @@
         margin-bottom: 32px;
         padding-bottom: 32px;
     }
-    #propay .left-block h1.plan-name {
-        margin-bottom: 32px;
-    }
     #propay .right-block {
-        background-color: var(--surface-main);
+        background-color: var(--mobile-page-background);
         padding: 0 24px;
         width: auto;
         justify-content: center;
@@ -1800,31 +1912,27 @@
         margin-top: -15px;
         margin-bottom: -15px;
     }
+
+    /* No bounce past the end, or the sticky footer rides the content. Safari 15 bounces
+       regardless, which is how it behaves today anyway. */
+    body.propay-page #startholder {
+
+        /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+        overscroll-behavior-y: none;
+    }
+
+    /* Sticky stays in the flow, so it reserves its own room without a spacer to keep in step */
     #propay.mobile-device .fixed-continue-btn {
+        position: sticky;
         bottom: 0;
-        left: 0;
-        right: 0;
+        margin-top: auto;
         padding: 16px 24px;
-        background: var(--surface-main);
+        border-top: 1px solid var(--mobile-border-strong);
+        background: var(--mobile-page-background);
         z-index: 20;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-    }
-    #propay.mobile-device .fixed-continue-btn:not(.spacer) {
-        position: fixed;
-        border-top: 1px solid var(--surface-grey-2);
-    }
-    #propay.mobile-device .fixed-continue-btn.spacer {
-        position: relative;
-        z-index: 0;
-    }
-    #propay.mobile-device .fixed-continue-btn.spacer .spacer-cover{
-        width: 100%;
-        height: 100%;
-        background-color: var(--surface-main);
-        z-index: 1;
-        position: absolute;
     }
      #propay.mobile-device .fixed-continue-btn .s4-tos {
         margin-bottom: 16px;
@@ -1837,7 +1945,7 @@
     }
     .bottom-page.propay .top-head.floating,
     .rtl .bottom-page.propay .top-head.floating {
-        background: var(--surface-main);
+        background: var(--mobile-page-background);
     }
     #propay .subscription-info > * {
         max-width: 621px;

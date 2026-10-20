@@ -1122,9 +1122,13 @@ async function api_cachepubkeys(users) {
  */
 function encryptto(user, data) {
     'use strict';
-    var pubkey;
+    var pubkey = u_pubkeys[user];
 
-    if ((pubkey = u_pubkeys[user])) {
+    if (!pubkey && is_megadrop) {
+        pubkey = mega.fileRequestUpload.getUploadPageOwnerPublicKey(user);
+    }
+
+    if (pubkey) {
         return crypto_rsaencrypt(data, pubkey, -0x4D454741);
     }
 

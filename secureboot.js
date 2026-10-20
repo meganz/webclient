@@ -417,14 +417,14 @@ function getCleanSitePath(path) {
             if (path.cjevent) {
                 sessionStorage.cjevent = path.cjevent;
             }
-            // Google Ads click: capture gclid/wbraid/gbraid/ts from the URL.
+            // Google/Meta Ads click: capture gclid/wbraid/gbraid/fbclid/fbc/fbp/ts from the URL.
             var gAds = {};
-            var gAKeys = ['gclid', 'wbraid', 'gbraid', 'gclts', 'gap'];
+            var gAKeys = ['gclid', 'wbraid', 'gbraid', 'gclts', 'gap', 'fbclid', 'fbc', 'fbp'];
             for (var i = 0; i < gAKeys.length; i++) {
                 if (path[gAKeys[i]]) {
                     gAds[gAKeys[i]] = path[gAKeys[i]];
                 }
-                else if (gAKeys[i] === 'gclts' && (path.gclid || path.wbraid || path.gbraid)) {
+                else if (gAKeys[i] === 'gclts' && (path.gclid || path.wbraid || path.gbraid || path.fbclid)) {
                     gAds.gclts = Math.floor(Date.now() / 1000);
                 }
             }

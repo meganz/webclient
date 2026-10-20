@@ -1528,6 +1528,13 @@ lazy(mega, 'fileRequestUpload', () => {
             return handle;
         }
 
+        getUploadPageOwnerPublicKey(ownerHandle) {
+            if (ownerHandle !== this.ownerHandle) {
+                return false;
+            }
+            return this.ownerPublicKey;
+        }
+
         onItemUploadProgress(id, bps, retime, perc, bl) {
             return this.uploadPage.onItemUploadProgress(id, bps, retime, perc, bl);
         }
@@ -1578,8 +1585,6 @@ lazy(mega, 'fileRequestUpload', () => {
                 api_create_u_k();
                 u_k_aes = new sjcl.cipher.aes(u_k);
             }
-            u_pubkeys[this.ownerHandle] = this.ownerPublicKey; // Store public key for owner
-
             this.uploadPage.initUploadEventHandler();
             InitFileDrag(); // Init file drag upload
             this.uploadPage.initLanguage();
@@ -1605,14 +1610,34 @@ lazy(mega, 'fileRequestUpload', () => {
             mega.ui.setTheme(theme);
             this.uploadPage.setLabel(name, title, description);
 
-            return this.fileRequestApi
-                .getOwnerPublicKey(this.ownerHandle)
-                .then((pubk) => {
+            this.ownerPublicKey = await this.fetchOwnerPublicKey();
 
-                    this.ownerPublicKey = crypto_decodepubkey(base64urldecode(pubk));
+            return this.handleInitialized();
+        }
 
-                    return this.handleInitialized();
-                });
+        /**
+         * Retrieves the owner's RSA pub key to encrypt the uploaded nodes' keys to.
+         * Anonymous/failed to verify shall still be able to upload to the API provided key
+         * accepting the downgraded security as before
+         *
+         * @returns {Promise} fulfilled with the owner's pub key.
+         */
+        async fetchOwnerPublicKey() {
+            const { ownerHandle, fileRequestApi } = this;
+            if (u_type !== false) {
+                const pubKey = await Promise.resolve(authring.getContacts('RSA'))
+                    .then(() => crypt.getPubRSA(ownerHandle))
+                    .catch((ex) => {
+                        logger.warn('Unverified pub key for owner %s, falling back...', ownerHandle, ex);
+                    });
+                if (pubKey) {
+                    return pubKey;
+                }
+            }
+
+            // Don't store this in u_pubkeys as it hasn't been verified
+            const pubk = await fileRequestApi.getOwnerPublicKey(ownerHandle);
+            return crypto_decodepubkey(base64urldecode(pubk));
         }
 
         handlePreview(parameters) {

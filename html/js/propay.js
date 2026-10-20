@@ -56,6 +56,9 @@ pro.propay = {
     savedCardInitiated: false,
     sca: false,
 
+    // Cached by getScrollBlock(), dropped when leaving the page
+    scrollBlock: null,
+
     trial: 1,
 
     usingBalance: false,    // User has not entered into voucher flow, only sees balance
@@ -147,6 +150,35 @@ pro.propay = {
         });
 
         return pro.propay.userOnPropayPage;
+    },
+
+    /**
+     * The scrolling block of the page, which holds the header so that it scrolls too
+     * @returns {Element|null} The perfect scrollbar container
+     */
+    getScrollBlock() {
+        'use strict';
+
+        if (!this.scrollBlock) {
+            this.scrollBlock = document.querySelector('#startholder .bottom-page.propay > .bottom-page.content');
+        }
+
+        return this.scrollBlock;
+    },
+
+    /**
+     * Scrolls the desktop page back to the top, remeasuring the scrollbar with it
+     * @returns {void}
+     */
+    scrollToTop() {
+        'use strict';
+
+        const scrollBlock = is_mobile ? null : this.getScrollBlock();
+
+        if (scrollBlock) {
+            scrollBlock.scrollTop = 0;
+            Ps.update(scrollBlock);
+        }
     },
 
     initSwitchers() {
@@ -2686,7 +2718,7 @@ pro.propay = {
 
         if (option.tooltip) {
             const tooltip = document.createElement('i');
-            tooltip.className = 'pricing-i-icon simpletip';
+            tooltip.className = 'sprite-fm-mono icon-info-thin-outline simpletip';
             tooltip.dataset.simpletip = option.tooltip;
             tooltip.dataset.simpletipposition = 'bottom';
             tooltip.dataset.simpletipoffset = '3';
@@ -2872,6 +2904,7 @@ pro.propay = {
             const options = this.paymentGateways[type];
 
             $('.payment-method .selected').removeClass('selected');
+            $('#propay-payment-dropdown-pri').addClass('selected');
 
             pro.propay.showErrors(true);
 
@@ -3781,10 +3814,20 @@ pro.propay = {
         this.setContinuebuttonText();
         this.pageInitialised = true;
         this.sk.endLoadAll();
+        if (!is_mobile) {
+            // Content is only sized once loading finishes, so the scrollbar needs a second pass.
+            initPerfectScrollbar(
+                $(this.getScrollBlock()),
+                {suppressScrollX: true}
+            );
+        }
     },
 
     init() {
         'use strict';
+
+        // A re-render detaches the node a previous visit cached
+        this.scrollBlock = null;
 
         if (is_mobile) {
             document.body.classList.remove('psa-notification');
@@ -3868,6 +3911,17 @@ pro.propay = {
             return;
         }
 
+        // Scopes the holder and the dialogs, which CSS cannot reach from the page itself.
+        // Past the redirecting guards above, or it outlives the page on every one of them.
+        document.body.classList.add('propay-page');
+
+        if (!is_mobile) {
+            initPerfectScrollbar(
+                $(this.getScrollBlock()),
+                {suppressScrollX: true}
+            );
+        }
+
         this.preloadAnimation();
 
         delete pro.propay.discountInfo;
@@ -3902,6 +3956,8 @@ pro.propay = {
         pro.propay.pageChangeHandler = mBroadcaster.addListener('pagechange', () => {
             if (!pro.propay.onPropayPage()) {
                 pro.propay.hideLoadingOverlay();
+                pro.propay.scrollBlock = null;
+                document.body.classList.remove('propay-page');
                 delete window.s4ac;
                 // Reset country so a return visit picks up IP-detected again, not the prior pick.
                 pro.propay.billing.initialCountry = undefined;
@@ -4050,11 +4106,16 @@ pro.propay = {
         let previousWidth = $(window).width();
         let newWidth;
 
+        // Stale scrollbar rails prop up scrollHeight, leaving blank scrollable space below the page
+        const updateScrollbar = is_mobile ? nop : SoonFc(40, () => Ps.update(this.getScrollBlock()));
+
         $(window).rebind('resize.propay-page', () => {
             if (page.slice(0, 7) !== 'propay_') {
                 $(window).off('resize.propay-page');
                 return;
             }
+
+            updateScrollbar();
 
             if (!this.paymentButton) {
                 return;

@@ -192,7 +192,7 @@ var accountChangePassword = {
         if (hasTwoFactor) {
 
             // Show the verify 2FA dialog to collect the user's PIN
-            twoFactorPin = await twofactor.verifyActionDialog.init();
+            twoFactorPin = await twofactor.verifyActionDialog.init(l.twofa_verify_pass);
         }
 
         const same = await security.changePassword.isPasswordTheSame($.trim(newPassword), accountAuthVersion);

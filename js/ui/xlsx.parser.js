@@ -51,11 +51,15 @@
     var SIG_CENTRAL = 0x02014b50;
     var SIG_EOCD = 0x06054b50;
     var MAX_CELLS_PER_SHEET = 50000;
+    var XL_MAX_ROWS = 1048576;
+    var XL_MAX_COLS = 16384;
     var REL_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
     var SVG_NS = 'http://www.w3.org/2000/svg';
     var NON_SCALING_STROKE = 'non-scaling-stroke';
     var STROKE_WIDTH_ATTR = 'stroke-width';
-    var EMU_PER_PX = 9525;
+    var STROKE_DASHARRAY_ATTR = 'stroke-dasharray';
+    var EMU_PER_POINT = 12700;
+    var CHART_POINT_TO_PX = 1;
     var HEADER_W = 44;
     var HEADER_H = 22;
 
@@ -460,16 +464,78 @@
         return v < 10 ? `0${  v}` : `${  v}`;
     }
 
-    var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
-                       'July', 'August', 'September', 'October', 'November', 'December'];
-    var DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    var STOCK_HILO_LINE_COLOR = '#808080';
+    var STOCK_BAR_LINE_COLOR = '#595959';
+    var STOCK_DOWN_FILL = '#404040';
+    var OF_PIE_OTHER_SHADE = -0.15;
+    var NUMFMT_COLORS = {
+        red: '#ff0000', blue: '#0000ff', green: '#008000', black: '#000000',
+        white: '#ffffff', yellow: '#ffff00', magenta: '#ff00ff', cyan: '#00ffff'
+    };
+    var viewerLocale = '';
 
-    function excelSerialToDate(serial) {
+    function setLocale(tag) {
+        viewerLocale = typeof tag === 'string' ? tag : '';
+        intlLocale.cache = '';
+        numFmtSeparators.cache = null;
+        localeDateNames.cache = null;
+    }
+
+    function intlLocale() {
+        if (intlLocale.cache) {
+            return intlLocale.cache;
+        }
+        var tags = [viewerLocale, navigator.language, 'en'];
+        for (var i = 0; i < tags.length; i++) {
+            try {
+                if (tags[i] && Intl.NumberFormat.supportedLocalesOf(tags[i]).length) {
+                    intlLocale.cache = tags[i];
+                    return tags[i];
+                }
+            }
+            catch (ex) {
+                continue;
+            }
+        }
+        intlLocale.cache = 'en';
+        return intlLocale.cache;
+    }
+
+    function localeDateNames() {
+        if (localeDateNames.cache) {
+            return localeDateNames.cache;
+        }
+        var loc = intlLocale();
+        var fmt = (opts) => new Intl.DateTimeFormat(loc, Object.assign({timeZone: 'UTC'}, opts));
+        var monthLong = fmt({month: 'long'});
+        var monthShort = fmt({month: 'short'});
+        var dayLong = fmt({weekday: 'long'});
+        var dayShort = fmt({weekday: 'short'});
+        var out = {month: [], monthShort: [], day: [], dayShort: []};
+        for (var m = 0; m < 12; m++) {
+            var md = new Date(Date.UTC(2021, m, 15));
+            out.month.push(monthLong.format(md));
+            out.monthShort.push(monthShort.format(md));
+        }
+        for (var w = 0; w < 7; w++) {
+            var wd = new Date(Date.UTC(2021, 7, 1 + w));
+            out.day.push(dayLong.format(wd));
+            out.dayShort.push(dayShort.format(wd));
+        }
+        localeDateNames.cache = out;
+        return out;
+    }
+
+    function excelSerialToDate(serial, date1904) {
         var s = serial;
-        if (s < 60) {
+        var epoch = 25569;
+        if (date1904) {
+            epoch = 24107;
+        }
+        else if (s < 60) {
             s += 1;
         }
-        var ms = (s - 25569) * 86400 * 1000;
+        var ms = (s - epoch) * 86400 * 1000;
         var d = new Date(ms);
         return isNaN(d.getTime()) ? null : d;
     }
@@ -547,18 +613,19 @@
         if (tk.lit !== undefined) {
             return tk.lit;
         }
+        var names = localeDateNames();
         var emitters = {
             yyyy: () => String(ctx.Y),
             yyy: () => String(ctx.Y).slice(-2),
             yy: () => String(ctx.Y).slice(-2),
             y: () => String(ctx.Y),
-            mmmmm: () => MONTH_NAMES[ctx.Mi].slice(0, 1),
-            mmmm: () => MONTH_NAMES[ctx.Mi],
-            mmm: () => MONTH_NAMES[ctx.Mi].slice(0, 3),
+            mmmmm: () => names.month[ctx.Mi].slice(0, 1),
+            mmmm: () => names.month[ctx.Mi],
+            mmm: () => names.monthShort[ctx.Mi],
             mm: () => tk.minute ? pad2(ctx.mi) : pad2(ctx.Mi + 1),
             m: () => tk.minute ? String(ctx.mi) : String(ctx.Mi + 1),
-            dddd: () => DAY_NAMES[ctx.W],
-            ddd: () => DAY_NAMES[ctx.W].slice(0, 3),
+            dddd: () => names.day[ctx.W],
+            ddd: () => names.dayShort[ctx.W],
             dd: () => pad2(ctx.D),
             d: () => String(ctx.D),
             hh: () => pad2(ctx.hour),
@@ -572,8 +639,8 @@
         return fn ? fn() : tk.tok;
     }
 
-    function formatDate(serial, code) {
-        var d = excelSerialToDate(serial);
+    function formatDate(serial, code, date1904) {
+        var d = excelSerialToDate(serial, date1904);
         if (!d) {
             return String(serial);
         }
@@ -763,8 +830,14 @@
             horizontal: align ? align.getAttribute('horizontal') || '' : '',
             vertical: align ? align.getAttribute('vertical') || '' : '',
             wrapText: !!(align && align.getAttribute('wrapText') === '1'),
-            indent: align ? parseInt(align.getAttribute('indent') || '0', 10) || 0 : 0
+            indent: align ? parseInt(align.getAttribute('indent') || '0', 10) || 0 : 0,
+            textRotation: align ? parseInt(align.getAttribute('textRotation') || '0', 10) || 0 : 0
         };
+    }
+
+    function isDateFormatCode(code) {
+        var s = code.replace(/"[^"]*"|\\.|[*_].|\[(?!(?:h+|m+|s+)])[^\]]*]/gi, '');
+        return /[dhmsy]/i.test(s) && !/[#$?]/.test(s);
     }
 
     function readXfs(stylesDoc, customNumFmts) {
@@ -776,8 +849,7 @@
         function parseOneXf(x) {
             var fmtId = parseInt(x.getAttribute('numFmtId'), 10) || 0;
             var fmtCode = customNumFmts[fmtId] || BUILTIN_NUM_FMTS[fmtId] || '';
-            var isDate = BUILTIN_DATE_FMTS.has(fmtId)
-                || /[dhmsy]/i.test(fmtCode) && !/[#$?]/.test(fmtCode);
+            var isDate = BUILTIN_DATE_FMTS.has(fmtId) || isDateFormatCode(fmtCode);
             return Object.assign({
                 fontId: parseInt(x.getAttribute('fontId'), 10) || 0,
                 fillId: parseInt(x.getAttribute('fillId'), 10) || 0,
@@ -811,7 +883,8 @@
                     horizontal: x.horizontal,
                     vertical: x.vertical,
                     wrap: x.wrapText,
-                    indent: x.indent || 0
+                    indent: x.indent || 0,
+                    textRotation: x.textRotation || 0
                 },
                 numFmtCode: x.numFmtCode,
                 isDate: x.isDate
@@ -1047,11 +1120,12 @@
     function readSheet(doc, sharedStrings) {
         var rows = [];
         var cellStyles = [];
+        var rowStyles = [];
+        var formulas = [];
+        var sharedF = { masters: Object.create(null), chars: 0 };
         var rowEls = getAll(doc, 'row');
         var cellCount = 0;
         var truncated = false;
-        var XL_MAX_ROWS = 1048576;
-        var XL_MAX_COLS = 16384;
 
         for (var r = 0; r < rowEls.length; r++) {
             var rowEl = rowEls[r];
@@ -1069,6 +1143,8 @@
             while (rows.length < rIdx) {
                 rows.push([]);
                 cellStyles.push([]);
+                rowStyles.push(0);
+                formulas.push(null);
             }
             var rowDefaultStyleAttr = rowEl.getAttribute('s');
             var rowDefaultStyle = rowDefaultStyleAttr ? parseInt(rowDefaultStyleAttr, 10) || 0 : 0;
@@ -1076,6 +1152,7 @@
             var fillStyle = rowCustomFormat ? rowDefaultStyle : 0;
             var row = [];
             var styles = [];
+            var frow = null;
             var cells = getAll(rowEl, 'c');
             for (var c = 0; c < cells.length; c++) {
                 var cell = cells[c];
@@ -1095,6 +1172,7 @@
                 var styleIdx = styleIdxAttr ? parseInt(styleIdxAttr, 10) : rowDefaultStyle;
                 row.push(parseCellValue(cell, type, sharedStrings));
                 styles.push(styleIdx || 0);
+                frow = storeCellFormula(frow, cell, rIdx, colIdx, sharedF);
                 cellCount++;
                 if (cellCount >= MAX_CELLS_PER_SHEET) {
                     truncated = true;
@@ -1103,11 +1181,65 @@
             }
             rows.push(row);
             cellStyles.push(styles);
+            rowStyles.push(fillStyle);
+            formulas.push(frow);
             if (truncated) {
                 break;
             }
         }
-        return { rows, cellStyles, truncated };
+        return { rows, cellStyles, rowStyles, formulas, truncated };
+    }
+
+    var MAX_FORMULA_LEN = 8192;
+    var MAX_SHEET_FORMULA_CHARS = 4 * 1024 * 1024;
+    var XL_FN_PREFIX_RE = /("[^"]*(?:""[^"]*)*"?|'[^']*(?:''[^']*)*'?)|(^|[^\w.])(?:_xl(?:fn|ws|udf|pm)\.)+/g;
+
+    // Stores a cell's formula (when present) into the lazily-allocated per-row
+    // sparse array, returning the (possibly newly-created) array.
+    function storeCellFormula(frow, cell, rIdx, colIdx, sharedF) {
+        var formulaText = readCellFormula(cell, rIdx, colIdx, sharedF);
+        if (!formulaText) {
+            return frow;
+        }
+        sharedF.chars += formulaText.length;
+        if (formulaText.length > MAX_FORMULA_LEN) {
+            return frow;
+        }
+        if (!frow) {
+            frow = [];
+        }
+        frow[colIdx] = formulaText;
+        return frow;
+    }
+
+    // Reads the <f> (formula) element of a cell, resolving shared-formula
+    // dependents against their master via relative-reference translation.
+    // Returns the formula text without a leading '=', or null when none.
+    function readCellFormula(cell, rIdx, colIdx, sharedF) {
+        var fEl = getOneDirect(cell, 'f');
+        if (!fEl || sharedF.chars > MAX_SHEET_FORMULA_CHARS) {
+            return null;
+        }
+        var text = fEl.textContent || '';
+        if (text.length > MAX_FORMULA_LEN) {
+            return null;
+        }
+        text = text.replace(XL_FN_PREFIX_RE, '$1$2');
+        if (fEl.getAttribute('t') === 'shared') {
+            var si = fEl.getAttribute('si');
+            if (text) {
+                if (si !== null) {
+                    sharedF.masters[si] = { formula: text, baseR: rIdx, baseC: colIdx };
+                }
+                return text;
+            }
+            if (si !== null && sharedF.masters[si]) {
+                var m = sharedF.masters[si];
+                return translateFormula(m.formula, rIdx - m.baseR, colIdx - m.baseC);
+            }
+            return null;
+        }
+        return text || null;
     }
 
     var MAX_MERGE_CELLS_TOTAL = 200000;
@@ -1147,12 +1279,18 @@
         return out;
     }
 
+    function isGridCell(row, col) {
+        return row >= 0 && row < XL_MAX_ROWS && col >= 0 && col < XL_MAX_COLS;
+    }
+
     function parseRef(ref) {
         var m = /^([A-Z]+)(\d+)$/.exec(ref);
         if (!m) {
             return null;
         }
-        return { col: colRefToIndex(m[1]), row: parseInt(m[2], 10) - 1 };
+        var col = colRefToIndex(m[1]);
+        var row = parseInt(m[2], 10) - 1;
+        return isGridCell(row, col) ? { col, row } : null;
     }
 
     function readColWidths(doc) {
@@ -1184,7 +1322,7 @@
         for (var i = 0; i < rows.length; i++) {
             var r = parseInt(rows[i].getAttribute('r'), 10);
             var ht = parseFloat(rows[i].getAttribute('ht'));
-            if (!isNaN(ht) && r) {
+            if (!isNaN(ht) && r > 0 && r <= XL_MAX_ROWS) {
                 out[r - 1] = ht;
             }
         }
@@ -1317,6 +1455,8 @@
             name,
             rows: [],
             cellStyles: [],
+            rowStyles: [],
+            formulas: [],
             merges: [],
             colWidths: [],
             rowHeights: [],
@@ -1353,7 +1493,14 @@
         if (!ctx) {
             return sheet;
         }
-        var caps = { cellsTotal: 0, mergeRemaining: 500000, hyperlinkRemaining: 500000 };
+        var caps = { cellsTotal: 0, mergeRemaining: 500000, hyperlinkRemaining: 500000,
+                     sheetRowsByName: Object.create(null) };
+        for (var si = 0; si < workbook.sheets.length; si++) {
+            var sh = workbook.sheets[si];
+            if (sh && sh.rows && !sh.__lazy) {
+                caps.sheetRowsByName[sh.name] = sh.rows;
+            }
+        }
         var sheetDoc = await readXml(ctx.zip, sheet.__lazyPath);
         var built = await buildSheetEntry(ctx.zip, sheetDoc, sheet.__lazyPath, sheet.name,
                                           ctx.sharedStrings, ctx.themeColors, caps);
@@ -1369,7 +1516,7 @@
         var merges = readMerges(sheetDoc, caps.mergeRemaining);
         caps.mergeRemaining -= merges._consumed || 0;
         var sheetFmt = readSheetFormat(sheetDoc);
-        var drawingsRes = await readDrawingsForSheet(zip, path, parsed.rows, themeColors);
+        var drawingsRes = await readDrawingsForSheet(zip, path, parsed.rows, themeColors, caps.sheetRowsByName);
         var sheetHyperlinkRels = await readSheetHyperlinkRels(zip, path);
         var hyperlinks = readHyperlinks(sheetDoc, sheetHyperlinkRels, caps.hyperlinkRemaining);
         caps.hyperlinkRemaining -= hyperlinks._consumed || 0;
@@ -1392,6 +1539,8 @@
             name,
             rows: parsed.rows,
             cellStyles: parsed.cellStyles,
+            rowStyles: parsed.rowStyles,
+            formulas: parsed.formulas,
             merges,
             colWidths: readColWidths(sheetDoc),
             rowHeights: readRowHeights(sheetDoc),
@@ -1401,7 +1550,7 @@
             showGridLines: readSheetShowGridLines(sheetDoc),
             charts: drawingsRes.charts,
             drawings: drawingsRes.drawings,
-            conditionalFormatting: readConditionalFormatting(sheetDoc),
+            conditionalFormatting: readConditionalFormatting(sheetDoc, themeColors),
             hyperlinks,
             truncated: parsed.truncated,
             __sheetPath: path
@@ -1419,6 +1568,9 @@
         }
         var sharedStrings = await loadSharedStrings(zip);
         var stylesResult = await readStylesAndTheme(zip);
+        var wbPr = getOne(workbookDoc, 'workbookPr');
+        var d1904 = wbPr && wbPr.getAttribute('date1904');
+        var date1904 = d1904 === '1' || d1904 === 'true';
         var sheetEls = workbookDoc.getElementsByTagName('sheet');
         var MAX_SHEETS = 256;
         var MAX_CELLS_PER_WORKBOOK = 250000;
@@ -1426,7 +1578,8 @@
         var caps = {
             cellsTotal: 0,
             mergeRemaining: 500000,
-            hyperlinkRemaining: 500000
+            hyperlinkRemaining: 500000,
+            sheetRowsByName: Object.create(null)
         };
         var sheetLimit = Math.min(sheetEls.length, MAX_SHEETS);
         for (var s = 0; s < sheetLimit; s++) {
@@ -1443,12 +1596,15 @@
                 continue;
             }
             var sheetDoc = await readXml(zip, path);
-            sheets.push(await buildSheetEntry(zip, sheetDoc, path, name,
-                                              sharedStrings, stylesResult.themeColors, caps));
+            var built = await buildSheetEntry(zip, sheetDoc, path, name,
+                                              sharedStrings, stylesResult.themeColors, caps);
+            sheets.push(built);
+            caps.sheetRowsByName[name] = built.rows;
         }
         await resolveSlicerItems(zip, sheets);
         for (var si = 0; si < sheets.length; si++) {
             delete sheets[si].__sheetPath;
+            sheets[si].date1904 = date1904;
         }
         return {
             sheets,
@@ -1456,6 +1612,7 @@
             dxfs: stylesResult.dxfs || [],
             tableStyles: stylesResult.tableStyles || {},
             defaultFont: stylesResult.defaultFont || null,
+            date1904,
             __lazyCtx: { zip, sharedStrings, themeColors: stylesResult.themeColors }
         };
     }
@@ -1681,6 +1838,15 @@
         return out;
     }
 
+    function readTableColumnNames(tableEl) {
+        var colEls = getAll(tableEl, 'tableColumn');
+        var names = [];
+        for (var i = 0; i < colEls.length; i++) {
+            names.push(colEls[i].getAttribute('name') || '');
+        }
+        return names;
+    }
+
     function buildTablePartEntry(tableEl, rng) {
         var styleInfoEl = getOne(tableEl, 'tableStyleInfo');
         return {
@@ -1688,6 +1854,8 @@
             c1: rng.c1,
             r2: rng.r2,
             c2: rng.c2,
+            name: tableEl.getAttribute('displayName') || tableEl.getAttribute('name') || '',
+            columns: readTableColumnNames(tableEl),
             headerRowCount: parseInt(tableEl.getAttribute('headerRowCount') || '1', 10),
             totalsRowCount: parseInt(tableEl.getAttribute('totalsRowCount') || '0', 10),
             styleName: styleInfoEl ? styleInfoEl.getAttribute('name') || '' : '',
@@ -1774,7 +1942,9 @@
         if (!m) {
             return null;
         }
-        return { c: colRefToIndex(m[1]), r: parseInt(m[2], 10) - 1 };
+        var c = colRefToIndex(m[1]);
+        var r = parseInt(m[2], 10) - 1;
+        return isGridCell(r, c) ? { c, r } : null;
     }
 
     function readCfSqref(cfEl) {
@@ -1827,7 +1997,49 @@
         };
     }
 
-    function readCfRule(ruleEl) {
+    function readCfvo(el) {
+        return {
+            type: el.getAttribute('type') || 'percentile',
+            val: el.getAttribute('val') || ''
+        };
+    }
+
+    function readCfColorScale(el, themeColors) {
+        if (!el) {
+            return null;
+        }
+        var cfvos = getAll(el, 'cfvo');
+        var colors = getAll(el, 'color');
+        var n = Math.min(cfvos.length, colors.length, 8);
+        if (n < 2) {
+            return null;
+        }
+        var stops = [];
+        for (var i = 0; i < n; i++) {
+            var stop = readCfvo(cfvos[i]);
+            stop.color = resolveColor(colors[i], themeColors);
+            stops.push(stop);
+        }
+        return stops;
+    }
+
+    function readCfDataBar(el, themeColors) {
+        if (!el) {
+            return null;
+        }
+        var cfvos = getAll(el, 'cfvo');
+        if (cfvos.length < 2) {
+            return null;
+        }
+        return {
+            min: readCfvo(cfvos[0]),
+            max: readCfvo(cfvos[1]),
+            color: resolveColor(getOne(el, 'color'), themeColors) || '#638EC6',
+            showValue: el.getAttribute('showValue') !== '0'
+        };
+    }
+
+    function readCfRule(ruleEl, themeColors) {
         var MAX_CF_FORMULAS_PER_RULE = 4;
         var MAX_CF_FORMULA_LEN = 4096;
         var dxfIdAttr = ruleEl.getAttribute('dxfId');
@@ -1849,16 +2061,19 @@
             priority: parseInt(ruleEl.getAttribute('priority'), 10) || 0,
             formulas,
             iconSet: readCfIconSet(getOne(ruleEl, 'iconSet')),
+            colorScale: readCfColorScale(getOneDirect(ruleEl, 'colorScale'), themeColors),
+            dataBar: readCfDataBar(getOneDirect(ruleEl, 'dataBar'), themeColors),
             stopIfTrue: ruleEl.getAttribute('stopIfTrue') === '1'
         };
     }
 
-    function readConditionalFormatting(sheetDoc) {
+    function readConditionalFormatting(sheetDoc, themeColors) {
         var out = [];
         var cfs = getAll(sheetDoc, 'conditionalFormatting');
         var MAX_CF_BLOCKS_PER_SHEET = 256;
         var MAX_CF_RULES_PER_BLOCK = 64;
         var blockLimit = Math.min(cfs.length, MAX_CF_BLOCKS_PER_SHEET);
+        var x14Ids = new Set();
         for (var i = 0; i < blockLimit; i++) {
             var ranges = parseSqref(readCfSqref(cfs[i]));
             if (!ranges.length) {
@@ -1868,7 +2083,15 @@
             var rules = [];
             var ruleLimit = Math.min(ruleEls.length, MAX_CF_RULES_PER_BLOCK);
             for (var j = 0; j < ruleLimit; j++) {
-                rules.push(readCfRule(ruleEls[j]));
+                var x14IdEl = getOne(ruleEls[j], 'id');
+                if (x14IdEl) {
+                    x14Ids.add(x14IdEl.textContent);
+                }
+                else if (x14Ids.has(ruleEls[j].getAttribute('id'))) {
+                    // x14 extension of a main data bar rule; keep the main rule's colour
+                    continue;
+                }
+                rules.push(readCfRule(ruleEls[j], themeColors));
             }
             rules.sort((a, b) => a.priority - b.priority);
             out.push({ ranges, rules });
@@ -1971,6 +2194,90 @@
         return out;
     }
 
+    function applyDrawingColorTransforms(hex, colorEl) {
+        var out = safeHex(hex);
+        if (!out || !colorEl) {
+            return out;
+        }
+        var tintEl = getOne(colorEl, 'tint');
+        var shadeEl = getOne(colorEl, 'shade');
+        if (tintEl) {
+            out = applyTint(out, 1 - parseInt(tintEl.getAttribute('val'), 10) / 100000);
+        }
+        if (shadeEl) {
+            var shade = parseInt(shadeEl.getAttribute('val'), 10) / 100000;
+            out = applyTint(out, -(1 - shade));
+        }
+        var lumModEl = getOne(colorEl, 'lumMod');
+        var lumOffEl = getOne(colorEl, 'lumOff');
+        if (!lumModEl && !lumOffEl) {
+            return out;
+        }
+        var mod = lumModEl ? parseInt(lumModEl.getAttribute('val'), 10) / 100000 : 1;
+        var off = lumOffEl ? parseInt(lumOffEl.getAttribute('val'), 10) / 100000 : 0;
+        var r = parseInt(out.slice(0, 2), 16) / 255;
+        var g = parseInt(out.slice(2, 4), 16) / 255;
+        var b = parseInt(out.slice(4, 6), 16) / 255;
+        var max = Math.max(r, g, b);
+        var min = Math.min(r, g, b);
+        var d = max - min;
+        var currentLum = (max + min) / 2;
+        var targetLum = Math.max(0, Math.min(1, currentLum * mod + off));
+        if (isNaN(targetLum)) {
+            return out;
+        }
+        var sat = d ? d / (1 - Math.abs(2 * currentLum - 1)) : 0;
+        var hue = 0;
+        if (d) {
+            hue = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+        }
+        var halfChroma = sat * Math.min(targetLum, 1 - targetLum);
+        var channel = function(n) {
+            var k = (n + hue * 2) % 12;
+            return hex2(255 * (targetLum - halfChroma * Math.max(-1, Math.min(k - 3, 9 - k, 1))));
+        };
+        return channel(0) + channel(8) + channel(4);
+    }
+
+    function resolveDrawingColorNode(colorEl, themeColors) {
+        if (!colorEl) {
+            return '';
+        }
+        if (colorEl.localName === 'schemeClr') {
+            return resolveSchemeClr(colorEl, themeColors);
+        }
+        var safe = safeHex(colorEl.getAttribute('val'));
+        if (!safe) {
+            return '';
+        }
+        var transformed = applyDrawingColorTransforms(safe, colorEl);
+        return transformed ? `#${transformed}` : '';
+    }
+
+    function resolveDrawingFillColor(fillEl, themeColors) {
+        if (!fillEl) {
+            return '';
+        }
+        return resolveDrawingColorNode(
+            getOne(fillEl, 'srgbClr') || getOne(fillEl, 'schemeClr'),
+            themeColors
+        );
+    }
+
+    function readDrawingFillOpacity(fillEl) {
+        if (!fillEl) {
+            return null;
+        }
+        var colorEl = getOne(fillEl, 'srgbClr') || getOne(fillEl, 'schemeClr') || getOne(fillEl, 'sysClr') ||
+            getOne(fillEl, 'prstClr') || getOne(fillEl, 'scrgbClr') || getOne(fillEl, 'hslClr');
+        var alphaEl = colorEl && getOne(colorEl, 'alpha');
+        if (!alphaEl) {
+            return null;
+        }
+        var value = parseInt(alphaEl.getAttribute('val'), 10);
+        return isNaN(value) ? null : Math.max(0, Math.min(1, value / 100000));
+    }
+
     function readLineProps(spPr, themeColors) {
         if (!spPr) {
             return null;
@@ -1984,20 +2291,7 @@
         }
         var wRaw = parseInt(ln.getAttribute('w'), 10);
         var solid = getOne(ln, 'solidFill');
-        var color = '';
-        if (solid) {
-            var srgb = getOne(solid, 'srgbClr');
-            if (srgb) {
-                var _safe = safeHex(srgb.getAttribute('val'));
-                color = _safe ? `#${_safe}` : '';
-            }
-            else {
-                var scheme = getOne(solid, 'schemeClr');
-                if (scheme) {
-                    color = resolveSchemeClr(scheme, themeColors);
-                }
-            }
-        }
+        var color = resolveDrawingFillColor(solid, themeColors);
         var prst = getOne(ln, 'prstDash');
         return {
             color,
@@ -2013,10 +2307,12 @@
         var symEl = getOne(markerEl, 'symbol');
         var sizeEl = getOne(markerEl, 'size');
         var spPr = getOne(markerEl, 'spPr');
+        var fill = spPr && getOne(spPr, 'solidFill');
         return {
             symbol: symEl ? symEl.getAttribute('val') : 'auto',
             size: sizeEl ? parseInt(sizeEl.getAttribute('val'), 10) || 5 : 5,
             color: readSpPrColor(spPr, themeColors),
+            opacity: readDrawingFillOpacity(fill),
             line: readLineProps(spPr, themeColors)
         };
     }
@@ -2109,23 +2405,12 @@
             return null;
         }
         var szRaw = parseInt(rPr.getAttribute('sz'), 10);
-        var bold = rPr.getAttribute('b') === '1';
-        var italic = rPr.getAttribute('i') === '1';
+        var boldRaw = rPr.getAttribute('b');
+        var italicRaw = rPr.getAttribute('i');
+        var bold = boldRaw === null ? null : boldRaw === '1' || boldRaw === 'true';
+        var italic = italicRaw === null ? null : italicRaw === '1' || italicRaw === 'true';
         var solid = getOne(rPr, 'solidFill');
-        var color = '';
-        if (solid) {
-            var srgb = getOne(solid, 'srgbClr');
-            if (srgb) {
-                var _safe = safeHex(srgb.getAttribute('val'));
-                color = _safe ? `#${_safe}` : '';
-            }
-            else {
-                var scheme = getOne(solid, 'schemeClr');
-                if (scheme) {
-                    color = resolveSchemeClr(scheme, themeColors);
-                }
-            }
-        }
+        var color = resolveDrawingFillColor(solid, themeColors);
         var latin = getOne(rPr, 'latin');
         return {
             size: isNaN(szRaw) ? null : szRaw / 100,
@@ -2210,7 +2495,7 @@
             text,
             font,
             layout: readChartTitleLayout(titleEl),
-            overlay: overlayEl && readBool(overlayEl, false)
+            overlay: overlayEl ? readBool(overlayEl, false) : false
         };
     }
 
@@ -2237,16 +2522,16 @@
         var orientationEl = getOne(scaling, 'orientation');
         var logBaseEl = getOne(scaling, 'logBase');
         return {
-            min: minEl ? parseFloat(minEl.getAttribute('val')) : null,
-            max: maxEl ? parseFloat(maxEl.getAttribute('val')) : null,
+            min: minEl ? readChartNumberOption(scaling, 'min', null, false) : null,
+            max: maxEl ? readChartNumberOption(scaling, 'max', null, false) : null,
             reversed: orientationEl && orientationEl.getAttribute('val') === 'maxMin',
-            logBase: logBaseEl ? parseFloat(logBaseEl.getAttribute('val')) : null
+            logBase: logBaseEl ? readChartNumberOption(scaling, 'logBase', null, false) : null
         };
     }
 
     function readAxisGridlines(majorGrid, minorGrid, themeColors) {
-        var DEFAULT_MAJOR = { color: '#d9d9d9', width: 0.75, dash: 'solid' };
-        var DEFAULT_MINOR = { color: '#f0f0f0', width: 0.5, dash: 'solid' };
+        var DEFAULT_MAJOR = { color: '#000000', width: 1, dash: 'solid' };
+        var DEFAULT_MINOR = { color: '#d9d9d9', width: 0.75, dash: 'solid' };
         return {
             majorGridlines: majorGrid
                 ? { line: readLineProps(getOne(majorGrid, 'spPr'), themeColors) || DEFAULT_MAJOR }
@@ -2290,19 +2575,24 @@
         var majorTickEl = getOne(axEl, 'majorTickMark');
         var minorTickEl = getOne(axEl, 'minorTickMark');
         var labelPosEl = getOne(axEl, 'tickLblPos');
-        var spPr = getOne(axEl, 'spPr');
+        var spPr = getOneDirect(axEl, 'spPr');
+        var majorTick = majorTickEl ? majorTickEl.getAttribute('val') : 'out';
+        var minorTick = minorTickEl ? minorTickEl.getAttribute('val') : 'none';
+        var inferredHidden = !delEl && !labelPosEl && !spPr
+            && majorTick === 'none' && minorTick === 'none';
         return {
-            hidden: delEl && readBool(delEl, false),
+            hidden: delEl ? readBool(delEl, false) : inferredHidden,
+            deleted: !!delEl && readBool(delEl, false),
             title: readChartTitleEl(titleEl, themeColors),
             min: scaling.min,
             max: scaling.max,
             reversed: scaling.reversed,
             logBase: scaling.logBase,
-            majorUnit: majorUnitEl ? parseFloat(majorUnitEl.getAttribute('val')) : null,
-            minorUnit: minorUnitEl ? parseFloat(minorUnitEl.getAttribute('val')) : null,
+            majorUnit: majorUnitEl ? readChartNumberOption(axEl, 'majorUnit', null, false) : null,
+            minorUnit: minorUnitEl ? readChartNumberOption(axEl, 'minorUnit', null, false) : null,
             numFmt: numFmtEl ? (numFmtEl.getAttribute('formatCode') || '').slice(0, MAX_NUM_FMT_LEN) : '',
-            majorTick: majorTickEl ? majorTickEl.getAttribute('val') : 'out',
-            minorTick: minorTickEl ? minorTickEl.getAttribute('val') : 'none',
+            majorTick,
+            minorTick,
             labelPos: labelPosEl ? labelPosEl.getAttribute('val') : 'nextTo',
             line: readLineProps(spPr, themeColors),
             labelFont: labelOpts.labelFont,
@@ -2321,22 +2611,10 @@
             return { color: '', line: readLineProps(spPr, themeColors) };
         }
         var solid = getOne(spPr, 'solidFill');
-        var color = '';
-        if (solid) {
-            var srgb = getOne(solid, 'srgbClr');
-            if (srgb) {
-                var _safe = safeHex(srgb.getAttribute('val'));
-                color = _safe ? `#${_safe}` : '';
-            }
-            else {
-                var scheme = getOne(solid, 'schemeClr');
-                if (scheme) {
-                    color = resolveSchemeClr(scheme, themeColors);
-                }
-            }
-        }
+        var color = resolveDrawingFillColor(solid, themeColors);
         return {
             color,
+            opacity: readDrawingFillOpacity(solid),
             line: readLineProps(spPr, themeColors)
         };
     }
@@ -2444,6 +2722,29 @@
         return [];
     }
 
+    function readSeriesSizes(ser, resolveRef) {
+        var sizeEl = getOne(ser, 'bubbleSize');
+        if (!sizeEl) {
+            return [];
+        }
+        var numRef = getOne(sizeEl, 'numRef');
+        if (numRef) {
+            var cached = readCachedPts(getOne(numRef, 'numCache'), true);
+            if (cached) {
+                return cached;
+            }
+            var f = getOne(numRef, 'f');
+            if (f) {
+                return resolveRef(f.textContent).map((v) => {
+                    var n = parseFloat(v);
+                    return isNaN(n) ? 0 : n;
+                });
+            }
+        }
+        var numLit = getOne(sizeEl, 'numLit');
+        return numLit && readCachedPts(numLit, true) || [];
+    }
+
     function readSeriesNumFmt(ser) {
         var valEl = getOne(ser, 'val') || getOne(ser, 'yVal');
         if (!valEl) {
@@ -2499,6 +2800,31 @@
         return null;
     }
 
+    // Captures the source-range formulas (e.g. "Sheet1!$G$2:$G$6") behind a series'
+    // values, categories and name, so a selected chart can highlight its data cells.
+    function readSeriesRefs(ser) {
+        var refs = { val: null, cat: null, name: null };
+        var valEl = getOne(ser, 'val') || getOne(ser, 'yVal');
+        var valNumRef = valEl ? getOne(valEl, 'numRef') : null;
+        var vf = valNumRef ? getOne(valNumRef, 'f') : null;
+        if (vf) {
+            refs.val = vf.textContent;
+        }
+        var catEl = getOne(ser, 'cat') || getOne(ser, 'xVal');
+        var catRefEl = catEl ? getOne(catEl, 'strRef') || getOne(catEl, 'numRef') : null;
+        var cf = catRefEl ? getOne(catRefEl, 'f') : null;
+        if (cf) {
+            refs.cat = cf.textContent;
+        }
+        var tx = getOne(ser, 'tx');
+        var nameRefEl = tx ? getOne(tx, 'strRef') : null;
+        var nf = nameRefEl ? getOne(nameRefEl, 'f') : null;
+        if (nf) {
+            refs.name = nf.textContent;
+        }
+        return refs;
+    }
+
     function readSpPrColor(spPr, themeColors) {
         if (!spPr) {
             return '';
@@ -2512,16 +2838,7 @@
             if (!container) {
                 return '';
             }
-            var s = getOne(container, 'srgbClr');
-            if (s) {
-                var h = safeHex(s.getAttribute('val'));
-                return h ? `#${h}` : '';
-            }
-            var sc = getOne(container, 'schemeClr');
-            if (sc) {
-                return resolveSchemeClr(sc, themeColors);
-            }
-            return '';
+            return resolveDrawingFillColor(container, themeColors);
         };
         if (solid) {
             return pickFromContainer(solid);
@@ -2558,28 +2875,7 @@
             idx = pairSwap[idx];
         }
         var hex = themeColors[idx] || DEFAULT_THEME[idx] || '000000';
-        var tintEl = getOne(scheme, 'tint');
-        var shadeEl = getOne(scheme, 'shade');
-        var lumModEl = getOne(scheme, 'lumMod');
-        var lumOffEl = getOne(scheme, 'lumOff');
-        if (tintEl) {
-            hex = applyTint(hex, parseInt(tintEl.getAttribute('val'), 10) / 100000);
-        }
-        if (shadeEl) {
-            var shadeVal = parseInt(shadeEl.getAttribute('val'), 10) / 100000;
-            hex = applyTint(hex, -(1 - shadeVal));
-        }
-        if (lumModEl || lumOffEl) {
-            var mod = lumModEl ? parseInt(lumModEl.getAttribute('val'), 10) / 100000 : 1;
-            var off = lumOffEl ? parseInt(lumOffEl.getAttribute('val'), 10) / 100000 : 0;
-            if (off > 0) {
-                hex = applyTint(hex, off);
-            }
-            else if (mod < 1) {
-                var factor = Math.pow(mod, 2.5);
-                hex = applyTint(hex, -(1 - factor));
-            }
-        }
+        hex = applyDrawingColorTransforms(hex, scheme);
         var safe = safeHex(hex);
         return safe ? `#${safe}` : '';
     }
@@ -2636,6 +2932,7 @@
         var series = getAll(el, 'ser');
         var seriesOut = [];
         var categories = null;
+        var categoryRef = null;
         var seriesLimit = Math.min(series.length, MAX_CHART_SERIES);
         for (var si = 0; si < seriesLimit; si++) {
             var ser = series[si];
@@ -2650,10 +2947,28 @@
                     categories.length = MAX_CHART_POINTS;
                 }
             }
+            var xData = readSeriesCategories(ser, resolveRef);
+            if (xData && xData.length > MAX_CHART_POINTS) {
+                xData.length = MAX_CHART_POINTS;
+            }
+            var refs = readSeriesRefs(ser);
+            var orderEl = getOne(ser, 'order');
+            if (!categoryRef && refs.cat) {
+                categoryRef = refs.cat;
+            }
             var advanced = readSeriesAdvanced(ser, themeColors);
             advanced.name = name || `Series ${  si + 1}`;
+            advanced.plotOrder = orderEl
+                ? parseInt(orderEl.getAttribute('val'), 10) : si;
             advanced.data = data;
+            advanced.xData = xData || [];
+            advanced.sizeData = readSeriesSizes(ser, resolveRef);
+            if (advanced.sizeData.length > MAX_CHART_POINTS) {
+                advanced.sizeData.length = MAX_CHART_POINTS;
+            }
             advanced.valueNumFmt = readSeriesNumFmt(ser);
+            advanced.valueRef = refs.val;
+            advanced.nameRef = refs.name;
             seriesOut.push(advanced);
         }
         if (!categories) {
@@ -2663,33 +2978,41 @@
                 categories.push(String(k + 1));
             }
         }
-        return { series: seriesOut, categories };
+        return { series: seriesOut, categories, categoryRef };
     }
 
     function readChartGroupOptions(el) {
         var grouping = getOne(el, 'grouping');
         var barDir = getOne(el, 'barDir');
-        var gapWidth = getOne(el, 'gapWidth');
-        var overlap = getOne(el, 'overlap');
         var varyColors = getOne(el, 'varyColors');
-        var holeSize = getOne(el, 'holeSize');
-        var firstSliceAng = getOne(el, 'firstSliceAng');
+        var scatterStyle = getOne(el, 'scatterStyle');
         return {
             grouping: grouping ? grouping.getAttribute('val') : 'standard',
             barDirection: barDir ? barDir.getAttribute('val') : 'col',
-            gapWidth: gapWidth ? parseInt(gapWidth.getAttribute('val'), 10) : 150,
-            overlap: overlap ? parseInt(overlap.getAttribute('val'), 10) : -27,
-            varyColors: varyColors ? readBool(varyColors, false) : false,
-            holeSize: holeSize ? parseInt(holeSize.getAttribute('val'), 10) : 50,
-            firstSliceAng: firstSliceAng ? parseInt(firstSliceAng.getAttribute('val'), 10) : 0
+            gapWidth: readChartNumberOption(el, 'gapWidth', 150, true),
+            gapDepth: readChartNumberOption(el, 'gapDepth', 150, true),
+            overlap: readChartNumberOption(el, 'overlap', 0, true),
+            varyColors: varyColors ? readBool(varyColors, false) : null,
+            holeSize: readChartNumberOption(el, 'holeSize', 50, true),
+            firstSliceAng: readChartNumberOption(el, 'firstSliceAng', 0, true),
+            scatterStyle: scatterStyle ? scatterStyle.getAttribute('val') || 'marker' : 'marker'
         };
+    }
+
+    function resolveVaryColors(explicit, type, seriesCount) {
+        if (explicit !== null && explicit !== undefined) {
+            return explicit;
+        }
+        return type === 'ofPie' || seriesCount === 1
+            && (type === 'bar' || type === 'pie' || type === 'doughnut' || type === 'bubble');
     }
 
     var MAX_CHART_ELS = 16;
     function collectChartElements(doc) {
         var typeNames = ['barChart', 'lineChart', 'pieChart', 'doughnutChart',
                          'areaChart', 'bar3DChart', 'line3DChart', 'pie3DChart', 'area3DChart',
-                         'ofPieChart', 'scatterChart', 'radarChart'];
+                         'ofPieChart', 'scatterChart', 'radarChart',
+                         'bubbleChart', 'stockChart', 'surfaceChart', 'surface3DChart'];
         var chartEls = [];
         for (var t = 0; t < typeNames.length && chartEls.length < MAX_CHART_ELS; t++) {
             var found = getAll(doc, typeNames[t]);
@@ -2713,9 +3036,9 @@
         return title;
     }
 
-    function collectAxisIds(catAxes, valAxes, dateAxes) {
+    function collectAxisIds(catAxes, valAxes, dateAxes, serAxes) {
         var axisById = Object.create(null);
-        var groups = [catAxes, valAxes, dateAxes];
+        var groups = [catAxes, valAxes, dateAxes, serAxes];
         for (var g = 0; g < groups.length; g++) {
             for (var i = 0; i < groups[g].length; i++) {
                 var ce = getOne(groups[g][i], 'axId');
@@ -2731,6 +3054,7 @@
         var catAxes = plotArea ? getAll(plotArea, 'catAx') : [];
         var valAxes = plotArea ? getAll(plotArea, 'valAx') : [];
         var dateAxes = plotArea ? getAll(plotArea, 'dateAx') : [];
+        var serAxes = plotArea ? getAll(plotArea, 'serAx') : [];
         function pickAxisByPos(els, pos) {
             for (var ai = 0; ai < els.length; ai++) {
                 var posEl = getOne(els[ai], 'axPos');
@@ -2742,17 +3066,45 @@
         }
         var primaryValEl = pickAxisByPos(valAxes, 'l') || valAxes[0] || null;
         var secondaryValEl = pickAxisByPos(valAxes, 'r');
+        var horizontalValEl = pickAxisByPos(valAxes, 'b') || pickAxisByPos(valAxes, 't');
         if (secondaryValEl === primaryValEl) {
             secondaryValEl = null;
+        }
+        if (horizontalValEl === primaryValEl || horizontalValEl === secondaryValEl) {
+            horizontalValEl = null;
         }
         var secondaryAxIdEl = secondaryValEl && getOne(secondaryValEl, 'axId');
         return {
             catAxis: readAxisProps(catAxes[0] || dateAxes[0], themeColors),
             valAxis: readAxisProps(primaryValEl, themeColors),
             valAxis2: readAxisProps(secondaryValEl, themeColors),
+            xValAxis: readAxisProps(horizontalValEl, themeColors),
+            serAxis: readAxisProps(serAxes[0], themeColors),
             secondaryValAxId: secondaryAxIdEl ? secondaryAxIdEl.getAttribute('val') : null,
-            axisById: collectAxisIds(catAxes, valAxes, dateAxes)
+            axisById: collectAxisIds(catAxes, valAxes, dateAxes, serAxes)
         };
+    }
+
+    // Gathers the distinct source-range formulas a chart draws from (category axis
+    // plus each series' values and name), preserving order so the renderer can colour
+    // them consistently. These drive the range-finder highlight when a chart is picked.
+    function collectChartSourceRefs(chart) {
+        var out = [];
+        var seen = Object.create(null);
+        var add = function(kind, ref) {
+            if (!ref || seen[ref]) {
+                return;
+            }
+            seen[ref] = 1;
+            out.push({ kind, ref });
+        };
+        add('cat', chart.categoryRef);
+        var series = chart.series || [];
+        for (var i = 0; i < series.length; i++) {
+            add('val', series[i].valueRef);
+            add('name', series[i].nameRef);
+        }
+        return out;
     }
 
     function parseChartXml(doc, sheetRowsByName, currentSheetRows, themeColors) {
@@ -2771,6 +3123,13 @@
         var chartBackground = readBackground(getOneDirect(doc.documentElement, 'spPr'), themeColors);
         var plotBackground = readBackground(plotArea ? getOneDirect(plotArea, 'spPr') : null, themeColors);
         var view3DInfo = readView3D(getOne(doc, 'view3D'));
+        var styleEl = getOneDirect(doc.documentElement, 'style');
+        var altEls = getAllDirect(doc.documentElement, 'AlternateContent');
+        for (var ae = 0; ae < altEls.length && !styleEl; ae++) {
+            var fallbackEl = getOneDirect(altEls[ae], 'Fallback');
+            styleEl = fallbackEl && getOneDirect(fallbackEl, 'style');
+        }
+        var roundedCornersEl = getOne(doc, 'roundedCorners');
         var resolveRef = function(refStr) {
             var range = parseCellRangeRef(refStr);
             if (!range) {
@@ -2782,6 +3141,8 @@
         };
         var sharedCtx = Object.assign({
             title, legend, chartBackground, plotBackground, view3DInfo, plotLayout,
+            chartStyle: styleEl ? parseInt(styleEl.getAttribute('val'), 10) || null : null,
+            roundedCorners: roundedCornersEl ? readBool(roundedCornersEl, false) : null,
             themeColors, resolveRef
         }, axes);
         var cartesianTypes = { barChart: 1, lineChart: 1, areaChart: 1,
@@ -2797,6 +3158,9 @@
         }
         for (var si = 0; si < standaloneEntries.length; si++) {
             out.push(buildChartObject(standaloneEntries[si], sharedCtx));
+        }
+        for (var oi = 0; oi < out.length; oi++) {
+            out[oi].sourceRefs = collectChartSourceRefs(out[oi]);
         }
         return out;
     }
@@ -2827,6 +3191,7 @@
         return {
             opts,
             categories: built.categories,
+            categoryRef: built.categoryRef,
             group: {
                 type: normalised,
                 series: built.series,
@@ -2839,15 +3204,16 @@
     function buildCartesianChartObject(entries, ctx) {
         var combinedSeries = [];
         var categories = null;
-        var firstOpts = null;
+        var categoryRef = null;
+        var firstOpts = readChartGroupOptions(entries[0].el);
         var seriesGroups = [];
         for (var i = 0; i < entries.length; i++) {
             var built = buildCartesianEntryGroup(entries[i], ctx, combinedSeries);
-            if (!firstOpts) {
-                firstOpts = built.opts;
-            }
             if (!categories && built.categories && built.categories.length) {
                 ({categories} = built);
+            }
+            if (!categoryRef && built.categoryRef) {
+                ({ categoryRef } = built);
             }
             seriesGroups.push(built.group);
         }
@@ -2862,48 +3228,121 @@
             catAxis: ctx.catAxis,
             valAxis: ctx.valAxis,
             valAxis2: ctx.valAxis2,
+            xValAxis: ctx.xValAxis,
+            serAxis: ctx.serAxis,
             chartBackground: ctx.chartBackground,
             plotBackground: ctx.plotBackground,
             view3D: ctx.view3DInfo,
+            chartStyle: ctx.chartStyle,
             plotLayout: ctx.plotLayout,
-            grouping: firstOpts ? firstOpts.grouping : 'standard',
-            barDirection: firstOpts ? firstOpts.barDirection : 'col',
-            gapWidth: firstOpts ? firstOpts.gapWidth : 150,
-            overlap: firstOpts ? firstOpts.overlap : -27,
-            varyColors: firstOpts ? firstOpts.varyColors : false,
-            holeSize: firstOpts ? firstOpts.holeSize : 50,
-            firstSliceAng: firstOpts ? firstOpts.firstSliceAng : 0,
+            roundedCorners: ctx.roundedCorners,
+            grouping: firstOpts.grouping,
+            barDirection: firstOpts.barDirection,
+            gapWidth: firstOpts.gapWidth,
+            gapDepth: firstOpts.gapDepth,
+            overlap: firstOpts.overlap,
+            varyColors: resolveVaryColors(firstOpts && firstOpts.varyColors,
+                                          entries.length > 1 ? 'combo' : primaryType, combinedSeries.length),
+            holeSize: firstOpts.holeSize,
+            firstSliceAng: firstOpts.firstSliceAng,
+            scatterStyle: firstOpts.scatterStyle,
             seriesGroups,
             series: combinedSeries,
-            categories: categories || []
+            categories: categories || [],
+            categoryRef
+        };
+    }
+
+    function readChartStringOption(el, name, fallback) {
+        var option = getOne(el, name);
+        return option && option.getAttribute('val') || fallback;
+    }
+
+    function readChartNumberOption(el, name, fallback, integer) {
+        var option = getOne(el, name);
+        if (!option) {
+            return fallback;
+        }
+        var value = integer
+            ? parseInt(option.getAttribute('val'), 10) : parseFloat(option.getAttribute('val'));
+        return Number.isFinite(value) ? value : fallback;
+    }
+
+    function readCustSplit(el) {
+        var pts = getAll(el, 'secondPiePt');
+        var out = new Set();
+        for (var i = 0; i < pts.length && i < MAX_CHART_POINTS; i++) {
+            out.add(parseInt(pts[i].getAttribute('val'), 10));
+        }
+        return out;
+    }
+
+    function readChartExtraOptions(el) {
+        var wireframeEl = getOne(el, 'wireframe');
+        var upDownBarsEl = getOne(el, 'upDownBars');
+        var upDownGapEl = upDownBarsEl && getOne(upDownBarsEl, 'gapWidth');
+        return {
+            radarStyle: readChartStringOption(el, 'radarStyle', 'marker'),
+            ofPieType: readChartStringOption(el, 'ofPieType', 'pie'),
+            splitType: readChartStringOption(el, 'splitType', 'auto'),
+            splitPos: readChartNumberOption(el, 'splitPos', 0, false),
+            custSplit: readCustSplit(el),
+            secondPieSize: readChartNumberOption(el, 'secondPieSize', 75, true),
+            upDownBars: !!upDownBarsEl,
+            upDownGapWidth: upDownGapEl
+                ? parseInt(upDownGapEl.getAttribute('val'), 10) || 150 : 150,
+            wireframe: wireframeEl ? readBool(wireframeEl, true) : false,
+            bubbleScale: readChartNumberOption(el, 'bubbleScale', 100, true),
+            sizeRepresents: readChartStringOption(el, 'sizeRepresents', 'area')
         };
     }
 
     function buildChartObject(entry, ctx) {
-        var built = readChartSeries(entry.el, ctx.resolveRef, ctx.themeColors);
+        var {
+            resolveRef, themeColors, axisById, xValAxis, valAxis, title, legend, catAxis, serAxis,
+            chartBackground, plotBackground, view3DInfo, chartStyle,
+            plotLayout, roundedCorners
+        } = ctx;
+        var built = readChartSeries(entry.el, resolveRef, themeColors);
         var opts = readChartGroupOptions(entry.el);
         var normalised = entry.type.replace('3DChart', '').replace('Chart', '');
-        return {
+        var entryAxIdEls = getAll(entry.el, 'axId');
+        var entryAxIds = [];
+        for (var ai = 0; ai < entryAxIdEls.length; ai++) {
+            entryAxIds.push(entryAxIdEls[ai].getAttribute('val'));
+        }
+        if ((normalised === 'bubble' || normalised === 'scatter') && entryAxIds.length >= 2) {
+            xValAxis = readAxisProps(axisById[entryAxIds[0]], themeColors);
+            valAxis = readAxisProps(axisById[entryAxIds[1]], themeColors);
+        }
+        return Object.assign(readChartExtraOptions(entry.el), {
             type: normalised,
             is3D: entry.type.includes('3D'),
-            title: ctx.title,
-            legend: ctx.legend,
-            catAxis: ctx.catAxis,
-            valAxis: ctx.valAxis,
-            chartBackground: ctx.chartBackground,
-            plotBackground: ctx.plotBackground,
-            view3D: ctx.view3DInfo,
-            plotLayout: ctx.plotLayout,
+            title,
+            legend,
+            catAxis,
+            valAxis,
+            xValAxis,
+            serAxis,
+            chartBackground,
+            plotBackground,
+            view3D: view3DInfo,
+            chartStyle,
+            plotLayout,
+            roundedCorners,
             grouping: opts.grouping,
             barDirection: opts.barDirection,
             gapWidth: opts.gapWidth,
+            gapDepth: opts.gapDepth,
             overlap: opts.overlap,
-            varyColors: opts.varyColors,
+            varyColors: resolveVaryColors(opts.varyColors, normalised, built.series.length),
             holeSize: opts.holeSize,
             firstSliceAng: opts.firstSliceAng,
+            scatterStyle: opts.scatterStyle,
             series: built.series,
-            categories: built.categories
-        };
+            categories: built.categories,
+            categoryRef: built.categoryRef
+        });
     }
 
     function readChartLayout(layoutEl) {
@@ -2933,19 +3372,18 @@
         if (!view3D) {
             return null;
         }
-        var rotXEl = getOne(view3D, 'rotX');
-        var rotYEl = getOne(view3D, 'rotY');
-        var depthEl = getOne(view3D, 'depthPercent');
-        var perspEl = getOne(view3D, 'perspective');
+        var rightAngleEl = getOne(view3D, 'rAngAx');
         return {
-            rotX: rotXEl ? parseInt(rotXEl.getAttribute('val'), 10) : 15,
-            rotY: rotYEl ? parseInt(rotYEl.getAttribute('val'), 10) : 20,
-            depth: depthEl ? parseInt(depthEl.getAttribute('val'), 10) : 100,
-            perspective: perspEl ? parseInt(perspEl.getAttribute('val'), 10) : 30
+            rotX: readChartNumberOption(view3D, 'rotX', 15, true),
+            rotY: readChartNumberOption(view3D, 'rotY', 20, true),
+            depth: readChartNumberOption(view3D, 'depthPercent', 100, true),
+            height: readChartNumberOption(view3D, 'hPercent', 100, true),
+            perspective: readChartNumberOption(view3D, 'perspective', 30, true),
+            rightAngleAxes: rightAngleEl ? readBool(rightAngleEl, false) : false
         };
     }
 
-    async function readDrawingsForSheet(zip, sheetPath, sheetRows, themeColors) {
+    async function readDrawingsForSheet(zip, sheetPath, sheetRows, themeColors, sheetRowsByName) {
         var empty = { charts: [], drawings: [] };
         var rels = await findRelTarget(zip, sheetPath,
                                        '/relationships/drawing');
@@ -2996,7 +3434,7 @@
             var drawings = [];
             var MAX_DRAWINGS_PER_SHEET = 1024;
             var MAX_CHARTS_PER_SHEET = 256;
-            var ctx = Object.assign({ zip, sheetRows, themeColors }, maps);
+            var ctx = Object.assign({ zip, sheetRows, themeColors, sheetRowsByName }, maps);
             var anchors = collectDrawingAnchors(drawingDoc);
             for (var ai = 0; ai < anchors.length; ai++) {
                 if (drawings.length >= MAX_DRAWINGS_PER_SHEET
@@ -3004,6 +3442,8 @@
                     break;
                 }
                 var anchorBox = readAnchorBox(anchors[ai]);
+                var chartStart = charts.length;
+                var drawingStart = drawings.length;
                 var directChildren = getDirectChildren(anchors[ai]);
                 for (var ci = 0; ci < directChildren.length; ci++) {
                     if (drawings.length >= MAX_DRAWINGS_PER_SHEET
@@ -3011,6 +3451,12 @@
                         break;
                     }
                     await handleAnchorChild(directChildren[ci], anchorBox, ctx, charts, drawings);
+                }
+                for (var chartIdx = chartStart; chartIdx < charts.length; chartIdx++) {
+                    charts[chartIdx].zOrder = ai;
+                }
+                for (var drawingIdx = drawingStart; drawingIdx < drawings.length; drawingIdx++) {
+                    drawings[drawingIdx].zOrder = ai;
                 }
             }
             if (drawings.length > MAX_DRAWINGS_PER_SHEET) {
@@ -3126,6 +3572,7 @@
         if (!chartRefEl) {
             return;
         }
+        var frameXfrm = readEmuXfrm(getOneDirect(frameEl, 'xfrm'));
         var chartRId = chartRefEl.getAttribute('r:id')
             || chartRefEl.getAttributeNS(REL_NS, 'id');
         var chartPath = ctx.chartIdToPath[chartRId];
@@ -3133,9 +3580,10 @@
             return;
         }
         var chartDoc = await readXml(ctx.zip, chartPath);
-        var parsed = parseChartXml(chartDoc, {}, ctx.sheetRows, ctx.themeColors);
+        var parsed = parseChartXml(chartDoc, ctx.sheetRowsByName || {}, ctx.sheetRows, ctx.themeColors);
         for (var p = 0; p < parsed.length; p++) {
             parsed[p].anchor = anchorBox;
+            parsed[p].frameXfrm = frameXfrm;
             charts.push(parsed[p]);
         }
     }
@@ -3283,8 +3731,31 @@
             custDef: custGeomEl ? parseCustGeom(custGeomEl) : null,
             fill,
             line,
+            shadow: readDrawingShadow(spPr, themeColors),
             text,
             hlinkId: nvInfo.hlinkId
+        };
+    }
+
+    function readDrawingShadow(spPr, themeColors) {
+        var effectLst = spPr ? getOneDirect(spPr, 'effectLst') : null;
+        var shadowEl = effectLst ? getOneDirect(effectLst, 'outerShdw') : null;
+        if (!shadowEl) {
+            return null;
+        }
+        var distanceRaw = parseInt(shadowEl.getAttribute('dist') || '0', 10) || 0;
+        var directionRaw = parseInt(shadowEl.getAttribute('dir') || '0', 10) || 0;
+        var blurRaw = parseInt(shadowEl.getAttribute('blurRad') || '0', 10) || 0;
+        var distance = distanceRaw / EMU_PER_POINT;
+        var radians = directionRaw / 60000 * Math.PI / 180;
+        var color = readDrawingColor(shadowEl, themeColors) || '#000000';
+        var opacity = readDrawingFillOpacity(shadowEl);
+        return {
+            offsetX: distance * Math.cos(radians),
+            offsetY: distance * Math.sin(radians),
+            blur: blurRaw / EMU_PER_POINT,
+            color,
+            opacity: opacity === null ? 1 : opacity
         };
     }
 
@@ -3346,7 +3817,7 @@
         else if (idx === 3) {
             widthEmu = 19050;
         }
-        var px = Math.max(1, Math.round(widthEmu / EMU_PER_PX));
+        var px = Math.max(1, Math.round(widthEmu / EMU_PER_POINT));
         return { width: px, color };
     }
 
@@ -3521,7 +3992,7 @@
             return null;
         }
         var w = parseInt(ln.getAttribute('w') || '0', 10) || 0;
-        var px = w > 0 ? Math.max(1, Math.round(w / EMU_PER_PX)) : 0;
+        var px = w > 0 ? Math.max(1, Math.round(w / EMU_PER_POINT)) : 0;
         var kids = getDirectChildren(ln);
         var color = '';
         var noFill = false;
@@ -3602,30 +4073,7 @@
     }
 
     function applyColorMods(hex, el) {
-        var tintEl = getOne(el, 'tint');
-        var shadeEl = getOne(el, 'shade');
-        var lumModEl = getOne(el, 'lumMod');
-        var lumOffEl = getOne(el, 'lumOff');
-        var out = hex;
-        if (tintEl) {
-            out = applyTint(out, parseInt(tintEl.getAttribute('val'), 10) / 100000);
-        }
-        if (shadeEl) {
-            var shadeVal = parseInt(shadeEl.getAttribute('val'), 10) / 100000;
-            out = applyTint(out, -(1 - shadeVal));
-        }
-        if (lumModEl || lumOffEl) {
-            var mod = lumModEl ? parseInt(lumModEl.getAttribute('val'), 10) / 100000 : 1;
-            var off = lumOffEl ? parseInt(lumOffEl.getAttribute('val'), 10) / 100000 : 0;
-            if (off > 0) {
-                out = applyTint(out, off);
-            }
-            else if (mod < 1) {
-                var factor = Math.pow(mod, 2.5);
-                out = applyTint(out, -(1 - factor));
-            }
-        }
-        return safeHex(out) || hex;
+        return safeHex(applyDrawingColorTransforms(hex, el)) || hex;
     }
 
     function namedPrstColor(name) {
@@ -3788,6 +4236,58 @@
 
     var MAX_INLINE_IMAGE_BYTES = 25 * 1024 * 1024;
     var MAX_TOTAL_IMG_BYTES = 80 * 1024 * 1024;
+
+    function readU32LE(bytes, offset) {
+        if (!bytes || offset < 0 || offset + 4 > bytes.byteLength) {
+            return null;
+        }
+        return new DataView(
+            bytes.buffer, bytes.byteOffset + offset, 4
+        ).getUint32(0, true);
+    }
+
+    function emfEmbeddedDibAsBmp(bytes) {
+        if (!bytes || bytes.byteLength < 128) {
+            return null;
+        }
+        var offset = 0;
+        while (offset + 80 <= bytes.byteLength) {
+            var type = readU32LE(bytes, offset);
+            var size = readU32LE(bytes, offset + 4);
+            if (!size || size < 8 || offset + size > bytes.byteLength) {
+                break;
+            }
+            if (type === 81 && size >= 80) {
+                var bmiOffset = readU32LE(bytes, offset + 48);
+                var bmiSize = readU32LE(bytes, offset + 52);
+                var bitsOffset = readU32LE(bytes, offset + 56);
+                var bitsSize = readU32LE(bytes, offset + 60);
+                if (bmiOffset !== null && bmiSize && bitsOffset !== null && bitsSize
+                    && bmiSize <= 16 * 1024 * 1024
+                    && bitsSize <= MAX_INLINE_IMAGE_BYTES
+                    && bmiOffset + bmiSize <= size
+                    && bitsOffset + bitsSize <= size) {
+                    var bmpSize = 14 + bmiSize + bitsSize;
+                    var bmp = new Uint8Array(bmpSize);
+                    var view = new DataView(bmp.buffer);
+                    bmp[0] = 0x42;
+                    bmp[1] = 0x4D;
+                    view.setUint32(2, bmpSize, true);
+                    view.setUint32(10, 14 + bmiSize, true);
+                    bmp.set(bytes.subarray(
+                        offset + bmiOffset, offset + bmiOffset + bmiSize
+                    ), 14);
+                    bmp.set(bytes.subarray(
+                        offset + bitsOffset, offset + bitsOffset + bitsSize
+                    ), 14 + bmiSize);
+                    return bmp;
+                }
+            }
+            offset += size;
+        }
+        return null;
+    }
+
     const SVG_DROP_TAGS = freeze({
         animate: 1, animatemotion: 1, animatetransform: 1, audio: 1,
         discard: 1, embed: 1, foreignobject: 1, handler: 1, iframe: 1,
@@ -3869,7 +4369,8 @@
     async function loadImageAsDataUrl(zip, path) {
         try {
             var mime = mimeForImage(path);
-            if (!mime) {
+            var ext = (path.split('.').pop() || '').toLowerCase();
+            if (!mime && ext !== 'emf') {
                 return '';
             }
             if (!zip._imageDataUrlCache) {
@@ -3887,6 +4388,14 @@
             if (!bytes || bytes.byteLength > MAX_INLINE_IMAGE_BYTES) {
                 zip._imageDataUrlCache[path] = '';
                 return '';
+            }
+            if (ext === 'emf') {
+                bytes = emfEmbeddedDibAsBmp(bytes);
+                mime = 'image/bmp';
+                if (!bytes) {
+                    zip._imageDataUrlCache[path] = '';
+                    return '';
+                }
             }
             if (mime === 'image/svg+xml') {
                 bytes = sanitizeSvgBytes(bytes);
@@ -3966,14 +4475,247 @@
         return best;
     }
 
-    function decodeCsvBytes(buffer) {
-        var bytes = new Uint8Array(buffer);
+    var CSV_SNIFF_BYTES = 64 * 1024;
+
+    var CSV_LEGACY_ENCODINGS = ['euc-kr', 'shift_jis', 'gb18030', 'big5'];
+
+    function bomEncoding(bytes) {
+        if (bytes.length > 1) {
+            if (bytes[0] === 0xFF && bytes[1] === 0xFE) {
+                return 'utf-16le';
+            }
+            if (bytes[0] === 0xFE && bytes[1] === 0xFF) {
+                return 'utf-16be';
+            }
+        }
+        return '';
+    }
+
+    function localeCsvEncoding(tag) {
+        if (tag.startsWith('ko')) {
+            return 'euc-kr';
+        }
+        if (tag.startsWith('ja')) {
+            return 'shift_jis';
+        }
+        if (tag.startsWith('zh')) {
+            return tag.includes('hant') || /-(?:tw|hk|mo)\b/.test(tag) ? 'big5' : 'gb18030';
+        }
+        return '';
+    }
+
+    function csvEncodingCandidates() {
+        var tags = navigator.languages && navigator.languages.length
+            ? navigator.languages
+            : [navigator.language || ''];
+        var out = [];
+        var i;
+        for (i = 0; i < tags.length; i++) {
+            var enc = localeCsvEncoding(String(tags[i]).toLowerCase());
+            if (enc && !out.includes(enc)) {
+                out.push(enc);
+            }
+        }
+        for (i = 0; i < CSV_LEGACY_ENCODINGS.length; i++) {
+            if (!out.includes(CSV_LEGACY_ENCODINGS[i])) {
+                out.push(CSV_LEGACY_ENCODINGS[i]);
+            }
+        }
+        return out;
+    }
+
+    function looksLikeDoubleByte(bytes) {
+        var len = Math.min(bytes.length, CSV_SNIFF_BYTES);
+        var high = 0;
+        var adjacent = 0;
+        for (var i = 0; i < len; i++) {
+            if (bytes[i] < 0x80) {
+                continue;
+            }
+            high++;
+            if (i && bytes[i - 1] >= 0x80 || i + 1 < len && bytes[i + 1] >= 0x80) {
+                adjacent++;
+            }
+        }
+        return high > 1 && adjacent >= high / 2;
+    }
+
+    function isAsciiLetter(c) {
+        return c >= 0x41 && c <= 0x5A || c >= 0x61 && c <= 0x7A;
+    }
+
+    function isAsciiSpace(c) {
+        return c === 0x20 || c === 0x09 || c === 0x0A || c === 0x0D;
+    }
+
+    function isCjkChar(c) {
+        return c >= 0x1100 && c <= 0x11FF || c >= 0x3000 && c <= 0x30FF
+            || c >= 0x4E00 && c <= 0x9FFF || c >= 0xAC00 && c <= 0xD7A3
+            || c >= 0xFF01 && c <= 0xFF60;
+    }
+
+    function isMojibakeChar(c) {
+        return c >= 0xA0 && c <= 0xFF || c >= 0xE000 && c <= 0xF8FF || c === 0xFFFD;
+    }
+
+    function looksLikeCjkText(text) {
+        var len = Math.min(text.length, CSV_SNIFF_BYTES);
+        var cjk = 0;
+        var junk = 0;
+        var glued = 0;
+        var total = 0;
+        for (var i = 0; i < len; i++) {
+            var c = text.charCodeAt(i);
+            if (isAsciiSpace(c)) {
+                continue;
+            }
+            total++;
+            if (c < 0x80) {
+                continue;
+            }
+            if (isCjkChar(c)) {
+                cjk++;
+                if (isAsciiLetter(text.charCodeAt(i - 1)) && isAsciiLetter(text.charCodeAt(i + 1))) {
+                    glued++;
+                }
+            }
+            else if (isMojibakeChar(c)) {
+                junk++;
+            }
+        }
+        return cjk > 0 && cjk * 20 >= total && glued * 5 <= cjk && junk * 10 <= cjk;
+    }
+
+    function decodeBytes(bytes, encoding, fatal) {
         try {
-            return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+            return new TextDecoder(encoding, { fatal: !!fatal }).decode(bytes);
         }
         catch (ex) {
-            return new TextDecoder('windows-1252').decode(bytes);
+            return '';
         }
+    }
+
+    function decodeCsvBytes(buffer) {
+        var bytes = new Uint8Array(buffer);
+        var bom = bomEncoding(bytes);
+        if (bom) {
+            return decodeBytes(bytes, bom);
+        }
+        var text = decodeBytes(bytes, 'utf-8', true);
+        if (text) {
+            return text;
+        }
+        if (looksLikeDoubleByte(bytes)) {
+            var candidates = csvEncodingCandidates();
+            for (var i = 0; i < candidates.length; i++) {
+                text = decodeBytes(bytes, candidates[i], true);
+                if (text && looksLikeCjkText(text)) {
+                    return text;
+                }
+            }
+        }
+        return decodeBytes(bytes, 'windows-1252');
+    }
+
+    var CSV_NUMBER_RE = /^[+-]?(\d+|\d{1,3}(?:,\d{3})+)(\.\d+)?(?:[Ee][+-]?\d+)?$/;
+    var CSV_PERCENT_RE = /^[+-]?\d+(\.\d+)?%$/;
+    var CSV_DATE_RE = /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/;
+    var CSV_MAX_FIELD_SCAN = 40;
+
+    function dateToExcelSerial(y, mo, d, hh, mi, se) {
+        var utc = Date.UTC(y, mo - 1, d, hh || 0, mi || 0, se || 0);
+        if (isNaN(utc)) {
+            return 0;
+        }
+        var back = new Date(utc);
+        if (back.getUTCFullYear() !== y || back.getUTCMonth() !== mo - 1 || back.getUTCDate() !== d) {
+            return 0;
+        }
+        var serial = utc / 86400000 + 25569;
+        return serial < 60 ? serial - 1 : serial;
+    }
+
+    function csvDateCell(m) {
+        var serial = dateToExcelSerial(+m[1], +m[2], +m[3], +m[4], +m[5], +m[6]);
+        if (!serial) {
+            return null;
+        }
+        if (!m[4]) {
+            return {v: serial, code: 'yyyy-mm-dd', isDate: true};
+        }
+        return {v: serial, code: m[6] ? 'yyyy-mm-dd hh:mm:ss' : 'yyyy-mm-dd hh:mm', isDate: true};
+    }
+
+    function csvNumberCell(raw) {
+        var m = CSV_NUMBER_RE.exec(raw);
+        if (!m) {
+            return null;
+        }
+        var body = m[1];
+        if (raw.replace(/\D/g, '').length > 15 || body.length > 1 && body.charAt(0) === '0' && !m[2]) {
+            return null;
+        }
+        var value = parseFloat(raw.replace(/,/g, ''));
+        if (!isFinite(value)) {
+            return null;
+        }
+        if (!body.includes(',')) {
+            return {v: value};
+        }
+        var decimals = m[2] ? m[2].length - 1 : 0;
+        return {v: value, code: decimals ? `#,##0.${'0'.repeat(decimals)}` : '#,##0'};
+    }
+
+    function csvCellValue(raw, decComma) {
+        if (!raw || raw.length > CSV_MAX_FIELD_SCAN) {
+            return null;
+        }
+        var t = raw.trim();
+        if (!t) {
+            return null;
+        }
+        if (decComma) {
+            t = t.replace(/[,.]/g, (ch) => ch === '.' ? ',' : '.');
+        }
+        if (/^(?:true|false)$/i.test(t)) {
+            return {v: t.length === 4};
+        }
+        var dm = CSV_DATE_RE.exec(t);
+        if (dm) {
+            return csvDateCell(dm);
+        }
+        if (CSV_PERCENT_RE.test(t)) {
+            var frac = /\.(\d+)%$/.exec(t);
+            var decimals = frac ? frac[1].length : 0;
+            return {v: parseFloat(t) / 100, code: decimals ? `0.${'0'.repeat(decimals)}%` : '0%'};
+        }
+        return csvNumberCell(t);
+    }
+
+    function applyCsvCellTypes(rows, cellStyles, decComma) {
+        var styleTable = [null];
+        var seen = Object.create(null);
+        for (var r = 0; r < rows.length; r++) {
+            var row = rows[r];
+            for (var c = 0; c < row.length; c++) {
+                var info = csvCellValue(row[c], decComma);
+                if (!info) {
+                    continue;
+                }
+                row[c] = info.v;
+                if (!info.code) {
+                    continue;
+                }
+                var idx = seen[info.code];
+                if (!idx) {
+                    idx = styleTable.length;
+                    seen[info.code] = idx;
+                    styleTable.push({numFmtCode: info.code, isDate: !!info.isDate});
+                }
+                cellStyles[r][c] = idx;
+            }
+        }
+        return styleTable;
     }
 
     function parseCsv(buffer) {
@@ -4064,6 +4806,7 @@
                 name: 'Sheet1',
                 rows,
                 cellStyles,
+                formulas: [],
                 merges: [],
                 colWidths: [],
                 rowHeights: [],
@@ -4072,40 +4815,296 @@
                 charts: [],
                 truncated
             }],
-            styleTable: []
+            styleTable: applyCsvCellTypes(rows, cellStyles, delim === ';')
         };
+    }
+
+    function splitFormatSections(code) {
+        var out = [];
+        var cur = '';
+        var quote = false;
+        for (var i = 0; i < code.length; i++) {
+            var ch = code.charAt(i);
+            if (ch === '\\' && i + 1 < code.length) {
+                cur += ch + code.charAt(i + 1);
+                i++;
+            }
+            else if (ch === '"') {
+                quote = !quote;
+                cur += ch;
+            }
+            else if (ch === ';' && !quote) {
+                out.push(cur);
+                cur = '';
+            }
+            else {
+                cur += ch;
+            }
+        }
+        out.push(cur);
+        return out;
+    }
+
+    var FORMAT_COND_RE = /\[(<>|<=|>=|<|>|=)\s*([+-]?[\d.]+(?:[Ee][+-]?\d+)?)\s*]/;
+    var FORMAT_COND_OPS = {
+        '<': (a, b) => a < b,
+        '<=': (a, b) => a <= b,
+        '>': (a, b) => a > b,
+        '>=': (a, b) => a >= b,
+        '=': (a, b) => a === b,
+        '<>': (a, b) => a !== b
+    };
+
+    function stripFormatLiterals(text) {
+        return text.replace(/"[^"]*"|\\./g, '');
+    }
+
+    function pickFormatSection(code, value) {
+        var sections = splitFormatSections(code);
+        var n = sections.length;
+        if (n > 1 && n < 4 && stripFormatLiterals(sections[n - 1]).includes('@')) {
+            n--;
+        }
+        var conds = sections.slice(0, Math.min(n, 2)).map((text) => {
+            var m = FORMAT_COND_RE.exec(stripFormatLiterals(text));
+            return m && {op: m[1], v: parseFloat(m[2])};
+        });
+        if (conds[0] || conds[1]) {
+            var pick = conds.findIndex((c) => c && FORMAT_COND_OPS[c.op](value, c.v));
+            if (pick < 0) {
+                pick = conds.includes(null) ? conds.indexOf(null) : n > 2 ? 2 : 0;
+            }
+            var cond = conds[pick];
+            return {
+                text: sections[pick],
+                abs: cond ? cond.v === 0 && (cond.op === '<' || cond.op === '<=') :
+                    pick === 1 && conds[0].v === 0 && conds[0].op === '>='
+            };
+        }
+        if (value < 0 && n > 1) {
+            return {text: sections[1], abs: true};
+        }
+        if (!value && n > 2) {
+            return {text: sections[2], abs: false};
+        }
+        return {text: sections[0], abs: false};
+    }
+
+    function numFmtColor(value, code) {
+        if (typeof value !== 'number' || !code) {
+            return '';
+        }
+        var m = /\[(red|blue|green|black|white|yellow|magenta|cyan)]/i.exec(pickFormatSection(code, value).text);
+        return m ? NUMFMT_COLORS[m[1].toLowerCase()] : '';
+    }
+
+    function numFmtSeparators() {
+        if (numFmtSeparators.cache) {
+            return numFmtSeparators.cache;
+        }
+        var out = {group: ',', dec: '.'};
+        try {
+            var parts = new Intl.NumberFormat(intlLocale()).formatToParts(12345.6);
+            for (var i = 0; i < parts.length; i++) {
+                if (parts[i].type === 'group') {
+                    out.group = parts[i].value;
+                }
+                else if (parts[i].type === 'decimal') {
+                    out.dec = parts[i].value;
+                }
+            }
+        }
+        catch (ex) {
+            out = {group: ',', dec: '.'};
+        }
+        numFmtSeparators.cache = out;
+        return out;
+    }
+
+    function unescapeFormatLiteral(s) {
+        return s.replace(/\\(.)/g, '$1').replace(/"/g, '');
+    }
+
+    function cleanFormatSection(text) {
+        return text.replace(/"[^"]*"|\\.|[*_].|\[([^\]]*)]/g, (t, block) => {
+            if (block === undefined) {
+                return t.charAt(0) === '_' || t.charAt(0) === '*' ? '' : t;
+            }
+            var currency = /^\$([^-]*)/.exec(block);
+            return currency && currency[1] ? `"${currency[1].replace(/"/g, '')}"` : '';
+        });
+    }
+
+    function numericPatternRange(section) {
+        var first = -1;
+        var last = -1;
+        for (var i = 0; i < section.length; i++) {
+            var ch = section.charAt(i);
+            if (ch === '"') {
+                i = section.indexOf('"', i + 1);
+                if (i < 0) {
+                    break;
+                }
+            }
+            else if (ch === '\\') {
+                i++;
+            }
+            else if (ch === '#' || ch === '0' || ch === '?') {
+                if (first < 0) {
+                    first = i;
+                }
+                last = i;
+            }
+        }
+        if (first >= 0 && section.charAt(last + 1) === '/') {
+            var j = last + 2;
+            while (j < section.length && '#?0123456789'.includes(section.charAt(j))) {
+                j++;
+            }
+            if (j > last + 2) {
+                last = j - 1;
+            }
+        }
+        return {first, last};
+    }
+
+    function formatDecimalPattern(abs, pattern, sep) {
+        var dot = pattern.indexOf('.');
+        var intPat = dot < 0 ? pattern : pattern.slice(0, dot);
+        var fracPat = dot < 0 ? '' : pattern.slice(dot + 1);
+        var decimals = (fracPat.match(/[#0?]/g) || []).length;
+        var body = abs.toFixed(Math.min(decimals, 20));
+        var at = body.indexOf('.');
+        var ip = at < 0 ? body : body.slice(0, at);
+        var fp = at < 0 ? '' : body.slice(at + 1);
+        var intPh = intPat.replace(/[^#0?]/g, '');
+        if (ip === '0') {
+            ip = '';
+        }
+        for (var k = intPh.length - ip.length - 1; k >= 0; k--) {
+            ip = (intPh.charAt(k) === '0' ? '0' : intPh.charAt(k) === '?' ? ' ' : '') + ip;
+        }
+        var mandatory = fracPat.lastIndexOf('0') + 1;
+        while (fp.length > mandatory && fp.charAt(fp.length - 1) === '0') {
+            fp = fp.slice(0, -1);
+        }
+        if (intPat.includes(',')) {
+            ip = ip.replace(/\B(?=(\d{3})+(?!\d))/g, sep.group);
+        }
+        return fp ? ip + sep.dec + fp : ip;
+    }
+
+    function formatScientificPattern(abs, pattern, sep) {
+        var m = /^(.*?)[Ee]([+-]?)([#0?]*)$/.exec(pattern);
+        if (!m) {
+            return '';
+        }
+        var mdot = m[1].indexOf('.');
+        var decimals = mdot < 0 ? 0 : (m[1].slice(mdot + 1).match(/[#0?]/g) || []).length;
+        var pieces = abs.toExponential(Math.min(decimals, 20)).split('e');
+        var exp = parseInt(pieces[1], 10);
+        var digits = String(Math.abs(exp));
+        while (digits.length < m[3].length) {
+            digits = `0${digits}`;
+        }
+        var sign = exp < 0 ? '-' : m[2] === '+' ? '+' : '';
+        return `${pieces[0].replace('.', sep.dec)}E${sign}${digits}`;
+    }
+
+    // Closest n/d with d <= limit, from the continued-fraction convergents of frac.
+    function bestFraction(frac, limit) {
+        var p0 = 0;
+        var q0 = 1;
+        var p1 = 1;
+        var q1 = 0;
+        var x = frac;
+        for (var i = 0; i < 64; i++) {
+            var a = Math.floor(x);
+            var q2 = q0 + a * q1;
+            if (q2 > limit) {
+                break;
+            }
+            var p2 = p0 + a * p1;
+            p0 = p1;
+            q0 = q1;
+            p1 = p2;
+            q1 = q2;
+            if (x === a) {
+                break;
+            }
+            x = 1 / (x - a);
+        }
+        var k = Math.floor((limit - q0) / q1);
+        var semi = {n: p0 + k * p1, d: q0 + k * q1};
+        var conv = {n: p1, d: q1};
+        return k > 0 && Math.abs(frac - semi.n / semi.d) < Math.abs(frac - conv.n / conv.d) - 1e-9 ? semi : conv;
+    }
+
+    function formatFractionPattern(abs, pattern) {
+        var m = /^([^/]*?)[#0?]+\/([#0?]+|\d+)$/.exec(pattern);
+        if (!m) {
+            return '';
+        }
+        var whole = /[#0?]/.test(m[1]);
+        var fixed = /^\d+$/.test(m[2]) ? parseInt(m[2], 10) : 0;
+        if (!isFinite(abs) || !Number.isSafeInteger(fixed)) {
+            return '';
+        }
+        var intPart = whole ? Math.floor(abs) : 0;
+        var f = fixed
+            ? {n: Math.round((abs - intPart) * fixed), d: fixed}
+            : bestFraction(abs - intPart, Math.min(Math.pow(10, m[2].length) - 1, Number.MAX_SAFE_INTEGER));
+        if (f.n && f.n === f.d) {
+            intPart++;
+            f.n = 0;
+        }
+        if (!whole) {
+            return `${intPart * f.d + f.n}/${f.d}`;
+        }
+        if (!f.n) {
+            return String(intPart);
+        }
+        return intPart || m[1].includes('0') ? `${intPart} ${f.n}/${f.d}` : `${f.n}/${f.d}`;
+    }
+
+    function formatNumberBody(abs, pattern, sep) {
+        var body = '';
+        if (pattern.includes('/')) {
+            body = formatFractionPattern(abs, pattern);
+        }
+        else if (/[Ee][+-]?[#0?]*$/.test(pattern)) {
+            body = formatScientificPattern(abs, pattern, sep);
+        }
+        return body || formatDecimalPattern(abs, pattern, sep);
     }
 
     function formatNumber(value, code) {
         if (typeof value !== 'number' || !code || code === 'General' || code === '@') {
             return value;
         }
-        var c = code.replace(/\[[^\]]*]/g, '');
-        var section = c.split(';')[0];
-        section = section.replace(/_./g, '').replace(/\*./g, '');
-        var isPercent = section.includes('%');
-        var v = isPercent ? value * 100 : value;
-        var hasThousand = /#,##/.test(section);
-        var decMatch = /\.(0+)/.exec(section);
-        var decimals = decMatch ? decMatch[1].length : 0;
-        var prefixMatch = /^([^#%,.0?]*)/.exec(section);
-        var suffixMatch = /([^#%,.0?]*)$/.exec(section);
-        var prefix = (prefixMatch && prefixMatch[1] || '').replace(/["\\]/g, '');
-        var suffix = (suffixMatch && suffixMatch[1] || '').replace(/["\\]/g, '');
-        if (isPercent) {
-            suffix = `${suffix  }%`.replace(/%%$/, '%');
-        }
+        var picked = pickFormatSection(code, value);
+        var section = cleanFormatSection(picked.text);
+        var range = numericPatternRange(section);
+        var v = picked.abs ? Math.abs(value) : value;
         var sign = v < 0 ? '-' : '';
-        var abs = Math.abs(v);
-        var body = decimals > 0 ? abs.toFixed(decimals) : String(Math.round(abs));
-        if (hasThousand) {
-            var dot = body.indexOf('.');
-            var intPart = dot >= 0 ? body.slice(0, dot) : body;
-            var fracPart = dot >= 0 ? body.slice(dot) : '';
-            intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-            body = intPart + fracPart;
+        if (range.first < 0) {
+            var general = String(Math.abs(v));
+            return sign + unescapeFormatLiteral(section.replace(/"[^"]*"|\\.|(general)/gi, (t, g) => g ? general : t));
         }
-        return prefix + sign + body + suffix;
+        var rest = section.slice(range.last + 1);
+        var scale = /^,+/.exec(rest);
+        if (stripFormatLiterals(section).includes('%')) {
+            v *= 100;
+        }
+        if (scale) {
+            v /= Math.pow(1000, scale[0].length);
+        }
+        var sep = numFmtSeparators();
+        var body = formatNumberBody(Math.abs(v), section.slice(range.first, range.last + 1), sep);
+        return sign +
+            unescapeFormatLiteral(section.slice(0, range.first)) +
+            body +
+            unescapeFormatLiteral(rest.replace(/^,+/, ''));
     }
 
     async function parseSpreadsheet(buffer, ext) {
@@ -4114,7 +5113,7 @@
             return {
                 sheets: [{
                     name: 'Sheet1',
-                    rows: [], cellStyles: [], merges: [], colWidths: [],
+                    rows: [], cellStyles: [], formulas: [], merges: [], colWidths: [],
                     rowHeights: [], defaultColWidth: null, defaultRowHeight: null,
                     charts: [], drawings: [], truncated: false
                 }],
@@ -4127,12 +5126,370 @@
         return parseXlsx(buffer);
     }
 
+    var formulaDate1904 = false;
     function evaluateFormula(formula, sheet, baseR, baseC, currR, currC) {
         var tokens = tokenizeFormula(formula);
         var dR = currR - baseR;
         var dC = currC - baseC;
         var ctx = { tokens, pos: 0, sheet, dR, dC };
+        formulaDate1904 = !!sheet.date1904;
         return parseComparison(ctx);
+    }
+
+    // A1 reference (A1, A1:B2, A:B, 1:3) inside a formula code segment. The leading group is a
+    // boundary char (not an identifier char / '$' / '.') so we don't touch function names
+    // (LOG10) or defined names. The trailing lookahead rejects matches that run into another
+    // identifier, a function call or a sheet name.
+    var REL_REF_RE = new RegExp(
+        '(^|[^\\p{L}\\p{N}_$.])(\\$?[A-Z]{1,3}\\$?\\d+(?::\\$?[A-Z]{1,3}\\$?\\d+)?|' +
+        '\\$?[A-Z]{1,3}:\\$?[A-Z]{1,3}|\\$?\\d+:\\$?\\d+)(?![\\p{L}\\p{N}_(.!])', 'gu');
+
+    // Shifts every relative reference in a formula code segment by (dR, dC), preserving
+    // $-absolute parts. A reference shifted off the grid becomes #REF! (as in Excel).
+    function translateRefsInSegment(seg, dR, dC) {
+        return seg.replace(REL_REF_RE, (m, pre, ref) => {
+            var parts = ref.split(':');
+            var off = false;
+            for (var i = 0; i < parts.length; i++) {
+                var p = /^(?:(\$?)([A-Z]+))?(\$?)(\d*)$/.exec(parts[i]);
+                var c = p[2] ? colRefToIndex(p[2]) : 0;
+                var r = p[4] ? parseInt(p[4], 10) - 1 : 0;
+                if (!isGridCell(r, c)) {
+                    return m;
+                }
+                c += p[2] && !p[1] ? dC : 0;
+                r += p[4] && !p[3] ? dR : 0;
+                off = off || !isGridCell(r, c);
+                parts[i] = (p[2] ? p[1] + indexToColRef(c) : '') + (p[4] ? p[3] + (r + 1) : '');
+            }
+            return pre + (off ? '#REF!' : parts.join(':'));
+        });
+    }
+
+    // Shifts every relative cell reference in `formula` by (dR, dC), leaving string
+    // literals / quoted sheet names / bracket groups untouched. Resolves shared-formula
+    // dependents against their master cell.
+    function translateFormula(formula, dR, dC) {
+        if (!formula || dR === 0 && dC === 0) {
+            return formula;
+        }
+        var out = '';
+        var i = 0;
+        var n = formula.length;
+        while (i < n) {
+            var ch = formula[i];
+            if (ch === '[') {
+                var grp = readBracketGroup(formula, i);
+                var end = grp ? grp.end : n;
+                out += formula.slice(i, end);
+                i = end;
+                continue;
+            }
+            if (ch === '"' || ch === '\'') {
+                var j = i + 1;
+                while (j < n) {
+                    if (formula[j] === ch) {
+                        if (formula[j + 1] === ch) {
+                            j += 2;
+                            continue;
+                        }
+                        j++;
+                        break;
+                    }
+                    j++;
+                }
+                out += formula.slice(i, j);
+                i = j;
+                continue;
+            }
+            var seg = i;
+            while (i < n && formula[i] !== '"' && formula[i] !== '\'' && formula[i] !== '[') {
+                i++;
+            }
+            out += translateRefsInSegment(formula.slice(seg, i), dR, dC);
+        }
+        return out;
+    }
+
+    // Blanks out string-literal and quoted-sheet-name contents with spaces, keeping
+    // the same length so character indices stay valid for reference scanning.
+    function maskFormulaLiterals(formula) {
+        var arr = Array.prototype.slice.call(formula);
+        var n = arr.length;
+        var i = 0;
+        while (i < n) {
+            var ch = formula[i];
+            if (ch === '"' || ch === '\'') {
+                arr[i] = ' ';
+                i++;
+                while (i < n) {
+                    if (formula[i] === ch) {
+                        if (formula[i + 1] === ch) {
+                            arr[i] = ' ';
+                            arr[i + 1] = ' ';
+                            i += 2;
+                            continue;
+                        }
+                        arr[i] = ' ';
+                        i++;
+                        break;
+                    }
+                    arr[i] = ' ';
+                    i++;
+                }
+                continue;
+            }
+            i++;
+        }
+        return arr.join('');
+    }
+
+    function parseRefHalf(s) {
+        var m = /^\$?([A-Z]{1,3})?\$?(\d+)?$/.exec(s);
+        if (!m || !m[1] && !m[2]) {
+            return null;
+        }
+        var col = m[1] ? colRefToIndex(m[1]) : null;
+        var row = m[2] ? parseInt(m[2], 10) - 1 : null;
+        if (!isGridCell(row === null ? 0 : row, col === null ? 0 : col)) {
+            return null;
+        }
+        return { col, row };
+    }
+
+    function parseRefToken(tok) {
+        var parts = tok.split(':');
+        var a = parseRefHalf(parts[0]);
+        if (!a) {
+            return null;
+        }
+        if (parts.length === 1) {
+            if (a.col === null || a.row === null) {
+                return null;
+            }
+            return { r1: a.row, c1: a.col, r2: a.row, c2: a.col };
+        }
+        var b = parseRefHalf(parts[1]);
+        if (!b) {
+            return null;
+        }
+        var r1;
+        var r2;
+        var c1;
+        var c2;
+        if (a.col !== null && b.col !== null && a.row === null && b.row === null) {
+            c1 = a.col; c2 = b.col; r1 = 0; r2 = Infinity;
+        }
+        else if (a.row !== null && b.row !== null && a.col === null && b.col === null) {
+            r1 = a.row; r2 = b.row; c1 = 0; c2 = Infinity;
+        }
+        else if (a.col !== null && a.row !== null && b.col !== null && b.row !== null) {
+            c1 = a.col; c2 = b.col; r1 = a.row; r2 = b.row;
+        }
+        else {
+            return null;
+        }
+        return {
+            r1: Math.min(r1, r2), r2: Math.max(r1, r2),
+            c1: Math.min(c1, c2), c2: Math.max(c1, c2)
+        };
+    }
+
+    var REF_TOKEN_RE = new RegExp(
+        '\\$?[A-Z]{1,3}\\$?\\d+(?::\\$?[A-Z]{1,3}\\$?\\d+)?'
+        + '|\\$?[A-Z]{1,3}:\\$?[A-Z]{1,3}'
+        + '|\\$?\\d+:\\$?\\d+', 'g');
+
+    // Extracts same-sheet cell/range references from a formula string (no leading '=').
+    // Returns ordered { r1,c1,r2,c2, text, start, end } entries (start/end index into
+    // `formula`). Sheet-qualified refs, string literals and defined names are skipped
+    // so they stay uncoloured in the formula bar and unhighlighted in the grid.
+    function extractFormulaRefs(formula) {
+        var refs = [];
+        if (!formula) {
+            return refs;
+        }
+        var masked = maskFormulaLiterals(formula);
+        REF_TOKEN_RE.lastIndex = 0;
+        var m;
+        while ((m = REF_TOKEN_RE.exec(masked)) !== null) {
+            var start = m.index;
+            var end = start + m[0].length;
+            var prev = start > 0 ? formula[start - 1] : '';
+            var next = end < formula.length ? formula[end] : '';
+            if (prev === '!' || prev && /[\w$.]/.test(prev)) {
+                continue;
+            }
+            if (next && /[\w(.]/.test(next)) {
+                continue;
+            }
+            var coords = parseRefToken(formula.slice(start, end));
+            if (!coords) {
+                continue;
+            }
+            coords.text = formula.slice(start, end);
+            coords.start = start;
+            coords.end = end;
+            refs.push(coords);
+        }
+        return refs;
+    }
+
+    // Reads a bracket group starting at s[i] === '[', honouring the apostrophe escape
+    // (' makes the next char literal) and nested brackets. Returns { inner, end } where
+    // inner is the content between the outer brackets and end is just past the ']'.
+    function readBracketGroup(s, i) {
+        var depth = 0;
+        var n = s.length;
+        var j = i;
+        while (j < n) {
+            var c = s[j];
+            if (c === '\'') {
+                j += 2;
+                continue;
+            }
+            if (c === '[') {
+                depth++;
+            }
+            else if (c === ']') {
+                depth--;
+                if (depth === 0) {
+                    return { inner: s.slice(i + 1, j), end: j + 1 };
+                }
+            }
+            j++;
+        }
+        return null;
+    }
+
+    function unescapeStructured(s) {
+        return s.replace(/'(.)/g, '$1');
+    }
+
+    function applyStructuredItem(desc, raw) {
+        var it = raw.trim().toLowerCase();
+        if (it === '#this row' || it === '@') {
+            desc.thisRow = true;
+        }
+        else if (it === '#all' || it === '#data' || it === '#headers' || it === '#totals') {
+            desc.item = it;
+        }
+    }
+
+    function classifyStructuredPart(desc, content) {
+        if (content.charAt(0) === '#') {
+            applyStructuredItem(desc, content);
+        }
+        else if (content) {
+            desc.columns.push(content);
+        }
+    }
+
+    // Parses the content between a structured reference's outer brackets into
+    // { thisRow, item, columns, isRange }.
+    function parseStructuredInner(inner) {
+        var desc = { thisRow: false, item: null, columns: [], isRange: false };
+        var n = inner.length;
+        var k = 0;
+        while (k < n) {
+            var c = inner[k];
+            if (c === ' ' || c === '\t' || c === '\n' || c === '\r' || c === ',') {
+                k++;
+            }
+            else if (c === '@') {
+                desc.thisRow = true;
+                k++;
+            }
+            else if (c === ':') {
+                desc.isRange = true;
+                k++;
+            }
+            else if (c === '[') {
+                var g = readBracketGroup(inner, k);
+                if (!g) {
+                    break;
+                }
+                classifyStructuredPart(desc, unescapeStructured(g.inner));
+                k = g.end;
+            }
+            else {
+                var rest = inner.slice(k);
+                var m = /^[^,:[\]]+/.exec(rest);
+                if (!m) {
+                    k++;
+                    continue;
+                }
+                classifyStructuredPart(desc, unescapeStructured(m[0].trim()));
+                k += m[0].length;
+            }
+        }
+        return desc;
+    }
+
+    // Reads the bracket group at `bracketStart` and, if it is a structured reference,
+    // pushes a descriptor spanning [idStart, end). `table` is the qualifying table name
+    // or null for an unqualified ref. Returns the index past the bracket (an unmatched
+    // bracket runs to the end of the formula).
+    function pushStructuredRef(refs, formula, idStart, bracketStart, table) {
+        var grp = readBracketGroup(formula, bracketStart);
+        if (!grp) {
+            return formula.length;
+        }
+        var d = parseStructuredInner(grp.inner);
+        // Unqualified brackets must look structured (@, # or a nested [) so workbook
+        // indices like the [1] in "[1]Sheet1!A1" are not mistaken for a column.
+        var ok = table !== null
+            || /[#@[]/.test(grp.inner) && (d.thisRow || d.item || d.columns.length);
+        if (ok) {
+            d.table = table;
+            d.text = formula.slice(idStart, grp.end);
+            d.start = idStart;
+            d.end = grp.end;
+            refs.push(d);
+        }
+        return grp.end;
+    }
+
+    // Extracts Excel structured (table) references from a formula, e.g.
+    //   [@[Total Sold]]  [@Col]  [[#Totals],[Total Revenue]]
+    //   Table1[Col]  Table1[[#Totals],[Col]]  Table1[#All]  Table1[[Col1]:[Col2]]
+    // Returns ordered descriptors { text, start, end, table, thisRow, item, columns,
+    // isRange } - without grid coordinates (resolved later against table metadata).
+    function extractStructuredRefs(formula) {
+        var refs = [];
+        if (!formula || !formula.includes('[')) {
+            return refs;
+        }
+        var n = formula.length;
+        var i = 0;
+        while (i < n) {
+            var ch = formula[i];
+            if (ch === '"' || ch === '\'') {
+                var q = i + 1;
+                while (q < n && formula[q] !== ch) {
+                    q++;
+                }
+                i = q + 1;
+            }
+            else if (/\p{L}|[\\_]/u.test(ch)) {
+                var idStart = i;
+                while (i < n && /\p{L}|\p{M}|\p{N}|[.\\_]/u.test(formula[i])) {
+                    i++;
+                }
+                var e = formula[i] === '['
+                    ? pushStructuredRef(refs, formula, idStart, i, formula.slice(idStart, i)) : -1;
+                if (e >= 0) {
+                    i = e;
+                }
+            }
+            else if (ch === '[') {
+                i = pushStructuredRef(refs, formula, i, i, null);
+            }
+            else {
+                i++;
+            }
+        }
+        return refs;
     }
 
     function readFormulaIdentifier(s, i) {
@@ -4381,7 +5738,7 @@
         if (!isFinite(v)) {
             return null;
         }
-        var d = excelSerialToDate(v);
+        var d = excelSerialToDate(v, formulaDate1904);
         if (!d) {
             return null;
         }
@@ -12416,17 +13773,99 @@
         return cleaned.slice(0, 64);
     }
 
+    // Rotating palette for the formula range-finder: each distinct reference in the
+    // selected cell's formula gets the next colour, matched between the grid outline
+    // and the formula-bar token. Mirrors Excel's reference colouring.
+    var REF_HIGHLIGHT_COLORS = [
+        '#1a73e8', '#188038', '#a142f4', '#e8710a',
+        '#d01884', '#12a4af', '#9a6700', '#c5221f'
+    ];
+    // Ranges up to this many cells are filled; larger ones only get their perimeter outlined.
+    var MAX_HIGHLIGHT_CELLS = 256;
+    // Cap on the perimeter cells one selection outlines for ranges above MAX_HIGHLIGHT_CELLS.
+    var MAX_HIGHLIGHT_EDGE_CELLS = 16384;
+    // Cap on the cells all colour-scale/data-bar statistics of one sheet may visit.
+    var MAX_CF_STAT_VISITS = 1000000;
+
+    // Normalises a table column name for matching: lowercases, turns encoded/literal
+    // line breaks and whitespace runs into a single space. A column name carrying a
+    // newline (e.g. "Total\nRevenue") thus matches the same name written either way.
+    function normalizeTableColName(name) {
+        return String(name || '')
+            .replace(/_x000[ad]_/gi, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .toLowerCase();
+    }
+
+    // Translucent rgba from a #rrggbb palette colour, for the range fill tint.
+    function hexToRgba(hex, alpha) {
+        var h = hex.charAt(0) === '#' ? hex.slice(1) : hex;
+        var r = parseInt(h.slice(0, 2), 16);
+        var g = parseInt(h.slice(2, 4), 16);
+        var b = parseInt(h.slice(4, 6), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    // Builds an inset box-shadow that draws 2px coloured segments only on the
+    // requested sides, plus a faint full-cell fill tint when edges.fill. Used to stitch a contiguous
+    // reference range into one box (perimeter cells contribute their outer edges,
+    // interior edges stay open) with a light wash inside, like Excel's range finder.
+    // The fill is translucent so the cell's own background shows through, and is
+    // listed last so the opaque edge lines paint on top of it.
+    function edgeBoxShadow(color, edges) {
+        var parts = [];
+        if (edges.top) {
+            parts.push(`inset 0 2px 0 0 ${color}`);
+        }
+        if (edges.bottom) {
+            parts.push(`inset 0 -2px 0 0 ${color}`);
+        }
+        if (edges.left) {
+            parts.push(`inset 2px 0 0 0 ${color}`);
+        }
+        if (edges.right) {
+            parts.push(`inset -2px 0 0 0 ${color}`);
+        }
+        if (edges.fill) {
+            parts.push(`inset 0 0 0 9999px ${hexToRgba(color, 0.13)}`);
+        }
+        return parts.join(', ');
+    }
+
     class XlsxRenderer {
 
         constructor(workbook, opts) {
             this.workbook = workbook;
             this.onInternalLinkClick = opts && opts.onInternalLinkClick || null;
+            this.onSelectionChange = opts && opts.onSelectionChange || null;
+            this.strings = opts && opts.strings || null;
+            this.thumbnail = !!(opts && opts.thumbnail);
+            this._selectedTd = null;
+            this._selectedChartCard = null;
+            this._highlightedTds = [];
+            this._table = null;
+            this._cells = null;
+            this._cellCols = 0;
+            this._listeners = [];
+        }
+
+        destroy() {
+            this.removeListeners();
+            this._table = null;
+            this._cells = null;
+            this._selectedTd = null;
+            this._selectedChartCard = null;
+            this._highlightedTds = [];
+            this._activeSheet = null;
+            this.tabList = null;
         }
 
         handleExternalLink(ev, url) {
             if (ev) {
                 ev.preventDefault();
-                ev.stopPropagation();
+                // Note: intentionally not stopping propagation so the click still
+                // bubbles to the table delegate and selects the cell.
             }
             if (!url || typeof url !== 'string') {
                 return;
@@ -12439,7 +13878,8 @@
         handleInternalLink(ev, target) {
             if (ev) {
                 ev.preventDefault();
-                ev.stopPropagation();
+                // Note: intentionally not stopping propagation so the click still
+                // bubbles to the table delegate and selects the cell.
             }
             if (!target) {
                 return;
@@ -12598,8 +14038,10 @@
         }
 
         fontCss(f) {
-            if (!f) {
-                return [];
+            const base = this.workbook && this.workbook.defaultFont || {};
+            f = Object.assign({}, base, f || {});
+            if (!f.name && base.name) {
+                f.name = base.name;
             }
             const parts = [];
             if (f.bold) {
@@ -12620,7 +14062,7 @@
             }
             const sz = safeNum(f.size, 0, 144);
             if (sz) {
-                parts.push(`font-size:${sz}pt`);
+                parts.push(`font-size:${sz}px`);
             }
             const col = safeCssColor(f.color);
             if (col) {
@@ -12668,6 +14110,65 @@
             return parts;
         }
 
+        applyTextRotation(inner, xf) {
+            const rot = xf && xf.alignment && xf.alignment.textRotation;
+            if (!rot || rot > 180 && rot !== 255) {
+                return;
+            }
+            inner.style.setProperty('position', 'static', 'important');
+            inner.style.setProperty('overflow', 'visible', 'important');
+            inner.style.setProperty('display', 'inline-block', 'important');
+            inner.style.setProperty('width', 'auto', 'important');
+            if (rot === 255) {
+                inner.style.writingMode = 'vertical-rl';
+                inner.style.textOrientation = 'upright';
+                return;
+            }
+            inner.style.whiteSpace = 'nowrap';
+            inner.style.transformOrigin = 'center';
+            inner.style.transform = `rotate(${rot <= 90 ? -rot : rot - 90}deg)`;
+        }
+
+        rowStyleIndex(sheet, r) {
+            return sheet.rowStyles && sheet.rowStyles[r] || 0;
+        }
+
+        cellStyleIndex(styleRow, c, rowStyle) {
+            return (styleRow[c] === undefined ? rowStyle : styleRow[c]) || 0;
+        }
+
+        rotatedRowHeight(sheet, r, styleRow, styleTable, maxCols) {
+            const row = sheet.rows[r] || [];
+            const rowStyle = this.rowStyleIndex(sheet, r);
+            let h = 0;
+            for (let c = 0; c < maxCols; c++) {
+                const xf = styleTable[this.cellStyleIndex(styleRow, c, rowStyle)];
+                const rot = xf && xf.alignment && xf.alignment.textRotation;
+                if (!rot || rot > 180 && rot !== 255) {
+                    continue;
+                }
+                const txt = this.cellDisplayText(row[c], xf);
+                if (!txt) {
+                    continue;
+                }
+                const font = Object.assign(
+                    {}, this.workbook && this.workbook.defaultFont || {}, xf && xf.font || {}
+                );
+                const fontPx = font.size || 11;
+                const ctx = this.measureContext();
+                ctx.font = this.fontStringFor(font);
+                // 255 = stacked: one upright glyph per line, ~1.2em each.
+                const textWidth = rot === 255 ? txt.length * fontPx * 1.2 : ctx.measureText(txt).width;
+                const rad = (rot === 255 ? 90 : rot <= 90 ? rot : 180 - rot) * Math.PI / 180;
+                h = Math.max(h, Math.ceil(
+                    Math.abs(textWidth * Math.sin(rad))
+                    + Math.abs(fontPx * Math.cos(rad))
+                    + 8
+                ));
+            }
+            return h;
+        }
+
         cssForXf(xf) {
             if (!xf) {
                 return '';
@@ -12675,7 +14176,7 @@
             const parts = this.fontCss(xf.font);
             const bg = safeCssColor(xf.fill && xf.fill.bgColor);
             if (bg) {
-                parts.push(`background-color:${bg}`);
+                parts.push(`background-color:${bg}`, 'border-style:none');
             }
             parts.push(...this.borderCss(xf.border), ...this.alignmentCss(xf.alignment));
             return parts.join(';');
@@ -12690,6 +14191,20 @@
             return `${decl} ${color}`;
         }
 
+        date1904() {
+            return !!(this.workbook && this.workbook.date1904);
+        }
+
+        applyNumFmtColor(inner, value, xf) {
+            if (typeof value !== 'number' || !xf || xf.isDate) {
+                return;
+            }
+            const color = numFmtColor(value, xf.numFmtCode);
+            if (color) {
+                inner.style.color = color;
+            }
+        }
+
         cellDisplayText(value, xf) {
             if (value === null || value === undefined || value === '') {
                 return '';
@@ -12699,7 +14214,7 @@
             }
             if (typeof value === 'number') {
                 if (xf && xf.isDate) {
-                    return String(formatDate(value, xf.numFmtCode));
+                    return String(formatDate(value, xf.numFmtCode, this.date1904()));
                 }
                 if (xf && xf.numFmtCode) {
                     return String(formatNumber(value, xf.numFmtCode));
@@ -12772,41 +14287,21 @@
             const name = font && font.name || 'Calibri';
             const style = font && font.italic ? 'italic' : 'normal';
             const weight = font && font.bold ? 'bold' : 'normal';
-            return `${style} ${weight} ${size}pt "${name}", sans-serif`;
-        }
-
-        defaultMDW() {
-            if (this._defaultMDW !== undefined) {
-                return this._defaultMDW;
-            }
-            const f = this.workbook && this.workbook.defaultFont;
-            let mdw;
-            try {
-                const ctx = this.measureContext();
-                ctx.font = this.fontStringFor(f);
-                mdw = Math.max(5, Math.ceil(ctx.measureText('0').width));
-            }
-            catch (ex) {
-                const size = f && f.size || 11;
-                mdw = Math.max(6, Math.min(12, Math.round(size * 7 / 11)));
-            }
-            this._defaultMDW = mdw;
-            return mdw;
+            return `${style} ${weight} ${size}px "${name}", sans-serif`;
         }
 
         colWidthToPx(width) {
             if (!width || isNaN(width)) {
                 return null;
             }
-            const mdw = this.defaultMDW();
-            return Math.max(20, Math.round(width * mdw + 5));
+            return Math.max(1, Math.round(width * 6 + 5));
         }
 
         rowHeightToPx(ht) {
             if (!ht || isNaN(ht)) {
                 return null;
             }
-            return Math.max(14, Math.round(ht * 96 / 72));
+            return Math.max(1, Math.round(ht * CHART_POINT_TO_PX));
         }
 
         sheetDefaultColPx(sheet) {
@@ -12816,7 +14311,7 @@
             if (sheet.baseColWidth) {
                 return this.colWidthToPx(sheet.baseColWidth + 0.43);
             }
-            return 64;
+            return 53;
         }
 
         buildColgroup(maxCols, sheet, styleTable, mergeMaps) {
@@ -12872,12 +14367,13 @@
             for (let r = 0; r < sheet.rows.length; r++) {
                 const row = sheet.rows[r];
                 const styleRow = cellStyles[r] || [];
+                const rowStyle = this.rowStyleIndex(sheet, r);
                 for (let c = 0; c < Math.min(maxCols, row.length); c++) {
                     const v = row[c];
                     if (this.shouldSkipCellForMeasure(v, r, c, mergeMaps)) {
                         continue;
                     }
-                    const xf = styleTable[styleRow[c] || 0];
+                    const xf = styleTable[this.cellStyleIndex(styleRow, c, rowStyle)];
                     const text = this.cellDisplayText(v, xf);
                     if (!text) {
                         continue;
@@ -13046,12 +14542,23 @@
             this.applyCellTypeClasses(td, value, xf);
             const text = this.cellDisplayText(value, xf);
             if (text && !this.isInvisibleText(xf) && !hidden) {
-                td.appendChild(this.buildCellInner(td, value, xf, spill, isLink, linkUrl));
+                const inner = this.buildCellInner(td, value, xf, spill, isLink, linkUrl);
+                this.applyTextRotation(inner, xf);
+                this.applyNumFmtColor(inner, value, xf);
+                if (xf && (xf.__dataBar && !xf.__dataBar.showValue || xf.__iconSet && !xf.__iconSet.showValue)) {
+                    inner.style.visibility = 'hidden';
+                }
+                td.appendChild(inner);
             }
             if (xf && xf.__iconSet) {
                 const dot = document.createElement('span');
                 dot.className = `xlsx-cf-icon xlsx-cf-icon-${xf.__iconSet.type} xlsx-cf-icon-anchor-left`;
                 td.appendChild(dot);
+            }
+            if (xf && xf.__dataBar) {
+                const p = xf.__dataBar.percent;
+                td.style.backgroundImage = `linear-gradient(90deg, ${hexToRgba(xf.__dataBar.color, 0.85)} 0%, `
+                    + `${hexToRgba(xf.__dataBar.color, 0.25)} ${p}%, transparent ${p}%)`;
             }
             return td;
         }
@@ -13136,13 +14643,28 @@
                 return;
             }
             const { baseR, baseC } = origin;
+            const value = sheet.rows[r] && sheet.rows[r][c];
             for (const rule of cf.rules) {
                 if (rule.iconSet) {
-                    const iconType = this.pickIconForValue(sheet.rows[r] && sheet.rows[r][c], rule.iconSet);
+                    const iconType = this.pickIconForValue(value, rule.iconSet);
                     if (iconType) {
                         state.icon = {
                             setName: rule.iconSet.setName, type: iconType, showValue: rule.iconSet.showValue
                         };
+                    }
+                    continue;
+                }
+                if (rule.colorScale) {
+                    const bg = this.colorScaleColor(rule, cf, sheet, value);
+                    if (bg) {
+                        state.merged = this.cloneWithFill(state.merged, bg);
+                    }
+                    continue;
+                }
+                if (rule.dataBar) {
+                    const bar = this.dataBarFor(rule, cf, sheet, value);
+                    if (bar) {
+                        state.dataBar = bar;
                     }
                     continue;
                 }
@@ -13163,16 +14685,19 @@
             if (!cfList || !cfList.length) {
                 return baseXf;
             }
-            const state = { merged: baseXf, icon: null };
+            const state = { merged: baseXf, icon: null, dataBar: null };
             for (const cf of cfList) {
                 this.applyCfBlock(cf, sheet, r, c, dxfs, state);
             }
-            let { merged, icon } = state;
-            if (icon && merged === baseXf) {
-                merged = Object.assign({}, merged, { __iconSet: icon });
+            let { merged, icon, dataBar } = state;
+            if ((icon || dataBar) && merged === baseXf) {
+                merged = Object.assign({}, merged);
             }
-            else if (icon) {
+            if (icon) {
                 merged.__iconSet = icon;
+            }
+            if (dataBar) {
+                merged.__dataBar = dataBar;
             }
             return merged;
         }
@@ -13249,6 +14774,136 @@
             return cmp ? cmp(v, a, b) : false;
         }
 
+        cfStats(rule, cf, sheet) {
+            if (rule.__stats !== undefined) {
+                return rule.__stats;
+            }
+            let min = Infinity;
+            let max = -Infinity;
+            let budget = sheet.__cfStatBudget === undefined ? MAX_CF_STAT_VISITS : sheet.__cfStatBudget;
+            const vals = [];
+            for (const rng of cf.ranges) {
+                const r2 = Math.min(rng.r2, sheet.rows.length - 1);
+                for (let r = rng.r1; r <= r2 && budget > 0; r++) {
+                    const row = sheet.rows[r];
+                    budget--;
+                    if (!row) {
+                        continue;
+                    }
+                    const c2 = Math.min(rng.c2, row.length - 1);
+                    for (let c = rng.c1; c <= c2; c++) {
+                        const v = row[c];
+                        if (typeof v === 'number' && isFinite(v)) {
+                            min = Math.min(min, v);
+                            max = Math.max(max, v);
+                            vals.push(v);
+                        }
+                    }
+                    budget -= Math.max(0, c2 - rng.c1 + 1);
+                }
+            }
+            sheet.__cfStatBudget = budget;
+            rule.__stats = vals.length ? { min, max, sorted: vals.sort((a, b) => a - b) } : null;
+            return rule.__stats;
+        }
+
+        resolveCfvo(cfvo, stats) {
+            const num = parseFloat(cfvo.val);
+            switch (cfvo.type) {
+                case 'min':
+                case 'autoMin':
+                    return stats.min;
+                case 'max':
+                case 'autoMax':
+                    return stats.max;
+                case 'percent':
+                    return stats.min + (stats.max - stats.min) * ((isNaN(num) ? 0 : num) / 100);
+                case 'percentile':
+                    return this.percentileOf(stats.sorted, isNaN(num) ? 50 : num);
+                default:
+                    return isNaN(num) ? stats.min : num;
+            }
+        }
+
+        percentileOf(sorted, p) {
+            if (p <= 0) {
+                return sorted[0];
+            }
+            if (p >= 100) {
+                return sorted[sorted.length - 1];
+            }
+            const idx = p / 100 * (sorted.length - 1);
+            const lo = Math.floor(idx);
+            const hi = Math.ceil(idx);
+            return sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo);
+        }
+
+        colorScaleColor(rule, cf, sheet, value) {
+            if (typeof value !== 'number' || !isFinite(value)) {
+                return '';
+            }
+            const stats = this.cfStats(rule, cf, sheet);
+            if (!stats) {
+                return '';
+            }
+            const pts = rule.colorScale.map(s => ({ t: this.resolveCfvo(s, stats), color: s.color }));
+            const last = pts[pts.length - 1];
+            if (value <= pts[0].t) {
+                return pts[0].color;
+            }
+            if (value >= last.t) {
+                return last.color;
+            }
+            for (let i = 1; i < pts.length; i++) {
+                if (value <= pts[i].t) {
+                    const span = pts[i].t - pts[i - 1].t;
+                    const f = span > 0 ? (value - pts[i - 1].t) / span : 0;
+                    return this.lerpHexColor(pts[i - 1].color, pts[i].color, f);
+                }
+            }
+            return last.color;
+        }
+
+        dataBarFor(rule, cf, sheet, value) {
+            if (typeof value !== 'number' || !isFinite(value)) {
+                return null;
+            }
+            const stats = this.cfStats(rule, cf, sheet);
+            if (!stats) {
+                return null;
+            }
+            const lo = this.resolveCfvo(rule.dataBar.min, stats);
+            const hi = this.resolveCfvo(rule.dataBar.max, stats);
+            const span = hi - lo;
+            const frac = Math.max(0, Math.min(1, span > 0 ? (value - lo) / span : 0));
+            return { percent: Math.round(frac * 100), color: rule.dataBar.color, showValue: rule.dataBar.showValue };
+        }
+
+        parseHex(hex) {
+            const h = hex && hex.charAt(0) === '#' ? hex.slice(1) : hex;
+            const s = h && h.length === 8 ? h.slice(2) : h;
+            if (!s || s.length !== 6) {
+                return null;
+            }
+            return [parseInt(s.slice(0, 2), 16), parseInt(s.slice(2, 4), 16), parseInt(s.slice(4, 6), 16)];
+        }
+
+        lerpHexColor(a, b, f) {
+            const ca = this.parseHex(a);
+            const cb = this.parseHex(b);
+            if (!ca || !cb) {
+                return a || b || '';
+            }
+            const mix = (x, y) => Math.round(x + (y - x) * f).toString(16).padStart(2, '0');
+            return `#${mix(ca[0], cb[0])}${mix(ca[1], cb[1])}${mix(ca[2], cb[2])}`;
+        }
+
+        cloneWithFill(xf, hex) {
+            const out = Object.assign({}, xf);
+            out.fill = Object.assign({}, xf && xf.fill, { bgColor: hex });
+            return out;
+        }
+
         mergeDxf(base, dxf) {
             const out = Object.assign({}, base);
             if (dxf.font) {
@@ -13315,6 +14970,27 @@
             return next;
         }
 
+        builtInTableStyleDxf(tp, r) {
+            const m = tp && /^TableStyleMedium([1-7])$/.exec(tp.styleName);
+            if (!m) {
+                return null;
+            }
+            const headerRows = tp.headerRowCount || 0;
+            const isBody = r >= tp.r1 + headerRows
+                && r <= tp.r2 - (tp.totalsRowCount || 0);
+            if (!isBody || !tp.showRowStripes) {
+                return null;
+            }
+            const bodyIndex = r - tp.r1 - headerRows;
+            if (bodyIndex % 2) {
+                return null;
+            }
+            // Medium1 = dk1, Medium2..7 = accent1..6 (theme slots 0 and 4..9).
+            const idx = m[1] === '1' ? 0 : Number(m[1]) + 2;
+            const tc = this.workbook.__lazyCtx && this.workbook.__lazyCtx.themeColors;
+            return { fill: { bgColor: `#${applyTint(tc && tc[idx] || DEFAULT_THEME[idx], 0.8)}` } };
+        }
+
         applyTablePartStyling(xf, sheet, r, c) {
             if (!sheet.tableParts) {
                 return xf;
@@ -13327,6 +15003,10 @@
                 }
                 const style = tableStyles[tp.styleName];
                 if (!style) {
+                    const builtInDxf = this.builtInTableStyleDxf(tp, r);
+                    if (builtInDxf) {
+                        return this.mergeTablePartDxf(xf, builtInDxf);
+                    }
                     continue;
                 }
                 const dxfId = this.pickTablePartDxfId(tp, style, r, c);
@@ -13361,23 +15041,26 @@
         }
 
         buildTbodyRow(sheet, r, ctx) {
-            const { maxCols, styleTable, mergeMaps, cellStyles, rowHeights, defaultRowPx,
+            const { maxCols, styleTable, mergeMaps, cellStyles,
                     dxfs, cfList, opaqueRects, shapeHyperlinkUrls } = ctx;
             const row = sheet.rows[r];
             const styleRow = cellStyles[r] || [];
+            const rowStyle = this.rowStyleIndex(sheet, r);
             const tr = document.createElement('tr');
-            const px = this.rowHeightToPx(rowHeights[r]) || defaultRowPx;
+            const px = sheet.effectiveRowHeightsPx[r];
             if (px) {
                 tr.style.height = `${px}px`;
             }
             const rowHead = document.createElement('th');
             rowHead.textContent = String(r + 1);
             tr.appendChild(rowHead);
+            const cells = [];
+            this._cells[r] = cells;
             for (let c = 0; c < maxCols; c++) {
                 if (mergeMaps.skip.get(`${r},${c}`)) {
                     continue;
                 }
-                const baseXf = styleTable[styleRow[c] || 0];
+                const baseXf = styleTable[this.cellStyleIndex(styleRow, c, rowStyle)];
                 let xf = this.applyConditionalFormatting(baseXf, sheet, r, c, dxfs, cfList);
                 xf = this.applyTablePartStyling(xf, sheet, r, c);
                 xf = this.applyAutoFilterFlag(xf, sheet, r, c);
@@ -13394,28 +15077,43 @@
                     row[c], xf, mergeMaps.anchor.get(`${r},${c}`), spill, isLink, hidden, linkUrl
                 );
                 td.dataset.cellRef = indexToColRef(c) + (r + 1);
+                const cellFormula = sheet.formulas && sheet.formulas[r] && sheet.formulas[r][c];
+                if (cellFormula) {
+                    td.dataset.cellFormula = cellFormula;
+                }
                 if (this.isTableCorner(sheet, r, c)) {
                     td.classList.add('xlsx-table-corner');
                 }
                 tr.appendChild(td);
+                cells[c] = td;
             }
             return tr;
         }
 
         buildTbody(sheet, maxCols, styleTable, mergeMaps) {
             const tbody = document.createElement('tbody');
+            const cellStyles = sheet.cellStyles || [];
+            const rowHeights = sheet.rowHeights || [];
+            const defaultRowPx = this.rowHeightToPx(sheet.defaultRowHeight) || 15;
+            sheet.effectiveRowHeightsPx = sheet.rows.map((row, r) => {
+                const explicitHeight = this.rowHeightToPx(rowHeights[r]);
+                return explicitHeight || Math.max(
+                    defaultRowPx,
+                    this.rotatedRowHeight(sheet, r, cellStyles[r] || [], styleTable, maxCols)
+                );
+            });
             const ctx = {
                 maxCols,
                 styleTable,
                 mergeMaps,
-                cellStyles: sheet.cellStyles || [],
-                rowHeights: sheet.rowHeights || [],
-                defaultRowPx: this.rowHeightToPx(sheet.defaultRowHeight),
+                cellStyles,
                 dxfs: this.workbook.dxfs || [],
                 cfList: sheet.conditionalFormatting || [],
                 opaqueRects: this.collectOpaqueDrawingRects(sheet),
                 shapeHyperlinkUrls: this.collectShapeHyperlinkUrls(sheet)
             };
+            this._cells = [];
+            this._cellCols = maxCols;
             for (let r = 0; r < sheet.rows.length; r++) {
                 tbody.appendChild(this.buildTbodyRow(sheet, r, ctx));
             }
@@ -13535,14 +15233,20 @@
         renderSheet(idx, contentNode) {
             const sheet = this.workbook.sheets[idx];
             const styleTable = this.workbook.styleTable || [];
+            this._activeSheet = sheet;
+            this._table = null;
+            this._cells = null;
             contentNode.replaceChildren();
             contentNode.scrollTop = 0;
             contentNode.scrollLeft = 0;
+            // The formula bar lives outside #xlsx-content, so replaceChildren above
+            // won't clear it - reset selection state and the bar on every (re)render.
+            this.resetSelection();
 
             if (!sheet || !sheet.rows || !sheet.rows.length) {
                 const empty = document.createElement('div');
                 empty.className = 'xlsx-empty';
-                empty.textContent = 'This sheet is empty';
+                empty.textContent = this.strings.emptySheet;
                 contentNode.appendChild(empty);
                 this.renderCharts(sheet);
                 return;
@@ -13552,6 +15256,14 @@
             const declaredCols = sheet.colWidths ? sheet.colWidths.length : 0;
             const maxCols = Math.min(Math.max(dataCols, declaredCols), dataCols + 8);
             const mergeMaps = this.buildMergeMaps(sheet.merges || []);
+
+            if (sheet.truncated && !this.thumbnail) {
+                const warn = document.createElement('div');
+                warn.className = 'xlsx-truncated';
+                warn.textContent = this.strings.truncated
+                    .replace('%1', MAX_CELLS_PER_SHEET.toLocaleString(intlLocale()));
+                contentNode.appendChild(warn);
+            }
 
             const wrap = document.createElement('div');
             wrap.className = 'xlsx-table-wrap';
@@ -13572,18 +15284,356 @@
             table.appendChild(this.buildTbody(sheet, maxCols, styleTable, mergeMaps));
             wrap.appendChild(table);
             contentNode.appendChild(wrap);
-
-            if (sheet.truncated) {
-                const warn = document.createElement('div');
-                warn.className = 'xlsx-truncated';
-                warn.textContent = `This sheet was truncated to ${
-                    MAX_CELLS_PER_SHEET.toLocaleString()
-                } cells for preview.`;
-                contentNode.appendChild(warn);
+            this._table = table;
+            if (!this.thumbnail) {
+                this.wireSelection(table, contentNode);
             }
 
             this.renderCharts(sheet, wrap);
             this.renderDrawings(sheet, wrap);
+        }
+
+        wireSelection(table, contentNode) {
+            this.removeListeners();
+            this._listeners = [
+                [table, 'click', (ev) => this.handleCellClick(ev)],
+                [contentNode, 'click', (ev) => {
+                    if (!ev.target.closest('td[data-cell-ref]')) {
+                        this.resetSelection();
+                    }
+                }],
+                [document, 'keydown', (ev) => {
+                    if (ev.key === 'Escape' && (this._selectedTd || this._selectedChartCard)) {
+                        this.resetSelection();
+                    }
+                }]
+            ];
+            for (const [node, type, handler] of this._listeners) {
+                node.addEventListener(type, handler);
+            }
+        }
+
+        removeListeners() {
+            for (const [node, type, handler] of this._listeners) {
+                node.removeEventListener(type, handler);
+            }
+            this._listeners = [];
+        }
+
+        handleCellClick(ev) {
+            const td = ev.target.closest('td[data-cell-ref]');
+            if (td) {
+                this.selectCell(td);
+            }
+        }
+
+        selectCell(td) {
+            if (this._selectedTd === td) {
+                return;
+            }
+            this.clearHighlights();
+            this.clearChartSelection();
+            if (this._selectedTd) {
+                this._selectedTd.classList.remove('xlsx-cell-selected');
+            }
+            this._selectedTd = td;
+            td.classList.add('xlsx-cell-selected');
+
+            const nameRef = td.dataset.cellRef || '';
+            const formula = td.dataset.cellFormula;
+            if (formula) {
+                const pos = parseRef(nameRef) || { row: -1, col: -1 };
+                const refs = this.collectRefs(formula, this._activeSheet, pos.row, pos.col);
+                const colorMap = this.assignRefColors(refs);
+                this.highlightRefs(td.closest('table'), refs, colorMap);
+                if (this.onSelectionChange) {
+                    this.onSelectionChange(nameRef, {
+                        kind: 'formula',
+                        tokens: this.buildFormulaTokens(formula, refs, colorMap)
+                    });
+                }
+            }
+            else if (this.onSelectionChange) {
+                this.onSelectionChange(nameRef, { kind: 'value', text: this.cellDisplayValue(td) });
+            }
+        }
+
+        // Collects every highlightable reference in a formula: A1-style refs plus
+        // resolved structured (table) refs. Structured-ref spans are blanked before
+        // A1 extraction so a column like [Q1] isn't misread as cell Q1. Result is
+        // sorted by position so the formula bar can colour tokens left-to-right.
+        collectRefs(formula, sheet, currR, currC) {
+            let struct = [];
+            try {
+                struct = extractStructuredRefs(formula);
+            }
+            catch (ex) {
+                struct = [];
+            }
+            const resolved = [];
+            let masked = formula;
+            for (const s of struct) {
+                masked = masked.slice(0, s.start) + ' '.repeat(s.end - s.start) + masked.slice(s.end);
+                let coords = null;
+                try {
+                    coords = this.resolveStructuredRef(s, sheet, currR, currC);
+                }
+                catch (ex) {
+                    coords = null;
+                }
+                if (coords) {
+                    resolved.push({ text: s.text, start: s.start, end: s.end,
+                                    r1: coords.r1, c1: coords.c1, r2: coords.r2, c2: coords.c2 });
+                }
+            }
+            let a1 = [];
+            try {
+                a1 = extractFormulaRefs(masked);
+            }
+            catch (ex) {
+                a1 = [];
+            }
+            return [...resolved, ...a1].sort((x, y) => x.start - y.start);
+        }
+
+        tableColIndex(tp, name) {
+            if (!tp.columns) {
+                return -1;
+            }
+            const target = normalizeTableColName(name);
+            for (let i = 0; i < tp.columns.length; i++) {
+                if (normalizeTableColName(tp.columns[i]) === target) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        findTablePart(sheet, desc, currR, currC) {
+            const parts = sheet && sheet.tableParts;
+            if (!parts || !parts.length) {
+                return null;
+            }
+            if (desc.table) {
+                const want = normalizeTableColName(desc.table);
+                return parts.find((t) => normalizeTableColName(t.name) === want) || null;
+            }
+            return parts.find((t) => currR >= t.r1 && currR <= t.r2
+                && currC >= t.c1 && currC <= t.c2) || null;
+        }
+
+        // Resolves a structured reference descriptor to a grid rectangle using the
+        // owning table's range, columns and header/totals rows. Returns null when the
+        // table or a referenced column can't be found on the active sheet.
+        resolveStructuredRef(desc, sheet, currR, currC) {
+            const tp = this.findTablePart(sheet, desc, currR, currC);
+            if (!tp) {
+                return null;
+            }
+            const { r1: tr1, r2: tr2, c1: tc1, c2: tc2,
+                    headerRowCount, totalsRowCount } = tp;
+            let c1 = tc1;
+            let c2 = tc2;
+            if (desc.columns.length) {
+                const idxs = [];
+                for (const name of desc.columns) {
+                    const idx = this.tableColIndex(tp, name);
+                    if (idx < 0) {
+                        return null;
+                    }
+                    idxs.push(tc1 + idx);
+                }
+                c1 = Math.min(...idxs);
+                c2 = Math.max(...idxs);
+            }
+            const hdr = headerRowCount || 0;
+            const tot = totalsRowCount || 0;
+            let r1;
+            let r2;
+            if (desc.thisRow) {
+                r1 = r2 = currR;
+            }
+            else if (desc.item === '#totals') {
+                if (!tot) {
+                    return null;
+                }
+                r1 = tr2 - tot + 1;
+                r2 = tr2;
+            }
+            else if (desc.item === '#headers') {
+                if (!hdr) {
+                    return null;
+                }
+                r1 = tr1;
+                r2 = tr1 + hdr - 1;
+            }
+            else if (desc.item === '#all') {
+                r1 = tr1;
+                r2 = tr2;
+            }
+            else {
+                r1 = tr1 + hdr;
+                r2 = tr2 - tot;
+            }
+            if (r1 > r2 || c1 > c2 || currR < 0) {
+                return null;
+            }
+            return { r1, r2, c1, c2 };
+        }
+
+        resetSelection() {
+            this.clearHighlights();
+            this.clearChartSelection();
+            if (this._selectedTd) {
+                this._selectedTd.classList.remove('xlsx-cell-selected');
+                this._selectedTd = null;
+            }
+            if (this.onSelectionChange) {
+                this.onSelectionChange(null, null);
+            }
+        }
+
+        clearChartSelection() {
+            if (this._selectedChartCard) {
+                this._selectedChartCard.classList.remove('xlsx-chart-selected');
+                this._selectedChartCard = null;
+            }
+        }
+
+        // Selects a chart overlay and highlights the source cells it draws from,
+        // mirroring how Excel outlines a chart's data ranges when it is clicked.
+        selectChart(card) {
+            if (this._selectedChartCard === card) {
+                return;
+            }
+            this.clearHighlights();
+            if (this._selectedTd) {
+                this._selectedTd.classList.remove('xlsx-cell-selected');
+                this._selectedTd = null;
+            }
+            this.clearChartSelection();
+            this._selectedChartCard = card;
+            card.classList.add('xlsx-chart-selected');
+
+            const chart = card._chart;
+            this.highlightChartRefs(chart);
+            if (this.onSelectionChange) {
+                const name = chart && chart.title && chart.title.text || '';
+                this.onSelectionChange(name, { kind: 'value', text: '' });
+            }
+        }
+
+        // Parses each of the chart's source-range formulas and highlights those that
+        // live on the active sheet, one colour per distinct range.
+        highlightChartRefs(chart) {
+            const table = this._table;
+            if (!table || !chart || !chart.sourceRefs || !chart.sourceRefs.length) {
+                return;
+            }
+            const activeName = this._activeSheet && this._activeSheet.name;
+            const refs = [];
+            for (const sr of chart.sourceRefs) {
+                const range = parseCellRangeRef(sr.ref);
+                if (!range) {
+                    continue;
+                }
+                if (range.sheet && activeName && range.sheet !== activeName) {
+                    continue;
+                }
+                refs.push({ text: sr.ref, r1: range.r1, c1: range.c1, r2: range.r2, c2: range.c2 });
+            }
+            const colorMap = this.assignRefColors(refs);
+            this.highlightRefs(table, refs, colorMap);
+        }
+
+        cellDisplayValue(td) {
+            const content = td.querySelector('.xlsx-cell-content');
+            return content ? content.textContent : '';
+        }
+
+        // Maps each distinct reference text to a palette index, in first-seen order,
+        // so the same reference is coloured identically wherever it appears.
+        assignRefColors(refs) {
+            const map = new Map();
+            let next = 0;
+            for (const ref of refs) {
+                if (!map.has(ref.text)) {
+                    map.set(ref.text, next % REF_HIGHLIGHT_COLORS.length);
+                    next++;
+                }
+            }
+            return map;
+        }
+
+        // Splits the formula into ordered { text, color? } spans for the formula bar:
+        // reference substrings carry their matched colour, the rest are plain.
+        buildFormulaTokens(formula, refs, colorMap) {
+            const tokens = [];
+            let cursor = 0;
+            for (const ref of refs) {
+                if (ref.start < cursor) {
+                    continue;
+                }
+                if (ref.start > cursor) {
+                    tokens.push({ text: formula.slice(cursor, ref.start) });
+                }
+                tokens.push({ text: ref.text, color: REF_HIGHLIGHT_COLORS[colorMap.get(ref.text)] });
+                cursor = ref.end;
+            }
+            if (cursor < formula.length) {
+                tokens.push({ text: formula.slice(cursor) });
+            }
+            return tokens;
+        }
+
+        highlightRefs(table, refs, colorMap) {
+            if (!table) {
+                return;
+            }
+            for (const ref of refs) {
+                this.highlightRange(ref, REF_HIGHLIGHT_COLORS[colorMap.get(ref.text)]);
+            }
+        }
+
+        highlightRange(ref, color) {
+            const { r1, c1 } = ref;
+            // Full column / full row refs come back as Infinity - clamp to the rendered grid.
+            const r2 = Math.min(ref.r2, this._cells.length - 1);
+            const c2 = Math.min(ref.c2, this._cellCols - 1);
+            if (r2 < r1 || c2 < c1) {
+                return;
+            }
+            const fill = (r2 - r1 + 1) * (c2 - c1 + 1) <= MAX_HIGHLIGHT_CELLS;
+            // Draw the whole contiguous range as a single box: each cell carries border
+            // segments only on the sides that lie on the range perimeter.
+            for (let r = r1; r <= r2; r++) {
+                if (!fill && this._highlightedTds.length >= MAX_HIGHLIGHT_EDGE_CELLS) {
+                    return;
+                }
+                const wholeRow = fill || r === r1 || r === r2;
+                for (let c = c1; c <= c2; c = wholeRow || c === c2 ? c + 1 : c2) {
+                    this.markCell(r, c, color,
+                                  { top: r === r1, bottom: r === r2, left: c === c1, right: c === c2, fill });
+                }
+            }
+        }
+
+        markCell(r, c, color, edges) {
+            const td = this._cells[r] && this._cells[r][c];
+            if (!td) {
+                return;
+            }
+            td.classList.add('xlsx-ref-highlight');
+            td.style.boxShadow = edgeBoxShadow(color, edges);
+            this._highlightedTds.push(td);
+        }
+
+        clearHighlights() {
+            for (const td of this._highlightedTds) {
+                td.classList.remove('xlsx-ref-highlight');
+                td.style.boxShadow = '';
+            }
+            this._highlightedTds = [];
         }
 
         renderDrawings(sheet, wrap) {
@@ -13622,19 +15672,23 @@
             if (!rect || rect.w <= 0 || rect.h <= 0) {
                 return null;
             }
+            let node = null;
             if (drawing.kind === 'group') {
-                return this.buildGroupNode(drawing, sheet, rect);
+                node = this.buildGroupNode(drawing, sheet, rect);
             }
-            if (drawing.kind === 'picture') {
-                return this.buildPictureNode(drawing, rect);
+            else if (drawing.kind === 'picture') {
+                node = this.buildPictureNode(drawing, rect);
             }
-            if (drawing.kind === 'shape') {
-                return this.buildShapeNode(drawing, rect);
+            else if (drawing.kind === 'shape') {
+                node = this.buildShapeNode(drawing, rect);
             }
-            if (drawing.kind === 'slicer') {
-                return this.buildSlicerNode(drawing, rect);
+            else if (drawing.kind === 'slicer') {
+                node = this.buildSlicerNode(drawing, rect);
             }
-            return null;
+            if (node && Number.isInteger(drawing.zOrder)) {
+                node.style.zIndex = String(10 + drawing.zOrder);
+            }
+            return node;
         }
 
         buildSlicerNode(drawing, rect) {
@@ -13755,8 +15809,8 @@
             const rotDeg = typeof drawing.xfrm.rot === 'number' ? drawing.xfrm.rot : 0;
             const normRot = (rotDeg % 360 + 360) % 360;
             const isQuarter = Math.abs(normRot - 90) < 0.5 || Math.abs(normRot - 270) < 0.5;
-            const wantW = Math.max(1, Math.round((isQuarter ? xext.cy : xext.cx) / EMU_PER_PX));
-            const wantH = Math.max(1, Math.round((isQuarter ? xext.cx : xext.cy) / EMU_PER_PX));
+            const wantW = Math.max(1, Math.round((isQuarter ? xext.cy : xext.cx) / EMU_PER_POINT));
+            const wantH = Math.max(1, Math.round((isQuarter ? xext.cx : xext.cy) / EMU_PER_POINT));
             const wRatio = rect.w / wantW;
             const hRatio = rect.h / wantH;
             if (wRatio > 0.5 && wRatio < 2 && hRatio > 0.5 && hRatio < 2) {
@@ -13775,10 +15829,10 @@
 
         absoluteEmuToRect(xfrm, sheet) {
             const {off, ext} = xfrm;
-            const x = HEADER_W + off.x / EMU_PER_PX;
-            const y = HEADER_H + off.y / EMU_PER_PX;
-            const w = ext.cx / EMU_PER_PX;
-            const h = ext.cy / EMU_PER_PX;
+            const x = HEADER_W + off.x / EMU_PER_POINT;
+            const y = HEADER_H + off.y / EMU_PER_POINT;
+            const w = ext.cx / EMU_PER_POINT;
+            const h = ext.cy / EMU_PER_POINT;
             return {
                 x: Math.round(x),
                 y: Math.round(y),
@@ -13793,10 +15847,10 @@
                 return null;
             }
             if (!anchor.from && anchor.pos) {
-                const x = HEADER_W + anchor.pos.x / EMU_PER_PX;
-                const y = HEADER_H + anchor.pos.y / EMU_PER_PX;
-                const w = anchor.ext ? anchor.ext.cx / EMU_PER_PX : 120;
-                const h = anchor.ext ? anchor.ext.cy / EMU_PER_PX : 60;
+                const x = HEADER_W + anchor.pos.x / EMU_PER_POINT;
+                const y = HEADER_H + anchor.pos.y / EMU_PER_POINT;
+                const w = anchor.ext ? anchor.ext.cx / EMU_PER_POINT : 120;
+                const h = anchor.ext ? anchor.ext.cy / EMU_PER_POINT : 60;
                 return {
                     x: Math.round(x),
                     y: Math.round(y),
@@ -13819,8 +15873,8 @@
                 h = endY - y;
             }
             else if (anchor.ext) {
-                w = anchor.ext.cx / EMU_PER_PX;
-                h = anchor.ext.cy / EMU_PER_PX;
+                w = anchor.ext.cx / EMU_PER_POINT;
+                h = anchor.ext.cy / EMU_PER_POINT;
             }
             else {
                 w = 120;
@@ -13838,33 +15892,27 @@
         anchorPointX(pt, sheet) {
             let col = pt.col || 0;
             let colOff = pt.colOff || 0;
-            while (true) {
+            while (col < XL_MAX_COLS) {
                 const excelPx = this.excelStoredColPx(col, sheet);
                 if (excelPx <= 0) {
                     break;
                 }
-                const excelEmu = excelPx * EMU_PER_PX;
-                if (colOff > excelEmu + EMU_PER_PX) {
+                const excelEmu = excelPx * EMU_PER_POINT;
+                if (colOff > excelEmu + EMU_PER_POINT) {
                     colOff -= excelEmu;
                     col += 1;
                     continue;
                 }
                 break;
             }
-            let x = HEADER_W;
-            for (let c = 0; c < col; c++) {
-                x += this.colPx(c, sheet);
-            }
-            x += colOff / EMU_PER_PX;
+            let x = HEADER_W + this.anchorColsPx(col, sheet);
+            x += colOff / EMU_PER_POINT;
             return x;
         }
 
         anchorPointY(pt, sheet) {
-            let y = HEADER_H;
-            for (let r = 0; r < (pt.row || 0); r++) {
-                y += this.rowPx(r, sheet);
-            }
-            y += (pt.rowOff || 0) / EMU_PER_PX;
+            let y = HEADER_H + this.anchorRowsPx(pt.row || 0, sheet);
+            y += (pt.rowOff || 0) / EMU_PER_POINT;
             return y;
         }
 
@@ -14020,6 +16068,7 @@
             this.applyXfrmTransform(node, drawing.xfrm);
             node._drawingRect = rect;
             const textRect = this.applyShapeGeometry(node, drawing, drawRect);
+            this.applyDrawingShadow(node, drawing.shadow);
             if (drawing.text) {
                 node.appendChild(this.buildShapeTextBlock(drawing.text, drawing.prst, textRect, drawRect));
             }
@@ -14031,6 +16080,18 @@
                 this.applyScrollHotspot(node, prst, drawing.descr || drawing.name);
             }
             return node;
+        }
+
+        applyDrawingShadow(node, shadow) {
+            if (!node || !shadow || !shadow.color) {
+                return;
+            }
+            const x = Math.round(shadow.offsetX || 0);
+            const y = Math.round(shadow.offsetY || 0);
+            const blur = Math.max(0, Math.round(shadow.blur || 0));
+            const raw = typeof shadow.opacity === 'number' ? shadow.opacity : 1;
+            const opacity = Math.max(0, Math.min(1, raw));
+            node.style.boxShadow = `${x}px ${y}px ${blur}px ${hexToRgba(shadow.color, opacity)}`;
         }
 
         applyScrollHotspot(node, prst, title) {
@@ -14540,7 +16601,18 @@
             const h = document.createElement('div');
             h.className = 'xlsx-chart-title';
             h.textContent = title.text;
-            this.applyFontStyle(h, title.font);
+            this.applyFontStyle(h, this.chartFont(title.font, true));
+            if (title.overlay === false && !card._chart.plotLayout) {
+                if (card._chart.is3D && card._chart.type === 'bar') {
+                    h.classList.add('xlsx-chart-title-3d-flow');
+                }
+                else {
+                    h.classList.add('xlsx-chart-title-flow');
+                    if (card._chart.is3D) {
+                        h.classList.add('xlsx-chart-title-3d-shift');
+                    }
+                }
+            }
             const x = title.layout && title.layout.x;
             let align;
             if (typeof x !== 'number') {
@@ -14555,7 +16627,8 @@
             else {
                 align = 'center';
             }
-            h.style.alignSelf = align;
+            h.style.textAlign = align === 'flex-start' ? 'left'
+                : align === 'flex-end' ? 'right' : 'center';
             card.appendChild(h);
         }
 
@@ -14565,10 +16638,6 @@
             body.style.flexDirection = legendPos === 't' || legendPos === 'b' ? 'column' : 'row';
             const svgWrap = document.createElement('div');
             svgWrap.className = 'xlsx-chart-svg-wrap';
-            const plotBg = safeCssColor(chart.plotBackground && chart.plotBackground.color);
-            if (plotBg) {
-                svgWrap.style.background = plotBg;
-            }
             const svgSize = this.estimateChartBodySize(chart, legendPos, pos);
             const svg = this.renderChartSvg(chart, svgSize);
             if (svg) {
@@ -14577,7 +16646,7 @@
             else {
                 const note = document.createElement('div');
                 note.className = 'xlsx-chart-note';
-                note.textContent = `Chart type "${chart.type}" is not supported in preview.`;
+                note.textContent = this.strings.chartUnsupported.replace('%1', chart.type);
                 svgWrap.appendChild(note);
             }
             return { body, svgWrap, svg };
@@ -14592,10 +16661,27 @@
                 legend = this.renderLegend(chart);
             }
             if (legend) {
-                this.applyFontStyle(legend, chart.legend && chart.legend.font);
+                this.applyFontStyle(legend, this.chartFont(chart.legend && chart.legend.font, false));
                 legend.classList.add(`xlsx-chart-legend-${legendPos}`);
             }
             return legend;
+        }
+
+        appendChartBodyContents(body, svgWrap, legend, options) {
+            const { legendPos, isCornerLegend, isOverlaySideLegend } = options;
+            if ((legendPos === 't' || legendPos === 'l') && legend && !isOverlaySideLegend) {
+                body.appendChild(legend);
+                body.appendChild(svgWrap);
+            }
+            else if (isCornerLegend || isOverlaySideLegend) {
+                body.appendChild(svgWrap);
+            }
+            else {
+                body.appendChild(svgWrap);
+                if (legend) {
+                    body.appendChild(legend);
+                }
+            }
         }
 
         buildChartCard(chart, pos) {
@@ -14605,33 +16691,70 @@
             card.style.top = `${pos.y}px`;
             card.style.width = `${pos.w}px`;
             card.style.height = `${pos.h}px`;
+            if (Number.isInteger(chart.zOrder)) {
+                card.style.zIndex = String(10 + chart.zOrder);
+            }
+            card._chart = chart;
+            if (chart.roundedCorners === true
+                || chart.roundedCorners === null && !chart.chartBackground) {
+                card.style.borderRadius = '13px';
+            }
+            card.addEventListener('click', (ev) => {
+                // Stop the click reaching the background handler (which would deselect)
+                // and select the chart instead of any cell underneath it.
+                ev.stopPropagation();
+                this.selectChart(card);
+            });
             this.applyChartCardBackground(card, chart.chartBackground);
             this.appendChartTitle(card, chart.title);
 
             const legendPos = chart.legend && chart.legend.show ? chart.legend.position : null;
             const isCornerLegend = legendPos === 'tr' || legendPos === 'br'
                 || legendPos === 'tl' || legendPos === 'bl';
+            const isOverlaySideLegend = this.shouldOverlaySideLegend(chart, legendPos);
             const { body, svgWrap, svg } = this.buildChartBody(chart, legendPos, pos);
             const legend = this.buildChartLegend(chart, svg, legendPos);
-
-            if ((legendPos === 't' || legendPos === 'l') && legend) {
-                body.appendChild(legend);
-                body.appendChild(svgWrap);
+            if (legend && isOverlaySideLegend) {
+                legend.classList.add(`xlsx-chart-legend-overlay-${legendPos}`);
             }
-            else if (isCornerLegend) {
-                body.appendChild(svgWrap);
-            }
-            else {
-                body.appendChild(svgWrap);
-                if (legend) {
-                    body.appendChild(legend);
-                }
-            }
+            this.appendChartBodyContents(body, svgWrap, legend, {
+                legendPos,
+                isCornerLegend,
+                isOverlaySideLegend
+            });
             card.appendChild(body);
-            if (isCornerLegend && legend) {
+            if ((isCornerLegend || isOverlaySideLegend) && legend) {
                 card.appendChild(legend);
             }
             return card;
+        }
+
+        shouldOverlaySideLegend(chart, legendPos) {
+            if (legendPos !== 'r' && legendPos !== 'l') {
+                return false;
+            }
+            return !!(chart && (chart.is3D || chart.type === 'stock'
+                || chart.type === 'surface' || chart.type === 'ofPie'));
+        }
+
+        chartFont(font, bold) {
+            const merged = {
+                size: 10,
+                bold: !!bold,
+                italic: false,
+                color: '#000000',
+                name: 'Calibri'
+            };
+            if (!font) {
+                return merged;
+            }
+            for (const key of ['size', 'bold', 'italic', 'color', 'name']) {
+                if (font[key] !== null && font[key] !== undefined && font[key] !== '' &&
+                    !(key === 'name' && String(font[key]).charAt(0) === '+')) {
+                    merged[key] = font[key];
+                }
+            }
+            return merged;
         }
 
         applyFontStyle(el, font) {
@@ -14639,7 +16762,7 @@
                 return;
             }
             if (font.size) {
-                el.style.fontSize = `${font.size}pt`;
+                el.style.fontSize = `${font.size}px`;
             }
             if (font.color) {
                 el.style.color = font.color;
@@ -14707,11 +16830,44 @@
         }
 
         rowPx(r, sheet) {
+            const effective = sheet.effectiveRowHeightsPx && sheet.effectiveRowHeightsPx[r];
+            if (effective) {
+                return effective;
+            }
             const specific = sheet.rowHeights && sheet.rowHeights[r];
             if (specific) {
                 return this.rowHeightToPx(specific);
             }
-            return this.rowHeightToPx(sheet.defaultRowHeight) || 20;
+            return this.rowHeightToPx(sheet.defaultRowHeight) || 15;
+        }
+
+        chartEmuToPx(value) {
+            return value / EMU_PER_POINT * CHART_POINT_TO_PX;
+        }
+
+        anchorColsPx(col, sheet) {
+            const n = Math.max(0, Math.min(col, XL_MAX_COLS)) || 0;
+            const known = Math.min(n, Math.max(
+                (sheet.effectiveColWidthsPx || []).length, (sheet.colWidths || []).length
+            ));
+            let px = 0;
+            for (let c = 0; c < known; c++) {
+                px += this.colPx(c, sheet);
+            }
+            return px + (n - known) * this.sheetDefaultColPx(sheet);
+        }
+
+        anchorRowsPx(row, sheet) {
+            const n = Math.max(0, Math.min(row, XL_MAX_ROWS)) || 0;
+            // readSheet keeps at most MAX_CELLS_PER_SHEET rows; default height past that
+            const known = Math.min(n, MAX_CELLS_PER_SHEET, Math.max(
+                (sheet.effectiveRowHeightsPx || []).length, (sheet.rowHeights || []).length
+            ));
+            let px = 0;
+            for (let r = 0; r < known; r++) {
+                px += this.rowPx(r, sheet);
+            }
+            return px + (n - known) * (this.rowHeightToPx(sheet.defaultRowHeight) || 15);
         }
 
         computeChartPosition(chart, sheet) {
@@ -14719,38 +16875,36 @@
             const from = anchor.from || { col: 0, row: 0, colOff: 0, rowOff: 0 };
             const {to} = anchor;
             const {ext} = anchor;
+            const frame = chart.frameXfrm;
 
-            let x = HEADER_W;
-            for (let c = 0; c < from.col; c++) {
-                x += this.colPx(c, sheet);
+            if (frame && frame.off && frame.ext && frame.ext.cx > 0 && frame.ext.cy > 0) {
+                return {
+                    x: Math.round(HEADER_W + this.chartEmuToPx(frame.off.x)),
+                    y: Math.round(HEADER_H + this.chartEmuToPx(frame.off.y)),
+                    w: Math.max(120, Math.round(this.chartEmuToPx(frame.ext.cx))),
+                    h: Math.max(80, Math.round(this.chartEmuToPx(frame.ext.cy)))
+                };
             }
-            x += from.colOff / EMU_PER_PX;
 
-            let y = HEADER_H;
-            for (let r = 0; r < from.row; r++) {
-                y += this.rowPx(r, sheet);
-            }
-            y += from.rowOff / EMU_PER_PX;
+            let x = HEADER_W + this.anchorColsPx(from.col, sheet);
+            x += this.chartEmuToPx(from.colOff);
+
+            let y = HEADER_H + this.anchorRowsPx(from.row, sheet);
+            y += this.chartEmuToPx(from.rowOff);
 
             let w;
             let h;
             if (to) {
-                let endX = HEADER_W;
-                for (let c = 0; c < to.col; c++) {
-                    endX += this.colPx(c, sheet);
-                }
-                endX += to.colOff / EMU_PER_PX;
+                let endX = HEADER_W + this.anchorColsPx(to.col, sheet);
+                endX += this.chartEmuToPx(to.colOff);
                 w = endX - x;
-                let endY = HEADER_H;
-                for (let r = 0; r < to.row; r++) {
-                    endY += this.rowPx(r, sheet);
-                }
-                endY += to.rowOff / EMU_PER_PX;
+                let endY = HEADER_H + this.anchorRowsPx(to.row, sheet);
+                endY += this.chartEmuToPx(to.rowOff);
                 h = endY - y;
             }
             else if (ext) {
-                w = ext.cx / EMU_PER_PX;
-                h = ext.cy / EMU_PER_PX;
+                w = this.chartEmuToPx(ext.cx);
+                h = this.chartEmuToPx(ext.cy);
             }
             else {
                 w = 480;
@@ -14767,39 +16921,75 @@
         chartColor(chart, si, pi) {
             const palette = this.chartPalette();
             const series = chart.series[si];
+            let idx = si;
             if (series) {
                 if (typeof pi === 'number' && series.pointColors && series.pointColors[pi]) {
                     return series.pointColors[pi];
                 }
                 if (chart.varyColors && typeof pi === 'number') {
-                    return palette[pi % palette.length];
+                    idx = pi;
                 }
-                if (series.color) {
+                else if (series.color) {
                     return series.color;
                 }
             }
-            return palette[si % palette.length];
+            const color = palette[idx % palette.length];
+            const cycle = Math.floor(idx / palette.length);
+            if (!cycle || !color || color.charAt(0) !== '#') {
+                return color;
+            }
+            // Excel colorful palette variations: lumMod 60%, lumMod 80% + lumOff 20%, ...
+            const variations = [0, -0.4, 0.2, -0.2, 0.4, -0.5, 0.3, -0.3, 0.5];
+            const tint = variations[cycle % variations.length];
+            return `#${applyTint(color.slice(1), tint)}`;
         }
 
         renderLegend(chart) {
             const legend = document.createElement('div');
             legend.className = 'xlsx-chart-legend';
-            for (let i = 0; i < chart.series.length; i++) {
+            const byPoint = chart.varyColors && chart.categories && chart.categories.length
+                && (chart.series.length === 1 || chart.type === 'ofPie');
+            const entries = byPoint ? chart.categories : chart.series;
+            for (let i = 0; i < entries.length; i++) {
                 const item = document.createElement('span');
                 item.className = 'xlsx-chart-legend-item';
                 const sw = document.createElement('span');
                 sw.className = 'xlsx-chart-legend-swatch';
-                sw.style.background = this.chartColor(chart, i);
+                sw.style.background = byPoint ? this.chartColor(chart, 0, i) : this.legendSwatchColor(chart, i);
                 item.appendChild(sw);
                 const label = document.createElement('span');
-                label.textContent = chart.series[i].name;
+                label.textContent = byPoint ?
+                    this.formatCategoryLabel(chart.categories[i], chart.catAxis && chart.catAxis.numFmt, i) :
+                    chart.series[i].name;
                 item.appendChild(label);
                 legend.appendChild(item);
             }
             return legend;
         }
 
+        legendSwatchColor(chart, si) {
+            const series = chart.series[si];
+            const color = this.chartColor(chart, si);
+            const type = series.seriesType || chart.type;
+            const lineSwatch = type === 'line' && !chart.is3D || type === 'scatter' || type === 'stock' ||
+                type === 'radar' && chart.radarStyle !== 'filled';
+            if (!lineSwatch || !series.line || series.line.width !== 0) {
+                return color;
+            }
+            const {marker} = series;
+            const styleMarkers = type === 'scatter' && /^marker$|Marker$/.test(chart.scatterStyle) ||
+                type === 'radar' && chart.radarStyle === 'marker';
+            if (marker ? marker.symbol === 'none' : !styleMarkers) {
+                return 'transparent';
+            }
+            return marker && marker.color || color;
+        }
+
         chartPalette() {
+            const tc = this.workbook && this.workbook.__lazyCtx && this.workbook.__lazyCtx.themeColors;
+            if (tc && tc.length >= 10) {
+                return tc.slice(4, 10).map((h) => `#${h}`);
+            }
             return ['#4472C4', '#ED7D31', '#A5A5A5', '#FFC000', '#5B9BD5',
                     '#70AD47', '#264478', '#9E480E', '#636363', '#997300'];
         }
@@ -14811,14 +17001,17 @@
             const {w: posW, h: posH} = pos;
             let w = posW;
             let h = posH;
-            if (chart.title && chart.title.text && !chart.title.hidden) {
+            if (chart.title && chart.title.text && !chart.title.hidden
+                && chart.title.overlay === false && !chart.plotLayout
+                && !(chart.is3D && chart.type === 'bar')) {
                 h -= 26;
             }
             if (legendPos === 't' || legendPos === 'b') {
                 h -= 24;
             }
-            else if (legendPos === 'r' || legendPos === 'l') {
-                w -= Math.min(120, Math.round(posW * 0.32));
+            else if ((legendPos === 'r' || legendPos === 'l')
+                && !this.shouldOverlaySideLegend(chart, legendPos)) {
+                w -= Math.min(96, Math.max(64, Math.round(posW * 0.13)));
             }
             return { w: Math.max(80, Math.round(w)), h: Math.max(60, Math.round(h)) };
         }
@@ -14827,6 +17020,24 @@
             const {type} = chart;
             if (type === 'bar' || type === 'line' || type === 'area' || type === 'combo') {
                 return this.renderCartesianChart(chart, size);
+            }
+            if (type === 'scatter') {
+                return this.renderScatterChart(chart, size);
+            }
+            if (type === 'bubble') {
+                return this.renderBubbleChart(chart, size);
+            }
+            if (type === 'radar') {
+                return this.renderRadarChart(chart, size);
+            }
+            if (type === 'stock') {
+                return this.renderStockChart(chart, size);
+            }
+            if (type === 'surface') {
+                return this.renderSurfaceChart(chart, size);
+            }
+            if (type === 'ofPie') {
+                return this.renderOfPieChart(chart, size);
             }
             if (type === 'pie' || type === 'doughnut') {
                 return this.renderPieChart(chart, size);
@@ -14905,9 +17116,13 @@
         computeRange(chart) {
             const grouping = chart.grouping || 'standard';
             const valAxis = chart.valAxis || {};
+            const targetTicks3D = chart.is3D && chart.type === 'bar'
+                ? 10 : chart.is3D && (chart.type === 'line' || chart.type === 'area') ? 5 : null;
+            let headroom = targetTicks3D ? 1 : 1.1;
             let extent;
             if (grouping === 'percentStacked') {
                 extent = { min: 0, max: 1 };
+                headroom = 1;
             }
             else if (grouping === 'stacked') {
                 extent = this.rangeStacked(chart.series);
@@ -14916,22 +17131,23 @@
                 extent = this.rangeStandard(chart.series);
             }
             const rawRange = Math.max(1e-9, extent.max - extent.min);
-            const rawStep = this.niceStep(rawRange);
-            const majorUnit = typeof valAxis.majorUnit === 'number' && valAxis.majorUnit > 0
+            const rawStep = this.niceStep(rawRange, targetTicks3D || 7);
+            const majorUnit = Number.isFinite(valAxis.majorUnit) && valAxis.majorUnit > 0
                 ? valAxis.majorUnit
                 : rawStep;
-            const niceMax = typeof valAxis.max === 'number'
+            const niceMax = Number.isFinite(valAxis.max)
                 ? valAxis.max
-                : extent.max <= 0 ? 0 : Math.ceil(extent.max / majorUnit) * majorUnit;
-            const niceMin = typeof valAxis.min === 'number'
+                : extent.max <= 0 ? 0
+                    : Math.ceil(extent.max * headroom / majorUnit) * majorUnit;
+            const niceMin = Number.isFinite(valAxis.min)
                 ? valAxis.min
                 : extent.min < 0 ? Math.floor(extent.min / majorUnit) * majorUnit : 0;
             const range = Math.max(1e-9, niceMax - niceMin);
             return { niceMin, niceMax, range, majorUnit };
         }
 
-        niceStep(range) {
-            const rough = range / 5;
+        niceStep(range, targetTicks) {
+            const rough = range / (targetTicks || 7);
             const exp = Math.floor(Math.log10(rough));
             const base = Math.pow(10, exp);
             const m = rough / base;
@@ -14969,7 +17185,7 @@
             if (line && line.dash && line.dash !== 'solid') {
                 const da = this.dashArrayFor(line.dash, line.width || 1);
                 if (da) {
-                    el.setAttribute('stroke-dasharray', da);
+                    el.setAttribute(STROKE_DASHARRAY_ATTR, da);
                 }
             }
             svg.appendChild(el);
@@ -14996,7 +17212,7 @@
         applySvgFont(el, font) {
             const sz = safeNum(font.size, 0, 144);
             if (sz) {
-                el.style.fontSize = `${sz * 1.333}px`;
+                el.style.fontSize = `${sz}px`;
             }
             const col = safeCssColor(font.color);
             if (col) {
@@ -15009,7 +17225,7 @@
                 el.setAttribute('font-style', 'italic');
             }
             const fam = safeFontFamily(font.name);
-            if (fam) {
+            if (fam && fam.charAt(0) !== '+') {
                 el.setAttribute('font-family', `"${fam}",sans-serif`);
             }
         }
@@ -15031,7 +17247,7 @@
                 if (line.dash && line.dash !== 'solid') {
                     const da = this.dashArrayFor(line.dash, line.width || 1);
                     if (da) {
-                        el.setAttribute('stroke-dasharray', da);
+                        el.setAttribute(STROKE_DASHARRAY_ATTR, da);
                     }
                 }
             }
@@ -15065,11 +17281,11 @@
                 return String(fallbackIdx + 1);
             }
             if (typeof value === 'number' && numFmt && numFmt !== 'General') {
-                const isDateCode = /[dhmsy]/i.test(numFmt) && !/[#$?]/.test(numFmt);
+                const isDateCode = isDateFormatCode(numFmt);
                 if (isDateCode) {
                     const dateStr = (() => {
                         try {
-                            return formatDate(value, numFmt);
+                            return formatDate(value, numFmt, this.date1904());
                         }
                         catch (ex) {
                             return null;
@@ -15088,12 +17304,60 @@
         }
 
         drawYAxisMajorGridline(svg, ns, geom, majorGrid, y) {
+            if (geom.project3D) {
+                const ratio = Math.max(
+                    0, Math.min(1, (geom.H - geom.padB - y) / Math.max(1, geom.innerH))
+                );
+                const frontLeft = geom.project3D(0, ratio, 0);
+                const backLeft = geom.project3D(0, ratio, 1);
+                const backRight = geom.project3D(1, ratio, 1);
+                this.draw3DGridSegment(svg, ns, frontLeft, backLeft, majorGrid);
+                this.draw3DGridSegment(svg, ns, backLeft, backRight, majorGrid);
+                return;
+            }
+            const shift = geom.shift || { dx: 0, dy: 0 };
+            const x1 = geom.padL + shift.dx;
+            const x2 = geom.W - geom.padR + shift.dx;
+            const gy = y - shift.dy;
+            if (geom.rightAngle3D && geom.shift) {
+                this.draw3DGridSegment(
+                    svg, ns, [geom.padL, y], [x1, gy], majorGrid
+                );
+            }
             if (majorGrid && majorGrid.line && (majorGrid.line.color || majorGrid.line.width !== 0)) {
-                this.drawGridLine(svg, ns, geom.padL, geom.W - geom.padR, y, majorGrid.line);
+                this.drawGridLine(svg, ns, x1, x2, gy, majorGrid.line);
             }
             else if (majorGrid !== null && majorGrid !== undefined) {
-                this.drawGridLine(svg, ns, geom.padL, geom.W - geom.padR, y, null);
+                this.drawGridLine(svg, ns, x1, x2, gy, null);
             }
+        }
+
+        draw3DGridSegment(svg, ns, p1, p2, grid) {
+            if (grid === null || grid === undefined) {
+                return;
+            }
+            const line = grid && grid.line;
+            const el = document.createElementNS(ns, 'line');
+            el.setAttribute('x1', p1[0]);
+            el.setAttribute('y1', p1[1]);
+            el.setAttribute('x2', p2[0]);
+            el.setAttribute('y2', p2[1]);
+            if (line && line.color) {
+                el.setAttribute('stroke', line.color);
+            }
+            else {
+                el.setAttribute('class', 'xlsx-chart-grid');
+            }
+            if (line && line.width) {
+                el.setAttribute(STROKE_WIDTH_ATTR, String(line.width));
+            }
+            if (line && line.dash && line.dash !== 'solid') {
+                const da = this.dashArrayFor(line.dash, line.width || 1);
+                if (da) {
+                    el.setAttribute(STROKE_DASHARRAY_ATTR, da);
+                }
+            }
+            svg.appendChild(el);
         }
 
         drawYAxisTick(svg, ns, geom, ctxYAxis, v, y) {
@@ -15102,12 +17366,26 @@
                 this.drawYAxisMajorGridline(svg, ns, geom, majorGrid, y);
             }
             if (showAxis) {
+                const shift = geom.shift || { dx: 0, dy: 0 };
+                const right = sideKey === 'right';
+                const at = geom.project3D ?
+                    geom.project3D(right ? 1 : 0, (geom.H - geom.padB - y) / Math.max(1, geom.innerH), 0) :
+                    [right ? geom.W - geom.padR : geom.padL, y - shift.dy];
+                const text = this.formatAxisValue(v, valAxis.numFmt, chart.grouping);
+                const font = this.chartFont(labelFont, false);
+                let x = at[0] + (right ? 6 : -6);
+                if (geom.project3D) {
+                    const mctx = this.measureContext();
+                    mctx.font = this.fontStringFor(font);
+                    const w = mctx.measureText(text).width + 2;
+                    x = right ? Math.min(x, geom.W - w) : Math.max(x, w);
+                }
                 this.drawAxisLabel(svg, ns, {
-                    x: sideKey === 'right' ? geom.W - geom.padR + 6 : geom.padL - 6,
-                    y: y + 4,
-                    text: this.formatAxisValue(v, valAxis.numFmt, chart.grouping),
+                    x,
+                    y: at[1] + 4,
+                    text,
                     anchor: sideKey === 'right' ? 'start' : 'end',
-                    font: labelFont
+                    font
                 });
             }
         }
@@ -15117,12 +17395,12 @@
                 return;
             }
             const label = this.drawAxisLabel(svg, ns, {
-                x: sideKey === 'right' ? geom.W - 14 : 14,
+                x: sideKey === 'right' ? geom.W - 19 : 19,
                 y: geom.padT + geom.innerH / 2,
                 text: title.text,
                 anchor: 'middle',
                 rotation: sideKey === 'right' ? 90 : -90,
-                font: title.font
+                font: this.chartFont(title.font, true)
             });
             label.classList.add('xlsx-chart-axis-title');
         }
@@ -15141,15 +17419,23 @@
                 showAxis,
                 chart
             };
-            const ticks = Math.max(2, Math.round(rangeInfo.range / rangeInfo.majorUnit));
+            const step = rangeInfo.range / rangeInfo.majorUnit <= 1000 && Number.isFinite(rangeInfo.majorUnit) ?
+                rangeInfo.majorUnit : this.niceStep(rangeInfo.range);
+            const ticks = Math.max(2, Math.round(rangeInfo.range / step));
             for (let i = 0; i <= ticks; i++) {
-                const v = rangeInfo.niceMin + rangeInfo.majorUnit * i;
+                const v = rangeInfo.niceMin + step * i;
                 if (v > rangeInfo.niceMax + 1e-6) {
                     break;
                 }
                 this.drawYAxisTick(svg, ns, geom, tickCtx, v, valToY(v));
             }
-            if (showAxis) {
+            if (showAxis && geom.project3D) {
+                const px = sideKey === 'right' ? 1 : 0;
+                const [x1, y1] = geom.project3D(px, 0, 0);
+                const [x2, y2] = geom.project3D(px, 1, 0);
+                this.drawAxisLine(svg, ns, x1, y1, x2, y2, valAxis.line);
+            }
+            else if (showAxis) {
                 const ax = sideKey === 'right' ? geom.W - geom.padR : geom.padL;
                 this.drawAxisLine(svg, ns, ax, geom.padT, ax, geom.H - geom.padB, valAxis.line);
             }
@@ -15161,6 +17447,7 @@
             const {labelFont, hidden, labelRotation, numFmt, line, title} = catAxis;
             const showAxis = !hidden;
             const {innerW, padL, padB, H, W, padR, valToY} = geom;
+            const plotBottom = H - padB;
             if (nCats > 0 && showAxis) {
                 const step = innerW / nCats;
                 const offsetMid = isBar ? 0.5 : 0;
@@ -15177,7 +17464,7 @@
                         text: this.formatCategoryLabel(cats[i], numFmt, i),
                         anchor,
                         rotation,
-                        font: labelFont
+                        font: this.chartFont(labelFont, false)
                     });
                 }
             }
@@ -15186,27 +17473,36 @@
                 this.drawAxisLine(svg, ns, padL, baseY, W - padR, baseY, line);
             }
             if (title && title.text) {
-                this.drawAxisLabel(svg, ns, {
+                const label = this.drawAxisLabel(svg, ns, {
                     x: padL + innerW / 2,
-                    y: H - 6,
+                    y: Math.min(H - 7, plotBottom + (showAxis ? 32 : 18)),
                     text: title.text,
                     anchor: 'middle',
-                    font: title.font
+                    font: this.chartFont(title.font, true)
                 });
+                label.classList.add('xlsx-chart-axis-title');
+            }
+        }
+
+        raiseAxisTitles(svg) {
+            const titles = svg.querySelectorAll('.xlsx-chart-axis-title');
+            for (let i = 0; i < titles.length; i++) {
+                svg.appendChild(titles[i]);
             }
         }
 
         barGeometry(chart, geom, si, i, nCats) {
             const groupW = geom.innerW / Math.max(nCats, 1);
             const gapPct = (chart.gapWidth === undefined ? 150 : chart.gapWidth) / 100;
-            const overlapPct = (chart.overlap === undefined ? -27 : chart.overlap) / 100;
-            const isStacked = chart.grouping === 'stacked' || chart.grouping === 'percentStacked';
-            const nSeries = isStacked ? 1 : chart.series.length;
+            const overlapPct = (chart.overlap === undefined ? 0 : chart.overlap) / 100;
+            const oneSlot = chart.grouping === 'stacked' || chart.grouping === 'percentStacked'
+                || this.barsInDepth(chart);
+            const nSeries = oneSlot ? 1 : chart.series.length;
             const denom = nSeries + (nSeries - 1) * -overlapPct + gapPct;
             const barW = groupW / Math.max(1, denom);
             const gap = barW * gapPct;
             const sx = geom.padL + groupW * i + gap / 2;
-            const x = isStacked ? sx : sx + barW * si * (1 - overlapPct);
+            const x = oneSlot ? sx : sx + barW * si * (1 - overlapPct);
             return { x, w: barW };
         }
 
@@ -15239,14 +17535,269 @@
             return [stackState.geom.valToY(0), stackState.geom.valToY(v)];
         }
 
+        depth3D(chart, geom) {
+            const v = chart.view3D || {};
+            const rotX = (Number.isFinite(v.rotX) ? v.rotX : 15) * Math.PI / 180;
+            const rotY = (Number.isFinite(v.rotY) ? v.rotY : 20) * Math.PI / 180;
+            const pct = Math.max(20, Math.min(200, Number.isFinite(v.depth) ? v.depth : 100)) / 100;
+            const len = Math.min(geom.innerW, geom.innerH) * 0.25 * pct;
+            const sx = Math.sin(rotY) < 0 ? -1 : 1;
+            return {
+                dx: sx * Math.max(4, Math.round(len * Math.abs(Math.sin(rotY)))),
+                dy: Math.max(3, Math.round(len * Math.abs(Math.sin(rotX))))
+            };
+        }
+
+        cartesian3DProjector(chart, geom) {
+            const view = chart.view3D || {};
+            const rotY = Number.isFinite(view.rotY) ? view.rotY : 20;
+            const normalizedRotY = (rotY % 360 + 360) % 360;
+            const direction = Math.sin(normalizedRotY * Math.PI / 180) < 0 ? -1 : 1;
+            const depthScale = Math.max(
+                0.2,
+                Math.min(2, Number.isFinite(view.depth) ? view.depth / 100 : 1)
+            );
+            const heightScale = Math.max(
+                0.2,
+                Math.min(2, Number.isFinite(view.height) ? view.height / 100 : 1)
+            );
+            return (x, y, z) => {
+                const px = direction > 0 ? x : 1 - x;
+                const pz = z * depthScale;
+                const lineLayout = chart.type === 'line';
+                const frontBottomX = lineLayout
+                    ? 0.056 + 0.852 * px : 0.050 + 0.863 * px;
+                const backBottomX = lineLayout
+                    ? 0.188 + 0.756 * px : 0.187 + 0.757 * px;
+                const frontTopX = lineLayout
+                    ? 0.038 + 0.887 * px : 0.036 + 0.891 * px;
+                const backTopX = lineLayout
+                    ? 0.184 + 0.776 * px : 0.182 + 0.780 * px;
+                const bottomX = frontBottomX + (backBottomX - frontBottomX) * pz;
+                const topX = frontTopX + (backTopX - frontTopX) * pz;
+                const projectedX = bottomX + (topX - bottomX) * y;
+                const topFront = lineLayout
+                    ? 0.101 + 0.100 * px : 0.147 + 0.121 * px;
+                const bottomFront = lineLayout
+                    ? 0.670 + 0.167 * px : 0.602 + 0.197 * px;
+                const topBack = lineLayout
+                    ? 0.019 + 0.091 * px : 0.085 + 0.088 * px;
+                const bottomBack = 0.531 + 0.158 * px;
+                const defaultTop = topFront + (topBack - topFront) * pz;
+                const bottom = bottomFront + (bottomBack - bottomFront) * pz;
+                const top = bottom - (bottom - defaultTop) * heightScale;
+                const outX = geom.W * projectedX;
+                return [
+                    direction > 0 ? outX : geom.W - outX,
+                    geom.H * (bottom - (bottom - top) * y)
+                ];
+            };
+        }
+
+        cartesian3DAreaProjector(chart, geom) {
+            const view = chart.view3D || {};
+            const rotY = Number.isFinite(view.rotY) ? view.rotY : 20;
+            const normalizedRotY = (rotY % 360 + 360) % 360;
+            const direction = Math.sin(normalizedRotY * Math.PI / 180) < 0 ? -1 : 1;
+            const depthScale = Math.max(
+                0.2,
+                Math.min(2, Number.isFinite(view.depth) ? view.depth / 100 : 1)
+            );
+            const heightScale = Math.max(
+                0.2,
+                Math.min(2, Number.isFinite(view.height) ? view.height / 100 : 1)
+            );
+            return (x, y, z) => {
+                const px = direction > 0 ? x : 1 - x;
+                const pz = z * depthScale;
+                const frontX = 0.056 + 0.8324 * px;
+                const backX = 0.148 + 0.81 * px;
+                const projectedX = geom.W * (frontX + (backX - frontX) * pz);
+                const topFront = 0.1553 + 0.1441 * px;
+                const bottomFront = 0.5976 + 0.2084 * px;
+                const topBack = 0.0684 + 0.0763 * px;
+                const bottomBack = 0.5569 + 0.0517 * px;
+                const defaultTop = topFront + (topBack - topFront) * pz;
+                const bottom = bottomFront + (bottomBack - bottomFront) * pz;
+                const top = bottom - (bottom - defaultTop) * heightScale;
+                return [
+                    direction > 0 ? projectedX : geom.W - projectedX,
+                    geom.H * (bottom - (bottom - top) * y)
+                ];
+            };
+        }
+
+        draw3DWalls(svg, ns, geom, off) {
+            if (geom.project3D) {
+                const p = geom.project3D;
+                this.addFace(svg, ns, [
+                    p(0, 0, 0), p(1, 0, 0), p(1, 0, 1), p(0, 0, 1)
+                ], '#ffffff', '#b7b7b7');
+                this.addFace(svg, ns, [
+                    p(0, 0, 0), p(0, 0, 1), p(0, 1, 1), p(0, 1, 0)
+                ], '#ffffff', '#b7b7b7');
+                this.addFace(svg, ns, [
+                    p(0, 0, 1), p(1, 0, 1), p(1, 1, 1), p(0, 1, 1)
+                ], '#ffffff', '#b7b7b7');
+                return;
+            }
+            const left = geom.padL;
+            const right = geom.W - geom.padR;
+            const top = geom.padT;
+            const bottom = geom.H - geom.padB;
+            const {dx, dy} = off;
+            this.addFace(svg, ns, [
+                [left, bottom], [right, bottom], [right + dx, bottom - dy], [left + dx, bottom - dy]
+            ], '#ffffff', '#b7b7b7');
+            this.addFace(svg, ns, [
+                [left, top], [left + dx, top - dy], [left + dx, bottom - dy], [left, bottom]
+            ], '#ffffff', '#b7b7b7');
+            this.addFace(svg, ns, [
+                [left + dx, top - dy], [right + dx, top - dy],
+                [right + dx, bottom - dy], [left + dx, bottom - dy]
+            ], '#ffffff', '#b7b7b7');
+        }
+
+        addFace(svg, ns, points, fill, stroke) {
+            const face = document.createElementNS(ns, 'path');
+            const coords = points.map((p) => `${p[0]},${p[1]}`).join('L');
+            face.setAttribute('d', `M${coords}Z`);
+            face.setAttribute('fill', fill);
+            if (stroke) {
+                face.setAttribute('stroke', stroke);
+                face.setAttribute(STROKE_WIDTH_ATTR, '0.5');
+            }
+            svg.appendChild(face);
+            return face;
+        }
+
+        draw3DBarFaces(svg, ns, bar, off, color) {
+            const top = Math.min(bar.y0, bar.y1);
+            const bottom = Math.max(bar.y0, bar.y1);
+            const w = Math.max(0.5, bar.w);
+            const {x} = bar;
+            const {dx, dy} = off;
+            this.addFace(svg, ns, [
+                [x + w, top], [x + w + dx, top - dy], [x + w + dx, bottom - dy], [x + w, bottom]
+            ], this.shadeColor(color, -0.36) || color, '');
+            this.addFace(svg, ns, [
+                [x, top], [x + w, top], [x + w + dx, top - dy], [x + dx, top - dy]
+            ], this.shadeColor(color, -0.24) || color, '');
+        }
+
+        draw3DBarFront(svg, ns, bar, color) {
+            const top = Math.min(bar.y0, bar.y1);
+            const bottom = Math.max(bar.y0, bar.y1);
+            const w = Math.max(0.5, bar.w);
+            const front = document.createElementNS(ns, 'rect');
+            front.setAttribute('x', bar.x);
+            front.setAttribute('y', top);
+            front.setAttribute('width', w);
+            front.setAttribute('height', Math.max(1, bottom - top));
+            front.setAttribute('fill', color);
+            svg.appendChild(front);
+        }
+
+        barsInDepth(chart) {
+            return !!chart.is3D && chart.grouping !== 'stacked' && chart.grouping !== 'percentStacked'
+                && chart.grouping !== 'clustered';
+        }
+
+        barDepthSlot3D(chart, si, count, inDepth) {
+            if (inDepth) {
+                return this.seriesDepthSlot3D(chart, si, count);
+            }
+            const gap = Math.max(
+                0,
+                Math.min(500, Number.isFinite(chart.gapDepth) ? chart.gapDepth : 150)
+            ) / 100;
+            const size = 1 / (1 + gap);
+            return {
+                start: (1 - size) / 2,
+                size
+            };
+        }
+
+        seriesDepthIndex3D(chart, si, count) {
+            const ser = chart.series[si] || {};
+            const raw = Number.isFinite(ser.plotOrder) ? ser.plotOrder : si;
+            const index = Math.max(0, Math.min(count - 1, Math.round(raw)));
+            return chart.serAxis && chart.serAxis.reversed ? count - 1 - index : index;
+        }
+
+        draw3DBars(svg, ns, chart, geom, bars) {
+            const off = geom.shift || this.depth3D(chart, geom);
+            const inDepth = this.barsInDepth(chart);
+            const ordered = [...bars].sort((a, b) => {
+                const seriesOrder = inDepth
+                    ? this.seriesDepthIndex3D(chart, b.si, chart.series.length)
+                        - this.seriesDepthIndex3D(chart, a.si, chart.series.length)
+                    : a.si - b.si;
+                return seriesOrder || b.x - a.x || a.y0 - b.y0;
+            });
+            const rendered = ordered.map((bar) => {
+                const color = bar.seriesColor;
+                const depthIndex = this.seriesDepthIndex3D(
+                    chart, bar.si, chart.series.length
+                );
+                const slot = this.barDepthSlot3D(
+                    chart, depthIndex, chart.series.length, inDepth
+                );
+                const placed = Object.assign({}, bar, {
+                    x: bar.x + off.dx * slot.start,
+                    y0: bar.y0 - off.dy * slot.start,
+                    y1: bar.y1 - off.dy * slot.start
+                });
+                return {
+                    bar,
+                    color,
+                    placed,
+                    layer: inDepth ? depthIndex : 0,
+                    faceOff: {
+                        dx: off.dx * slot.size,
+                        dy: off.dy * slot.size
+                    }
+                };
+            });
+            let start = 0;
+            while (start < rendered.length) {
+                let end = start + 1;
+                while (end < rendered.length && rendered[end].layer === rendered[start].layer) {
+                    end++;
+                }
+                const layer = rendered.slice(start, end);
+                for (const item of layer) {
+                    this.draw3DBarFaces(svg, ns, item.placed, item.faceOff, item.color);
+                }
+                for (const item of layer) {
+                    this.draw3DBarFront(svg, ns, item.placed, item.color);
+                }
+                start = end;
+            }
+            for (const item of rendered) {
+                const { bar, placed, faceOff } = item;
+                if (bar.ser.dataLabels && bar.ser.dataLabels.show) {
+                    this.drawBarDataLabel(svg, ns, {
+                        chart,
+                        ser: bar.ser,
+                        v: bar.v,
+                        i: bar.i,
+                        cx: placed.x + bar.w / 2 + faceOff.dx / 2,
+                        y0: placed.y0 - faceOff.dy,
+                        y1: placed.y1 - faceOff.dy
+                    });
+                }
+            }
+        }
+
         drawSingleBar(svg, ns, chart, ctx) {
-            const { x, w, y0, y1, si, i, ser, seriesColor } = ctx;
+            const { x, w, y0, y1, ser, seriesColor } = ctx;
             const rect = document.createElementNS(ns, 'rect');
             rect.setAttribute('x', x);
             rect.setAttribute('y', Math.min(y0, y1));
             rect.setAttribute('width', Math.max(0.5, w));
             rect.setAttribute('height', Math.max(1, Math.abs(y1 - y0)));
-            rect.setAttribute('fill', this.chartColor(chart, si, i) || seriesColor);
+            rect.setAttribute('fill', seriesColor);
             const lineProps = ser.line;
             if (lineProps && lineProps.color) {
                 rect.setAttribute('stroke', lineProps.color);
@@ -15261,10 +17812,7 @@
         }
 
         shouldApplyChartShadow(chart, ser) {
-            if (ser && ser.hasShadow === false) {
-                return false;
-            }
-            return chart.type === 'bar' || chart.type === 'pie' || chart.type === 'doughnut';
+            return !!(ser && ser.hasShadow);
         }
 
         ensureShadowFilter(svg, ns, deep) {
@@ -15321,6 +17869,7 @@
             const posStack = new Array(nCats).fill(0);
             const negStack = new Array(nCats).fill(0);
             const totals = isPctStacked ? this.percentStackTotals(chart.series, nCats) : null;
+            const bars3D = chart.is3D ? [] : null;
             for (let si = 0; si < chart.series.length; si++) {
                 const ser = chart.series[si];
                 const seriesColor = this.chartColor(chart, si);
@@ -15332,11 +17881,18 @@
                     const { x, w } = this.barGeometry(chart, geom, si, i, nCats);
                     const [y0, y1] = this.barYRange({ isStacked, geom, posStack, negStack, i }, v);
                     const color = this.barFill(chart, ser, si, i, v, seriesColor);
+                    if (bars3D) {
+                        bars3D.push({ x, w, y0, y1, si, i, ser, v, seriesColor: color });
+                        continue;
+                    }
                     this.drawSingleBar(svg, ns, chart, { x, w, y0, y1, si, i, ser, seriesColor: color });
                     if (ser.dataLabels && ser.dataLabels.show) {
                         this.drawBarDataLabel(svg, ns, { chart, ser, v, i, cx: x + w / 2, y0, y1 });
                     }
                 }
+            }
+            if (bars3D) {
+                this.draw3DBars(svg, ns, chart, geom, bars3D);
             }
         }
 
@@ -15379,7 +17935,7 @@
         horizBarGeometry(chart, geom, si, i, nCats) {
             const groupH = geom.innerH / Math.max(nCats, 1);
             const gapPct = (chart.gapWidth === undefined ? 150 : chart.gapWidth) / 100;
-            const overlapPct = (chart.overlap === undefined ? -27 : chart.overlap) / 100;
+            const overlapPct = (chart.overlap === undefined ? 0 : chart.overlap) / 100;
             const isStacked = chart.grouping === 'stacked' || chart.grouping === 'percentStacked';
             const nSeries = isStacked ? 1 : chart.series.length;
             const denom = nSeries + (nSeries - 1) * -overlapPct + gapPct;
@@ -15391,13 +17947,13 @@
         }
 
         drawSingleHorizBar(svg, ns, chart, ctx) {
-            const { y, h, x0, x1, si, i, ser, seriesColor } = ctx;
+            const { y, h, x0, x1, ser, seriesColor } = ctx;
             const rect = document.createElementNS(ns, 'rect');
             rect.setAttribute('x', Math.min(x0, x1));
             rect.setAttribute('y', y);
             rect.setAttribute('width', Math.max(1, Math.abs(x1 - x0)));
             rect.setAttribute('height', Math.max(0.5, h));
-            rect.setAttribute('fill', this.chartColor(chart, si, i) || seriesColor);
+            rect.setAttribute('fill', seriesColor);
             const lineProps = ser.line;
             if (lineProps && lineProps.color) {
                 rect.setAttribute('stroke', lineProps.color);
@@ -15444,7 +18000,7 @@
             const dl = ser.dataLabels;
             const parts = [];
             if (dl.showCategory && chart.categories && chart.categories[i] !== undefined) {
-                parts.push(String(chart.categories[i]));
+                parts.push(this.formatCategoryLabel(chart.categories[i], chart.catAxis && chart.catAxis.numFmt, i));
             }
             if (dl.showSeries) {
                 parts.push(ser.name);
@@ -15482,7 +18038,7 @@
         }
 
         drawMarker(svg, ns, opts) {
-            const { cx, cy, symbol, size, fill, stroke } = opts;
+            const { cx, cy, symbol, size, fill, stroke, opacity } = opts;
             if (!symbol || symbol === 'none') {
                 return;
             }
@@ -15531,6 +18087,9 @@
                     break;
             }
             el.setAttribute('fill', fill);
+            if (typeof opacity === 'number') {
+                el.setAttribute('fill-opacity', String(opacity));
+            }
             if (stroke) {
                 el.setAttribute('stroke', stroke);
                 el.setAttribute(STROKE_WIDTH_ATTR, '1');
@@ -15613,7 +18172,8 @@
             });
         }
 
-        drawAreaFill(svg, ns, points, prevPoints, color, isStacked, geom) {
+        drawAreaFill(svg, ns, points, prevPoints, color, opts) {
+            const {isStacked, geom, opaque} = opts;
             if (!points.length) {
                 return;
             }
@@ -15628,13 +18188,16 @@
             const polygon = document.createElementNS(ns, 'polygon');
             polygon.setAttribute('points', polyPoints.map((p) => p.join(',')).join(' '));
             polygon.setAttribute('fill', color);
-            polygon.setAttribute('fill-opacity', isStacked ? '0.8' : '0.3');
+            polygon.setAttribute('fill-opacity', opaque ? '1' : isStacked ? '0.8' : '0.3');
             svg.appendChild(polygon);
         }
 
-        drawSeriesPath(svg, ns, points, ser, color) {
+        drawSeriesPath(svg, ns, points, ser, color, defaultWidth = 2) {
             const line = ser.line || {};
-            const lineWidth = line.width || 2;
+            if (line.width === 0 || !points.length) {
+                return;
+            }
+            const lineWidth = typeof line.width === 'number' ? line.width : defaultWidth;
             const path = document.createElementNS(ns, 'path');
             path.setAttribute('d', ser.smooth
                 ? this.smoothPathD(points)
@@ -15645,7 +18208,7 @@
             if (line.dash && line.dash !== 'solid') {
                 const da = this.dashArrayFor(line.dash, lineWidth);
                 if (da) {
-                    path.setAttribute('stroke-dasharray', da);
+                    path.setAttribute(STROKE_DASHARRAY_ATTR, da);
                 }
             }
             svg.appendChild(path);
@@ -15660,7 +18223,8 @@
                 symbol: marker.symbol && marker.symbol !== 'auto' ? marker.symbol : 'circle',
                 size: marker.size || 5,
                 fill: marker.color || color,
-                stroke: marker.line && marker.line.color || color
+                stroke: marker.line && marker.line.color || color,
+                opacity: marker.opacity
             };
             for (const [px, py] of points) {
                 this.drawMarker(svg, ns, { ...opts, cx: px, cy: py });
@@ -15686,26 +18250,169 @@
             }
         }
 
-        drawLines(svg, ns, chart, geom, nCats) {
+        depthLayer(svg, ns, off, index) {
+            if (!off || !index) {
+                return svg;
+            }
+            const layer = document.createElementNS(ns, 'g');
+            layer.setAttribute('transform', `translate(${off.dx * index},${-off.dy * index})`);
+            svg.appendChild(layer);
+            return layer;
+        }
+
+        draw3DRibbon(svg, ns, points, off, color) {
+            for (let i = 0; i + 1 < points.length; i++) {
+                const a = points[i];
+                const b = points[i + 1];
+                this.addFace(svg, ns, [
+                    a, b, [b[0] + off.dx, b[1] - off.dy], [a[0] + off.dx, a[1] - off.dy]
+                ], color, '');
+            }
+        }
+
+        seriesDepthSlot3D(chart, si, count) {
+            const gapDepth = chart.gapDepth === undefined ? 150 : chart.gapDepth;
+            const gap = Math.max(0, Math.min(500, gapDepth)) / 100;
+            if (chart.type === 'area') {
+                const denom = Math.max(1, count * (1 + gap));
+                return {
+                    start: (gap / 2 + si * (1 + gap)) / denom,
+                    size: 1 / denom
+                };
+            }
+            const denom = Math.max(1, count + Math.max(0, count - 1) * gap);
+            return {
+                start: si * (1 + gap) / denom,
+                size: 1 / denom
+            };
+        }
+
+        projectCartesianPoints3D(points, geom, z, nCats) {
+            const bottom = geom.H - geom.padB;
+            return points.map((point, i) => {
+                const centeredX = (i + 0.5) / Math.max(1, nCats);
+                const x = nCats
+                    ? 0.015 + 0.98 * centeredX
+                    : (point[0] - geom.padL) / Math.max(1, geom.innerW);
+                const y = (bottom - point[1]) / Math.max(1, geom.innerH);
+                return (geom.projectData3D || geom.project3D)(x, y, z);
+            });
+        }
+
+        drawProjectedArea3D(svg, ns, chart, geom, ctx) {
+            const {points, prevPoints, color, slot, ser} = ctx;
+            const front = this.projectCartesianPoints3D(points, geom, slot.start);
+            const back = this.projectCartesianPoints3D(points, geom, slot.start + slot.size);
+            const basePoints = points.map((p, i) => prevPoints && prevPoints[i] || [p[0], geom.valToY(0)]);
+            const frontBase = this.projectCartesianPoints3D(basePoints, geom, slot.start);
+            const backBase = this.projectCartesianPoints3D(basePoints, geom, slot.start + slot.size);
+            const dark = this.shadeColor(color, -0.28) || color;
+            const top = this.shadeColor(color, -0.20) || color;
+            const end = this.shadeColor(color, -0.36) || color;
+            this.addFace(svg, ns, [...back, ...[...backBase].reverse()], dark, '');
+            this.addFace(svg, ns, [...front, ...[...back].reverse()], top, '');
+            if (front.length) {
+                const last = front.length - 1;
+                this.addFace(svg, ns, [
+                    front[last], back[last], backBase[last], frontBase[last]
+                ], end, '');
+            }
+            this.addFace(svg, ns, [...front, ...[...frontBase].reverse()], color, '');
+            this.drawSeriesPath(svg, ns, front, ser || {}, color, 1);
+            return front;
+        }
+
+        drawProjectedLine3D(svg, ns, geom, ctx) {
+            const {points, color, slot, ser, nCats} = ctx;
+            const front = this.projectCartesianPoints3D(points, geom, slot.start, nCats);
+            const back = this.projectCartesianPoints3D(points, geom, slot.start + slot.size, nCats);
+            const end = this.shadeColor(color, -0.26) || color;
+            if (front.length > 1) {
+                for (let i = 0; i + 1 < front.length; i++) {
+                    const shade = front[i + 1][1] < front[i][1] ? -0.26 : -0.18;
+                    const top = this.shadeColor(color, shade) || color;
+                    this.addFace(svg, ns, [
+                        front[i], front[i + 1], back[i + 1], back[i]
+                    ], top, '');
+                }
+                const last = front.length - 1;
+                const cap = document.createElementNS(ns, 'line');
+                cap.setAttribute('x1', front[last][0]);
+                cap.setAttribute('y1', front[last][1]);
+                cap.setAttribute('x2', back[last][0]);
+                cap.setAttribute('y2', back[last][1]);
+                cap.setAttribute('stroke', end);
+                cap.setAttribute(STROKE_WIDTH_ATTR, '1');
+                svg.appendChild(cap);
+            }
+            this.drawSeriesPath(svg, ns, front, ser, color, 1);
+            return front;
+        }
+
+        drawProjectedSeries3D(svg, ns, chart, geom, nCats) {
             const isStacked = chart.grouping === 'stacked' || chart.grouping === 'percentStacked';
             const seriesPoints = this.buildSeriesPoints(chart, geom, nCats);
-            for (let si = 0; si < chart.series.length; si++) {
+            const order = chart.series.map((_ser, si) => si).sort((a, b) => {
+                return this.seriesDepthIndex3D(chart, b, chart.series.length)
+                    - this.seriesDepthIndex3D(chart, a, chart.series.length);
+            });
+            for (const si of order) {
                 const ser = chart.series[si];
                 const color = this.chartColor(chart, si);
                 const points = seriesPoints[si];
-                if (chart.type === 'area') {
-                    this.drawAreaFill(svg, ns, points,
-                                      isStacked && si > 0 ? seriesPoints[si - 1] : null,
-                                      color, isStacked, geom);
-                }
-                this.drawSeriesPath(svg, ns, points, ser, color);
+                const depthIndex = this.seriesDepthIndex3D(chart, si, chart.series.length);
+                const slot = this.seriesDepthSlot3D(
+                    chart, depthIndex, chart.series.length
+                );
+                const projected = chart.type === 'area'
+                    ? this.drawProjectedArea3D(svg, ns, chart, geom, {
+                        points,
+                        prevPoints: isStacked && si > 0 ? seriesPoints[si - 1] : null,
+                        color,
+                        slot,
+                        ser
+                    })
+                    : this.drawProjectedLine3D(svg, ns, geom, { points, color, slot, ser, nCats });
                 if (chart.type !== 'area') {
-                    this.drawSeriesMarkers(svg, ns, points, ser, color);
+                    this.drawSeriesMarkers(svg, ns, projected, ser, color);
+                }
+                this.drawSeriesDataLabels(svg, ns, projected, chart, ser);
+            }
+        }
+
+        drawLines(svg, ns, chart, geom, nCats) {
+            if (chart.is3D && geom.project3D) {
+                this.drawProjectedSeries3D(svg, ns, chart, geom, nCats);
+                return;
+            }
+            const isStacked = chart.grouping === 'stacked' || chart.grouping === 'percentStacked';
+            const seriesPoints = this.buildSeriesPoints(chart, geom, nCats);
+            const off = chart.is3D ? this.depth3D(chart, geom) : null;
+            const order = chart.series.map((ser, si) => si);
+            if (off) {
+                order.reverse();
+            }
+            for (const si of order) {
+                const ser = chart.series[si];
+                const color = this.chartColor(chart, si);
+                const points = seriesPoints[si];
+                const target = this.depthLayer(svg, ns, off, si);
+                if (off) {
+                    this.draw3DRibbon(target, ns, points, off, this.shadeColor(color, 0.22) || color);
+                }
+                if (chart.type === 'area') {
+                    this.drawAreaFill(target, ns, points,
+                                      isStacked && si > 0 ? seriesPoints[si - 1] : null,
+                                      color, { isStacked, geom, opaque: !!off });
+                }
+                this.drawSeriesPath(target, ns, points, ser, color);
+                if (chart.type !== 'area') {
+                    this.drawSeriesMarkers(target, ns, points, ser, color);
                 }
                 if (ser.trendline) {
-                    this.drawTrendline(svg, ns, chart, ser, points, geom);
+                    this.drawTrendline(target, ns, chart, ser, points, geom);
                 }
-                this.drawSeriesDataLabels(svg, ns, points, chart, ser);
+                this.drawSeriesDataLabels(target, ns, points, chart, ser);
             }
         }
 
@@ -15741,9 +18448,50 @@
             line.setAttribute(STROKE_WIDTH_ATTR, String(lp.width || 1.5));
             const da = this.dashArrayFor(lp.dash || 'dash', lp.width || 1.5);
             if (da) {
-                line.setAttribute('stroke-dasharray', da);
+                line.setAttribute(STROKE_DASHARRAY_ATTR, da);
             }
             svg.appendChild(line);
+        }
+
+        default3DCartesianPlotBox(chart, W, H) {
+            const valAxisHidden = !!(chart.valAxis && chart.valAxis.hidden);
+            const catAxisHidden = !!(chart.catAxis && chart.catAxis.hidden);
+            if (!chart.is3D || !valAxisHidden || !catAxisHidden) {
+                return null;
+            }
+            const outerX = Math.max(12, Math.round(W * 0.04));
+            const outerY = Math.max(10, Math.round(H * 0.057));
+            const shift = this.depth3D(chart, {
+                innerW: W - outerX * 2,
+                innerH: H - outerY * 3
+            });
+            const padL = outerX;
+            const padR = outerX + Math.abs(shift.dx);
+            const padT = outerY + shift.dy;
+            const padB = outerY;
+            return {
+                padL,
+                padR,
+                padT,
+                padB,
+                innerW: W - padL - padR,
+                innerH: H - padT - padB
+            };
+        }
+
+        defaultCartesianPadding(chart, hasSecondaryAxis) {
+            const valAxisHidden = !!(chart.valAxis && chart.valAxis.hidden);
+            const catAxisHidden = !!(chart.catAxis && chart.catAxis.hidden);
+            const padL = valAxisHidden
+                ? 15 : chart.valAxis && chart.valAxis.title && chart.valAxis.title.text ? 64 : 50;
+            const padR = hasSecondaryAxis ? 60 : valAxisHidden ? 20 : 16;
+            const padT = valAxisHidden && catAxisHidden ? 15 : 20;
+            const hasCatTitle = !!(chart.catAxis
+                && chart.catAxis.title && chart.catAxis.title.text);
+            const padB = hasCatTitle
+                ? catAxisHidden ? 28 : 50
+                : catAxisHidden ? 13 : 40;
+            return { padL, padR, padT, padB };
         }
 
         computeCartesianPlotBox(chart, W, H, hasSecondaryAxis) {
@@ -15760,11 +18508,20 @@
                     padB: Math.max(0, H - padT - innerH)
                 };
             }
-            const padL = chart.valAxis && chart.valAxis.title && chart.valAxis.title.text ? 64 : 50;
-            const padR = hasSecondaryAxis ? 60 : 16;
-            const padT = 20;
-            const padB = chart.catAxis && chart.catAxis.title && chart.catAxis.title.text ? 50 : 40;
-            return { padL, padR, padT, padB, innerW: W - padL - padR, innerH: H - padT - padB };
+            const box3D = this.default3DCartesianPlotBox(chart, W, H);
+            if (box3D) {
+                return box3D;
+            }
+            const {padL, padR, padT, padB} =
+                this.defaultCartesianPadding(chart, hasSecondaryAxis);
+            return {
+                padL,
+                padR,
+                padT,
+                padB,
+                innerW: W - padL - padR,
+                innerH: H - padT - padB
+            };
         }
 
         computeAxisRanges(chart, geom, hasSecondaryAxis) {
@@ -15816,6 +18573,1109 @@
             }
         }
 
+        drawScatterPlotBackground(svg, ns, chart, geom) {
+            const plot = chart.plotBackground || {};
+            const fill = safeCssColor(plot.color) || 'transparent';
+            const rect = document.createElementNS(ns, 'rect');
+            rect.setAttribute('x', geom.padL);
+            rect.setAttribute('y', geom.padT);
+            rect.setAttribute('width', geom.innerW);
+            rect.setAttribute('height', geom.innerH);
+            rect.setAttribute('fill', fill);
+            if (typeof plot.opacity === 'number') {
+                rect.setAttribute('fill-opacity', String(plot.opacity));
+            }
+            const {line} = plot;
+            const stroke = safeCssColor(line && line.color);
+            if (stroke) {
+                const width = line.width || 1;
+                rect.setAttribute('stroke', stroke);
+                rect.setAttribute(STROKE_WIDTH_ATTR, String(width));
+                const dash = this.dashArrayFor(line.dash, width);
+                if (dash) {
+                    rect.setAttribute(STROKE_DASHARRAY_ATTR, dash);
+                }
+            }
+            svg.appendChild(rect);
+        }
+
+        drawVerticalGridLine(svg, ns, y1, y2, x, line) {
+            const el = document.createElementNS(ns, 'line');
+            el.setAttribute('x1', x);
+            el.setAttribute('x2', x);
+            el.setAttribute('y1', y1);
+            el.setAttribute('y2', y2);
+            if (line && line.color) {
+                el.setAttribute('stroke', line.color);
+            }
+            else {
+                el.setAttribute('class', 'xlsx-chart-grid');
+            }
+            if (line && line.width) {
+                el.setAttribute(STROKE_WIDTH_ATTR, String(line.width));
+            }
+            if (line && line.dash && line.dash !== 'solid') {
+                const dash = this.dashArrayFor(line.dash, line.width || 1);
+                if (dash) {
+                    el.setAttribute(STROKE_DASHARRAY_ATTR, dash);
+                }
+            }
+            svg.appendChild(el);
+        }
+
+        drawScatterXAxis(svg, ns, chart, geom, rangeInfo, xToX) {
+            const axis = chart.xValAxis || chart.catAxis || {};
+            const showAxis = this.axisLabelsVisible(axis);
+            const ticks = Math.min(1000, Math.max(2, Math.round(rangeInfo.range / rangeInfo.majorUnit)));
+            const baseline = geom.padT + geom.innerH;
+            for (let i = 0; i <= ticks; i++) {
+                const v = rangeInfo.niceMin + rangeInfo.majorUnit * i;
+                if (v > rangeInfo.niceMax + 1e-6) {
+                    break;
+                }
+                const x = xToX(v);
+                const grid = axis.majorGridlines;
+                if (grid && grid.line && (grid.line.color || grid.line.width !== 0)) {
+                    this.drawVerticalGridLine(svg, ns, geom.padT, baseline, x, grid.line);
+                }
+                else if (grid !== null && grid !== undefined) {
+                    this.drawVerticalGridLine(svg, ns, geom.padT, baseline, x, null);
+                }
+                if (showAxis) {
+                    this.drawAxisLabel(svg, ns, {
+                        x,
+                        y: baseline + 15,
+                        text: this.formatAxisValue(v, axis.numFmt, 'standard'),
+                        anchor: 'middle',
+                        font: this.chartFont(axis.labelFont, false)
+                    });
+                }
+            }
+            if (showAxis) {
+                this.drawAxisLine(svg, ns, geom.padL, baseline,
+                                  geom.W - geom.padR, baseline, axis.line);
+            }
+            if (axis.title && axis.title.text) {
+                const label = this.drawAxisLabel(svg, ns, {
+                    x: geom.padL + geom.innerW / 2,
+                    y: Math.min(geom.H - 7, baseline + 32),
+                    text: axis.title.text,
+                    anchor: 'middle',
+                    font: this.chartFont(axis.title.font, true)
+                });
+                label.classList.add('xlsx-chart-axis-title');
+            }
+        }
+
+        scatterXData(ser, chart) {
+            const xs = ser.xData && ser.xData.length ? ser.xData : chart.categories || [];
+            const nums = xs.map((x) => typeof x === 'number' ? x : parseFloat(x));
+            return xs.some((x, i) => typeof x === 'string' && x !== '' && !isFinite(nums[i]))
+                ? xs.map((_x, i) => i + 1) : nums;
+        }
+
+        scatterXScale(chart, xAxis, box) {
+            const xValues = [];
+            for (const ser of chart.series) {
+                for (const x of this.scatterXData(ser, chart)) {
+                    if (isFinite(x)) {
+                        xValues.push(x);
+                    }
+                }
+            }
+            const xRange = this.computeRange({
+                grouping: 'standard',
+                valAxis: xAxis,
+                series: [{ data: xValues }]
+            });
+            const xToX = (v) => {
+                const ratio = (v - xRange.niceMin) / xRange.range;
+                return box.padL + (xAxis.reversed ? 1 - ratio : ratio) * box.innerW;
+            };
+            return { xRange, xToX };
+        }
+
+        scatterSeriesPoints(ser, chart, geom, xToX) {
+            const xs = this.scatterXData(ser, chart);
+            const points = [];
+            const values = [];
+            const pointCount = Math.min(xs.length, ser.data.length);
+            for (let i = 0; i < pointCount; i++) {
+                const x = typeof xs[i] === 'number' ? xs[i] : parseFloat(xs[i]);
+                const y = typeof ser.data[i] === 'number' ? ser.data[i] : parseFloat(ser.data[i]);
+                if (isFinite(x) && isFinite(y)) {
+                    points.push([xToX(x), geom.valToY(y)]);
+                    values.push(y);
+                }
+            }
+            return { points, values };
+        }
+
+        drawScatterSeries(svg, ns, chart, geom, xToX) {
+            const style = chart.scatterStyle || 'marker';
+            const styleHasMarkers = style === 'marker' || /Marker$/.test(style);
+            const styleHasLine = style !== 'marker';
+            for (let si = 0; si < chart.series.length; si++) {
+                const ser = chart.series[si];
+                const { points, values } = this.scatterSeriesPoints(ser, chart, geom, xToX);
+                const color = this.chartColor(chart, si);
+                if (styleHasLine && (!ser.line || ser.line.width !== 0)) {
+                    const lineSer = style.indexOf('smooth') === 0
+                        ? Object.assign({}, ser, { smooth: true }) : ser;
+                    this.drawSeriesPath(svg, ns, points, lineSer, color);
+                }
+                if (styleHasMarkers || ser.marker && ser.marker.symbol !== 'none') {
+                    const markerSer = ser.marker ? ser : Object.assign({}, ser, {
+                        marker: { symbol: 'circle', size: 5, color, line: { color } }
+                    });
+                    this.drawSeriesMarkers(svg, ns, points, markerSer, color);
+                }
+                const labelSer = Object.assign({}, ser, { data: values });
+                this.drawSeriesDataLabels(svg, ns, points, chart, labelSer);
+            }
+        }
+
+        renderScatterChart(chart, size) {
+            const ns = SVG_NS;
+            const W = size && size.w || 640;
+            const H = size && size.h || 320;
+            const xAxis = chart.xValAxis || chart.catAxis || {};
+            const boxChart = Object.assign({}, chart, { catAxis: xAxis });
+            const box = this.computeCartesianPlotBox(boxChart, W, H, false);
+            const svg = this.createSvg(W, H);
+            const yRange = this.computeRange(chart);
+            const valToY = (v) => box.padT + box.innerH
+                - (v - yRange.niceMin) / yRange.range * box.innerH;
+            const { xRange, xToX } = this.scatterXScale(chart, xAxis, box);
+            const geom = Object.assign({ W, H, valToY }, box);
+            this.drawScatterPlotBackground(svg, ns, chart, geom);
+            this.drawScatterXAxis(svg, ns, chart, geom, xRange, xToX);
+            this.drawYAxis(svg, ns, geom, yRange, chart);
+            this.drawScatterSeries(svg, ns, chart, geom, xToX);
+            this.raiseAxisTitles(svg);
+            return svg;
+        }
+
+        bubbleRadiusScale(chart, geom) {
+            let maxSize = 0;
+            for (const ser of chart.series) {
+                for (const s of ser.sizeData || []) {
+                    if (typeof s === 'number' && isFinite(s) && s > maxSize) {
+                        maxSize = s;
+                    }
+                }
+            }
+            const scale = Math.max(0, Math.min(300, chart.bubbleScale || 100)) / 100;
+            const byWidth = chart.sizeRepresents === 'w';
+            const maxR = Math.max(4, Math.min(geom.innerW, geom.innerH) * 0.12 * scale);
+            return (v) => {
+                if (!maxSize || !(v > 0)) {
+                    return Math.max(2, 4 * scale);
+                }
+                const ratio = byWidth ? v / maxSize : Math.sqrt(v / maxSize);
+                return Math.max(2, ratio * maxR);
+            };
+        }
+
+        drawBubbleSeries(svg, ns, chart, geom, xToX) {
+            const radiusFor = this.bubbleRadiusScale(chart, geom);
+            for (let si = 0; si < chart.series.length; si++) {
+                const ser = chart.series[si];
+                const xs = this.scatterXData(ser, chart);
+                const sizes = ser.sizeData || [];
+                const count = Math.min(xs.length, ser.data.length);
+                for (let i = 0; i < count; i++) {
+                    const x = typeof xs[i] === 'number' ? xs[i] : parseFloat(xs[i]);
+                    const y = typeof ser.data[i] === 'number' ? ser.data[i] : parseFloat(ser.data[i]);
+                    if (!isFinite(x) || !isFinite(y)) {
+                        continue;
+                    }
+                    const color = this.chartColor(chart, si, i);
+                    const dot = document.createElementNS(ns, 'circle');
+                    dot.setAttribute('cx', xToX(x));
+                    dot.setAttribute('cy', geom.valToY(y));
+                    dot.setAttribute('r', radiusFor(sizes[i]));
+                    dot.setAttribute('fill', color);
+                    dot.setAttribute('stroke', this.shadeColor(color, -0.25) || color);
+                    if (chart.chartStyle === 18) {
+                        dot.setAttribute(
+                            'filter', `url(#${this.ensureShadowFilter(svg, ns, false)})`
+                        );
+                    }
+                    svg.appendChild(dot);
+                }
+            }
+        }
+
+        renderBubbleChart(source, size) {
+            const ns = SVG_NS;
+            const chart = source;
+            const W = size && size.w || 640;
+            const H = size && size.h || 320;
+            const inheritedHiddenAxis = !chart.xValAxis
+                && !this.axisLabelsVisible(chart.valAxis);
+            const xAxis = inheritedHiddenAxis
+                ? Object.assign({}, chart.catAxis || {}, { hidden: true })
+                : chart.xValAxis || chart.catAxis || {};
+            const renderChart = Object.assign({}, chart, { xValAxis: xAxis });
+            const box = this.computeCartesianPlotBox(
+                Object.assign({}, renderChart, { catAxis: xAxis }), W, H, false
+            );
+            const svg = this.createSvg(W, H);
+            const yRange = this.computeRange(chart);
+            const valToY = (v) => box.padT + box.innerH
+                - (v - yRange.niceMin) / yRange.range * box.innerH;
+            const { xRange, xToX } = this.scatterXScale(chart, xAxis, box);
+            const geom = Object.assign({ W, H, valToY }, box);
+            this.drawScatterPlotBackground(svg, ns, chart, geom);
+            this.drawScatterXAxis(svg, ns, renderChart, geom, xRange, xToX);
+            this.drawYAxis(svg, ns, geom, yRange, chart);
+            this.drawBubbleSeries(svg, ns, chart, geom, xToX);
+            this.raiseAxisTitles(svg);
+            return svg;
+        }
+
+        radarGeometry(chart, W, H) {
+            const cats = chart.categories || [];
+            const nCats = Math.max(cats.length, ...chart.series.map((s) => s.data.length));
+            const cx = W * 0.59;
+            const cy = H / 2 + 2;
+            const radius = Math.max(24, Math.min(W * 0.25, H * 0.46));
+            const range = this.computeRange(chart);
+            if (Math.round(range.range / range.majorUnit) > 6) {
+                range.majorUnit = this.niceStep(range.range, 6);
+                range.niceMax = range.niceMin + Math.ceil(range.range / range.majorUnit - 1e-9) * range.majorUnit;
+                range.range = range.niceMax - range.niceMin;
+            }
+            const angleFor = (i) => -Math.PI / 2 + i * 2 * Math.PI / Math.max(1, nCats);
+            const radiusFor = (v) => {
+                const t = (v - range.niceMin) / range.range;
+                return Math.max(0, Math.min(1, t)) * radius;
+            };
+            const pointAt = (i, v) => [
+                cx + Math.cos(angleFor(i)) * radiusFor(v),
+                cy + Math.sin(angleFor(i)) * radiusFor(v)
+            ];
+            return { cx, cy, radius, nCats, cats, range, angleFor, pointAt };
+        }
+
+        radarRingPath(g, ratio) {
+            const pts = [];
+            for (let i = 0; i < g.nCats; i++) {
+                const a = g.angleFor(i);
+                pts.push(`${g.cx + Math.cos(a) * g.radius * ratio},${g.cy + Math.sin(a) * g.radius * ratio}`);
+            }
+            return `M${pts.join('L')}Z`;
+        }
+
+        drawRadarRings(svg, ns, chart, g, ticks) {
+            const line = chart.valAxis && chart.valAxis.majorGridlines
+                && chart.valAxis.majorGridlines.line
+                || { color: '#000000', width: 1, dash: 'solid' };
+            for (let t = 1; t <= ticks; t++) {
+                const ring = document.createElementNS(ns, 'path');
+                ring.setAttribute('d', this.radarRingPath(g, t / ticks));
+                ring.setAttribute('fill', 'none');
+                ring.setAttribute('stroke', line.color || '#000000');
+                ring.setAttribute(STROKE_WIDTH_ATTR, String(line.width || 1));
+                if (line.dash && line.dash !== 'solid') {
+                    const dash = this.dashArrayFor(line.dash, line.width || 1);
+                    if (dash) {
+                        ring.setAttribute(STROKE_DASHARRAY_ATTR, dash);
+                    }
+                }
+                svg.appendChild(ring);
+            }
+        }
+
+        axisLabelsVisible(axis) {
+            return !!axis && !axis.hidden && !axis.deleted && axis.labelPos !== 'none';
+        }
+
+        drawRadarSpokes(svg, ns, chart, g) {
+            const font = this.chartFont(chart.catAxis && chart.catAxis.labelFont);
+            const showLabels = this.axisLabelsVisible(chart.catAxis);
+            for (let i = 0; i < g.nCats; i++) {
+                const a = g.angleFor(i);
+                const spoke = document.createElementNS(ns, 'line');
+                spoke.setAttribute('x1', g.cx);
+                spoke.setAttribute('y1', g.cy);
+                spoke.setAttribute('x2', g.cx + Math.cos(a) * g.radius);
+                spoke.setAttribute('y2', g.cy + Math.sin(a) * g.radius);
+                spoke.setAttribute('stroke', '#000000');
+                spoke.setAttribute(STROKE_WIDTH_ATTR, '1');
+                svg.appendChild(spoke);
+                if (!showLabels) {
+                    continue;
+                }
+                const lx = g.cx + Math.cos(a) * (g.radius + 14);
+                const ly = g.cy + Math.sin(a) * (g.radius + 14);
+                const cos = Math.cos(a);
+                this.drawAxisLabel(svg, ns, {
+                    x: lx,
+                    y: ly + 4,
+                    text: this.formatCategoryLabel(g.cats[i], chart.catAxis && chart.catAxis.numFmt, i),
+                    anchor: Math.abs(cos) < 0.2 ? 'middle' : cos > 0 ? 'start' : 'end',
+                    font
+                });
+            }
+        }
+
+        drawRadarValueLabels(svg, ns, chart, g, ticks) {
+            if (!this.axisLabelsVisible(chart.valAxis)) {
+                return;
+            }
+            const font = this.chartFont(chart.valAxis && chart.valAxis.labelFont);
+            const numFmt = chart.valAxis && chart.valAxis.numFmt;
+            for (let t = 0; t <= ticks; t++) {
+                const v = g.range.niceMin + g.range.range * t / ticks;
+                this.drawAxisLabel(svg, ns, {
+                    x: g.cx - 4,
+                    y: g.cy - g.radius * t / ticks + 4,
+                    text: this.formatAxisValue(v, numFmt),
+                    anchor: 'end',
+                    font
+                });
+            }
+        }
+
+        drawRadarSeries(svg, ns, chart, g) {
+            const filled = chart.radarStyle === 'filled';
+            const styleMarkers = chart.radarStyle === 'marker';
+            for (let si = 0; si < chart.series.length; si++) {
+                const ser = chart.series[si];
+                const color = this.chartColor(chart, si);
+                const points = [];
+                for (let i = 0; i < g.nCats; i++) {
+                    const v = ser.data[i];
+                    if (typeof v !== 'number' || !isFinite(v)) {
+                        continue;
+                    }
+                    points.push(g.pointAt(i, v));
+                }
+                if (points.length < 2) {
+                    continue;
+                }
+                const path = document.createElementNS(ns, 'path');
+                const coords = points.map((p) => `${p[0]},${p[1]}`).join('L');
+                path.setAttribute('d', `M${coords}Z`);
+                path.setAttribute('fill', filled ? hexToRgba(color, 0.45) : 'none');
+                path.setAttribute('stroke', color);
+                path.setAttribute(STROKE_WIDTH_ATTR, String(
+                    ser.line && ser.line.width || (chart.chartStyle === 26 ? 4 : 2)
+                ));
+                svg.appendChild(path);
+                const explicitMarker = ser.marker && ser.marker.symbol
+                    && ser.marker.symbol !== 'none' && ser.marker.symbol !== 'auto';
+                if (!filled && (explicitMarker || styleMarkers && !ser.marker)) {
+                    const markerSer = explicitMarker ? ser : Object.assign(
+                        {}, ser, { marker: { symbol: 'circle', size: 5, color, line: { color } } }
+                    );
+                    this.drawSeriesMarkers(svg, ns, points, markerSer, color);
+                }
+            }
+        }
+
+        renderRadarChart(chart, size) {
+            const ns = SVG_NS;
+            const W = size && size.w || 460;
+            const H = size && size.h || 320;
+            const svg = this.createSvg(W, H);
+            const g = this.radarGeometry(chart, W, H);
+            if (!g.nCats) {
+                return svg;
+            }
+            const ticks = Math.max(2, Math.min(6, Math.round(g.range.range / g.range.majorUnit) || 4));
+            this.drawRadarRings(svg, ns, chart, g, ticks);
+            this.drawRadarSpokes(svg, ns, chart, g);
+            this.drawRadarValueLabels(svg, ns, chart, g, ticks);
+            this.drawRadarSeries(svg, ns, chart, g);
+            return svg;
+        }
+
+        stockRoles(chart) {
+            const s = chart.series;
+            if (s.length >= 4) {
+                return { first: s[0], high: s[1], low: s[2], last: s[3] };
+            }
+            if (s.length === 3) {
+                if (chart.upDownBars) {
+                    return { first: s[0], high: s[0], low: s[1], last: s[2] };
+                }
+                return { high: s[0], low: s[1], last: s[2] };
+            }
+            return null;
+        }
+
+        stockValueAt(ser, i) {
+            const v = ser && ser.data[i];
+            return typeof v === 'number' && isFinite(v) ? v : null;
+        }
+
+        drawStockLine(svg, ns, seg, color, width) {
+            const el = document.createElementNS(ns, 'line');
+            el.setAttribute('x1', seg.x1);
+            el.setAttribute('y1', seg.y1);
+            el.setAttribute('x2', seg.x2);
+            el.setAttribute('y2', seg.y2);
+            el.setAttribute('stroke', color);
+            el.setAttribute(STROKE_WIDTH_ATTR, String(width || 1));
+            svg.appendChild(el);
+        }
+
+        drawStockBar(svg, ns, box, color, isDown) {
+            const rect = document.createElementNS(ns, 'rect');
+            rect.setAttribute('x', box.x);
+            rect.setAttribute('y', box.y);
+            rect.setAttribute('width', box.w);
+            rect.setAttribute('height', Math.max(1, box.h));
+            rect.setAttribute('fill', isDown ? STOCK_DOWN_FILL : '#ffffff');
+            rect.setAttribute('stroke', color);
+            svg.appendChild(rect);
+        }
+
+        drawStockPoint(svg, ns, roles, ctx) {
+            const {i, cx, half, valToY, hiLowColor, barLineColor, closeColor} = ctx;
+            const hi = this.stockValueAt(roles.high, i);
+            const lo = this.stockValueAt(roles.low, i);
+            const last = this.stockValueAt(roles.last, i);
+            const first = this.stockValueAt(roles.first, i);
+            if (hi !== null && lo !== null) {
+                this.drawStockLine(svg, ns,
+                                   {x1: cx, y1: valToY(hi), x2: cx, y2: valToY(lo)},
+                                   hiLowColor, 1);
+            }
+            if (first !== null && last !== null) {
+                const top = Math.min(valToY(first), valToY(last));
+                const bottom = Math.max(valToY(first), valToY(last));
+                this.drawStockBar(svg, ns,
+                                  {x: cx - half, y: top, w: half * 2, h: bottom - top},
+                                  barLineColor, last < first);
+                return;
+            }
+            if (last !== null) {
+                this.drawStockLine(svg, ns,
+                                   {x1: cx, y1: valToY(last), x2: cx + half, y2: valToY(last)},
+                                   closeColor, 2);
+            }
+        }
+
+        drawStockSeries(svg, ns, chart, geom, nCats) {
+            const roles = this.stockRoles(chart);
+            if (!roles) {
+                this.drawCartesianSeries(svg, ns, chart, geom, null, nCats);
+                return;
+            }
+            const step = geom.innerW / Math.max(1, nCats);
+            const gap = Math.max(0, (chart.upDownGapWidth || 150) / 100);
+            const half = Math.max(2, step / Math.max(1, 1 + gap) / 2);
+            const closeIdx = Math.max(0, chart.series.indexOf(roles.last));
+            for (let i = 0; i < nCats; i++) {
+                this.drawStockPoint(svg, ns, roles, {
+                    i,
+                    cx: geom.padL + step * (i + 0.5),
+                    half,
+                    valToY: geom.valToY,
+                    hiLowColor: STOCK_HILO_LINE_COLOR,
+                    barLineColor: STOCK_BAR_LINE_COLOR,
+                    closeColor: this.chartColor(chart, closeIdx)
+                });
+            }
+        }
+
+        stockRange(chart) {
+            const axis = chart.valAxis || {};
+            let min = Infinity;
+            let max = -Infinity;
+            for (const ser of chart.series) {
+                for (const v of ser.data) {
+                    if (typeof v === 'number' && isFinite(v)) {
+                        min = Math.min(min, v);
+                        max = Math.max(max, v);
+                    }
+                }
+            }
+            if (min > max) {
+                return this.computeRange(chart);
+            }
+            const pad = (max - min) * 0.1 || Math.abs(max) * 0.1 || 1;
+            const step = typeof axis.majorUnit === 'number' && axis.majorUnit > 0
+                ? axis.majorUnit
+                : this.niceStep(max + pad - (min - pad));
+            const niceMin = typeof axis.min === 'number'
+                ? axis.min
+                : Math.max(min >= 0 ? 0 : -Infinity, Math.floor((min - pad) / step) * step);
+            const niceMax = typeof axis.max === 'number'
+                ? axis.max
+                : Math.ceil((max + pad) / step) * step;
+            return { niceMin, niceMax, range: Math.max(1e-9, niceMax - niceMin), majorUnit: step };
+        }
+
+        renderStockChart(source, size) {
+            const ns = SVG_NS;
+            const chart = source;
+            const W = size && size.w || 640;
+            const H = size && size.h || 320;
+            const box = this.computeCartesianPlotBox(chart, W, H, false);
+            const svg = this.createSvg(W, H);
+            const range = this.stockRange(chart);
+            const valToY = (v) => box.padT + box.innerH
+                - (v - range.niceMin) / range.range * box.innerH;
+            const geom = Object.assign({ W, H, valToY }, box);
+            const cats = chart.categories || [];
+            const nCats = Math.max(cats.length, ...chart.series.map((s) => s.data.length));
+            this.drawYAxis(svg, ns, geom, range, chart);
+            this.drawXAxis(svg, ns, geom, cats, nCats, chart, true);
+            this.drawStockSeries(svg, ns, chart, geom, nCats);
+            this.raiseAxisTitles(svg);
+            return svg;
+        }
+
+        surfaceGrid(chart) {
+            const rows = [];
+            for (const ser of chart.series) {
+                rows.push(ser.data.map((v) => typeof v === 'number' && isFinite(v) ? v : null));
+            }
+            let min = Infinity;
+            let max = -Infinity;
+            let cols = 0;
+            for (const row of rows) {
+                cols = Math.max(cols, row.length);
+                for (const v of row) {
+                    if (v !== null) {
+                        min = Math.min(min, v);
+                        max = Math.max(max, v);
+                    }
+                }
+            }
+            if (!rows.length || !cols || min > max) {
+                return null;
+            }
+            return { rows, rowCount: rows.length, cols, min, max, span: Math.max(1e-9, max - min) };
+        }
+
+        surfaceProjector(grid, W, H, chart, bands) {
+            const view = chart && chart.view3D || {};
+            const direction = typeof view.rotY === 'number' && view.rotY < 0 ? -1 : 1;
+            const padX = W * 0.026;
+            const depthX = W * 0.097 * direction;
+            const depthY = H * 0.155;
+            const valueHeight = H * 0.455;
+            const baseY = H * 0.765;
+            const catW = Math.max(40, W - padX * 2 - Math.abs(depthX));
+            const range = bands && bands.range || {
+                niceMin: grid.min,
+                range: grid.span
+            };
+            return (i, j, z) => {
+                const x = grid.cols > 1 ? i / (grid.cols - 1) : 0.5;
+                const depth = grid.rowCount > 1 ? j / (grid.rowCount - 1) : 0;
+                const value = (z - range.niceMin) / range.range;
+                const originX = direction > 0 ? padX : padX + Math.abs(depthX);
+                return [
+                    originX + x * catW + depth * depthX,
+                    baseY - depth * depthY - value * valueHeight
+                ];
+            };
+        }
+
+        surfaceBands(chart, grid) {
+            const axis = chart.valAxis || {};
+            const min = Math.min(grid.min, 0);
+            const rawRange = Math.max(1e-9, grid.max - min);
+            const majorUnit = typeof axis.majorUnit === 'number' && axis.majorUnit > 0
+                ? axis.majorUnit : this.niceStep(rawRange);
+            const niceMin = typeof axis.min === 'number'
+                ? axis.min : min < 0 ? Math.floor(min / majorUnit) * majorUnit : 0;
+            const niceMax = typeof axis.max === 'number'
+                ? axis.max : Math.ceil(grid.max / majorUnit) * majorUnit;
+            const range = {
+                niceMin,
+                niceMax,
+                range: Math.max(1e-9, niceMax - niceMin),
+                majorUnit
+            };
+            if (Math.round(range.range / majorUnit) > 12) {
+                range.majorUnit = this.niceStep(range.range, 12);
+                range.niceMax = range.niceMin + Math.ceil(range.range / range.majorUnit - 1e-9) * range.majorUnit;
+                range.range = range.niceMax - range.niceMin;
+            }
+            const count = Math.max(2, Math.min(12, Math.round(range.range / range.majorUnit) || 4));
+            const out = [];
+            for (let i = 0; i < count; i++) {
+                out.push({
+                    lo: range.niceMin + range.majorUnit * i,
+                    hi: range.niceMin + range.majorUnit * (i + 1),
+                    color: this.chartColor(chart, i)
+                });
+            }
+            return { list: out, range };
+        }
+
+        surfaceCellStroke(chart) {
+            return chart.wireframe ? '#606060' : '#ffffff';
+        }
+
+        surfaceQuadCells(grid, maxCells) {
+            const stepI = Math.ceil((grid.cols - 1) * (grid.rowCount - 1) / maxCells) || 1;
+            const cells = [];
+            for (let j = 0; j + 1 < grid.rowCount; j++) {
+                for (let i = 0; i + 1 < grid.cols; i += stepI) {
+                    const i2 = Math.min(i + stepI, grid.cols - 1);
+                    const corners = [[i, j], [i2, j], [i2, j + 1], [i, j + 1]];
+                    const zs = corners.map((c) => grid.rows[c[1]][c[0]]);
+                    if (zs.some((z) => z === null || z === undefined)) {
+                        continue;
+                    }
+                    cells.push({ i, j, corners, zs, mean: zs.reduce((s, z) => s + z, 0) / 4 });
+                }
+            }
+            cells.sort((a, b) => b.i + b.j - (a.i + a.j));
+            return cells;
+        }
+
+        clipSurfacePolygon(poly, threshold, keepAbove) {
+            const out = [];
+            for (let i = 0; i < poly.length; i++) {
+                const a = poly[i];
+                const b = poly[(i + 1) % poly.length];
+                const aInside = keepAbove ? a.z >= threshold : a.z <= threshold;
+                const bInside = keepAbove ? b.z >= threshold : b.z <= threshold;
+                if (aInside) {
+                    out.push(a);
+                }
+                if (aInside !== bInside && b.z !== a.z) {
+                    const t = (threshold - a.z) / (b.z - a.z);
+                    out.push({
+                        i: a.i + (b.i - a.i) * t,
+                        j: a.j + (b.j - a.j) * t,
+                        z: threshold
+                    });
+                }
+            }
+            return out;
+        }
+
+        surfaceBandPolygon(triangle, band) {
+            const above = this.clipSurfacePolygon(triangle, band.lo, true);
+            return above.length < 3 ? [] : this.clipSurfacePolygon(above, band.hi, false);
+        }
+
+        surfaceTriangleShade(triangle, grid, bands, chart) {
+            const {range} = bands;
+            const direction = chart && chart.view3D && chart.view3D.rotY < 0 ? -1 : 1;
+            const normalize = (p) => [
+                direction * p.i / Math.max(1, grid.cols - 1),
+                p.j / Math.max(1, grid.rowCount - 1),
+                (p.z - range.niceMin) / range.range * 0.16
+            ];
+            const p0 = normalize(triangle[0]);
+            const p1 = normalize(triangle[1]);
+            const p2 = normalize(triangle[2]);
+            const u = p1.map((v, i) => v - p0[i]);
+            const v = p2.map((value, i) => value - p0[i]);
+            let nx = u[1] * v[2] - u[2] * v[1];
+            let ny = u[2] * v[0] - u[0] * v[2];
+            let nz = u[0] * v[1] - u[1] * v[0];
+            if (nz < 0) {
+                nx = -nx;
+                ny = -ny;
+                nz = -nz;
+            }
+            const length = Math.hypot(nx, ny, nz) || 1;
+            nx /= length;
+            ny /= length;
+            nz /= length;
+            const brightness = -0.192 + 0.573 * nx - 1.728 * ny + 0.919 * nz;
+            return Math.max(0.54, Math.min(0.9, brightness)) - 1;
+        }
+
+        drawSurfaceBandTriangle(svg, ns, project, triangle, bands, shade = 0) {
+            for (const band of bands.list) {
+                const poly = this.surfaceBandPolygon(triangle, band);
+                if (poly.length < 3) {
+                    continue;
+                }
+                const pts = poly.map((p) => project(p.i, p.j, p.z));
+                const color = shade ? this.shadeColor(band.color, shade) || band.color : band.color;
+                this.addFace(svg, ns, pts, color, color);
+            }
+        }
+
+        surfaceCellTriangles(vertices) {
+            if (vertices[0].z + vertices[2].z >= vertices[1].z + vertices[3].z) {
+                return [
+                    [vertices[0], vertices[1], vertices[2]],
+                    [vertices[0], vertices[2], vertices[3]]
+                ];
+            }
+            return [
+                [vertices[1], vertices[2], vertices[3]],
+                [vertices[0], vertices[1], vertices[3]]
+            ];
+        }
+
+        drawSurfaceQuads(svg, ns, chart, ctx) {
+            const MAX_SURFACE_FACES = 50000;
+            const {grid, project, bands} = ctx;
+            const stroke = this.surfaceCellStroke(chart);
+            const facesPerCell = chart.wireframe ? 1 : 2 * bands.list.length;
+            for (const cell of this.surfaceQuadCells(grid, MAX_SURFACE_FACES / facesPerCell)) {
+                const vertices = cell.corners.map((c, k) => ({i: c[0], j: c[1], z: cell.zs[k]}));
+                if (chart.wireframe) {
+                    const pts = vertices.map((p) => project(p.i, p.j, p.z));
+                    this.addFace(svg, ns, pts, chart.is3D ? '#ffffff' : 'none', stroke);
+                    continue;
+                }
+                // Excel's 2-D contour renderer uses a stable top-left to
+                // bottom-right diagonal for every cell. Its 3-D renderer, by
+                // contrast, chooses the higher diagonal so lighting follows the
+                // visible facets.
+                if (!chart.is3D) {
+                    const contourTriangles = [
+                        [vertices[0], vertices[1], vertices[2]],
+                        [vertices[0], vertices[2], vertices[3]]
+                    ];
+                    for (const triangle of contourTriangles) {
+                        this.drawSurfaceBandTriangle(svg, ns, project, triangle, bands);
+                    }
+                    continue;
+                }
+                for (const triangle of this.surfaceCellTriangles(vertices)) {
+                    const shade = this.surfaceTriangleShade(triangle, grid, bands, chart);
+                    this.drawSurfaceBandTriangle(svg, ns, project, triangle, bands, shade);
+                }
+            }
+        }
+
+        drawSurfaceWalls(svg, ns, grid, project, floorValue = grid.min) {
+            const front = [project(0, 0, floorValue), project(grid.cols - 1, 0, floorValue)];
+            const back = [project(0, grid.rowCount - 1, floorValue),
+                          project(grid.cols - 1, grid.rowCount - 1, floorValue)];
+            this.addFace(svg, ns, [front[0], front[1], back[1], back[0]], '#ffffff', '#b7b7b7');
+        }
+
+        drawSurfaceValueAxis(svg, ns, chart, ctx) {
+            const {grid, project, bands, box} = ctx;
+            const showLabels = this.axisLabelsVisible(chart.valAxis);
+            const font = this.chartFont(chart.valAxis && chart.valAxis.labelFont);
+            const numFmt = chart.valAxis && chart.valAxis.numFmt;
+            const majorGrid = chart.valAxis && chart.valAxis.majorGridlines
+                || { line: { color: '#7f7f7f', width: 1, dash: 'solid' } };
+            for (const band of [...bands.list, {lo: bands.list[bands.list.length - 1].hi}]) {
+                const frontLeft = project(0, 0, band.lo);
+                const backLeft = project(0, grid.rowCount - 1, band.lo);
+                const backRight = project(grid.cols - 1, grid.rowCount - 1, band.lo);
+                if (backLeft[1] < 2 || frontLeft[1] > box.H - 2) {
+                    continue;
+                }
+                this.draw3DGridSegment(svg, ns, frontLeft, backLeft, majorGrid);
+                this.draw3DGridSegment(svg, ns, backLeft, backRight, majorGrid);
+                if (showLabels) {
+                    this.drawAxisLabel(svg, ns, {
+                        x: frontLeft[0] - 6,
+                        y: frontLeft[1] + 4,
+                        text: this.formatAxisValue(band.lo, numFmt),
+                        anchor: 'end',
+                        font
+                    });
+                }
+            }
+        }
+
+        drawSurfaceCatLabels(svg, ns, chart, ctx) {
+            if (!this.axisLabelsVisible(chart.catAxis)) {
+                return;
+            }
+            const {grid, project, bands, box} = ctx;
+            const font = this.chartFont(chart.catAxis && chart.catAxis.labelFont);
+            const cats = chart.categories || [];
+            const stride = Math.max(1, Math.ceil(grid.cols / Math.max(2, Math.floor(box.W / 70))));
+            for (let i = 0; i < grid.cols; i += stride) {
+                const p = project(i, 0, bands.range.niceMin);
+                this.drawAxisLabel(svg, ns, {
+                    x: p[0],
+                    y: Math.min(p[1] + 14, box.H - 3),
+                    text: this.formatCategoryLabel(cats[i], chart.catAxis && chart.catAxis.numFmt, i),
+                    anchor: 'middle',
+                    font
+                });
+            }
+        }
+
+        drawSurfaceSeriesLabels(svg, ns, chart, ctx) {
+            if (!this.axisLabelsVisible(chart.serAxis)) {
+                return;
+            }
+            const {grid, project, bands, box} = ctx;
+            const font = this.chartFont(chart.serAxis && chart.serAxis.labelFont);
+            for (let j = 0; j < grid.rowCount; j++) {
+                const p = project(grid.cols - 1, j, bands.range.niceMin);
+                this.drawAxisLabel(svg, ns, {
+                    x: Math.min(p[0] + 8, box.W - 2),
+                    y: p[1] + 4,
+                    text: chart.series[j] && chart.series[j].name || '',
+                    anchor: 'start',
+                    font
+                });
+            }
+        }
+
+        buildSurfaceLegend(chart, bands) {
+            const legend = document.createElement('div');
+            legend.className = 'xlsx-chart-legend';
+            const numFmt = chart.valAxis && chart.valAxis.numFmt;
+            for (const band of [...bands.list].reverse()) {
+                const item = document.createElement('span');
+                item.className = 'xlsx-chart-legend-item';
+                const sw = document.createElement('span');
+                sw.className = 'xlsx-chart-legend-swatch';
+                sw.style.background = chart.is3D
+                    ? this.shadeColor(band.color, -0.12) || band.color : band.color;
+                item.appendChild(sw);
+                const label = document.createElement('span');
+                label.textContent = `${this.formatAxisValue(band.lo, numFmt)}-`
+                    + `${this.formatAxisValue(band.hi, numFmt)}`;
+                item.appendChild(label);
+                legend.appendChild(item);
+            }
+            return legend;
+        }
+
+        contourProjector(grid, box) {
+            const cellW = (box.W - box.padL - box.padR) / Math.max(1, grid.cols - 1);
+            const cellH = (box.H - box.padT - box.padB) / Math.max(1, grid.rowCount - 1);
+            return (i, j) => [
+                box.padL + i * cellW,
+                box.padT + (grid.rowCount - 1 - j) * cellH
+            ];
+        }
+
+        renderContourChart(chart, size) {
+            const ns = SVG_NS;
+            const W = size && size.w || 520;
+            const H = size && size.h || 340;
+            const svg = this.createSvg(W, H);
+            const grid = this.surfaceGrid(chart);
+            if (!grid) {
+                return svg;
+            }
+            const bands = this.surfaceBands(chart, grid);
+            const showCat = this.axisLabelsVisible(chart.catAxis);
+            const showSeries = this.axisLabelsVisible(chart.serAxis);
+            const box = {
+                W,
+                H,
+                padL: showSeries ? 58 : 16,
+                padR: 16,
+                padT: 14,
+                padB: showCat ? 34 : 14
+            };
+            const flat = this.contourProjector(grid, box);
+            const project = (i, j) => flat(i, j);
+            const ctx = { grid, project, bands, box };
+            this.drawSurfaceQuads(svg, ns, chart, ctx);
+            this.drawSurfaceCatLabels(svg, ns, chart, ctx);
+            if (showSeries) {
+                const font = this.chartFont(chart.serAxis && chart.serAxis.labelFont);
+                for (let j = 0; j < grid.rowCount; j++) {
+                    const p = flat(0, j);
+                    this.drawAxisLabel(svg, ns, {
+                        x: box.padL - 6,
+                        y: p[1] + 4,
+                        text: chart.series[j] && chart.series[j].name || '',
+                        anchor: 'end',
+                        font
+                    });
+                }
+            }
+            svg._pieLegend = this.buildSurfaceLegend(chart, bands);
+            return svg;
+        }
+
+        renderSurfaceChart(chart, size) {
+            if (!chart.is3D) {
+                return this.renderContourChart(chart, size);
+            }
+            const ns = SVG_NS;
+            const W = size && size.w || 520;
+            const H = size && size.h || 340;
+            const svg = this.createSvg(W, H);
+            const grid = this.surfaceGrid(chart);
+            if (!grid) {
+                return svg;
+            }
+            const bands = this.surfaceBands(chart, grid);
+            const project = this.surfaceProjector(grid, W, H, chart, bands);
+            const ctx = { grid, project, bands, box: { W, H } };
+            this.drawSurfaceWalls(svg, ns, grid, project, bands.range.niceMin);
+            this.drawSurfaceValueAxis(svg, ns, chart, ctx);
+            this.drawSurfaceQuads(svg, ns, chart, ctx);
+            this.drawSurfaceCatLabels(svg, ns, chart, ctx);
+            this.drawSurfaceSeriesLabels(svg, ns, chart, ctx);
+            svg._pieLegend = this.buildSurfaceLegend(chart, bands);
+            return svg;
+        }
+
+        ofPieInSplit(chart, data) {
+            const total = data.reduce((s, v) => s + Math.abs(v), 0) || 1;
+            const pos = chart.splitPos || 0;
+            if (chart.splitType === 'val') {
+                return (v) => v < pos;
+            }
+            if (chart.splitType === 'percent') {
+                return (v) => v / total * 100 < pos;
+            }
+            if (chart.splitType === 'cust') {
+                return (_v, i) => chart.custSplit.has(i);
+            }
+            const count = Math.min(data.length - 1, Math.max(1, Math.round(pos) || 2));
+            return (_v, i) => i >= data.length - count;
+        }
+
+        ofPieSplit(chart) {
+            const ser = chart.series[0];
+            if (!ser || !ser.data.length) {
+                return null;
+            }
+            const data = ser.data.map((v) => typeof v === 'number' && isFinite(v) ? v : 0);
+            const cats = chart.categories || [];
+            const inSplit = this.ofPieInSplit(chart, data);
+            const main = [];
+            const split = [];
+            for (let i = 0; i < data.length; i++) {
+                (inSplit(data[i], i) ? split : main).push({ value: Math.abs(data[i]), label: cats[i], index: i });
+            }
+            const other = split.reduce((s, p) => s + p.value, 0);
+            if (split.length) {
+                main.push({ value: other, label: 'Other', index: -1 });
+            }
+            return { main, split, other };
+        }
+
+        drawOfPieSlices(svg, ns, chart, parts, geom) {
+            const total = parts.reduce((s, p) => s + p.value, 0) || 1;
+            let start = 0;
+            const edges = [];
+            for (const part of parts) {
+                const end = start + part.value / total * Math.PI * 2;
+                const d = this.pieSlicePathD(
+                    { cx: geom.cx, cy: geom.cy, r: geom.r, innerR: 0, ox: 0, oy: 0 }, start, end
+                );
+                const slice = document.createElementNS(ns, 'path');
+                slice.setAttribute('d', d);
+                const base = this.chartColor(chart, 0, part.index < 0 ? parts.length - 1 : part.index);
+                slice.setAttribute('fill', part.index < 0
+                    ? this.shadeColor(base, OF_PIE_OTHER_SHADE) || base : base);
+                slice.setAttribute('stroke', '#ffffff');
+                svg.appendChild(slice);
+                if (part.index < 0) {
+                    edges.push(start, end);
+                }
+                start = end;
+            }
+            return edges;
+        }
+
+        drawOfPieSecondary(svg, ns, chart, split, geom) {
+            const total = split.reduce((s, p) => s + p.value, 0) || 1;
+            if (chart.ofPieType === 'bar') {
+                if (!split.length) {
+                    const placeholder = document.createElementNS(ns, 'rect');
+                    placeholder.setAttribute('x', geom.cx - geom.r * 0.5);
+                    placeholder.setAttribute('y', geom.cy - geom.r);
+                    placeholder.setAttribute('width', geom.r);
+                    placeholder.setAttribute('height', geom.r * 2);
+                    placeholder.setAttribute('fill', '#595959');
+                    placeholder.setAttribute('stroke', '#000000');
+                    placeholder.setAttribute(STROKE_WIDTH_ATTR, '3');
+                    svg.appendChild(placeholder);
+                    return;
+                }
+                let y = geom.cy - geom.r;
+                const h = geom.r * 2;
+                for (const part of split) {
+                    const seg = Math.max(1, part.value / total * h);
+                    const rect = document.createElementNS(ns, 'rect');
+                    rect.setAttribute('x', geom.cx - geom.r * 0.42);
+                    rect.setAttribute('y', y);
+                    rect.setAttribute('width', geom.r * 0.84);
+                    rect.setAttribute('height', seg);
+                    rect.setAttribute('fill', this.chartColor(chart, 0, part.index));
+                    rect.setAttribute('stroke', '#ffffff');
+                    svg.appendChild(rect);
+                    y += seg;
+                }
+                return;
+            }
+            let start = -Math.PI / 2;
+            for (const part of split) {
+                const end = start + part.value / total * Math.PI * 2;
+                const slice = document.createElementNS(ns, 'path');
+                slice.setAttribute('d', this.pieSlicePathD(
+                    { cx: geom.cx, cy: geom.cy, r: geom.r, innerR: 0, ox: 0, oy: 0 }, start, end
+                ));
+                slice.setAttribute('fill', this.chartColor(chart, 0, part.index));
+                slice.setAttribute('stroke', '#ffffff');
+                svg.appendChild(slice);
+                start = end;
+            }
+        }
+
+        drawOfPieConnectors(svg, ns, left, right, edges, isBar) {
+            if (!edges.length) {
+                return;
+            }
+            for (const angle of edges) {
+                this.drawStockLine(svg, ns, {
+                    x1: left.cx + Math.cos(angle) * left.r,
+                    y1: left.cy + Math.sin(angle) * left.r,
+                    x2: right.cx - right.r * (isBar ? 0.42 : 1),
+                    y2: angle === edges[0] ? right.cy - right.r : right.cy + right.r
+                }, '#c0c0c0', 1);
+            }
+        }
+
+        renderOfPieChart(chart, size) {
+            const ns = SVG_NS;
+            const W = size && size.w || 560;
+            const H = size && size.h || 320;
+            const svg = this.createSvg(W, H);
+            const split = this.ofPieSplit(chart);
+            if (!split) {
+                return svg;
+            }
+            const r = Math.max(24, Math.min(W * 0.245, H * 0.5));
+            const left = { cx: W * 0.35, cy: H * 0.52, r };
+            const right = {
+                cx: W * 0.78,
+                cy: H * 0.52,
+                r: r * (chart.secondPieSize || 75) / 100
+            };
+            const edges = this.drawOfPieSlices(svg, ns, chart, split.main, left);
+            this.drawOfPieConnectors(svg, ns, left, right, edges, chart.ofPieType === 'bar');
+            this.drawOfPieSecondary(svg, ns, chart, split.split, right);
+            return svg;
+        }
+
+        configureCartesian3D(svg, ns, chart, geom) {
+            if (!chart.is3D) {
+                return;
+            }
+            const rightAngle = !!(chart.view3D && chart.view3D.rightAngleAxes);
+            if (!rightAngle && chart.type !== 'bar') {
+                geom.project3D = this.cartesian3DProjector(chart, geom);
+                if (chart.type === 'area') {
+                    geom.projectData3D = this.cartesian3DAreaProjector(chart, geom);
+                }
+            }
+            else {
+                geom.shift = this.depth3D(chart, geom);
+                geom.rightAngle3D = true;
+            }
+            this.draw3DWalls(svg, ns, geom, geom.shift || { dx: 0, dy: 0 });
+        }
+
         renderCartesianChart(chart, size) {
             const ns = SVG_NS;
             const W = size && size.w || 640;
@@ -15838,6 +19698,7 @@
                 bg.setAttribute('fill', safeCssColor(chart.plotBackground.color) || 'transparent');
                 svg.appendChild(bg);
             }
+            this.configureCartesian3D(svg, ns, chart, geom);
             this.drawYAxis(svg, ns, geom, rangeInfo, chart);
             if (hasSecondaryAxis) {
                 this.drawYAxis(svg, ns, geom, rangeInfo2, chart, {
@@ -15849,6 +19710,7 @@
                 : chart.type === 'bar';
             this.drawXAxis(svg, ns, geom, cats, nCats, chart, hasBars);
             this.drawCartesianSeries(svg, ns, chart, geom, valToY2, nCats);
+            this.raiseAxisTitles(svg);
             return svg;
         }
 
@@ -15874,25 +19736,164 @@
             return { ox: Math.cos(mid) * expl, oy: Math.sin(mid) * expl };
         }
 
+        pie3DMetrics(_chart, W, H) {
+            const r = Math.max(40, W * 0.46);
+            const ry = Math.max(10, Math.min(H * 0.24, r * 0.205));
+            const cy = Math.max(ry + 4, H * 0.29);
+            return {
+                cx: W * 0.5,
+                cy,
+                hubY: cy - H * 0.046,
+                r,
+                ry,
+                thickness: Math.max(10, Math.min(H * 0.30, r * 0.29))
+            };
+        }
+
+        pie3DProjectedAngle(chart, angle) {
+            if (!chart.is3D) {
+                return angle;
+            }
+            const view = chart.view3D || {};
+            const rotY = typeof view.rotY === 'number' ? view.rotY : 20;
+            const strength = 13 * Math.PI / 180
+                * Math.sin(rotY * Math.PI / 180) / Math.sin(20 * Math.PI / 180);
+            return angle - strength * Math.cos(angle);
+        }
+
+        pie3DFrontRanges(start, end) {
+            const twoPi = Math.PI * 2;
+            const shift = -Math.floor(start / twoPi) * twoPi;
+            const s = start + shift;
+            const e = end + shift;
+            const out = [];
+            for (const base of [0, twoPi]) {
+                const a = Math.max(s, base);
+                const b = Math.min(e, base + Math.PI);
+                if (b > a) {
+                    out.push([a, b]);
+                }
+            }
+            return out;
+        }
+
+        drawPie3DWall(svg, ns, geom, span, color) {
+            const {cx, cy, r, ry, thickness: t} = geom;
+            const ox = geom.ox || 0;
+            const oy = geom.oy || 0;
+            const [a, b] = span;
+            const x1 = cx + ox + Math.cos(a) * r;
+            const y1 = cy + oy + Math.sin(a) * ry;
+            const x2 = cx + ox + Math.cos(b) * r;
+            const y2 = cy + oy + Math.sin(b) * ry;
+            const wall = document.createElementNS(ns, 'path');
+            wall.setAttribute('d', `M${x1} ${y1} A${r} ${ry} 0 0 1 ${x2} ${y2} `
+                + `L${x2} ${y2 + t} A${r} ${ry} 0 0 0 ${x1} ${y1 + t} Z`);
+            let defs = svg.querySelector('defs');
+            if (!defs) {
+                defs = document.createElementNS(ns, 'defs');
+                svg.insertBefore(defs, svg.firstChild);
+            }
+            this._pieGradientSeq = (this._pieGradientSeq || 0) + 1;
+            const gradientId = `xlsx-pie-wall-${this._pieGradientSeq}`;
+            const gradient = document.createElementNS(ns, 'linearGradient');
+            gradient.setAttribute('id', gradientId);
+            gradient.setAttribute('gradientUnits', 'userSpaceOnUse');
+            gradient.setAttribute('x1', cx - r);
+            gradient.setAttribute('x2', cx + r);
+            for (const [offset, shade] of [[0, -0.25], [0.35, -0.30], [1, -0.65]]) {
+                const stop = document.createElementNS(ns, 'stop');
+                stop.setAttribute('offset', String(offset));
+                stop.setAttribute('stop-color', this.shadeColor(color, shade) || color);
+                gradient.appendChild(stop);
+            }
+            defs.appendChild(gradient);
+            wall.setAttribute('fill', `url(#${gradientId})`);
+            wall.setAttribute('stroke', this.shadeColor(color, -0.4) || color);
+            wall.setAttribute(STROKE_WIDTH_ATTR, '0.5');
+            svg.appendChild(wall);
+        }
+
+        drawPie3DRadialFace(svg, ns, geom, angle, color) {
+            if (Math.sin(angle) < -0.02) {
+                return;
+            }
+            const ox = geom.ox || 0;
+            const oy = geom.oy || 0;
+            const centerTop = [geom.cx + ox, geom.cy + oy];
+            const edgeTop = [
+                geom.cx + ox + Math.cos(angle) * geom.r,
+                geom.cy + oy + Math.sin(angle) * geom.ry
+            ];
+            this.addFace(svg, ns, [
+                centerTop,
+                edgeTop,
+                [edgeTop[0], edgeTop[1] + geom.thickness],
+                [centerTop[0], centerTop[1] + geom.thickness]
+            ], color, color);
+        }
+
+        drawPie3DWalls(svg, ns, chart, ser, ctx) {
+            const {total, geom, startAngle} = ctx;
+            let start = startAngle;
+            for (let i = 0; i < ser.data.length; i++) {
+                const v = ser.data[i];
+                if (typeof v !== 'number' || v <= 0) {
+                    continue;
+                }
+                const end = start + v / total * Math.PI * 2;
+                const base = this.chartColor(chart, 0, i);
+                const projectedStart = this.pie3DProjectedAngle(chart, start);
+                const projectedEnd = this.pie3DProjectedAngle(chart, end);
+                const mid = (projectedStart + projectedEnd) / 2;
+                const offset = this.pieSliceOffset(ser, i, mid, geom.r);
+                const sliceGeom = Object.assign({}, geom, offset);
+                for (const span of this.pie3DFrontRanges(projectedStart, projectedEnd)) {
+                    this.drawPie3DWall(svg, ns, sliceGeom, span, base);
+                }
+                if (offset.ox || offset.oy) {
+                    const dark = this.shadeColor(base, -0.4) || base;
+                    this.drawPie3DRadialFace(svg, ns, sliceGeom, projectedStart, dark);
+                    this.drawPie3DRadialFace(svg, ns, sliceGeom, projectedEnd, dark);
+                }
+                start = end;
+            }
+        }
+
         pieSlicePathD(geom, start, end) {
             const { cx, cy, r, innerR, ox, oy } = geom;
+            const hubY = typeof geom.hubY === 'number' ? geom.hubY : cy;
+            const ry = geom.ry || r;
+            const innerRy = innerR * (ry / r);
             const large = end - start > Math.PI ? 1 : 0;
             const x1 = cx + ox + Math.cos(start) * r;
-            const y1 = cy + oy + Math.sin(start) * r;
+            const y1 = cy + oy + Math.sin(start) * ry;
             const x2 = cx + ox + Math.cos(end) * r;
-            const y2 = cy + oy + Math.sin(end) * r;
+            const y2 = cy + oy + Math.sin(end) * ry;
+            if (end - start > Math.PI * 2 - 1e-9) {
+                const ring = (rx, ryy, sweep) => {
+                    const sx = cx + ox + Math.cos(start) * rx;
+                    const sy = cy + oy + Math.sin(start) * ryy;
+                    const mx = cx + ox - Math.cos(start) * rx;
+                    const my = cy + oy - Math.sin(start) * ryy;
+                    return `M${sx} ${sy} A${rx} ${ryy} 0 0 ${sweep} ${mx} ${my} ` +
+                        `A${rx} ${ryy} 0 0 ${sweep} ${sx} ${sy} Z`;
+                };
+                return innerR > 0 ? `${ring(r, ry, 1)} ${ring(innerR, innerRy, 0)}` : ring(r, ry, 1);
+            }
             if (innerR > 0) {
                 const ix2 = cx + ox + Math.cos(end) * innerR;
-                const iy2 = cy + oy + Math.sin(end) * innerR;
+                const iy2 = cy + oy + Math.sin(end) * innerRy;
                 const ix1 = cx + ox + Math.cos(start) * innerR;
-                const iy1 = cy + oy + Math.sin(start) * innerR;
-                return `M${x1} ${y1} A${r} ${r} 0 ${large} 1 ${x2} ${y2} `
-                    + `L${ix2} ${iy2} A${innerR} ${innerR} 0 ${large} 0 ${ix1} ${iy1} Z`;
+                const iy1 = cy + oy + Math.sin(start) * innerRy;
+                return `M${x1} ${y1} A${r} ${ry} 0 ${large} 1 ${x2} ${y2} `
+                    + `L${ix2} ${iy2} A${innerR} ${innerRy} 0 ${large} 0 ${ix1} ${iy1} Z`;
             }
-            return `M${cx + ox} ${cy + oy} L${x1} ${y1} A${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
+            return `M${cx + ox} ${hubY + oy} L${x1} ${y1} A${r} ${ry} 0 ${large} 1 ${x2} ${y2} Z`;
         }
 
         drawPieSlicePath(svg, ns, ser, fill, d) {
+            const chart = svg._chart;
             const path = document.createElementNS(ns, 'path');
             path.setAttribute('d', d);
             path.setAttribute('fill', fill);
@@ -15902,11 +19903,10 @@
                 path.setAttribute(STROKE_WIDTH_ATTR, String(lp.width || 1));
             }
             else {
-                path.setAttribute('stroke', '#fff');
-                path.setAttribute(STROKE_WIDTH_ATTR, '1');
+                path.setAttribute('stroke', chart && chart.is3D ? fill : '#fff');
+                path.setAttribute(STROKE_WIDTH_ATTR, chart && chart.is3D ? '0.5' : '1');
             }
-            const chart = svg._chart;
-            if (chart && this.shouldApplyChartShadow(chart)) {
+            if (chart && this.shouldApplyChartShadow(chart, ser)) {
                 path.setAttribute('filter', `url(#${this.ensureShadowFilter(svg, ns, chart.is3D)})`);
             }
             svg.appendChild(path);
@@ -15964,9 +19964,10 @@
             const mid = (start + end) / 2;
             const labelR = this.pieLabelRadius(
                 effectiveDl.position || 'bestFit', geom.r, geom.innerR, chart.type === 'doughnut');
+            const squash = geom.ry ? geom.ry / geom.r : 1;
             return {
                 lx: geom.cx + geom.ox + Math.cos(mid) * labelR,
-                ly: geom.cy + geom.oy + Math.sin(mid) * labelR + 4
+                ly: geom.cy + geom.oy + Math.sin(mid) * labelR * squash + 4
             };
         }
 
@@ -15976,7 +19977,7 @@
                 if (!labelFont.size || labelFont.size < 20) {
                     labelFont.size = 36;
                 }
-                if (labelFont.color === undefined || labelFont.color === '') {
+                if (!labelFont.color) {
                     labelFont.color = '#555';
                 }
             }
@@ -16005,7 +20006,7 @@
             });
         }
 
-        buildPieLegend(chart, ser, total, labels) {
+        buildPieLegend(chart, ser, labels) {
             const legend = document.createElement('div');
             legend.className = 'xlsx-chart-legend';
             for (let i = 0; i < ser.data.length; i++) {
@@ -16016,12 +20017,12 @@
                 item.className = 'xlsx-chart-legend-item';
                 const sw = document.createElement('span');
                 sw.className = 'xlsx-chart-legend-swatch';
-                sw.style.background = this.chartColor(chart, 0, i);
+                const base = this.chartColor(chart, 0, i);
+                sw.style.background = chart.is3D
+                    ? this.shadeColor(base, -0.18) || base : base;
                 item.appendChild(sw);
                 const label = document.createElement('span');
-                const pct = (ser.data[i] / total * 100).toFixed(1);
-                const lbl = labels[i] === undefined ? i + 1 : labels[i];
-                label.textContent = `${lbl} (${pct}%)`;
+                label.textContent = this.formatCategoryLabel(labels[i], chart.catAxis && chart.catAxis.numFmt, i);
                 item.appendChild(label);
                 legend.appendChild(item);
             }
@@ -16053,6 +20054,15 @@
             return { cx, cy, r, innerR };
         }
 
+        pieRenderGeometry(chart, W, H) {
+            const base = this.computePieGeometry(chart, W, H);
+            if (!chart.is3D) {
+                return Object.assign({ ry: base.r, flat: null }, base);
+            }
+            const flat = this.pie3DMetrics(chart, W, H);
+            return Object.assign({}, base, flat, { flat });
+        }
+
         renderPieChart(chart, size) {
             const ns = SVG_NS;
             const W = size && size.w || 420;
@@ -16067,10 +20077,18 @@
             if (total <= 0) {
                 return svg;
             }
-            const { cx, cy, r, innerR } = this.computePieGeometry(chart, W, H);
+            const { cx, cy, hubY, r, ry, innerR, flat } =
+                this.pieRenderGeometry(chart, W, H);
             const startAngOffset = (chart.firstSliceAng || 0) * Math.PI / 180;
             let start = -Math.PI / 2 + startAngOffset;
             const labels = chart.categories || [];
+            if (flat) {
+                this.drawPie3DWalls(svg, ns, chart, ser, {
+                    total,
+                    startAngle: start,
+                    geom: { cx, cy, hubY, r, ry, thickness: flat.thickness }
+                });
+            }
 
             for (let i = 0; i < ser.data.length; i++) {
                 const v = ser.data[i];
@@ -16079,17 +20097,24 @@
                 }
                 const angle = v / total * Math.PI * 2;
                 const end = start + angle;
-                const mid = (start + end) / 2;
+                const projectedStart = flat
+                    ? this.pie3DProjectedAngle(chart, start) : start;
+                const projectedEnd = flat
+                    ? this.pie3DProjectedAngle(chart, end) : end;
+                const mid = (projectedStart + projectedEnd) / 2;
                 const { ox, oy } = this.pieSliceOffset(ser, i, mid, r);
-                const geom = { cx, cy, r, innerR, ox, oy };
-                const d = this.pieSlicePathD(geom, start, end);
-                this.drawPieSlicePath(svg, ns, ser, this.chartColor(chart, 0, i), d);
+                const geom = { cx, cy, hubY, r, ry, innerR, ox, oy };
+                const d = this.pieSlicePathD(geom, projectedStart, projectedEnd);
+                const base = this.chartColor(chart, 0, i);
+                const fill = flat ? this.shadeColor(base, -0.18) || base : base;
+                this.drawPieSlicePath(svg, ns, ser, fill, d);
                 this.drawPieSliceLabel(svg, ns, chart, ser,
-                                       { geom, start, end, v, i, total, labels });
+                                       { geom, start: projectedStart, end: projectedEnd,
+                                         v, i, total, labels });
                 start = end;
             }
 
-            svg._pieLegend = this.buildPieLegend(chart, ser, total, labels);
+            svg._pieLegend = this.buildPieLegend(chart, ser, labels);
             return svg;
         }
     }
@@ -16101,6 +20126,7 @@
         parseSheetRows,
         formatNumber,
         formatDate,
+        setLocale,
         evaluateFormula,
         indexToColRef,
         MAX_CELLS_PER_SHEET,

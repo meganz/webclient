@@ -26,9 +26,20 @@ class DocxViewer {
         document.addEventListener('docxviewerload', this.handleLoad.bind(this));
         document.addEventListener('docxviewercleanup', this.destroy.bind(this));
         window.addEventListener('resize', this.resize);
+        window.addEventListener('message', (ev) => {
+            const msg = ev.source === window.parent && ev.data;
+
+            if (msg && msg.type === 'docxviewer:thumbnail') {
+                this.handleThumbnail(msg);
+            }
+        });
 
         const loadedEv = new Event('docxviewerready');
         document.dispatchEvent(loadedEv);
+
+        if (window.parent !== window) {
+            window.parent.postMessage({type: 'docxviewer:ready'}, '*');
+        }
     }
 
     /**
@@ -58,6 +69,31 @@ class DocxViewer {
             errEv.data = { error: -2 };
             document.dispatchEvent(errEv);
         }
+    }
+
+    handleThumbnail(msg) {
+        const {buffer, reqId, css} = msg;
+        const done = (data) => {
+            window.parent.postMessage({type: 'docxviewer:thumbnail:done', reqId, dataURL: null, ...data}, '*');
+        };
+        if (!buffer) {
+            done();
+            return;
+        }
+        const holder = document.createElement('div');
+        holder.style.cssText = 'position:absolute;left:-99999px;top:0';
+        const inner = document.createElement('div');
+        holder.appendChild(inner);
+        document.body.appendChild(holder);
+        docx.renderAsync(buffer, inner, null, {...this.config, useBase64URL: true})
+            .then(() => captureNode(inner, css))
+            .then((canvas) => done(canvas && {
+                dataURL: canvas.toDataURL('image/png'),
+                width: canvas.width,
+                height: canvas.height
+            }))
+            .catch(() => done())
+            .then(() => holder.remove());
     }
 
     /**
@@ -102,6 +138,43 @@ class DocxViewer {
             document.body.classList.remove('scaled');
         }
     }
+}
+
+async function captureNode(node, css) {
+    'use strict';
+
+    const w = Math.min(node.scrollWidth || node.offsetWidth || 0, 1000);
+    const h = Math.min(node.scrollHeight || node.offsetHeight || 0, 1400);
+    if (!w || !h) {
+        return null;
+    }
+    css = String(css || '');
+    for (const sheet of document.styleSheets) {
+        if (!sheet.href) {
+            for (const rule of sheet.cssRules) {
+                css += rule.cssText;
+            }
+        }
+    }
+    const xhtml = new XMLSerializer().serializeToString(node);
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">`
+        + '<foreignObject width="100%" height="100%">'
+        + `<div xmlns="http://www.w3.org/1999/xhtml"><style>/*<![CDATA[*/${css}/*]]>*/</style>${xhtml}</div>`
+        + '</foreignObject></svg>';
+    const img = new Image();
+    await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    });
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, w, h);
+    ctx.drawImage(img, 0, 0);
+    return canvas;
 }
 
 var viewer = new DocxViewer();

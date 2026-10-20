@@ -221,8 +221,12 @@ var mThumbHandler = {
 mThumbHandler.add('DOCX,XLSX,XLSM,XLTX,XLTM,CSV', function MSThumbHandler(ab, cb) {
     'use strict';
 
-    // @todo ..
-    cb(null);
+    (self.officeThumbnail ? officeThumbnail(ab) : Promise.resolve(null)).then(cb).catch((ex) => {
+        if (d) {
+            console.warn('MS thumbnail failed.', ex);
+        }
+        cb(null);
+    });
 });
 
 mThumbHandler.add('PSD', function PSDThumbHandler(ab, cb) {

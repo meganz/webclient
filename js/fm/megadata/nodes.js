@@ -25,6 +25,9 @@
                 }
             }
         }
+        if (mega.gallery.tmpFa) {
+            delete mega.gallery.tmpFa[h];
+        }
     };
     const delNodeVersions = function(p, h) {
         const v = fileversioning.getVersionHandles(h);
@@ -4302,6 +4305,10 @@ MegaData.prototype.getNodeByHandle = function(handle) {
         return this.tnd[handle];
     }
 
+    if (mega.gallery.tmpFa && mega.gallery.tmpFa[handle] && !(mega.gallery.tmpFa[handle] instanceof GalleryNode)) {
+        return mega.gallery.tmpFa[handle];
+    }
+
     if (handle && handle.length === 8) {
         // @todo we should not need this...
 
@@ -4378,6 +4385,22 @@ MegaData.prototype.getNodeParent = function(node) {
     }
 
     return node && node.p || false;
+};
+
+/**
+ * Retrieve media or fallback timestamp of a node
+ * @param {String|MegaNode} node The node or its handle
+ * @return {Number} timestamp in milliseconds
+ */
+MegaData.prototype.getNodeMediaTs = function(node) {
+    'use strict';
+
+    if (typeof node === 'string') {
+        node = this.getNodeByHandle(node);
+    }
+
+    // @todo include exif data as a fallback.
+    return node.mts || (node.mtime || node.ts || 0) * 1000;
 };
 
 /**
@@ -5497,21 +5520,49 @@ MegaData.prototype.setNodeTag = async function(handles, newItemTag, isRemove) {
 };
 
 /**
- * Same as is_image3(), additionally checking whether the node meet requirements for photo/media gallery.
+ * Checking whether the node meet requirements for photo/media gallery.
  * @param {String|MegaNode|Object} n An ufs-node, or filename
- * @param {String} [ext] Optional filename extension
+ * @param {String} [ext] Optional filename extension, lowercase
  * @returns {Boolean}
  */
-MegaData.prototype.isGalleryImage = function(n, ext) {
+MegaData.prototype.isGalleryImage = function isGalleryImage(n, ext) {
     'use strict';
 
-    ext = ext || fileext(n && n.name || n, true, true);
-    return ext !== 'PSD' && ext !== 'SVG' && is_image3(n, ext);
+    if (n instanceof GalleryNode) {
+        return !!(n.media & this.IS_IMAGE);
+    }
+
+    ext = ext || fileext(n && n.name || n, false, true);
+
+    const mime = extmime[ext];
+
+    return mime && mime[0] === 'i' && !isGalleryImage.ignore[mime];
+};
+
+MegaData.prototype.isGalleryImage.ignore = {
+    'image/vnd.adobe.photoshop': 1,
+    'image/svg+xml': 1,
+    'image/vnd.dwg': 1,
+    'image/vnd.dxf': 1,
+    'image/x-3ds': 1,
+    'image/vnd.djvu': 1,
+    'image/cgm': 1,
+    'image/x-cmx': 1,
+    'image/x-freehand': 1,
+    'image/naplps': 1,
+    'image/g3fax': 1,
+    'image/t38': 1,
+    'image/vnd.ms-modi': 1,
+    'image/vnd.fujixerox.edmics-mmr': 1,
+    'image/vnd.fujixerox.edmics-rlc': 1,
+    'image/vnd.xiff': 1,
+    'image/vnd.fastbidsheet': 1,
+    'image/ktx': 1
 };
 
 /**
  * Checks whether the node is a video, plus checks if thumbnail is available
- * @param {Object} n ufs node
+ * @param {Object} n An ufs-node, or a media index row
  * @returns {Object.<String, Number>|Boolean}
  */
 MegaData.prototype.isGalleryVideo = function(n) {
@@ -5551,12 +5602,12 @@ MegaData.prototype.isInDevice = function(h) {
 MegaData.prototype.isGalleryNode = function(n, ext) {
     'use strict';
 
-    if (!(n && n.fa)) {
+    if (!(n && (n.fa || n instanceof GalleryNode))) {
         return false;
     }
     if (this.isGalleryVideo(n)) {
         return true;
     }
-    ext = ext || fileext(n && n.name || n, true, true);
+
     return this.isGalleryImage(n, ext);
 };

@@ -105,7 +105,7 @@ function FMDB(plainname, schema, channelmap) {
 }
 
 // @private increase to drop/recreate *all* databases.
-FMDB.version = 2;
+FMDB.version = 3;
 
 /** @property FMDB.perspex -- @private persistence prefix */
 lazy(FMDB, 'perspex', () => {
@@ -1281,8 +1281,8 @@ FMDB.prototype.del = function fmdb_del(table, index) {
 // (must NOT be used for dirty reads - use getbykey() instead)
 FMDB.prototype.get = async function fmdb_get(table, chunked) {
     "use strict";
-    if (this.crashed > 1) {
-        // a read operation failed previously
+    if (this.crashed > 1 || !this.db) {
+        // a read operation failed previously, or the engine never came up
         return [];
     }
 
@@ -1783,16 +1783,38 @@ FMDB.prototype.recent = async function(limit, until, filter, options) {
     return this.getbykey('f', options);
 };
 
-FMDB.prototype.media = async function(options) {
+FMDB.prototype.media = async function() {
     'use strict';
 
-    let res = await this.getbykey('fa', {...options});
+    const rows = await this.getbykey('fa');
+    return this.mediaRows(rows.filter(row => row.s > 0 && (row.t & (M.IS_VIDEO | M.IS_IMAGE)) > 0));
+};
 
-    if (res.length) {
-        res = await this.getbykey('f', 'h', ['h', res.map((n) => n.h)]);
+FMDB.prototype.mediaRows = function(rows) {
+    'use strict';
+
+    for (let i = rows.length; i--;) {
+        const row = rows[i];
+
+        if (row.mtime === undefined) {
+            row.mtime = row.ts;
+        }
+        if (row.mts === undefined) {
+            row.mts = row.mtime * 1000;
+        }
+        if (row.t & M.IS_SEN) {
+            row.sen = 1;
+        }
+        if (row.t & M.IS_FAV) {
+            row.fav = 1;
+        }
+
+        row.media = row.t & (M.IS_VIDEO | M.IS_IMAGE);
+        row.t = 0;
+        Object.setPrototypeOf(row, GalleryNode.prototype);
     }
 
-    return res;
+    return rows;
 };
 
 FMDB.prototype.suggest = async function() {
@@ -3700,31 +3722,23 @@ Object.defineProperty(self, 'dbfetch', (function() {
         },
 
         /**
-         * Retrieve media nodes (i.e. files containing attributes)
+         * Retrieve the media-index rows the gallery renders from, each standing in for its ufs-node.
          * WARNING: emplacenode() is not used, it's up to the caller if so desired.
          *
-         * @param {Number} [limit] amount of nodes to fetch at once in chunked mode
-         * @param {Function} [onchunk] chunked retrieval callback
-         * @returns {Promise} void
+         * @param {String} [sortBy] Which timestamp to order by, see {@link FMDB.prototype.media}
+         * @returns {Promise<Array>} {@link GalleryNode} rows
          * @memberOf dbfetch
          */
-        async media(limit = 2e3, onchunk = null) {
+        async media(sortBy) {
             if (fmdb) {
-                if (typeof limit === 'function') {
-                    onchunk = limit;
-                    limit = 2e3;
-                }
+                const {media} = dbfetch;
 
-                const options = {
-                    limit
-                };
-
-                if (onchunk) {
-                    return fmdb.getchunk('fa', options, onchunk);
-                }
-
-                delete options.limit;
-                return fmdb.getbykey('fa', options);
+                const key = sortBy || 'mts';
+                media.inflight = media.inflight || Object.create(null);
+                media.inflight[key] = media.inflight[key] || fmdb.media(sortBy).finally(() => {
+                    media.inflight[key] = null;
+                });
+                return media.inflight[key];
             }
         },
 

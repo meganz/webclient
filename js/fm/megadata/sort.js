@@ -44,7 +44,7 @@ MegaData.prototype.doFallbackSort = function(a, b, d) {
         return (a.ts < b.ts ? -1 : 1) * d;
     }
 
-    return this.compareStrings(a.h, b.h, d);
+    return a.h > b.h ? d : -d;
 };
 
 MegaData.prototype.doFallbackSortWithName = function(a, b, d) {
@@ -145,6 +145,25 @@ MegaData.prototype.sortByModTimeFn = function() {
         }
 
         return M.doFallbackSortWithName(a, b, d);
+    };
+};
+
+/**
+ * Order media by the timestamp derived from its name, falling back to mtime -> ts
+ * @returns {Function} The comparator
+ */
+MegaData.prototype.sortByMediaTsFn = function() {
+    'use strict';
+
+    return (a, b, d) => {
+        const time1 = M.getNodeMediaTs(a);
+        const time2 = M.getNodeMediaTs(b);
+
+        if (time1 !== time2) {
+            return (time1 < time2 ? -1 : 1) * d;
+        }
+
+        return this.doFallbackSortWithName(a, b, d);
     };
 };
 

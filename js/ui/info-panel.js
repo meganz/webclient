@@ -1574,6 +1574,11 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 delay.cancel('infoPanelsc');
             }
             handles = handles || [];
+
+            if (handles.length === 1 && !M.d[handles[0]] && handles[0].length === 8) {
+                return dbfetch.geta(handles).then(() => M.d[handles[0]] && this.show(handles)).catch(dump);
+            }
+
             const toResize = !mega.ui.flyout.name;
             mega.ui.flyout.showInfoFlyout(handles);
             if (toResize) {

@@ -97,7 +97,8 @@ var slideshowid;
 
         let current;
         let pos = [];
-        let filter = (n) => (n.fa || !M.getNodeShare(n).down) && (is_image2(n) || is_video(n));
+        let filter = n => n instanceof GalleryNode ? M.isGalleryImage(n) || is_video(n) :
+            (n.fa || !M.getNodeShare(n).down) && (is_image2(n) || is_video(n));
         let index = (i) => M.v[i].h;
 
         if (M.chat) {
@@ -208,6 +209,14 @@ var slideshowid;
         if (steps[step].length > 0) {
             const newShownHandle = steps[step][0];
             if (!newShownHandle) {
+                return;
+            }
+
+            const fromId = slideshowid;
+            const resume = () => slideshowid === fromId && slideshow_move(dir, steps);
+
+            // A media index row holds neither the name nor the key everything below reads
+            if (mega.gallery.hydrateSlideshow && mega.gallery.hydrateSlideshow(newShownHandle, resume)) {
                 return;
             }
             else if ($.videoAutoFullScreen && is_video(M.getNodeByHandle(newShownHandle))) {
@@ -497,7 +506,7 @@ var slideshowid;
         const $addToAlbumButton = $('.context-menu .add-to-album', $overlay);
         const $divider = $addToAlbumButton.closest('li').prev('.divider');
 
-        if (M.getNodeRoot(n.h) === M.RootID && mega.gallery
+        if ((!pfid && (M.isGalleryPage() || M.isAlbumsPage()) || M.getNodeRoot(n.h) === M.RootID) && mega.gallery
             && mega.gallery.canShowAddToAlbum() && M.isGalleryNode(n)) {
             $addToAlbumButton.removeClass('hidden');
             $divider.removeClass('hidden');
@@ -1029,8 +1038,15 @@ var slideshowid;
     // Viewer Init
     // eslint-disable-next-line complexity
     function slideshow(id, close, hideCounter, filteredNodeArr) {
+
         if (!close && M.isInvalidUserStatus()) {
             return false;
+        }
+
+        const resume = h => !slideshowid && slideshow(h, close, hideCounter, filteredNodeArr);
+
+        if (mega.gallery.hydrateSlideshow && mega.gallery.hydrateSlideshow(!close && id, resume)) {
+            return;
         }
 
         var $overlay = $('.media-viewer-container', 'body');

@@ -36,6 +36,8 @@ class GalleryNodeBlock {
         if (this.thumb) {
             this.thumb.classList.remove('w-full');
         }
+
+        this.el.setAttribute('title', this.node && this.node.name || '');
     }
 
     get isFav() {
@@ -61,11 +63,11 @@ class GalleryNodeBlock {
         else if (spanFav) {
             this.spanEl.removeChild(spanFav);
         }
+
+        this._fav = status;
     }
 
     fill(mode) {
-        this.el.setAttribute('title', this.node.name);
-
         const spanMedia = document.createElement('span');
         this.spanEl.appendChild(spanMedia);
         spanMedia.className = 'item-type-icon-90';
@@ -95,11 +97,9 @@ class GalleryNodeBlock {
         this.isFav = !!this.node.fav;
 
         if (mode === 'm' || mode === 'y') {
-            this.el.dataset.ts = this.node.mtime || 0;
-            this.el.dataset.date = GalleryNodeBlock.getTimeString(
-                this.node.mtime || 0,
-                mode === 'y' ? 14 : 15
-            );
+            const ts = Math.floor(M.getNodeMediaTs(this.node) / 1000);
+            this.el.dataset.ts = ts;
+            this.el.dataset.date = GalleryNodeBlock.getTimeString(ts, mode === 'y' ? 14 : 15);
         }
 
         this.isRendered = true;
@@ -212,8 +212,7 @@ class MegaGallery {
     }
 
     static sortViewNodes() {
-        const sortFn = M.sortByModTimeFn();
-        M.v.sort((a, b) => sortFn(a, b, -1));
+        M.v.sort(MegaGallery.sortFn);
     }
 
     static getCameraHandles() {
@@ -348,19 +347,31 @@ class MegaGallery {
     }
 
     getGroup(n) {
-        const timestamp = n.mtime || 0;
+        const timestamp = Math.floor(M.getNodeMediaTs(n) / 1000);
+        const last = this.dayGroup;
+
+        if (last !== undefined && timestamp >= last[3] && timestamp < last[0]) {
+            return [timestamp, last[1], last[2], last[3]];
+        }
+
         const time = new Date(timestamp * 1000);
 
-        const year = time.getFullYear();
-        const month = time.getMonth();
-        const day = time.getDate();
+        time.setHours(0, 0, 0, 0);
+        const day = Math.floor(time / 1000);
 
-        return [
-            timestamp,
-            parseInt(new Date(year, 0, 1) / 1000),
-            parseInt(new Date(year, month, 1) / 1000),
-            parseInt(new Date(year, month, day) / 1000),
-        ];
+        time.setDate(time.getDate() + 1);
+        const next = Math.floor(time / 1000);
+
+        time.setTime(day * 1000);
+        time.setDate(1);
+        const month = Math.floor(time / 1000);
+
+        time.setMonth(0);
+        const year = Math.floor(time / 1000);
+
+        this.dayGroup = [next, year, month, day];
+
+        return [timestamp, year, month, day];
     }
 
     setYearGroup(key, h) {
@@ -585,16 +596,11 @@ class MegaGallery {
         const {start, end} = calculateCalendar('d', ts);
         const keys = Object.keys(this.nodes);
         for (const h of keys) {
-            const n = mega.gallery.getNodeCache(h);
 
-            if (!n) {
-                continue;
-            }
+            const timestamp = this.nodes[h];
 
-            const timestamp = n.mtime || 0;
-            if (start <= timestamp && timestamp <= end) {
-                const res = this.getGroup(n);
-                this.setDayGroup(res[3], n.h);
+            if (start <= timestamp && timestamp <= end && mega.gallery.getNodeCache(h)) {
+                this.setDayGroup(this.getGroup({h, mtime: timestamp})[3], h);
             }
         }
     }
@@ -604,16 +610,11 @@ class MegaGallery {
         const {start, end} = calculateCalendar('m', ts);
         const keys = Object.keys(this.nodes);
         for (const h of keys) {
-            const n = mega.gallery.getNodeCache(h);
 
-            if (!n) {
-                continue;
-            }
+            const timestamp = this.nodes[h];
 
-            const timestamp = n.mtime || 0;
-            if (start <= timestamp && timestamp <= end) {
-                const res = this.getGroup(n);
-                this.setMonthGroup(ts, res[3]);
+            if (start <= timestamp && timestamp <= end && mega.gallery.getNodeCache(h)) {
+                this.setMonthGroup(ts, this.getGroup({h, mtime: timestamp})[3]);
             }
         }
         this.filterOneMonthGroup(ts);
@@ -1022,7 +1023,7 @@ class MegaGallery {
         const month = this.groups.a[monthKey];
 
         if (month) {
-            const sortFn = M.sortByModTimeFn();
+            const sortFn = MegaGallery.sortFn;
             const getNode = h => mega.gallery.getNodeCache(h) || this.updNode[h];
             let chunkKey = monthKey;
             let chunk = month;
@@ -1272,10 +1273,6 @@ class MegaGallery {
         const updatedGroup = this.getGroup(n);
 
         delete this.nodes[n.h];
-
-        if (mega.gallery.tmpFa) {
-            delete mega.gallery.tmpFa[n.h];
-        }
 
         // Do not change order, some function here is rely on result from another
         // This order should be keep this way in order to process data in order.
@@ -1816,8 +1813,6 @@ class MegaGallery {
     }
 
     sortByMtime(ah, bh) {
-        const { tmpFa } = mega.gallery;
-
         const a = typeof ah === 'string'
             ? mega.gallery.getNodeCache(ah) || this.updNode[ah]
             : ah;
@@ -1825,7 +1820,7 @@ class MegaGallery {
             ? mega.gallery.getNodeCache(bh) || this.updNode[bh]
             : bh;
 
-        return M.sortByModTimeFn()(a, b, -1);
+        return MegaGallery.sortFn(a, b);
     }
 
     getGroupMonthNodes(id, group) {
@@ -2546,8 +2541,7 @@ class MegaMediaTypeGallery extends MegaGallery {
         this.updNode = Object.create(null);
 
         // This sort is needed for building groups, do not remove
-        const sortFn = M.sortByModTimeFn();
-        nodes.sort((a, b) => sortFn(a, b, -1));
+        nodes.sort(MegaGallery.sortFn);
 
         if (!Array.isArray(nodes)) {
             if (d) {
@@ -2666,10 +2660,6 @@ Object.defineProperty(mega.gallery, 'nodeUpdated', {
     set(value) {
         'use strict';
 
-        if (value) {
-            delete mega.gallery.tmpFa;
-        }
-
         this._nodeUpdated = value;
     }
 });
@@ -2703,6 +2693,59 @@ mega.gallery.fillMainView = (list, mapper) => {
 mega.gallery.getNodeCache = h => {
     'use strict';
     return M.getNodeByHandle(h) || (mega.gallery.tmpFa && mega.gallery.tmpFa[h]) || undefined;
+};
+
+mega.gallery.hydrateSelection = (handles, quiet) => {
+    'use strict';
+
+    const hs = [];
+
+    if (!quiet) {
+        loadingDialog.show('hydrate-nodes');
+    }
+
+    for (let i = handles.length; i--;) {
+        if (mega.gallery.getNodeCache(handles[i]) instanceof GalleryNode) {
+            hs.push(handles[i]);
+        }
+    }
+
+    if (!hs.length) {
+        loadingDialog.hide('hydrate-nodes');
+        return Promise.reject();
+    }
+
+    return dbfetch.node(hs).then(nodes => {
+        const res = {};
+        for (let i = nodes.length; i--;) {
+            const n = mega.gallery.getNodeCache(nodes[i].h);
+
+            // Fold the ufs-node into the row it stands for, so whoever holds the row gets it with no copy
+            if (n instanceof GalleryNode) {
+                Object.setPrototypeOf(Object.assign(n, nodes[i]), MegaNode.prototype);
+            }
+            res[nodes[i].h] = n;
+        }
+        return res;
+    }).catch(dump).finally(() => quiet || loadingDialog.hide('hydrate-nodes'));
+};
+
+mega.gallery.hydrateSlideshow = (target, resume) => {
+    'use strict';
+
+    const n = typeof target === 'object' ? target : mega.gallery.getNodeCache(target);
+    const h = mega.gallery.lnh = n && n.h || null;
+
+    if (!h || !resume || !(n instanceof GalleryNode)) {
+        return false;
+    }
+
+    const view = M.currentdirid;
+
+    mega.gallery.hydrateSelection([h])
+        .then(() => mega.gallery.lnh === h && M.getNodeByHandle(h) && M.currentdirid === view && resume(h)).catch(nop);
+
+    return true;
 };
 
 mega.gallery.handleNodeRemoval = tryCatch((n) => {
@@ -2786,7 +2829,7 @@ mega.gallery.unsetShimmering = (el) => {
  */
 mega.gallery.isPreviewable = (n, ext) => {
     'use strict';
-    return is_image3(n, ext) || is_video(n);
+    return (n instanceof GalleryNode ? M.isGalleryImage(n) : is_image3(n, ext)) || is_video(n);
 };
 
 mega.gallery.checkEveryGalleryUpdate = n => {
@@ -2853,6 +2896,18 @@ mega.gallery.checkEveryGalleryDelete = h => {
 
 mega.gallery.handleNodeUpdate = tryCatch((n) => {
     'use strict';
+
+    if (mega.gallery.tmpFa && !n.t) {
+
+        n = M.d[n.h] || n;
+
+        if (n.fa && n.s > 0 && ufsc.bitfield(n, fileext(n.name)) & (M.IS_VIDEO | M.IS_IMAGE)) {
+            mega.gallery.tmpFa[n.h] = n;
+        }
+        else {
+            delete mega.gallery.tmpFa[n.h];
+        }
+    }
 
     if (M.gallery) {
         mega.gallery.checkEveryGalleryUpdate(n);
@@ -3363,6 +3418,12 @@ async function galleryUI(id) {
     });
 }
 
+lazy(MegaGallery, 'sortFn', () => {
+    'use strict';
+    const fn = M.sortByMediaTsFn();
+    return (a, b) => fn(a, b, -1);
+});
+
 /**
  * @param {GalleryNodeBlock[]} nodeBlocks Array of objects encapsulating setThumb and node
  * @returns {void}
@@ -3376,14 +3437,26 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
 
     const keys = [];
     const thumbBlocks = {};
-    const { pendingFaBlocks, pendingThumbBlocks, tmpFa } = mega.gallery;
+    const { pendingFaBlocks, pendingThumbBlocks } = mega.gallery;
+    const hydrateHandles = [];
+    const hydrateBlocks = [];
 
     for (let i = 0; i < nodeBlocks.length; i++) {
-        if (!nodeBlocks[i].node) { // No node is associated with the block
+
+        if (!nodeBlocks[i].node) {
             continue;
         }
 
+        nodeBlocks[i].node = mega.gallery.getNodeCache(nodeBlocks[i].node.h) || nodeBlocks[i].node;
+
         const { h, fa } = nodeBlocks[i].node;
+
+        // An index row carries no fa to fetch a thumbnail by, so it waits for the ufs-node below
+        if (nodeBlocks[i].node instanceof GalleryNode) {
+            hydrateHandles.push(h);
+            hydrateBlocks.push(nodeBlocks[i]);
+            continue;
+        }
 
         /**
          * The element width to fetch with relation to dpx
@@ -3435,6 +3508,12 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
         if (nodeBlocks[i].thumb) {
             nodeBlocks[i].thumb.classList.add('w-full');
         }
+    }
+
+    if (hydrateHandles.length) {
+        mega.gallery.hydrateSelection(hydrateHandles, true).then((hydrated = []) => {
+            MegaGallery.addThumbnails(hydrateBlocks.filter(({node}) => hydrated[node.h]));
+        }).catch(dump);
     }
 
     // Checking if there are any re-usable thumbnails available
@@ -3967,28 +4046,40 @@ lazy(mega.gallery, 'resetMediaCounts', () => {
 mega.gallery.initialiseMediaNodes = async(filterFn) => {
     'use strict';
 
-    if (!mega.gallery.tmpFa) {
-        mega.gallery.tmpFa = (await dbfetch.media())
-            .reduce((t, n) => {
-                t[n.h] = n;
-                return t;
-            }, Object.create(null));
+    const cameraTree = MegaGallery.getCameraHandles();
+    let mNodes;
 
-        // @todo work with the in-memory nodes, without loading them normally!
-        await dbfetch.geta(Object.keys(mega.gallery.tmpFa));
+    if (fmdb && !fmdb.crashed && mega.loadReport.mode !== 2 && !mega.gallery.tmpFa) {
 
-        for (const h in mega.gallery.tmpFa) {
-            mega.gallery.tmpFa[h] = M.d[h] || mega.gallery.tmpFa[h];
+        mNodes = await dbfetch.media();
+        const tmpFa = Object.create(null);
+
+        for (let i = 0; i < mNodes.length; i++) {
+            const row = mNodes[i];
+            const n = M.d[row.h];
+            if (n && n.mts === undefined) {
+                n.mts = row.mts;
+            }
+            mNodes[i] = tmpFa[row.h] = n || row;
         }
+
+        mega.gallery.tmpFa = tmpFa;
+    }
+    else if (mega.gallery.tmpFa) {
+        mNodes = Object.values(mega.gallery.tmpFa);
+    }
+    else {
+        mNodes = Object.values(M.d);
     }
 
-    return Object.values(mega.gallery.tmpFa).filter((n) => mega.gallery.allowedInMedia(n, filterFn));
+    return mNodes.filter(n => n.s && mega.gallery.allowedInMedia(n, filterFn, cameraTree));
 };
 
-mega.gallery.allowedInMedia = (n, filterFn) => {
+mega.gallery.allowedInMedia = (n, filterFn, ctree) => {
     'use strict';
 
-    const cameraTree = MegaGallery.getCameraHandles();
+    // Handed over by whoever is running a whole listing through this, so it is gathered but once
+    const cameraTree = ctree || MegaGallery.getCameraHandles();
 
     if (!mega.gallery.cdTree) {
         mega.gallery.cdTree = freeze(array.to.object(M.getTreeHandles(M.RootID), true));

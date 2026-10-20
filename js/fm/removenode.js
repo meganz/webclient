@@ -255,6 +255,9 @@ function removeUInode(h, parent) {
     }
 
     M.nodeRemovalUIRefresh(h,  parent);
+
+    delay.cancel(`gallery:node-update(${h})`);
+    delay.cancel(`sensitives.updateDomNode${h}`);
 }
 
 /**

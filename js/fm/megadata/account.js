@@ -1426,6 +1426,13 @@ mBroadcaster.addListener('fm:initialized', () => {
             queueMicrotask(() => M.convertedToFreeBanner());
         }
 
+        // Targeted discount offer, as accountData() no longer runs on entry
+        if (u_attr.mkt && Array.isArray(u_attr.mkt.dc) && u_attr.mkt.dc.length) {
+            delay('ShowDiscountOffer', () => {
+                pro.getTargetedDiscountInfo().then((dcis) => pro.propay.showDiscountOffer(dcis)).catch(dump);
+            }, 7e3);
+        }
+
         return 0xDEAD;
     }
 });

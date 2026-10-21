@@ -17,6 +17,8 @@ pro.propay.billing = {
 
     tngrRes: null,
 
+    blockedCountries: null,
+
     billingSections: null,
 
     lastValidatedErrorFields: {},
@@ -52,8 +54,9 @@ pro.propay.billing = {
         if (this.initialCountry !== undefined) {
             return this.initialCountry;
         }
-        await this.fetchDefaultCountry();
-        this.initialCountry = this.defaultCountry || (u_attr && u_attr.country) || '';
+        await Promise.all([this.fetchDefaultCountry(), this.getBlockedCountries()]);
+        const country = this.defaultCountry || (u_attr && u_attr.country) || '';
+        this.initialCountry = this.isBlockedCountry(country) ? '' : country;
         return this.initialCountry;
     },
 
@@ -399,7 +402,7 @@ pro.propay.billing = {
             return;
         }
 
-        const countries = M.getCountries();
+        const countries = this.saleCountries(M.getCountries(), this.blockedCountries);
         const sortedOptions = Object.fromEntries(Object.entries(countries)
             .sort((a, b) => a[1].localeCompare(b[1])));
         const selected = this.initialCountry || '';
@@ -1152,6 +1155,49 @@ pro.propay.billing = {
         this.tngrRes = res && res.result || false;
 
         return this.tngrRes;
+    },
+
+    /**
+     * Get and cache the countries the API takes no payments from
+     * @returns {Promise<Set<String>|false>} country codes, or false when utbc gave no usable list
+     */
+    async getBlockedCountries() {
+        'use strict';
+
+        if (this.blockedCountries) {
+            return this.blockedCountries;
+        }
+
+        // A failure counts as loaded, so nothing waits on it and nothing is filtered.
+        const res = await api.req({a: 'utbc'}).catch(dump);
+        this.blockedCountries = Array.isArray(res && res.result) ? new Set(res.result) : false;
+
+        return this.blockedCountries;
+    },
+
+    /**
+     * @param {Object} countries                The country list, code: name
+     * @param {Set<String>|false|null} blocked  Country codes to leave out
+     * @returns {Object}                        The countries a sale can be made in, code: name
+     */
+    saleCountries(countries, blocked) {
+        'use strict';
+
+        if (!blocked) {
+            return countries;
+        }
+
+        return Object.fromEntries(Object.entries(countries).filter(([cc]) => !blocked.has(cc)));
+    },
+
+    /**
+     * @param {String} country  Country code
+     * @returns {Boolean}       Whether the API takes no payments from it
+     */
+    isBlockedCountry(country) {
+        'use strict';
+
+        return !!this.blockedCountries && this.blockedCountries.has(country);
     },
 
     /**

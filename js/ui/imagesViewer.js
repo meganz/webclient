@@ -97,7 +97,8 @@ var slideshowid;
 
         let current;
         let pos = [];
-        let filter = (n) => (n.fa || !M.getNodeShare(n).down) && (is_image2(n) || is_video(n));
+        let filter = n => n instanceof GalleryNode ? M.isGalleryImage(n) || is_video(n) :
+            (n.fa || !M.getNodeShare(n).down) && (is_image2(n) || is_video(n));
         let index = (i) => M.v[i].h;
 
         if (M.chat) {
@@ -208,6 +209,14 @@ var slideshowid;
         if (steps[step].length > 0) {
             const newShownHandle = steps[step][0];
             if (!newShownHandle) {
+                return;
+            }
+
+            const fromId = slideshowid;
+            const resume = () => slideshowid === fromId && slideshow_move(dir, steps);
+
+            // A media index row holds neither the name nor the key everything below reads
+            if (mega.gallery.hydrateSlideshow && mega.gallery.hydrateSlideshow(newShownHandle, resume)) {
                 return;
             }
             else if ($.videoAutoFullScreen && is_video(M.getNodeByHandle(newShownHandle))) {
@@ -497,7 +506,7 @@ var slideshowid;
         const $addToAlbumButton = $('.context-menu .add-to-album', $overlay);
         const $divider = $addToAlbumButton.closest('li').prev('.divider');
 
-        if (M.getNodeRoot(n.h) === M.RootID && mega.gallery
+        if ((!pfid && (M.isGalleryPage() || M.isAlbumsPage()) || M.getNodeRoot(n.h) === M.RootID) && mega.gallery
             && mega.gallery.canShowAddToAlbum() && M.isGalleryNode(n)) {
             $addToAlbumButton.removeClass('hidden');
             $divider.removeClass('hidden');
@@ -1029,8 +1038,15 @@ var slideshowid;
     // Viewer Init
     // eslint-disable-next-line complexity
     function slideshow(id, close, hideCounter, filteredNodeArr) {
+
         if (!close && M.isInvalidUserStatus()) {
             return false;
+        }
+
+        const resume = h => !slideshowid && slideshow(h, close, hideCounter, filteredNodeArr);
+
+        if (mega.gallery.hydrateSlideshow && mega.gallery.hydrateSlideshow(!close && id, resume)) {
+            return;
         }
 
         var $overlay = $('.media-viewer-container', 'body');
@@ -2434,6 +2450,128 @@ var slideshowid;
         }).catch(tell);
     }
 
+    const MS_THUMB_MAX_BYTES = 36 * 1024 * 1024;
+    const msFrameCss = 'position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;border:0;visibility:hidden';
+    const msThumbCss = Object.create(null);
+    let msThumbReqId = 0;
+
+    const officeThumbnail = mutex('office-thumbnail', async(resolve, reject, ab) => {
+
+        const kind = ab && ab.byteLength > 0 && ab.byteLength <= MS_THUMB_MAX_BYTES && officeKind(ab);
+
+        if (!kind) {
+            return resolve(null);
+        }
+
+        resolve(await msThumb(kind === 'docx' ? 'docx' : 'xlsx', ab, kind).catch(dump));
+    });
+
+    function officeKind(ab) {
+        const view = new DataView(ab);
+        const len = view.byteLength;
+        if (len < 22 || view.getUint32(0, true) !== 0x04034b50) {
+            // OLE compound file, i.e. a password-protected OOXML or a legacy binary one.
+            return len > 7 && view.getUint32(0, true) === 0xE011CFD0 ? null : 'csv';
+        }
+        let eocd = -1;
+        for (let i = len - 22; i >= Math.max(0, len - 65557); i--) {
+            if (view.getUint32(i, true) === 0x06054b50) {
+                eocd = i;
+                break;
+            }
+        }
+        if (eocd < 0) {
+            return 'xlsx';
+        }
+        const decoder = new TextDecoder('utf-8');
+        let pos = view.getUint32(eocd + 16, true);
+        for (let n = view.getUint16(eocd + 10, true); n-- && view.getUint32(pos, true) === 0x02014b50;) {
+            const fnLen = view.getUint16(pos + 28, true);
+            if (decoder.decode(new Uint8Array(ab, pos + 46, fnLen)) === 'word/document.xml') {
+                return 'docx';
+            }
+            pos += 46 + fnLen + view.getUint16(pos + 30, true) + view.getUint16(pos + 32, true);
+        }
+        return 'xlsx';
+    }
+
+    function msThumbResult(data) {
+        if (!data || typeof data.dataURL !== 'string' || !data.dataURL.startsWith('data:image/png;base64,')) {
+            return null;
+        }
+        const buf = dataURLToAB(data.dataURL);
+        buf.width = data.width | 0;
+        buf.height = data.height | 0;
+        return buf;
+    }
+
+    function msThumbReply(frame, type, timeout, reqId) {
+        let onmsg;
+
+        return tSleep.race(timeout, new Promise(resolve => {
+
+            onmsg = ev => {
+                const msg = ev.source === frame.contentWindow && ev.data;
+
+                if (msg && msg.type === type && msg.reqId === reqId) {
+                    resolve(msg);
+                }
+            };
+
+            window.addEventListener('message', onmsg);
+        })).finally(() => window.removeEventListener('message', onmsg));
+    }
+
+    // A throwaway sandbox per file, so that no document can ever reach the bytes of another.
+    async function msThumbFrame(name) {
+        const rsc = [...require.map[`${name}viewer`].values()];
+        const css = rsc.filter((v) => v.endsWith('css'));
+        const html = await require(`${name}viewer`, rsc.filter((v) => !v.endsWith('css')), ...css);
+        const frame = document.createElement('iframe');
+        const ready = msThumbReply(frame, `${name}viewer:ready`, 15);
+
+        frame.setAttribute('sandbox', 'allow-scripts');
+        frame.style.cssText = msFrameCss;
+        frame.srcdoc = html;
+        document.body.appendChild(frame);
+
+        if (await ready === ETEMPUNAVAIL) {
+
+            frame.remove();
+            throw new MEGAException('Thumbnail frame timeout', name, 'TimeoutError');
+        }
+
+        return frame;
+    }
+
+    // The viewer's stylesheet, to inline into the capture, as the sandbox may not be allowed to fetch it.
+    function msThumbStyle(name) {
+        if (!msThumbCss[name]) {
+            const rsc = mega[`${name}viewercss`];
+
+            msThumbCss[name] = rsc && rsc.blob
+                ? fetch(rsc.blob).then((r) => r.text()).catch(() => '')
+                : Promise.resolve('');
+        }
+        return msThumbCss[name];
+    }
+
+    async function msThumb(name, ab, ext) {
+        const frame = await msThumbFrame(name);
+        const css = await msThumbStyle(name);
+        const reqId = ++msThumbReqId;
+        const reply = msThumbReply(frame, `${name}viewer:thumbnail:done`, 20, reqId);
+        const msg = {type: `${name}viewer:thumbnail`, buffer: ab, ext, reqId, css};
+
+        if (name === 'xlsx') {
+            Object.assign(msg, xlsxViewerL10n());
+        }
+
+        frame.contentWindow.postMessage(msg, '*');
+
+        return msThumbResult(await reply.finally(() => frame.remove()));
+    }
+
     function _linkSanityCheck(s) {
 
         if (typeof s !== 'string') {
@@ -2452,13 +2590,25 @@ var slideshowid;
         return s.replace(/[\u202A-\u202E\u2066-\u2069]/g, '');
     }
 
+    function xlsxViewerL10n() {
+        return {
+            locale: String(self.locale || 'en'),
+            strings: {
+                noSheets: l.xlsx_preview_no_sheets,
+                emptySheet: l.xlsx_preview_empty_sheet,
+                truncated: l.xlsx_preview_truncated,
+                chartUnsupported: l.xlsx_preview_chart_unsupported
+            }
+        };
+    }
+
     function prepareAndViewXlsxViewer(data) {
         const ext = data.type === extmime.csv ? 'csv' : 'xlsx';
         const signal = tryCatch(() => {
             const elem = document.getElementById('xlsxpreviewdiv1');
             elem.classList.remove('hidden');
             elem.contentWindow.postMessage(
-                { type: 'xlsxviewer:load', buffer: data.buffer, ext },
+                { type: 'xlsxviewer:load', buffer: data.buffer, ext, ...xlsxViewerL10n() },
                 '*'
             );
             slideshow_gesture(data.h, elem, 'XLSX');
@@ -2898,5 +3048,6 @@ var slideshowid;
     global.previewsrc = previewsrc;
     global.previewimg = previewimg;
     global.slideshowNodeAttributes = slideshowNodeAttributes;
+    global.officeThumbnail = officeThumbnail;
 
 })(self);

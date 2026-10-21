@@ -207,15 +207,16 @@ accountUI.plan = {
                 if (mainPlanDetails.next) {
                     this.renderSubscription(mainPlanDetails, $planContent);
                 }
-                // One-off, cancelled, or expired
-                else if (mainPlanDetails.expires) {
-                    const expiryTimestamp = M.account.expiry || mainPlanDetails.expires;
+                // One-off, cancelled, or expired; a naturally expired Business/Pro Flexi has expires 0
+                else {
+                    const expiryTimestamp = mainPlanDetails.expires
+                        && (M.account.expiry || mainPlanDetails.expires);
 
                     $('.subtitle-txt.expiry-txt', $planContent)
                         .text(expiryTimestamp < unixtime() ? l[8657] : l[987]);
                     $('.account.plan-info.expiry span', $planContent)
                         .addClass('red')
-                        .text(time2date(expiryTimestamp, 2));
+                        .text(expiryTimestamp ? time2date(expiryTimestamp, 2) : '');
                     $('.sub-container.subscription:not(.feature)', $planContent).addClass('hidden');
                 }
 

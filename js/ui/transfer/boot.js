@@ -436,11 +436,13 @@ mBroadcaster.once('boot_done', () => {
         const opts = {
             3: {year: 'numeric', month: 'long'},
             8: {year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'},
+            14: {year: 'numeric'},
+            16: {day: 'numeric'},
             21: {hour: '2-digit', minute: '2-digit'}
         };
 
         if (opts[format]) {
-            const locales = getCountryAndLocales();
+            const {locales} = getCountryAndLocales();
             return new Intl.DateTimeFormat(locales, opts[format]).format(date);
         }
 

@@ -252,11 +252,6 @@ pro.propay = {
             $billingAddressInfo.addClass('error');
         }
 
-        if (reasons.s4TosNeeded) {
-            const locationSelector = $('body').innerWidth() >= 1080 ? 'footer.desktop' : 'footer.mobile';
-            $(`${locationSelector} .s4-tos`, this.$page).addClass('error');
-        }
-
         if (this.isNewAccount) {
             const $accountDetails = $('.account-details', this.$page);
 
@@ -295,10 +290,6 @@ pro.propay = {
         }
 
         const currentGateway = this.currentGateway && this.currentGateway.gatewayId;
-
-        if (window.s4ac && this.s4Active && !this.s4TosAccepted) {
-            reasons.s4TosNeeded = 1;
-        }
 
         if (this.isNewAccount && !skipAccountDetails) {
             const {name, email, password} = this.signup.getNewAccountDetails();
@@ -726,13 +717,6 @@ pro.propay = {
             utsRequest.dc = discountInfo.dc;
         }
 
-        // Add S4 parameters
-        const s4Flexi = this.s4Active && window.s4ac && pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI;
-
-        if (s4Flexi) {
-            utsRequest.s4 = 1;
-        }
-
         const setValues = (extra, saleId) => {
 
             const enteredBillingInfo = pro.propay.billing.getEnteredBillingInfo();
@@ -939,12 +923,8 @@ pro.propay = {
                 // Default error is "Something went wrong. Try again later..."
                 let errorMessage;
 
-                // Get S4 error messages
-                if (s4Flexi && (errorMessage = ActivateS4.instance.getErrorMsg(ex))) {
-                    delete window.s4ac;
-                }
                 // Handle specific discount errors
-                else if (ex === EEXPIRED) {
+                if (ex === EEXPIRED) {
                     // The discount code has expired.
                     errorMessage = l[24675];
                 }
@@ -1797,16 +1777,6 @@ pro.propay = {
                 $includesContent.safeAppend(HTMLString);
             }
 
-            if ((this.planObj.level === pro.ACCOUNT_LEVEL_PRO_FLEXI) && window.s4ac) {
-                $includesContent
-                    .safeAppend(
-                        `<div class="plan-card-s4">
-                            <i class="sprite-fm-mono icon-bucket-triangle-thin-outline"></i>
-                            ${l.ri_s4_tab}
-                        </div>`
-                    );
-            }
-
             // S4-flagged discount codes get an extra egress feature line
             if (this.discountInfo && this.discountInfo.s4) {
                 $includesContent
@@ -2600,9 +2570,7 @@ pro.propay = {
         let shouldBlockFlow = false;
         const blockFlowReasons = this.blockFlow(true);
 
-        // If s4Tos needed but not accepted, still load payment option
         if (blockFlowReasons) {
-            delete blockFlowReasons.s4TosNeeded;
             shouldBlockFlow = Object.keys(blockFlowReasons).length;
         }
 
@@ -3694,50 +3662,10 @@ pro.propay = {
         return this.paymentGateways;
     },
 
-    handleS4() {
-        'use strict';
-
-        const $s4 = $('.s4-wrapper', this.$page);
-
-        this.s4Active = !!window.s4ac;
-        this.s4TosAccepted = false;
-
-        const $button = $('button', $s4);
-        const $s4Checkbox = $('.s4-tos', this.$page).removeClass('hidden');
-        const $checkboxParts = $('.checkbox-item', $s4Checkbox);
-
-        $button.rebind('click', () => {
-
-            this.s4Active = !this.s4Active;
-
-            $('.plan-card-s4', this.pageInfo.$planCard).toggleClass('hidden', !this.s4Active);
-
-            $button.toggleClass('active', this.s4Active);
-            $s4Checkbox.toggleClass('hidden', !this.s4Active);
-        });
-
-        $('div.tos', $s4Checkbox).rebind('click', () => {
-            this.s4TosAccepted = !this.s4TosAccepted;
-
-            $checkboxParts.removeClass('checkboxOn checkboxOff');
-            $checkboxParts.addClass(this.s4TosAccepted ? 'checkboxOn' : 'checkboxOff');
-
-            const currentGatewayName = pro.propay.currentGateway && pro.propay.currentGateway.gatewayName;
-
-            if ((currentGatewayName === 'stripeGP') || (currentGatewayName === 'stripeAP')) {
-                pro.propay.updatePayment();
-            }
-            else {
-                pro.propay.updatePageInfo();
-            }
-        });
-    },
-
     updateContinueDisabled() {
         'use strict';
-        const s4Blocked = !!(window.s4ac && this.blockFlow());
         const countryBlocked = this.countryMismatchAttempted && this.hasGatewayCountryMismatch();
-        $('.continue', this.$page).toggleClass('disabled', s4Blocked || countryBlocked);
+        $('.continue', this.$page).toggleClass('disabled', countryBlocked);
     },
 
     hasGatewayCountryMismatch() {
@@ -3866,11 +3794,6 @@ pro.propay = {
         if (userFlexiInfo) {
             // If Pro Flexi account is not expired/grace period, don't allow access to propay
             if (!userExpOrGrace) {
-                // Unless they have entered the S4 Object Storage RYI flow, in which case send them to that page.
-                if (window.s4ac) {
-                    loadSubPage('activate-s4');
-                    return;
-                }
                 loadSubPage('start');
                 return;
             }
@@ -3882,12 +3805,6 @@ pro.propay = {
         // If a current Pro Flexi user (not expired/grace period), don't allow
         // access to this Pro Pay page or they would end up purchasing a new plan
         if (u_attr && u_attr.pf && !pro.isExpiredOrInGracePeriod(u_attr.pf.s)) {
-            // Unless they have entered the S4 Object Storage RYI flow, in which case send them to that landing page.
-            if (window.s4ac) {
-                loadSubPage('activate-s4');
-                return;
-            }
-
             loadSubPage('start');
             return;
         }
@@ -3958,7 +3875,6 @@ pro.propay = {
                 pro.propay.hideLoadingOverlay();
                 pro.propay.scrollBlock = null;
                 document.body.classList.remove('propay-page');
-                delete window.s4ac;
                 // Reset country so a return visit picks up IP-detected again, not the prior pick.
                 pro.propay.billing.initialCountry = undefined;
                 mBroadcaster.removeListener(pro.propay.pageChangeHandler);
@@ -3996,8 +3912,7 @@ pro.propay = {
                 .toggleClass('discount', !!discountInfo)
                 .toggleClass('euro', this.planObj.currency === 'EUR')
                 .toggleClass('flexi', isFlexi)
-                .toggleClass('mobile-device', !!is_mobile)
-                .toggleClass('s4', !!(window.s4ac && isFlexi));
+                .toggleClass('mobile-device', !!is_mobile);
             // AR class is driven by the user-selected billing country - refreshed after
             // billing.init resolves and on every country-dropdown change.
 
@@ -4037,10 +3952,6 @@ pro.propay = {
                 this.renderPropayPage();
 
                 this.initResizeHandler();
-
-                if (window.s4ac && isFlexi) {
-                    this.handleS4();
-                }
 
                 const propayPageVisitEventId = pro.propay.getPropayPageEventId(pro.propay.planNum);
 

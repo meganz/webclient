@@ -485,7 +485,10 @@ function setContactLink($container) {
         var linkData = $(this).attr('data-lnk') || '';
 
         if (linkData.length) {
-            copyToClipboard(linkData, `${l[371]}<span class="link-text">${linkData}</span>`);
+            const toast = mCreateElement('span', {class: 'message'});
+            toast.textContent = l[371];
+            mCreateElement('span', {class: 'link-text'}, toast).textContent = linkData;
+            copyToClipboard(linkData, toast);
         }
     });
 }

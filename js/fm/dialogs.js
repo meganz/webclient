@@ -499,6 +499,9 @@
             scope.classList.add('hidden');
             return;
         }
+        if (section === 'cloud-drive' && !aTarget) {
+            aTarget = M.RootID;
+        }
         scope.classList.remove('hidden');
 
         // Update global $.mcselected with the target handle

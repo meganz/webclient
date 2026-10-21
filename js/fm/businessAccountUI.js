@@ -2276,10 +2276,10 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
     this.URLchanger('account');
     loadingDialog.pshow();
 
-    // The rules name the tax field and gate its validation, so render once they are in hand.
-    if (!pro.taxHandling.tngrLoaded) {
+    // The tax rules and the blocked countries both shape this page, so render once both are in.
+    if (!pro.taxHandling.tngrLoaded || pro.propay.billing.blockedCountries === null) {
         // Only while they are still on Profile, or this would pull them back to it.
-        pro.taxHandling.tngrReady
+        Promise.all([pro.taxHandling.tngrReady, pro.propay.billing.getBlockedCountries()])
             .then(() => page === 'fm/user-management/account' && mySelf.viewBusinessAccountPage())
             .finally(() => loadingDialog.phide());
         return;
@@ -2323,7 +2323,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
 
     // function to fill dropdown list of countries
     var loadCountries = function () {
-        var countries = M.getCountries();
+        var countries = pro.propay.billing.saleCountries(M.getCountries(), pro.propay.billing.blockedCountries);
         var ctnKeys = {};
 
         $countriesSelectScroll.text('');
@@ -2482,7 +2482,9 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
     // Select country
     bindDropdownEvents($countriesSelect);
     $cCountryOption.addClass('active').attr('data-state', 'active');
-    $('>span', $cCountrySelect).text($cCountryOption.text());
+    $cCountrySelect.removeClass('error');
+    // A saved country that is now blocked is not listed, so a different one has to be picked.
+    $('>span', $cCountrySelect).text($cCountryOption.text() || l[996]);
     $countriesSelect.rebind('change.businessacc', (e) => {
         checkChange($(e.target).attr('data-value'), cCountry, 'cCountry');
         return false;
@@ -2670,7 +2672,11 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
             if (typeof stateUpdate === 'string') {
                 attrsToChange.push({ key: '%state', val: stateUpdate });
             }
-            if ($selectedCountry.attr('data-value') !== cCountry) {
+            if (!$selectedCountry.length) {
+                $cCountrySelect.addClass('error');
+                valid = false;
+            }
+            else if ($selectedCountry.attr('data-value') !== cCountry) {
                 attrsToChange.push({ key: '%country', val: $selectedCountry.attr('data-value') });
             }
             if ($cZipInput.val().trim() !== cZip) {
@@ -2911,6 +2917,8 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
     $('.cnt-ddl .option', $profileContainer).rebind('click.suba', function countrySelectChangingHandler() {
 
         var value = $(this).attr('data-value');
+
+        $cCountrySelect.removeClass('error');
 
         if (value === shownCountry) {
             return;

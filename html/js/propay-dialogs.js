@@ -1253,6 +1253,9 @@ var addressDialog = {
             else if (pageCountry && !addressDialog.lastSelectedCountry && page !== 'repay') {
                 billingInfo.country = pageCountry;
             }
+            if (page !== 'repay' && pro.propay.billing.isBlockedCountry(billingInfo.country)) {
+                billingInfo.country = '';
+            }
 
             const selectedState =
                 (billingInfo.country === 'US' || billingInfo.country === 'CA') && billingInfo.state || false;
@@ -1276,7 +1279,8 @@ var addressDialog = {
                     || (u_attr && (u_attr.country || u_attr.ipcc))
                     || pro.propay.billing.defaultCountry
                     || '';
-                if (prefilled && prefilled !== self.businessRegPage.lastPricedCountry) {
+                if (prefilled && prefilled !== self.businessRegPage.lastPricedCountry
+                    && !pro.propay.billing.isBlockedCountry(prefilled)) {
                     pro.propay.billing.country = prefilled;
                     if (selectedState) {
                         pro.propay.billing.state = pro.taxHandling.stateKey(prefilled, selectedState);
@@ -1734,8 +1738,13 @@ var addressDialog = {
             $('*:not(.default)', $optionsContainer).remove();
         }
 
+        // Repay sells in the invoice's own country, so it keeps the whole list.
+        const countries = page === 'repay'
+            ? M.getCountries()
+            : pro.propay.billing.saleCountries(M.getCountries(), pro.propay.billing.blockedCountries);
+
         // Build options
-        $.each(M.getCountries(), function(isoCode, countryName) {
+        for (const [isoCode, countryName] of Object.entries(countries)) {
 
             var itemNode;
 
@@ -1755,7 +1764,7 @@ var addressDialog = {
                     $countriesSelect.val(countryName);
                 }
             }
-        });
+        }
 
         // Initialise the selectmenu
         this.bindPaymentSelectEvents($countriesSelect);

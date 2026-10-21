@@ -3122,7 +3122,10 @@ export class EmptyConvPanel extends React.Component {
                         }}
                         onClickSecondary={() => {
                             /* `Copied to clipboard` */
-                            copyToClipboard(linkData, `${l[371]}<span class="link-text">${linkData}</span>`);
+                            const toast = mCreateElement('span', {class: 'message'});
+                            toast.textContent = l[371];
+                            mCreateElement('span', {class: 'link-text'}, toast).textContent = linkData;
+                            copyToClipboard(linkData, toast);
                             delay('chat-event-copy-contact-link', () => eventlog(500277));
                         }}
                     />

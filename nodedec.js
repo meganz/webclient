@@ -729,9 +729,9 @@ self.getMediaTSFromFilename = (() => {
             }
         }
 
-        // UTC = local - offset
+        // UTC = local - offset, and no further than 2 days in the future
         const adjusted = utcMs - offset * 60000;
-        return adjusted > 0 ? adjusted : ENOENT;
+        return adjusted > 0 && adjusted <= Date.now() + 2 * 864e5 ? adjusted : ENOENT;
     };
 })();
 

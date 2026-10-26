@@ -1252,6 +1252,7 @@ function FileUpload(file) {
     this.gid = 'ul_' + this.ul.id;
     this[this.gid] = !0;
     GlobalProgress[this.gid] = {
+        xput: file.xput,
         working: []
     };
 }

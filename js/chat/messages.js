@@ -722,7 +722,8 @@ Message.prototype.getMessageRetentionSummary = function() {
 
 Message.prototype.isEditable = function() {
     'use strict';
-    return this.userId === u_handle && unixtime() - this.delay < Message.MESSAGE_NOT_EDITABLE_TIMEOUT;
+    return this.chatRoom.isNote ||
+        this.userId === u_handle && unixtime() - this.delay < Message.MESSAGE_NOT_EDITABLE_TIMEOUT;
 };
 
 Message.prototype.toPersistableObject = function() {

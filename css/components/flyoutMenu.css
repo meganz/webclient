@@ -33,6 +33,9 @@
     height: 100%;
     z-index: 210;
 }
+#pmlayout .flyout-holder.flyout-shown.info-panel-media {
+    z-index: 221;
+}
 
 @media only screen and (max-width: 1200px) {
     #pmlayout .flyout-holder.flyout-shown {

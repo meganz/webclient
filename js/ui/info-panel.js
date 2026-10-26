@@ -220,8 +220,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
     function checkCurrentView() {
         document.body.classList.add('info-panel-visible');
         const media = document.querySelector('.media-viewer-container');
+        const isMediaShown = !!media && !media.classList.contains('hidden');
         let shouldStretch = false;
-        if (media && !media.classList.contains('hidden')) {
+        if (isMediaShown) {
             shouldStretch = true;
         }
         if (document.body.classList.contains('in-call')) {
@@ -236,6 +237,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         if (mega.rewindUi && mega.rewindUi.sidebar.active) {
             mega.rewindUi.sidebar.forceClose();
         }
+        mega.ui.flyout.flyoutMenu.parentNode.classList.toggle('info-panel-media', isMediaShown);
     }
 
     class MegaInfoBlock extends MegaComponent {
@@ -1770,7 +1772,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
         cleanup() {
             document.body.classList.remove('info-panel-visible');
-            mega.ui.flyout.flyoutMenu.domNode.parentNode.classList.remove('info-panel-stretch');
+            mega.ui.flyout.flyoutMenu.domNode.parentNode.classList.remove('info-panel-stretch', 'info-panel-media');
         },
 
         MegaInfoBlock,

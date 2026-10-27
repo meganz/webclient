@@ -181,14 +181,26 @@ function dashboardUI(updProcess) {
         if (u_attr.p || [pro.ACCOUNT_STATUS_EXPIRED, pro.ACCOUNT_STATUS_GRACE_PERIOD].includes(accountStatus)) {
 
             var timestamp;
+            const planExpiryString = pro.filter.simple.miniPlans.has(u_attr.p)
+                ? l.plan_expires_on
+                : l[20153];
             // Subscription
             if (account.stype == 'S') {
 
                 // Get the date their subscription will renew
                 timestamp = account.srenew[0];
 
+                // Renewal date passed: the renewal failed and is retried, so the plan ends on its own date.
+                // Business and Pro Flexi have their own grace period flow.
+                const retryPlan = timestamp > 0 && timestamp < unixtime() && !u_attr.b && !u_attr.pf
+                    && account.plans.find(({ al }) => al === u_attr.p);
+
+                if (retryPlan) {
+                    $('.account.left-pane.plan-date-val').text(time2date(retryPlan.expires, 2));
+                    $('.account.left-pane.plan-date-info').text(planExpiryString);
+                }
                 // Display the date their subscription will renew
-                if (timestamp > 0) {
+                else if (timestamp > 0) {
                     $('.account.left-pane.plan-date-val').text(time2date(timestamp, 2));
                     $('.account.left-pane.plan-date-info').text(l[20154]);
                 }
@@ -198,9 +210,6 @@ function dashboardUI(updProcess) {
                 }
             }
             else if (account.stype == 'O') {
-                const planExpiryString = pro.filter.simple.miniPlans.has(u_attr.p)
-                    ? l.plan_expires_on
-                    : l[20153];
                 // one-time or cancelled subscription
                 $('.account.left-pane.plan-date-val').text(time2date(account.expiry, 2));
 

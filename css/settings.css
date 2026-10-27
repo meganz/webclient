@@ -289,6 +289,12 @@
     padding-top: 0;
     max-height: 100px;
 }
+.settings-sub-section.sub-container.payment-failed-container {
+    max-height: none;
+}
+.payment-failed-container .mega-component.banner {
+    padding: 16px 24px;
+}
 .settings-sub-section .subtitle-txt,
 .settings-sub-section .switch-label {
     max-width: calc(100% - 48px);

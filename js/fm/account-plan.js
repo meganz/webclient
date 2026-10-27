@@ -178,7 +178,26 @@ accountUI.plan = {
                     || al === pro.ACCOUNT_LEVEL_BUSINESS
                     || al === pro.ACCOUNT_LEVEL_PRO_FLEXI)
             );
-            const mainPlanDetails = activeSubscription || activePlan;
+            // A sub whose renewal failed stays in subs, with next in the past, while the API retries it
+            const retryingSub = !activeSubscription && this.getRetryingSub(account.subs, activePlan, unixtime());
+            const mainPlanDetails = activeSubscription || (activePlan && retryingSub) || activePlan;
+            const $paymentFailed = $('.payment-failed-container', $planContent).addClass('hidden');
+
+            if (retryingSub) {
+                const planName = pro.getProPlanName(retryingSub.al);
+                let text = escapeHTML(l.payment_failed_sub_retry_text).replace('%1', planName);
+
+                if (activePlan && account.nextplan) {
+                    text = escapeHTML(l.payment_failed_sub_switch_text).replace('%1', planName)
+                        .replace('%2', pro.getProPlanName(account.nextplan.p));
+                }
+                else if (activePlan) {
+                    text = escapeHTML(l.payment_failed_sub_expire_text).replace('%1', planName)
+                        .replace('%2', `<b>${time2date(activePlan.expires, 2)}</b>`);
+                }
+                $('.message-text', $paymentFailed).safeHTML(text);
+                $paymentFailed.removeClass('hidden');
+            }
 
             if (mainPlanDetails) { // Pro/Lite/Business account
                 var planNum = mainPlanDetails.al;
@@ -206,6 +225,15 @@ accountUI.plan = {
                 // Subscription
                 if (mainPlanDetails.next) {
                     this.renderSubscription(mainPlanDetails, $planContent);
+
+                    // The renewal failed, so the plan ends on its own date unless a retry goes through.
+                    // Red goes again when a retry is paid, as the page re-renders in place.
+                    const inRetry = mainPlanDetails === retryingSub;
+                    $('.account.plan-info.expiry span', $planContent).toggleClass('red', inRetry);
+                    if (inRetry) {
+                        $('.subtitle-txt.expiry-txt', $planContent).text(l[987]);
+                        $('.account.plan-info.expiry span', $planContent).text(time2date(activePlan.expires, 2));
+                    }
                 }
                 // One-off, cancelled, or expired; a naturally expired Business/Pro Flexi has expires 0
                 else {
@@ -220,14 +248,13 @@ accountUI.plan = {
                     $('.sub-container.subscription:not(.feature)', $planContent).addClass('hidden');
                 }
 
-                this.renderExtraSubscriptions(account, $planContent);
-
                 $('.account.plan-info.bandwidth', $planContent).parent().removeClass('hidden');
             }
             else { // Free account
                 $planDetails.removeClass('paid').attr('subid', '');
                 $('.account.plan-info.accounttype span', $planContent).text(l[1150]);
                 $('.account .plan-icon', $planContent).addClass('free');
+                $('.subtitle-txt.expiry-txt', $planContent).text(l[7354]);
                 $('.account.plan-info.expiry span', $planContent).removeClass('red').text(l[436]);
                 $('.sub-container.subscription:not(.feature)', $planContent).addClass('hidden');
                 if (account.mxfer) {
@@ -236,7 +263,62 @@ accountUI.plan = {
                 else {
                     $('.account.plan-info.bandwidth', $planContent).parent().addClass('hidden');
                 }
+
+                // The plan has ended but the API still retries the renewal, so the sub can still charge
+                if (retryingSub) {
+                    $planDetails.attr('subid', retryingSub.id);
+                    this.renderSubscription(retryingSub, $planContent);
+                    $('.subtitle-txt.expiry-txt', $planContent).text(l[8657]);
+                    $('.account.plan-info.expiry span', $planContent).text(time2date(retryingSub.next, 2));
+                }
             }
+
+            // Free cards too: other subs in retry need a card to be cancelled, and old cards must go
+            this.renderExtraSubscriptions(account, $planContent);
+        },
+
+        /**
+         * The main card's sub whose failed renewal is still retried: the active plan's own sub or,
+         * once reverted to Free (no plan), the one with the latest renewal date
+         * @param {Array} subs The uq subs
+         * @param {Object|false} plan The active plan, if any
+         * @param {Number} now The current unixtime
+         * @returns {Object|false} The sub, or false when none is in retry
+         */
+        getRetryingSub(subs, plan, now) {
+            'use strict';
+
+            // Business and Pro Flexi have their own grace period flow, feature plans their own cards
+            const retrying = subs.filter(({ al, next }) =>
+                next > 0 && next < now
+                && al !== pro.ACCOUNT_LEVEL_FEATURE
+                && al !== pro.ACCOUNT_LEVEL_BUSINESS
+                && al !== pro.ACCOUNT_LEVEL_PRO_FLEXI
+            );
+
+            if (plan) {
+                return retrying.find(({ id }) => id === plan.subid) || false;
+            }
+            return retrying.reduce((latest, sub) => (latest && latest.next >= sub.next ? latest : sub), false);
+        },
+
+        /**
+         * A sub's date while its failed renewal is retried: its plan's end while the plan runs, then the
+         * failed renewal date
+         * @param {Object} sub A uq sub, or a plan (never in retry)
+         * @param {Array} plans The uq plans
+         * @param {Number} now The current unixtime
+         * @returns {Object|false} { expires, time }, or false when the sub is not in retry
+         */
+        getRetryDate(sub, plans, now) {
+            'use strict';
+
+            if (!sub.next || sub.next >= now) {
+                return false;
+            }
+            const plan = plans.find(({ subid, expires }) => subid === sub.id && expires >= now);
+
+            return plan ? { expires: true, time: plan.expires } : { expires: false, time: sub.next };
         },
 
         /**
@@ -244,10 +326,11 @@ accountUI.plan = {
          *
          * @param {jQuery} $planContent The jQuery element to render the block into
          * @param {Object} featurePlan The plan details
+         * @param {Object|false} retry The sub's date while its failed renewal is retried
          * @returns {void}
          * @see pro.propay.purchasableFeaturePlans for features which can be rendered here
          */
-        renderFeaturePlanBlock($planContent, featurePlan) {
+        renderFeaturePlanBlock($planContent, featurePlan, retry) {
             'use strict';
 
             const feature = Object.keys(featurePlan.features)[0];
@@ -272,7 +355,11 @@ accountUI.plan = {
                     value: pro.getProPlanName(surveyAl),
                     isTrial
                 },
-                {
+                retry ? {
+                    label: retry.expires ? l[987] : l[8657],
+                    value: time2date(retry.time, 2),
+                    expires: retry.expires
+                } : {
                     label: featurePlan.next ? isTrial ? l.sub_begins : l[6971] : l[987],
                     value: time2date(featurePlan.next || featurePlan.expires, 2),
                     expires: featurePlan.expires
@@ -433,8 +520,10 @@ accountUI.plan = {
 
             // Check if a user has purchased any feature plans.
             const purchasableFeaturePlans = Object.keys(pro.propay.purchasableFeaturePlans());
+            // Includes subs whose failed renewal is still retried, so they can be cancelled; Pro Flexi keeps its
+            // own grace period flow
             const featureSubs = account.subs.filter(({ al, next }) =>
-                next >= unixtime() && al === pro.ACCOUNT_LEVEL_FEATURE
+                al === pro.ACCOUNT_LEVEL_FEATURE && (next >= unixtime() || next > 0 && !u_attr.pf)
             );
             const featurePlans = account.plans.filter(({ al, expires }) =>
                 expires >= unixtime() && al === pro.ACCOUNT_LEVEL_FEATURE
@@ -467,7 +556,8 @@ accountUI.plan = {
             $('.settings-right-block .feature-details', $planContent).remove();
             for (const purchase of subsAndPlans) {
                 if (purchasableFeaturePlans.includes(Object.keys(purchase.features)[0])) {
-                    this.renderFeaturePlanBlock($planContent, purchase);
+                    const retry = this.getRetryDate(purchase, account.plans, unixtime());
+                    this.renderFeaturePlanBlock($planContent, purchase, retry);
                 }
             }
         },
@@ -526,10 +616,13 @@ accountUI.plan = {
             const $rightBlock = $('.settings-right-block', $planContent);
 
             const mainSubId = $('.plan-details', $rightBlock).attr('subid') || null;
+            // Subs in retry keep their card; Business and Pro Flexi, the account or the sub, have their own
+            // grace period flow
             const extraSubs = account.subs.filter(({ al, id, next }) =>
                 al !== pro.ACCOUNT_LEVEL_FEATURE &&
                 mainSubId !== id &&
-                next >= unixtime()
+                (next >= unixtime() || next > 0 && !u_attr.b && !u_attr.pf
+                    && al !== pro.ACCOUNT_LEVEL_BUSINESS && al !== pro.ACCOUNT_LEVEL_PRO_FLEXI)
             );
 
             // Remove any already rendered plan cards
@@ -544,14 +637,20 @@ accountUI.plan = {
                 // Add paid class for plan card priority (Non-feature plan > Feature plan > Free)
                 subBlock.classList.add('paid');
 
+                const retry = this.getRetryDate(extraSubs[i], account.plans, unixtime());
                 const sections = [
                     { label: l[16166], value: pro.getProPlanName(al) },
-                    { label: l[6971], value: time2date(next, 2), classes: 'acc-renew-date-info' }
+                    {
+                        label: retry ? retry.expires ? l[987] : l[8657] : l[6971],
+                        value: time2date(retry ? retry.time : next, 2),
+                        expires: retry && retry.expires,
+                        classes: 'acc-renew-date-info'
+                    }
                 ];
 
                 for (let j = 0; j < sections.length; j++) {
-                    const { label, value, classes } = sections[j];
-                    const section = this.renderSubSection(label, value, false, classes);
+                    const { label, value, expires, classes } = sections[j];
+                    const section = this.renderSubSection(label, value, expires, classes);
                     subBlock.appendChild(section);
                 }
 

@@ -973,16 +973,10 @@ function init_page() {
         });
     }
     /**
-     * If S4 Auth Code from url e.g. #s4acAUTHCODE
-     */
-    else if (page.substr(0, 4) === 's4ac') {
-        loadSubPage('fm');
-    }
-    /**
-     * Activate S4 Auth Code for Pro Flexi accounts
+     * Retired S4 activation link -> redirect to mega.io objectstorage landing
      */
     else if (page.substr(0, 11) === 'activate-s4') {
-        ActivateS4Page.load();
+        mega.redirect('mega.io', 'objectstorage', false, false);
     }
     else if (page.substr(0, 5) === 'stats') {
         const ph = page.slice(6);

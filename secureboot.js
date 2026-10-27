@@ -2156,7 +2156,6 @@ else if (!browserUpdate) {
     jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5});
     jsl.push({f:'css/propay.css', n: 'propay_css', j:2,w:5});
     jsl.push({f:'css/planpricing.css', n: 'planpricing_css', j:2,w:5});
-    jsl.push({f:'css/activate-s4.css', n: 'activates4_css', j:2,w:5});
     jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5});
     jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5});
     jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5});
@@ -2286,10 +2285,6 @@ else if (!browserUpdate) {
 
     // Plan pages for features
     jsl.push({f:'html/js/planpricing/vpn-pricing.js', n: 'vpn_pricing_js', j:1});
-
-    // Activate S4 feature
-    jsl.push({f:'html/activates4.html', n: 'activates4', j:0});
-    jsl.push({f:'html/js/activate-s4.js', n: 'activates4_js', j:1});
 
     jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
     jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j:1, w:5});

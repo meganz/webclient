@@ -114,7 +114,7 @@
   left: 0;
   width: 100%;
   height: 64px;
-  transition: opacity 500ms ease-in-out, top 500ms ease-in-out, width 200ms ease-in-out;
+  transition: opacity 200ms ease-in-out, top 200ms ease-in-out, width 200ms ease-in-out;
   z-index: 13;
 }
 .stream-head-content {
@@ -1924,10 +1924,10 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   display: grid;
   position: relative;
   width: calc(100% - 32px);
-  height: calc(100% - 160px);
+  height: calc(100% - 32px);
   margin: 0 auto;
-  padding-top: 64px;
-  padding-bottom: 96px;
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
 .meetings-call .stream-wrapper.with-participants-block {
   float: left;
@@ -1937,6 +1937,11 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   .meetings-call .stream-wrapper.with-participants-block {
     width: calc(100% - 230px);
   }
+}
+.meetings-call .hovered .stream-wrapper {
+  padding-top: 64px;
+  padding-bottom: 96px;
+  height: calc(100% - 160px);
 }
 .meetings-call .stream-container {
   margin: auto;
@@ -2108,7 +2113,7 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   left: 32px;
   bottom: -250px;
   padding: 0 0 14px 0;
-  transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
+  transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
   text-align: center;
   z-index: 13;
 }
@@ -2207,7 +2212,7 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   padding: 22px 0 14px 0;
   width: 100%;
   text-align: center;
-  transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out, width 200ms ease-in-out;
+  transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out, width 200ms ease-in-out;
   background: #222;
   z-index: 12;
 }
@@ -2357,7 +2362,7 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   right: 32px;
   bottom: -250px;
   padding: 0 0 14px 0;
-  transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
+  transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
   z-index: 12;
 }
 .meetings-call .sidebar-controls ul {
@@ -4791,5 +4796,3 @@ body.rtl #schedule-dialog .meetings-select .mega-input .mega-input-dropdown {
   left: 0;
   right: auto;
 }
-
-/*# sourceMappingURL=chat-bundle.css.map */

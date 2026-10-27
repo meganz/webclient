@@ -205,6 +205,7 @@ export default class Call extends MegaRenderMixin {
 
     ephemeralAddListener = undefined;
     delayProcID = null;
+    idleProcID = null;
     pCallTimer = null;
     offlineDelayed = undefined;
     callStartTimeout = undefined;
@@ -315,6 +316,11 @@ export default class Call extends MegaRenderMixin {
             delay.cancel(this.delayProcID);
             this.delayProcID = null;
         }
+        this.idleProcID = delay('meetings-call-mouse-idle', () => {
+            if (!this.state.activeElement && this.isMounted()) {
+                this.setState({ hovered: false });
+            }
+        }, 2 * MOUSE_OUT_DELAY);
     }
 
     /**
@@ -332,6 +338,10 @@ export default class Call extends MegaRenderMixin {
                         this.setState({ hovered: false });
                     }
                 }, MOUSE_OUT_DELAY);
+        }
+        if (this.idleProcID) {
+            delay.cancel(this.idleProcID);
+            this.idleProcID = null;
         }
     }
 
@@ -391,7 +401,9 @@ export default class Call extends MegaRenderMixin {
             this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_UI);
         if (!this.state.onboardingUI) {
             this.state.onboardingRecording = this.state.hovered =
-                this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RECORDING);
+                this.flagMap &&
+                Call.isModerator(this.props.chatRoom, u_handle) &&
+                !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RECORDING);
         }
         if (!this.state.onboardingUI && !this.state.onboardingRecording) {
             this.state.onboardingRaise = this.state.hovered =
@@ -1198,7 +1210,10 @@ export default class Call extends MegaRenderMixin {
         }
     }
 
-    setActiveElement = activeElement => this.setState({ activeElement });
+    setActiveElement = activeElement => {
+        const { activeElement: prevActiveElement } = this.state;
+        this.setState({ activeElement }, () => prevActiveElement && !activeElement && this.handleMouseMove());
+    };
 
     componentWillUnmount() {
         super.componentWillUnmount();

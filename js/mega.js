@@ -1032,10 +1032,6 @@ scparser.$add('s2', {
         // 's2' still requires the logic for 's'
         this.s(a);
 
-        // store ownerkey
-        if (fmdb && !self.secureKeyMgr) {
-            fmdb.add('ok', {h: a.n, d: {k: a.ok, ha: a.ha}});
-        }
         processPS([a]);
     }
 });
@@ -2177,40 +2173,6 @@ async function fm_fullreload(light, logMsg) {
     ]).then(() => location.reload(true));
 }
 
-// this receives the ok elements one by one as per the filter rule
-// to facilitate the decryption of outbound shares, the API now sends ok before f
-function tree_ok0(ok) {
-    "use strict";
-
-    if (self.secureKeyMgr) {
-        if (d > 2) {
-            console.warn('Secure environment, moving on...', ok);
-        }
-        return;
-    }
-
-    if (fmdb) {
-        fmdb.add('ok', { h : ok.h, d : ok });
-    }
-
-    // bind outbound share root to specific worker, post ok element to that worker
-    // FIXME: check if nested outbound shares are returned with all shareufskeys!
-    // if that is not the case, we need to bind all ok handles to the same worker
-    if (decWorkerPool.ok) {
-        decWorkerPool.postNode(ok);
-    }
-    else if (crypto_handleauthcheck(ok.h, ok.ha)) {
-        if (d) {
-            console.log(`Successfully decrypted sharekeys for ${ok.h}`);
-        }
-        const key = decrypt_key(u_k_aes, base64_to_a32(ok.k));
-        crypto_setsharekey2(ok.h, key);
-    }
-    else {
-        console.error(`handleauthcheck() failed for ${ok.h}`);
-    }
-}
-
 /**
  * Emplace node into M.d and M.c
  *
@@ -2837,8 +2799,6 @@ function dbfetchfm(residual) {
 
     return Promise.all([fmdb.get('ok'), dbfetch.init()])
         .then(([ok]) => {
-            process_ok(ok, true);
-
             loadReport('recvNodes');
             return Promise.all([fmdb.get('mk'), fmdb.get('u'), fmdb.get('s')]);
         })
@@ -3651,21 +3611,6 @@ function process_businessAccountSubUsers_SC(packet) {
         );
     }
 }
-
-function process_ok(ok, ignoreDB) {
-    "use strict";
-
-    for (var i = ok.length; i--; ) {
-        if (ok[i].ha === crypto_handleauth(ok[i].h))
-        {
-            if (fmdb && !pfkey && !ignoreDB) {
-                fmdb.add('ok', { h : ok[i].h, d : ok[i] });
-            }
-            crypto_setsharekey(ok[i].h, decrypt_key(u_k_aes, base64_to_a32(ok[i].k)), ignoreDB);
-        }
-    }
-}
-
 
 function processMCF(mcfResponse, ignoreDB) {
     'use strict';

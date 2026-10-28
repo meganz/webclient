@@ -684,7 +684,7 @@ function u_setrsa(rsakey) {
                         try {
                             var data = JSON.parse(u_attr['^!promocode']);
 
-                            if (data[1] !== -1) {
+                            if (/^\d+$/.test(data[1])) {
                                 localStorage[data[0]] = data[1];
                             }
                             localStorage.voucher = data[0];

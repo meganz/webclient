@@ -1078,7 +1078,8 @@ security.register = {
         localStorage.removeItem('megaLiteMode');
 
         if (localStorage.voucher) {
-            const data = [localStorage.voucher, localStorage[localStorage.voucher] || -1];
+            const promo = localStorage[localStorage.voucher];
+            const data = [localStorage.voucher, /^\d+$/.test(promo) ? promo : -1];
             mega.attr.set('promocode', JSON.stringify(data), -2, true).dump();
         }
     },

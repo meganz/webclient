@@ -505,6 +505,11 @@ function u_logout(logout) {
         u_type = false;
         loggedout = true;
 
+        if (window.authring) {
+            authring._initialisingPromise = false;
+            u_keyring = u_privEd25519 = u_pubEd25519 = u_privCu25519 = u_pubCu25519 = undefined;
+        }
+
         $('#fmholder').text('').attr('class', 'fmholder');
         if (window.MegaData) {
             if (window.M instanceof MegaData) {

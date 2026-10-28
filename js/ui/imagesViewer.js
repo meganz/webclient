@@ -506,7 +506,8 @@ var slideshowid;
         const $addToAlbumButton = $('.context-menu .add-to-album', $overlay);
         const $divider = $addToAlbumButton.closest('li').prev('.divider');
 
-        if ((!pfid && (M.isGalleryPage() || M.isAlbumsPage()) || M.getNodeRoot(n.h) === M.RootID) && mega.gallery
+        if (!self.is_transferit && (!pfid && (M.isGalleryPage() || M.isAlbumsPage())
+            || M.getNodeRoot(n.h) === M.RootID) && mega.gallery
             && mega.gallery.canShowAddToAlbum() && M.isGalleryNode(n)) {
             $addToAlbumButton.removeClass('hidden');
             $divider.removeClass('hidden');

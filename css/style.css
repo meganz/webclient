@@ -9698,6 +9698,9 @@ div.camera-bottom-txt {
 .user-management-view .table-user-management .user-management-scroll {
     position: relative;
 }
+.user-management-view .table-user-management .user-management-scroll th {
+    z-index: 2;
+}
 .user-management-view .icon-admin {
     --icon-size: 24px;
     --mask-color: var(--icon-rest);

@@ -4487,9 +4487,9 @@ MegaData.prototype.nodeRemovalUIRefresh = function(handle, parent) {
                 console.debug('nodeRemovalUIRefresh(%s)', handle, target, path);
             }
 
-            if (!target && path[0] === this.RubbishID) {
+            if (!target && (path[0] === this.RubbishID || root === 'shares')) {
                 // fired 'dr'
-                target = path[0];
+                target = root;
             }
 
             if (target && this.getNodeRoot(handle) !== root) {

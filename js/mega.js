@@ -1032,10 +1032,6 @@ scparser.$add('s2', {
         // 's2' still requires the logic for 's'
         this.s(a);
 
-        // store ownerkey
-        if (fmdb && !self.secureKeyMgr) {
-            fmdb.add('ok', {h: a.n, d: {k: a.ok, ha: a.ha}});
-        }
         processPS([a]);
     }
 });
@@ -1761,13 +1757,14 @@ scparser.mcpc = scparser.mcc = function (a) {
         eventlog(
             99779,
             JSON.stringify([
-                1,
+                2,
                 buildVersion && buildVersion.website || 'dev',
                 sessionStorage.updateRequiredBy | 0,
                 loadfm.chatmcf === null ? 'null' : typeof loadfm.chatmcf,
                 u_type | 0,
                 (!!owner) | 0,
-                Object(actors).length | 0
+                Object(actors).length | 0,
+                fmdb ? fmdb.crashed | 0 : -1
             ])
         );
     }
@@ -2177,40 +2174,6 @@ async function fm_fullreload(light, logMsg) {
     ]).then(() => location.reload(true));
 }
 
-// this receives the ok elements one by one as per the filter rule
-// to facilitate the decryption of outbound shares, the API now sends ok before f
-function tree_ok0(ok) {
-    "use strict";
-
-    if (self.secureKeyMgr) {
-        if (d > 2) {
-            console.warn('Secure environment, moving on...', ok);
-        }
-        return;
-    }
-
-    if (fmdb) {
-        fmdb.add('ok', { h : ok.h, d : ok });
-    }
-
-    // bind outbound share root to specific worker, post ok element to that worker
-    // FIXME: check if nested outbound shares are returned with all shareufskeys!
-    // if that is not the case, we need to bind all ok handles to the same worker
-    if (decWorkerPool.ok) {
-        decWorkerPool.postNode(ok);
-    }
-    else if (crypto_handleauthcheck(ok.h, ok.ha)) {
-        if (d) {
-            console.log(`Successfully decrypted sharekeys for ${ok.h}`);
-        }
-        const key = decrypt_key(u_k_aes, base64_to_a32(ok.k));
-        crypto_setsharekey2(ok.h, key);
-    }
-    else {
-        console.error(`handleauthcheck() failed for ${ok.h}`);
-    }
-}
-
 /**
  * Emplace node into M.d and M.c
  *
@@ -2256,7 +2219,7 @@ function emplacenode(node, noc) {
             M.c[node.p][node.h] = node.t + 1;
         }
     }
-    else if (node.t > 1 && node.t < 5) {
+    else if (node.t > 1 && node.t < 5 && String(node.h).length === 8) {
         if (!M.c[node.h]) {
             M.c[node.h] = Object.create(null);
         }
@@ -2780,15 +2743,10 @@ function dbfetchfm(residual) {
     var tableProc = function(t) {
         return function(r) {
             if (tables[t] === 1) {
-                if (r.length > 0) {
-                    loadfm.chatmcf = r;
-                }
-                else {
-                    loadfm.chatmcf = -1;
-                }
+                loadfm.chatmcf = r;
             }
             else if (tables[t] === 2) {
-                loadfm.chatmcsm = r.length > 0 ? r : -1;
+                loadfm.chatmcsm = r;
             }
             else {
                 return tables[t](r, true);
@@ -2837,8 +2795,6 @@ function dbfetchfm(residual) {
 
     return Promise.all([fmdb.get('ok'), dbfetch.init()])
         .then(([ok]) => {
-            process_ok(ok, true);
-
             loadReport('recvNodes');
             return Promise.all([fmdb.get('mk'), fmdb.get('u'), fmdb.get('s')]);
         })
@@ -3652,21 +3608,6 @@ function process_businessAccountSubUsers_SC(packet) {
     }
 }
 
-function process_ok(ok, ignoreDB) {
-    "use strict";
-
-    for (var i = ok.length; i--; ) {
-        if (ok[i].ha === crypto_handleauth(ok[i].h))
-        {
-            if (fmdb && !pfkey && !ignoreDB) {
-                fmdb.add('ok', { h : ok[i].h, d : ok[i] });
-            }
-            crypto_setsharekey(ok[i].h, decrypt_key(u_k_aes, base64_to_a32(ok[i].k)), ignoreDB);
-        }
-    }
-}
-
-
 function processMCF(mcfResponse, ignoreDB) {
     'use strict';
 
@@ -3830,10 +3771,6 @@ function loadfm_callback(res) {
     }
     if (res.tct) {
         mega.loadReport.tct = res.tct;
-    }
-    if (res.ok && !res.ok0) {
-        // this is a legacy cached tree without an ok0 element
-        process_ok(res.ok);
     }
 
     if (res.suba) {

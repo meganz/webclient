@@ -2243,6 +2243,9 @@ function sharedFolderUI() {
             if (r === 2) {
                 buttons.push('.rename-item');
             }
+            if (!M.getNodeByHandle(p)) {
+                buttons.push('.leaveshare-item');
+            }
             M.contextMenuUI(ev, 8, buttons.join(','), [h]);
         };
         if (h === M.currentdirid) {

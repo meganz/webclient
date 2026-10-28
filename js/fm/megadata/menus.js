@@ -651,7 +651,6 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
             delete items['.move-item'];
             delete items['.remove-item'];
             delete items['.revert-item'];
-            delete items['.leaveshare-item'];
         }
     }
 

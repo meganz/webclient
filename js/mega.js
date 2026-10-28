@@ -3772,10 +3772,6 @@ function loadfm_callback(res) {
     if (res.tct) {
         mega.loadReport.tct = res.tct;
     }
-    if (res.ok && !res.ok0) {
-        // this is a legacy cached tree without an ok0 element
-        process_ok(res.ok);
-    }
 
     if (res.suba) {
         if (!is_mobile) {

@@ -1757,13 +1757,14 @@ scparser.mcpc = scparser.mcc = function (a) {
         eventlog(
             99779,
             JSON.stringify([
-                1,
+                2,
                 buildVersion && buildVersion.website || 'dev',
                 sessionStorage.updateRequiredBy | 0,
                 loadfm.chatmcf === null ? 'null' : typeof loadfm.chatmcf,
                 u_type | 0,
                 (!!owner) | 0,
-                Object(actors).length | 0
+                Object(actors).length | 0,
+                fmdb ? fmdb.crashed | 0 : -1
             ])
         );
     }
@@ -2742,15 +2743,10 @@ function dbfetchfm(residual) {
     var tableProc = function(t) {
         return function(r) {
             if (tables[t] === 1) {
-                if (r.length > 0) {
-                    loadfm.chatmcf = r;
-                }
-                else {
-                    loadfm.chatmcf = -1;
-                }
+                loadfm.chatmcf = r;
             }
             else if (tables[t] === 2) {
-                loadfm.chatmcsm = r.length > 0 ? r : -1;
+                loadfm.chatmcsm = r;
             }
             else {
                 return tables[t](r, true);

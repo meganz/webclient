@@ -1827,6 +1827,8 @@ function logExportEvt(evtId, data) {
                         );
 
                         document.addEventListener('keydown', onKeyDown, true);
+
+                        requestAnimationFrame(positionTooltip);
                     }
                 },
                 onClose: () => {

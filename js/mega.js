@@ -2219,7 +2219,7 @@ function emplacenode(node, noc) {
             M.c[node.p][node.h] = node.t + 1;
         }
     }
-    else if (node.t > 1 && node.t < 5) {
+    else if (node.t > 1 && node.t < 5 && String(node.h).length === 8) {
         if (!M.c[node.h]) {
             M.c[node.h] = Object.create(null);
         }

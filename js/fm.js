@@ -2539,7 +2539,15 @@ function fingerprintDialog(userid, isAdminVerify, callback) {
 
                 // Only push the sub-user's key once the credentials were actually verified
                 if (verified) {
-                    new BusinessAccount().sendSubMKey().catch(tell);
+                    const admin = u_attr && u_attr.b && !u_attr.b.m && u_attr.b.mu[0];
+
+                    // Admin changed while open, verify the current one
+                    if (admin && admin !== userid) {
+                        fingerprintDialog(admin, true);
+                    }
+                    else {
+                        new BusinessAccount().sendSubMKey(userid).catch(tell);
+                    }
                 }
             }
             else {

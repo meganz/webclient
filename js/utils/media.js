@@ -1159,6 +1159,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         // Changes the button state of certain button's so the correct visuals can be displayed with CSS
         var changeButtonState = function(type) {
+            if (!videoElement) {
+                return;
+            }
 
             // Play/Pause button
             if (type === 'playpause' && !timeDrag) {
@@ -1690,7 +1693,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 `${SPRITE} icon-playback-${String(rate).replace('.', '')}x-small-regular-outline`
             );
 
-            streamer.playbackRate = rate;
+            if (streamer) {
+                streamer.playbackRate = rate;
+            }
         };
 
         const updateSpeedSlider = (pageX) => {

@@ -2449,7 +2449,8 @@ function crypto_makecr(source, shares, source_is_nodes) {
                     cr[2].push(i, j, a32_to_base64(encrypt_key(aes, nk)));
                 }
                 else {
-                    console.warn(`crypto_makecr(): Node-key unavailable for ${shares[i]}->${source[j]}`, nk);
+                    const h = source_is_nodes ? source[j] : source[j].h;
+                    console.warn(`crypto_makecr(): Node-key unavailable for ${shares[i]}->${h}`, nk);
                 }
             }
         }

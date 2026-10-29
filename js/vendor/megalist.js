@@ -932,7 +932,7 @@
         });
 
         lazy(calculated, 'contentWidth', function() {
-            var contentWidth = self.listContainer.children[0].offsetWidth;
+            const contentWidth = self.listContainer.children[0] && self.listContainer.children[0].offsetWidth;
             if (contentWidth) {
                 return contentWidth;
             }

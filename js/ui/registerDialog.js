@@ -155,9 +155,6 @@
         options.businessSubAccountInfo = {email, signupCode, firstName, lastName};
     }
 
-    /*jshint -W074*/
-    // ^ zxcvbn stuff..
-
     function closeRegisterDialog($dialog, isUserTriggered) {
 
         const component = mega.ui.auth.getDialogComponent(page === 'register');
@@ -168,7 +165,9 @@
             $('.privacy-check', $dialog).removeClass('checkboxOn').addClass('checkboxOff');
         };
 
-        component.hide(component.name);
+        if (component) {
+            component.hide(component.name);
+        }
 
         _reset();
 
@@ -226,7 +225,7 @@
 
         const showExistingAccountError = () => {
             registerBtn.loading = false;
-            options.$dialog.find('input.email').megaInputsShowError(l[7869]);
+            $('input.email', $dialog).megaInputsShowError(l[7869]);
         };
 
         const attemptExistingAccountLogin = () => {
@@ -575,7 +574,10 @@
                 }
 
                 if (ev.target.value.length === 0) {
-                    $passwordInput.data('MegaInputs').hideError();
+                    const megaInput = $passwordInput.data('MegaInputs');
+                    if (megaInput) {
+                        megaInput.hideError();
+                    }
                     signup.updatePasswordStrength(validatePasswordStrength(ev.target.value), $dialog);
                 }
             });

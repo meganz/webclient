@@ -511,7 +511,7 @@ lazy(mega.ui, 'quotaDialogs', () => {
         if (lockPeriod && eligibleByPeriod[lockPeriod].length) {
             period = lockPeriod;
         }
-        else if (!eligibleByPeriod[period].length && (hasMonthly || hasYearly)) {
+        else if (!Object(eligibleByPeriod[period]).length && (hasMonthly || hasYearly)) {
             period = hasYearly ? 12 : 1;
         }
         tabs.selectTab(period === 1 ? 'm' : 'y');

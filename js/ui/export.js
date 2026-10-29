@@ -2052,7 +2052,9 @@ function logExportEvt(evtId, data) {
                             expContainer.removeChild(input);
                         }
 
-                        exportExpiry.datepicker.clear();
+                        if (exportExpiry.datepicker) {
+                            exportExpiry.datepicker.clear();
+                        }
                         newValues.exp = 0;
 
                         logExportEvt(500765, [0]);

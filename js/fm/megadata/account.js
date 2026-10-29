@@ -1413,7 +1413,7 @@ mBroadcaster.addListener('fm:initialized', () => {
     if (u_type === 3 && !pfid) {
         // Try showing this banner for users with a one-off plan/sub and are still pro, or that are no longer pro.
         tSleep(4 + Math.random())
-            .then(() => u_attr.p ? M.showPlanExpiringBanner() : M.showPaymentFailedBanner())
+            .then(() => u_attr && (u_attr.p ? M.showPlanExpiringBanner() : M.showPaymentFailedBanner()))
             .catch((ex) => {
                 if (ex < 0) {
                     return;

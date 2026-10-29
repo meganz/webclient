@@ -94,7 +94,7 @@ Object.defineProperty(MEGAException, 'assert', {
 /** @property MEGAException.stackFilter */
 lazy(MEGAException, 'stackFilter', () => {
     'use strict';
-    const assert = self.ua && ua.details.engine === 'Gecko' ? 'assert@' : 'assert ';
+    const assert = self.ua && ua.details && ua.details.engine === 'Gecko' ? 'assert@' : 'assert ';
 
     return (ln) => !ln.includes('MEGAException') && !ln.includes(assert);
 });

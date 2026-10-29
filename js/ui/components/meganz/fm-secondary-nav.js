@@ -133,7 +133,7 @@ class MegaNavCard extends MegaComponent {
             const { su } = this.node;
             const data = {
                 n: M.getNameByHandle(su),
-                m: M.u[su].m
+                m: M.getUserByHandle(su).m || ''
             };
             if (this._lastShareName && data.n === this._lastShareName.n && data.m === this._lastShareName.m) {
                 return '';
@@ -938,7 +938,7 @@ lazy(mega.ui, 'secondaryNav', () => {
         },
         openDownloadMenu(ev) {
             const target = ev.currentTarget;
-            const id = M.currentdirid.split('/').pop();
+            const id = String(M.currentdirid).split('/').pop();
             if (id) {
                 const classList =  ['fm-download-menu', 'fm-thin-dropdown'];
                 if (folderlink) {

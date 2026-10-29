@@ -1181,7 +1181,7 @@ lazy(mega.devices, 'ui', () => {
         /**
          * Returns device folder in the path passed as argument getting device from current view
          * @param {Array<String>|null} path - path to get folder from
-         * @returns {DeviceCentreFolder|undefined} device centre folder or undefined
+         * @returns {DeviceCentreFolder|false} device centre folder or false
          */
         getFolderInPath(path) {
             if (path) {
@@ -1195,6 +1195,7 @@ lazy(mega.devices, 'ui', () => {
                     }
                 }
             }
+            return false;
         }
 
         /**

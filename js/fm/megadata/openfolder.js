@@ -601,7 +601,7 @@
                     prefixPath = this.currentCustomView.prefixPath;
                 }
 
-                if (treeid.indexOf('/') > -1) {
+                if (String(treeid).includes('/')) {
                     treeid = treeid.split('/')[0];
                 }
 

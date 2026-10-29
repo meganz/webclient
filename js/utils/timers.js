@@ -464,6 +464,7 @@ self.mCreateHighPrecisionSleep = (ctx) => {
     worklet = new worklet(ctx);
 
     assert(ctx.state === 'running', `Invalid audio-context state, ${ctx.state}`);
+    assert(typeof worklet.attach === 'function', 'AudioWorkletNode subclassing is unsupported.');
     ctx = null;
 
     Object.defineProperty(self, 'sleep', {

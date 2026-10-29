@@ -279,6 +279,10 @@ class MegaMobileViewOverlay extends MegaComponent {
         const isLink = this.nodeComponent.node.link;
         const downloadSupport = await MegaMobileViewOverlay.checkSupport(this.nodeComponent.node);
 
+        if (!this.nodeComponent) {
+            return;
+        }
+
         // Build bottom bar
         if (this.bottomBar) {
             this.bottomBar.destroy();

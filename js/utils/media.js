@@ -1360,9 +1360,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
         if (is_embed !== 2 && self.contextMenu) {
             // Playback Speed context menu
             speedMenu = $('.context-menu.playback-speed', $wrapper).get(0);
-            if (!speedMenu) {
+            const speedTemplate = $('#media-viewer-speed-menu', $wrapper)[0];
+            if (!speedMenu && speedTemplate) {
                 speedMenu = contextMenu.create({
-                    template: $('#media-viewer-speed-menu', $wrapper)[0],
+                    template: speedTemplate,
                     sibling: $('.speed-wrapper .tooltip', $wrapper)[0],
                     animationDuration: 150,
                     boundingElement: $wrapper[0]
@@ -1371,9 +1372,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
             // Settings context menu
             settingsMenu = $('.context-menu.settings', $wrapper).get(0);
-            if (!settingsMenu) {
+            const settingsTemplate = $('#media-viewer-video-settings-menu', $wrapper)[0];
+            if (!settingsMenu && settingsTemplate) {
                 settingsMenu = contextMenu.create({
-                    template: $('#media-viewer-video-settings-menu', $wrapper)[0],
+                    template: settingsTemplate,
                     sibling: $('.settings-wrapper .tooltip', $wrapper)[0],
                     animationDuration: 150,
                     boundingElement: $wrapper[0]

@@ -11,13 +11,13 @@
     padding: 0;
     margin: 0;
 }
-.context-menu.title {
+.context-menu-title.title {
     display: flex;
     align-items: center;
     width: 100%;
     box-sizing: border-box;
 }
-.context-menu .fm-item-info {
+.context-menu-title .fm-item-info {
     white-space: nowrap;
     overflow: hidden;
     display: flex;

@@ -1982,7 +1982,7 @@
 
 <!-- View file template !-->
 <template id="view-file-template">
-    <div class="mobile main-block slideshow-image-previewer media-viewer-container hidden">
+    <div class="mobile main-block slideshow-image-previewer media-viewer-container theme-dark-forced hidden">
         <div class="media-viewer fm-scrolling">
             <header>
                 <nav class="viewer-bars">
@@ -1999,6 +1999,102 @@
                     <img alt="" class="img1" />
                     <img alt="" class="img2" />
                 </div>
+
+                <div class="viewer-rounded slideshow-controls-upper hidden">
+                    <button class="sl-btn close" aria-label="[[close]]">
+                        <i class="sprite-fm-mono icon-dialog-close-thin"></i>
+                    </button>
+                </div>
+
+                <template id="media-viewer-settings-menu">
+                    <nav class="context-menu slideshow-context-settings options-menu avoid-bottom" aria-expanded="false">
+                        <ul>
+                            <li>
+                                <div class="message">[$ss_settings_header]</div>
+                            </li>
+                            <li>
+                                <button class="speed sprite-fm-mono-after icon-chevron-right-thin-outline-after">
+                                    <span class="title">[$ss_settings_speed]</span>
+                                    <span class="current"></span>
+                                </button>
+                                <nav class="speed context-menu options-menu avoid-bottom" aria-expanded="false">
+                                    <ul>
+                                        <li>
+                                            <button class="slow">
+                                                <span></span>
+                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                                            </button>
+                                            <button class="normal">
+                                                <span></span>
+                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                                            </button>
+                                            <button class="fast">
+                                                <span></span>
+                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </li>
+                            <li>
+                                <button class="order sprite-fm-mono-after icon-chevron-right-thin-outline-after">
+                                    <span class="title">[$ss_settings_order]</span>
+                                    <i class="sprite-fm-mono"></i>
+                                </button>
+                                <nav class="order context-menu options-menu avoid-bottom" aria-expanded="false">
+                                    <ul>
+                                        <li>
+                                            <button class="default-order">
+                                                <i class="sprite-fm-mono"></i>
+                                                <span>[$ss_settings_order_opt_def]</span>
+                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                                            </button>
+                                            <button class="shuffle">
+                                                <i class="sprite-fm-mono"></i>
+                                                <span>[$ss_settings_order_opt_1]</span>
+                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                                            </button>
+                                            <button class="newest">
+                                                <i class="sprite-fm-mono"></i>
+                                                <span>[$ss_settings_order_opt_2]</span>
+                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                                            </button>
+                                            <button class="oldest">
+                                                <i class="sprite-fm-mono"></i>
+                                                <span>[$ss_settings_order_opt_3]</span>
+                                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </li>
+                            <li>
+                                <div class="switch-option">
+                                    <span class="title">[$ss_settings_repeat]</span>
+                                    <div class="mega-switch toggle-on" id="repeat">
+                                        <div class="mega-feature-switch sprite-fm-mono-after icon-check-after"></div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="switch-option">
+                                    <span class="title">[$gallery_videos]</span>
+                                    <div class="mega-switch toggle-off" id="playVid">
+                                        <div class="mega-feature-switch sprite-fm-mono-after icon-check-after"></div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="switch-option">
+                                    <span class="title">[$6859]</span>
+                                    <div class="mega-switch toggle-off" id="caption">
+                                        <div class="mega-feature-switch sprite-fm-mono-after icon-check-after"></div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </nav>
+                </template>
 
                 <!-- Video player !-->
                 <div class="video-block">
@@ -2156,8 +2252,8 @@
                         </button>
                     </div>
                     <div class="bar">
-                        <button class="sl-btn close" aria-label="[[close]]">
-                            <i class="sprite-fm-mono icon-dialog-close-thin"></i>
+                        <button class="sl-btn settings" aria-label="[[settings]]">
+                            <i class="sprite-fm-mono icon-sliders-thin-outline"></i>
                         </button>
                     </div>
                 </nav>

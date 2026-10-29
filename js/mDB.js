@@ -2191,7 +2191,7 @@ FMDB.prototype.invalidate = promisify(function(resolve, reject, readop) {
             onIdle(resolve);
         }
         else {
-            this.db.delete().finally(resolve);
+            this.db.delete().catch(dump).finally(resolve);
         }
 
         this.pending = [[]];
@@ -3411,6 +3411,10 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 throw new Error(`Invalid parent, cannot fetch children for ${parent}`);
             }
 
+            if (!fmdb) {
+                return;
+            }
+
             // is this a user handle or a non-handle? no fetching needed.
             while (parent.length === 8) {
 
@@ -3460,6 +3464,9 @@ Object.defineProperty(self, 'dbfetch', (function() {
          * @memberOf dbfetch
          */
         async geta(handles, options) {
+            if (!fmdb) {
+                return;
+            }
             handles = this.filter(handles);
             let bulk = handles.filter(h => !M.d[h]);
 

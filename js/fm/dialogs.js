@@ -2662,7 +2662,8 @@
                         const elem = document.createElement('div');
                         elem.className = 'chat-separator search';
                         elem.textContent = l.search_results;
-                        chatSeparators[0].parentNode.prepend(elem);
+                        // eslint-disable-next-line local-rules/jquery-replacements -- DOM node, not markup
+                        $lis.parent().prepend(elem);
                     }
                     else {
                         scroller.classList.add('hidden');

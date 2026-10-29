@@ -389,7 +389,7 @@ lazy(self, 'watchdog', () => {
 
                 tryCatch(mWatchDogHandlers[message])(payload, origin);
             }
-            else if (!mBroadcaster.sendMessage(`watchdog:${message}`, data) && message.startsWith('Q!')) {
+            else if (!mBroadcaster.sendMessage(`watchdog:${message}`, data) && String(message).startsWith('Q!')) {
                 const query = message.slice(2);
                 const value = mWatchDogQueryDux[query] && mWatchDogQueryDux[query](payload, data);
 

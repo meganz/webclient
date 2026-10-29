@@ -370,7 +370,7 @@ lazy(mega.ui, 'searchbar', () => {
                 renderUpdatedDropdown(null, false, true);
             }
 
-            if (e.key.length === 1 || e.key === 'Backspace') {
+            if (e.key && e.key.length === 1 || e.key === 'Backspace') {
                 // We render the suggestions separately with a delay
                 delay('searchbar.renderSuggestSearchedItems', () => renderSuggestSearchedItems(e), 1500);
             }
@@ -796,7 +796,7 @@ lazy(mega.ui, 'searchbar', () => {
             const searchTermLowercase = term.trim().toLowerCase();
 
             // Highlight search text for the result filename/s
-            const fileName = node.name;
+            const fileName = node.name || '';
             const { prefix, match, suffix } = findMatchWithSearchTerm(fileName, searchTermLowercase);
 
             // Set filename (with bold text for the matched search term part)

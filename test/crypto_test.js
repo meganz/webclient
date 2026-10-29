@@ -62,6 +62,18 @@ describe("crypto unit test", function() {
         mStub.restore();
     });
 
+    describe('assertUserHandle()', () => {
+        it('accepts a canonical handle', () => {
+            assertUserHandle('you456789xw');
+        });
+
+        it('rejects non-canonical spellings of a handle', () => {
+            assert.throws(() => assertUserHandle('you456789xx'));
+            assert.throws(() => assertUserHandle('you45,6789xw'));
+            assert.throws(() => assertUserHandle('you45 6789xw'));
+        });
+    });
+
     describe('crypt namespace', function() {
         describe('getPubKeyAttribute()', function() {
             it("RSA key", function() {
@@ -400,6 +412,18 @@ describe("crypto unit test", function() {
                     .fail(function() {
                         assert.fail('failed to retrv. uncached key, unseen');
                     });
+            });
+
+            it("non-canonical handle", () => {
+                mStub(window, 'u_authring', {Ed25519: {}});
+                mStub(window, 'pubEd25519', {});
+                mStub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
+                mStub(authring, 'setContactAuthenticated');
+
+                assert.throws(() => ns.getPubKey('you456789xx', 'Ed25519'));
+                assert.strictEqual(ns.getPubKeyAttribute.callCount, 0);
+                assert.strictEqual(authring.setContactAuthenticated.callCount, 0);
+                assert.deepEqual(pubEd25519, {});
             });
 
             it("uncached Ed25519 key, bad fingerprint", function(done) {

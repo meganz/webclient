@@ -834,7 +834,7 @@ function assert(test, ...args) {
 }
 
 /**
- * Assert that a user handle is potentially valid (e. g. not an email address).
+ * Assert that a user handle is potentially valid (e. g. not an email address)
  *
  * @param userHandle {string}
  *     The user handle to check.
@@ -844,7 +844,8 @@ function assert(test, ...args) {
 var assertUserHandle = function(userHandle) {
     try {
         if (typeof userHandle !== 'string'
-                || base64urldecode(userHandle).length !== 8) {
+                || base64urldecode(userHandle).length !== 8
+                || base64urlencode(base64urldecode(userHandle)) !== userHandle) {
 
             throw 1;
         }

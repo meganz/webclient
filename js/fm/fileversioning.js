@@ -968,17 +968,17 @@
                 fileversioning.fileVersioningDialog(handles);
             };
             if (is_text(M.d[previewHandle])) {
-                fileversioning.closeFileVersioningDialog();
-                mBroadcaster.once('text-editor:close', () => {
-                    onIdle(reopen);
-                });
                 mega.fileTextEditor
                     .getFile(previewHandle)
                     .done((data) => {
                         loadingDialog.hide();
+                        fileversioning.closeFileVersioningDialog();
+                        mBroadcaster.once('text-editor:close', () => {
+                            onIdle(reopen);
+                        });
                         mega.textEditorUI.setupEditor(M.d[previewHandle].name, data, previewHandle, true);
                     })
-                    .fail(loadingDialog.hide);
+                    .fail(() => loadingDialog.hide());
             }
             else if (is_video(M.d[previewHandle]) || is_image2(M.d[previewHandle])) {
                 fileversioning.getAllVersions(fileHandle).then((res) => {

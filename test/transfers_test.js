@@ -173,4 +173,30 @@ describe("Transfers Unit Test", function() {
             chai.assert.strictEqual((await getFingerprint(file)).hash, c);
         }
     });
+
+    it("can verify a whole-file gfsfetch() result against the file MAC", async() => {
+        // file keys as computed by encrypter.js with ul_key 01234567 89abcdef 02468ace 13579bdf 0badf00d 00ddba11
+        const tst = new Map([
+            [77, [177124714, -1988724738, -1714191616, 1149279192, 195948557, 14531089, -1684731442, 1473708039]],
+            [5768409, [177124714, -1988724738, 2093863114, -2044443146, 195948557, 14531089, 2123061764, -1787568599]]
+        ]);
+        const verify = (data) => mega.fileTextEditor.verify(data).catch((ex) => ex);
+
+        for (const [s, key] of tst) {
+            const data = new Uint8Array(s);
+            for (let i = s; i--;) {
+                data[i] = i * 7 + (i >> 9) & 0xFF;
+            }
+            data.payload = {key, s};
+
+            chai.assert.strictEqual(await verify(data), data);
+
+            const cut = data.subarray(0, s - 1);
+            cut.payload = data.payload;
+            chai.assert.strictEqual(await verify(cut), EKEY);
+
+            data[s - 2] ^= 1;
+            chai.assert.strictEqual(await verify(data), EKEY);
+        }
+    });
 });

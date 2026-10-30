@@ -762,8 +762,7 @@
                 subMsg:
                     `<p>${l[217]}</p>
                     <p>${l.account_delete_email_confirmation_no_receive}</p>
-                    <p>${l.contact_support_email.replace('https://mega.nz/support',
-                        '<a class="clickurl" href="/support" target="_blank">https://mega.nz/support</a>')}</p>`
+                    <p>${l.contact_support_email}</p>`
             },
             change: {
                 title: l[7743],

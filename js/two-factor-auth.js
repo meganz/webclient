@@ -128,7 +128,7 @@ twofactor.loginDialog = {
         closeDialog();
 
         // This is not a login, using global overlay.
-        if (options && options.skipLoginCheck) {
+        if (options && options.skipLoginCheck && !options.useAuthDialog) {
             this.dialogComponent = mega.ui.overlay;
         }
         else {

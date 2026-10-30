@@ -484,6 +484,9 @@
             }
         });
 
+        // Passkey (WebAuthn + PRF) - additive "Sign in with a passkey" affordance (password untouched).
+        initPasskeyLoginButton(submitWrap, $dialog, aPromise, options);
+
         if (is_mobile && page !== 'login') {
             return loadSubPage('login');
         }
@@ -709,7 +712,131 @@
         }
     }
 
-    // export
+    function passkeyTwoFactorPrompt(isRetry, state) {
+
+        const promise = twofactor.loginDialog.init(null, null, {
+            skipLoginCheck: true,
+            useAuthDialog: true,
+            showClose: !is_mobile,
+            showLostDevice: true,
+            onLostDevice: () => {
+                state.leftForRecovery = true;
+                twofactor.loginDialog.closeDialog(false, 'recovery');
+            }
+        });
+
+        if (isRetry) {
+            twofactor.loginDialog.showError();
+        }
+
+        return promise;
+    }
+
+    function passkeyTeardown(state, failed, aPromise, options) {
+
+        if (self.twofactor && twofactor.loginDialog.active) {
+            twofactor.loginDialog.closeDialog(false);
+        }
+
+        if (state.usedPinOverlay && failed && !state.leftForRecovery) {
+            (options.onReopen || showLoginDialog)(aPromise, options);
+        }
+    }
+
+    function initPasskeyLoginButton(submitWrap, $dialog, aPromise, options) {
+
+        if (!submitWrap ||
+            !(window.security && security.passkey && security.passkey.isSupported() && security.passkey.isEnabled())) {
+            return;
+        }
+
+        security.passkey.isPrfSupported().then(ok => {
+
+            if (!ok) {
+                return;
+            }
+
+            let pkBtn = submitWrap.componentSelector('.dialog-passkey-button');
+
+            if (!pkBtn) {
+                pkBtn = new MegaButton({
+                    parentNode: submitWrap,
+                    componentClassname: 'dialog-passkey-button secondary block fat no-max',
+                    text: l.passkey_login_button,
+                    type: 'normal',
+                    loaderIcon: 'icon-loader-throbber-dark-outline-after'
+                });
+            }
+
+            pkBtn.rebind('click.pklogin', () => {
+
+                const state = {usedPinOverlay: false, leftForRecovery: false};
+                const rememberMe = $('.login-check input', $dialog).prop('checked');
+
+                pkBtn.loading = true;
+
+                const onTwoFactor = isRetry => {
+
+                    state.usedPinOverlay = true;
+
+                    return passkeyTwoFactorPrompt(isRetry, state);
+                };
+
+                security.passkey.login(res => passkeyLoginComplete(res, aPromise, options), {onTwoFactor, rememberMe})
+                    .then(ok => passkeyTeardown(state, ok === false, aPromise, options)).catch(ex => {
+
+                        // String() only: an APIRequestError carries its request payload (incl. the 2FA code)
+                        dump('passkey login failed', String(ex));
+                        passkeyTeardown(state, true, aPromise, options);
+
+                        // NotAllowedError = user cancelled the native prompt; stay on the password form.
+                        if (ex && ex.name !== 'NotAllowedError') {
+                            toggleLoginError($dialog, l.passkey_login_error);
+                        }
+                    }).finally(() => {
+                        pkBtn.loading = false;
+                    });
+
+                return false;
+            });
+        });
+    }
+
+    /**
+     * Settle the login-required promise after a successful passkey login. Mirrors completeLogin's
+     * success branch; failures are surfaced by the caller's .catch or the decrypt tail's own dialog.
+     * @param {Number} result the login result / user type
+     * @param {MegaPromise} aPromise the promise to settle
+     * @param {Object} options showLoginDialog's options; onPasskeyLogin overrides the default completion
+     * @returns {void}
+     */
+    function passkeyLoginComplete(result, aPromise, options) {
+
+        if (result === false || result < 0) {
+            security.login.checkForCommonErrors(result, nop, nop);
+            return;
+        }
+
+        if (result >= 0) {
+
+            u_type = result;
+            u_checked = true;
+
+            if (options.onPasskeyLogin) {
+                return options.onPasskeyLogin(result);
+            }
+
+            if (u_type === 3) {
+                aPromise.resolve();
+                hideProLoginDialog();
+            }
+            else {
+                boot_auth(null, result);
+                aPromise.reject();
+            }
+        }
+    }
+
     mega.ui.auth = mega.ui.auth || {};
     mega.ui.login = mega.ui.login || {};
     mega.ui.auth.getDialogComponent = getLoginDialogComponent;
@@ -718,5 +845,6 @@
     mega.ui.login.showRequiredDialog = showLoginRequiredDialog;
     mega.ui.login.openDialog = openLoginDialog;
     mega.ui.login.buildSecurityTip = buildProLoginSecurityTip;
+    mega.ui.login.initPasskeyButton = initPasskeyLoginButton;
 
 })(jQuery, window);

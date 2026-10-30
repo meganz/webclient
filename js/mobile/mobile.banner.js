@@ -425,7 +425,7 @@ class MegaMobileBanner extends MegaComponent {
     set collapsed(collapse) {
         this._collapsed = collapse;
         this.xButton.icon =
-            `sprite-fm-mono ${collapse ? 'icon-arrow-down-thin-solid' : 'icon-arrow-up-thin-solid'}`;
+            `sprite-mobile-fm-mono ${collapse ? 'icon-arrow-down-thin-solid' : 'icon-arrow-up-thin-solid'}`;
         const textNode = this.domNode.querySelector('.message-text');
         if (collapse) {
             textNode.classList.add('hidden');
@@ -519,7 +519,7 @@ class MegaMobileBanner extends MegaComponent {
                     this.domNode.classList.remove('hidden');
                     this.wrapperNode.classList.remove('hidden');
                     if (closeBtn === false) {
-                        this.closeButton = false;
+                        this.closeButton = true;
                         this.collapsed = false;
                     }
                 });

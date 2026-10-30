@@ -357,6 +357,9 @@ body.web-desktop .overlay-wrap.pro-login-dialog-overlay .sheet {
     margin: 6px 0 0;
     font: var(--mobile-font-caption-small-regular);
 }
+.js-login-submit .dialog-passkey-button {
+    margin-top: 12px;
+}
 body.web-desktop .overlay-wrap.pro-login-dialog-overlay .overlay-footer.pro-login-security-tip {
     display: block;
     position: absolute;
@@ -389,3 +392,4 @@ body.web-desktop .overlay-wrap.pro-login-dialog-overlay .overlay-footer.pro-logi
 }
 
 /* end pro-login-dialog */
+

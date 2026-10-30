@@ -2122,6 +2122,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/account-switcher.js', n: 'account_switcher_js', j:1});
     jsl.push({f:'js/security.js', n: 'security_js', j: 1, w: 5});
     jsl.push({f:'js/two-factor-auth.js', n: 'two_factor_auth_js', j: 1, w: 5});
+    jsl.push({f:'js/fm/passkey.js', n: 'fm_passkey_js', j: 1, w: 5});
+    jsl.push({f:'js/passkeys-account.js', n: 'passkeys_account_js', j: 1, w: 5});
     jsl.push({f:'js/attr.js', n: 'mega_attr_js', j:1});
     jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j: 1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
@@ -2643,6 +2645,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile/mobile.settings.css', n: 'mobile_settings_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile/mobile.settings.history.css', n: 'mobile_settings_history_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile/mobile.settings.passkeys.css', n: 'mobile_settings_passkeys_css', j: 2, w: 30});
         jsl.push({f:'css/mobile/mobile.link-management.css', n: 'mobile_link_management_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-help.css', n: 'mobile_help_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
@@ -2719,6 +2722,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/verifyDelete.js', n: 'mobile_verify_delete_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/privacyAndSecurity.js', n: 'mobile_privacy_security_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/history.js', n: 'mobile_session_history_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/passkeys.js', n: 'mobile_settings_passkeys_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/backupRecovery.js', n: 'mobile_backup_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/fileManagement.js', n: 'mobile_file_management_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/notifications.js', n: 'mobile_account_notifications_js', j: 1, w: 1});

@@ -2119,6 +2119,11 @@ accountUI.security = {
 
         // 2fa
         twofactor.account.init();
+
+        // passkeys
+        if (self.passkeys) {
+            passkeys.account.init();
+        }
     },
 
     recoveryKey: {

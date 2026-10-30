@@ -1672,6 +1672,11 @@ lazy(mega, 'fileRequestUpload', () => {
 
             this.ownerPublicKey = await this.fetchOwnerPublicKey();
 
+            // No usable key to encrypt uploads to (e.g. a rejected one), they could never complete
+            if (!this.ownerPublicKey) {
+                return this.handlePageError(EINTERNAL);
+            }
+
             return this.handleInitialized();
         }
 

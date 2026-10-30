@@ -925,4 +925,46 @@ describe("crypto unit test", function() {
             });
         });
     });
+
+    describe('RSA exponent below 3', function() {
+        // The genuine key's bytes, re-split by the API into "modulus || 01 00" and exponent 01
+        var modulus = asmCrypto.bytes_to_string(RSA_PUB_KEY[0]);
+        var genuine = crypto_encodepubkey([modulus, '\x01\x00\x01']);
+        var resplit = crypto_encodepubkey([modulus + '\x01\x00', '\x01']);
+
+        it("crypto_decodepubkey() rejects it", function() {
+            assert.strictEqual(genuine, crypto_encodepubkey([modulus, '\x01\x00\x01']));
+            assert.strictEqual(resplit.length, genuine.length);
+            assert.strictEqual(crypto_decodepubkey(genuine)[1], '\x01\x00\x01');
+            assert.strictEqual(crypto_decodepubkey(resplit), false);
+            // current keys carry e=257 as 00 00 01 01, so check zero-prefixed exponents too
+            assert.strictEqual(crypto_decodepubkey(crypto_encodepubkey([modulus, '\x00\x00\x01\x01']))[1],
+                               '\x00\x00\x01\x01');
+            assert.strictEqual(crypto_decodepubkey(crypto_encodepubkey([modulus, '\x00\x00\x00\x01'])), false);
+            assert.strictEqual(crypto_decodepubkey(crypto_encodepubkey([modulus, '\x00'])), false);
+        });
+
+        it("crypto_rsaencrypt() refuses it", function() {
+            assert.strictEqual(crypto_rsaencrypt('file key', [modulus + '\x01\x00', '\x01'], -0x4D454741), '');
+            assert.strictEqual(crypto_rsaencrypt('file key', [modulus], -0x4D454741), '');
+            assert.notStrictEqual(crypto_rsaencrypt('file key', [modulus, '\x01\x00\x01'], -0x4D454741), '');
+        });
+
+        it("getPubKeyAttribute() neither caches nor resolves it", function() {
+            mStub(ns._logger, '_log');
+            var rootPromise = _stubMegaPromise(sinon, true);
+            mStub(attribCache, 'getItem').returns(_stubMegaPromise(sinon));
+            mStub(attribCache, 'setItem');
+            mStub(attribCache, 'removeItem');
+            _showDebug(['api_req', 'assertUserHandle']);
+
+            ns.getPubKeyAttribute('you456789xw', 'RSA');
+            var settleFunction = api_req.args[0][1].callback;
+            settleFunction({ pubk: base64urlencode(resplit), u: 'you456789xw'});
+            assert.strictEqual(rootPromise.resolve.callCount, 0);
+            assert.strictEqual(rootPromise.reject.callCount, 1);
+            assert.strictEqual(rootPromise.reject.args[0][0], EINTERNAL);
+            assert.strictEqual(attribCache.setItem.callCount, 0);
+        });
+    });
 });

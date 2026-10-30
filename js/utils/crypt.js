@@ -154,6 +154,17 @@ var crypt = (function() {
 
                     var pubKey = crypto_decodepubkey(base64urldecode(res.pubk));
 
+                    // Malformed or unsafe (e.g. exponent below 3), neither cache nor use it
+                    if (!pubKey) {
+                        logger.error(`Invalid ${keyType} pub key for user ${debugUserHandle}`);
+
+                        if (fromCache) {
+                            attribCache.removeItem(cacheKey);
+                        }
+                        masterPromise.reject(EINTERNAL, [res, userData]);
+                        return;
+                    }
+
                     if (d > 1 || is_karma) {
                         logger.debug('Got ' + keyType + ' pub key of user ' + debugUserHandle);
                     }

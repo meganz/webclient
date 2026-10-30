@@ -1297,6 +1297,13 @@
             delete pubEd25519[userHandle];
             crypt.getPubEd25519(userHandle);
         };
+        uaPacketParserHandler['+puCu255'] = function(userHandle) {
+            // pubCu25519 key or its signature was updated, re-fetch and verify on next use.
+            if (userHandle !== u_handle) {
+                delete pubCu25519[userHandle];
+            }
+        };
+        uaPacketParserHandler['+sigCu255'] = uaPacketParserHandler['+puCu255'];
         uaPacketParserHandler['*!fmconfig'] = function() {
             if (fminitialized) {
                 mega.config.fetch().dump('fmconfig.sync');

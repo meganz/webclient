@@ -1719,6 +1719,11 @@ function showLoginDialog(email, password) {
         });
     }
 
+    mega.ui.login.initPasskeyButton(submitWrap, $dialog, null, {
+        onPasskeyLogin: completeProLogin,
+        onReopen: () => showLoginDialog(email, password)
+    });
+
     $('.input-email', $dialog).val(email || '');
     $('.input-password', $dialog).val(password || '');
 

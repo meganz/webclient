@@ -2783,7 +2783,7 @@ mega.tpw = new function TransferProgressWidget() {
         mega.ui.onboarding.forceSection('tpw');
     };
     scope.canShowOnboarding = () => {
-        return !(!widgetRoot || !u_attr || u_attr.since > 178e10 || !mega.ui.onboarding || $.dialog || slideshowid ||
+        return !(!widgetRoot || !u_attr || u_attr.since > 178e7 || !mega.ui.onboarding || $.dialog || slideshowid ||
             fileversioning && fileversioning.isOpen || scope.isDialog || folderlink);
     };
     scope.hideOnboarding = () => {

@@ -11554,6 +11554,7 @@ class ChatlinkDialog extends REaCt()().Component {
   constructor(...args) {
     super(...args);
     this.domRef = REaCt()().createRef();
+    this.qrButtonRef = REaCt()().createRef();
     this.state = {
       link: l[5533],
       newTopic: ''
@@ -11562,6 +11563,19 @@ class ChatlinkDialog extends REaCt()().Component {
       if (this.props.onClose) {
         this.props.onClose();
       }
+    };
+    this.toggleQR = () => {
+      if (this.qrPopup && this.qrPopup.visible) {
+        this.qrPopup.hide();
+        return;
+      }
+      this.qrPopup = this.qrPopup || new MegaQrPopup({
+        parentNode: document.getElementById(ChatlinkDialog.NAMESPACE),
+        targetNode: this.qrButtonRef.current,
+        link: () => this.state.link,
+        fileName: () => this.props.chatRoom.getRoomTitle()
+      });
+      this.qrPopup.show();
     };
   }
   retrieveChatLink(forced) {
@@ -11586,6 +11600,32 @@ class ChatlinkDialog extends REaCt()().Component {
       }
     });
   }
+  renderQRButton() {
+    const {
+      chatRoom
+    } = this.props;
+    if (this.loading || !chatRoom.topic || !(chatRoom.publicLink || is_chatlink)) {
+      return null;
+    }
+    return REaCt()().createElement("button", {
+      ref: this.qrButtonRef,
+      className: `
+                    mega-component
+                    nav-elem
+                    button
+                    icon-only
+                    transparent-icon
+                    text-icon
+                    secondary
+                    show-qrcode
+                    simpletip
+                `,
+      "data-simpletip": l[17754],
+      onClick: this.toggleQR
+    }, REaCt()().createElement("i", {
+      className: "sprite-fm-mono icon-qr-thin-outline icon-size-20"
+    }));
+  }
   componentDidMount() {
     this.retrieveChatLink();
     M.safeShowDialog(ChatlinkDialog.NAMESPACE, () => {
@@ -11596,6 +11636,9 @@ class ChatlinkDialog extends REaCt()().Component {
     });
   }
   componentWillUnmount() {
+    if (this.qrPopup) {
+      this.qrPopup.destroy();
+    }
     if ($.dialog === ChatlinkDialog.NAMESPACE) {
       closeDialog();
     }
@@ -11674,7 +11717,7 @@ class ChatlinkDialog extends REaCt()().Component {
       type: "text",
       readOnly: true,
       value: this.loading ? l[5533] : !chatRoom.topic ? l[20660] : link
-    })), REaCt()().createElement("div", {
+    }), this.renderQRButton()), REaCt()().createElement("div", {
       className: "info"
     }, chatRoom.publicLink || is_chatlink ? publicLinkDetails : null)))), REaCt()().createElement("footer", null, REaCt()().createElement("div", {
       className: "footer-container"

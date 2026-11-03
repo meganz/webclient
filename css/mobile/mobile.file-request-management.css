@@ -76,7 +76,8 @@
     color: var(--mobile-text-primary);
     text-overflow: ellipsis;
 }
-.fr-mgmt-container .fr-link-field i.action-icon.copy-input-value {
+.fr-mgmt-container .fr-link-field i.action-icon.copy-input-value,
+.fr-mgmt-container .fr-link-field i.action-icon.show-qrcode {
     --icon-size: 20px;
     --mask-color: var(--mobile-icon-primary);
     margin-inline-end: 12px;
@@ -206,7 +207,8 @@ body.mobile .mega-component.mega-sheet.filereq-ob-dialog .main .subtitle span {
     color: var(--mobile-text-placeholder);
     padding: 11px 12px;
 }
-.fr-updated-sheet-contents .fr-link-field i.action-icon.copy-input-value {
+.fr-updated-sheet-contents .fr-link-field i.action-icon.copy-input-value,
+.fr-updated-sheet-contents .fr-link-field i.action-icon.show-qrcode {
     --icon-size: 16px;
 }
 

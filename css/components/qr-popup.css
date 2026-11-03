@@ -1,0 +1,62 @@
+.mega-component.show-qrcode.active {
+    background-color: var(--mobile-button-secondary-pressed);
+}
+.qrcode-popup {
+    position: fixed;
+    z-index: 1001;
+    background: var(--mobile-surface-2);
+    color: var(--mobile-text-primary);
+    padding: 12px;
+    border-radius: 8px;
+    font: var(--mobile-font-caption-large-bold);
+}
+.rtl .qrcode-popup {
+    transform: translateX(-100%);
+}
+.qrcode-popup::after {
+    content: "";
+    position: absolute;
+    top: 29px;
+    left: -11px;
+    width: 0;
+    height: 0;
+    border-top: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+    border-right: 11px solid var(--mobile-surface-2);
+}
+.rtl .qrcode-popup::after {
+    left: auto;
+    right: -11px;
+    border-left: 11px solid var(--mobile-surface-2);
+    border-right: 0;
+}
+.qrcode-popup .qrcode-popup-content-header {
+    display: flex;
+    align-items: center;
+}
+.qrcode-popup button.text-icon {
+    margin: 0;
+    padding: 0;
+    --mask-color: var(--mobile-icon-primary);
+}
+.qrcode-popup button.download-qrcode {
+    margin-inline-start: 8px;
+}
+.qrcode-popup .close-qrcode {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+}
+.rtl .qrcode-popup .close-qrcode {
+    left: 12px;
+    right: auto;
+}
+.qrcode-popup .qrcode-popup-content-body {
+    padding: 16px;
+    background-color: rgb(255, 255, 255, 1);
+    border-radius: 8px;
+    margin-top: 12px;
+}
+.qrcode-popup .qrcode-popup-content-body > canvas {
+    display: block;
+}

@@ -1713,7 +1713,7 @@ function showLoginDialog(email, password) {
     if (!loginBtn && submitWrap) {
         loginBtn = new MegaButton({
             parentNode: submitWrap,
-            componentClassname: 'mega-button block top-dialog-login-button dialog-login-button primary',
+            componentClassname: 'mega-button block top-dialog-login-button dialog-login-button primary no-max',
             text: l[16345],
             type: 'normal'
         });

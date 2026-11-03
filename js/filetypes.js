@@ -1,13 +1,13 @@
 var ext = {};
 var extensions = {
-    'threed': [['3ds', '3dm', 'max', 'obj'], '3D'],
+    'threed': [['3ds', '3dm', 'max', 'obj', 'fbx'], '3D'],
     'aftereffects': [['aep', 'aet'], 'Adobe Aftereffects'],
     'audio': [['mp3', 'wav', '3ga', 'aif', 'aiff', 'flac', 'iff', 'm4a', 'wma'], 'Audio'],
     'cad': [['dxf', 'dwg'], 'CAD'],
     'compressed': [['zip', 'rar', 'tgz', 'gz', 'bz2', 'tbz', 'tar', '7z', 'sitx'], 'Compressed'],
     'dmg': [['dmg'], 'Disk Image'],
     'excel': [['xls', 'xlsx', 'xlsm', 'xlt', 'xltm', 'xltx'], 'Excel'],
-    'executable': [['exe', 'com', 'bin', 'apk', 'app', 'msi', 'cmd', 'gadget'], 'Executable'],
+    'executable': [['exe', 'com', 'bin', 'apk', 'app', 'msi', 'cmd', 'gadget', 'bat'], 'Executable'],
     'font': [['fnt', 'otf', 'ttf', 'fon'], 'Font'],
     'generic': [['*'], 'File'],
     'illustrator': [['ai', 'ait'], 'Adobe Illustrator'],
@@ -16,7 +16,7 @@ var extensions = {
     'keynote': [['key'], 'Apple Keynote'],
     'mega': [['megaignore'], 'Mega Ignore'],
     'numbers': [['numbers'], 'Apple Numbers'],
-    'open-office': [['sxw', 'stw', 'sxc', 'stc', 'sxi', 'sti', 'sxd', 'std', 'sxm'], 'OpenOffice'],
+    'open-office': [['sxw', 'stw', 'sxc', 'stc', 'sxi', 'sti', 'sxd', 'std', 'sxm', 'odt'], 'OpenOffice'],
     'pages': [['pages'], 'Apple Pages'],
     'pdf': [['pdf'], 'PDF'],
     'photoshop': [['abr', 'psb', 'psd'], 'Adobe Photoshop'],
@@ -33,7 +33,7 @@ var extensions = {
     'web-lang': [[
         'php', 'php3', 'php4', 'php5', 'phtml', 'inc', 'asp', 'pl', 'cgi', 'py', 'sql', 'accdb', 'db', 'dbf', 'mdb',
         'pdb', 'c', 'cpp', 'h', 'cs', 'sh', 'vb', 'swift'], 'Web Server Code'],
-    'word': [['doc', 'docx', 'dotx', 'wps', 'odt', 'rtf'], 'MS Word']
+    'word': [['doc', 'docx', 'dotx', 'wps', 'rtf'], 'MS Word']
 };
 
 var extmime = {

@@ -83,7 +83,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 {
                     icon: 'file-text-thin-outline',
                     label: l.filter_chip_type_documents,
-                    data: ['word', 'text'],
+                    data: ['word', 'open-office', 'text'],
                     eid: 99944,
                     chipLabel: l.filtered_chip_documents,
                 },

@@ -23360,6 +23360,7 @@ class Call extends mixins.w9 {
     this.recordingConsentDialog = `${NAMESPACE}-consent`;
     this.ephemeralAddListener = undefined;
     this.delayProcID = null;
+    this.idleProcID = null;
     this.pCallTimer = null;
     this.offlineDelayed = undefined;
     this.callStartTimeout = undefined;
@@ -23916,9 +23917,14 @@ class Call extends mixins.w9 {
         className: "record-label"
       }, l.record_start_button));
     };
-    this.setActiveElement = activeElement => this.setState({
-      activeElement
-    });
+    this.setActiveElement = activeElement => {
+      const {
+        activeElement: prevActiveElement
+      } = this.state;
+      this.setState({
+        activeElement
+      }, () => prevActiveElement && !activeElement && this.handleMouseMove());
+    };
     const {
       SOUNDS
     } = megaChat;
@@ -23936,6 +23942,13 @@ class Call extends mixins.w9 {
       delay.cancel(this.delayProcID);
       this.delayProcID = null;
     }
+    this.idleProcID = delay('meetings-call-mouse-idle', () => {
+      if (!this.state.activeElement && this.isMounted()) {
+        this.setState({
+          hovered: false
+        });
+      }
+    }, 5000);
   }
   handleMouseOut() {
     if (this.state.hovered) {
@@ -23946,6 +23959,10 @@ class Call extends mixins.w9 {
           });
         }
       }, MOUSE_OUT_DELAY);
+    }
+    if (this.idleProcID) {
+      delay.cancel(this.idleProcID);
+      this.idleProcID = null;
     }
   }
   handleCallOffline() {
@@ -23960,7 +23977,7 @@ class Call extends mixins.w9 {
   setOnboarding() {
     this.state.onboardingUI = this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_UI);
     if (!this.state.onboardingUI) {
-      this.state.onboardingRecording = this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RECORDING);
+      this.state.onboardingRecording = this.state.hovered = this.flagMap && Call.isModerator(this.props.chatRoom, u_handle) && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RECORDING);
     }
     if (!this.state.onboardingUI && !this.state.onboardingRecording) {
       this.state.onboardingRaise = this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RAISE);
@@ -29459,7 +29476,7 @@ const mixin_namespaceFn = () => {
 };
 
 // MODULE: ./js/chat/ui/messages/types/partials/metaRichPreviewLoading.jsx
-const metaRichPreviewLoading_namespaceFn = REQ_.cw((module, EXP_) => {
+const metaRichPreviewLoading_namespaceFn = REQ_.cw((_, EXP_) => {
 REQ_.d(EXP_, {
 a: () => MetaRichpreviewLoading
 });

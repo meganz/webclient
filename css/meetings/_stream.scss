@@ -18,14 +18,14 @@
     @include meta.load-css('_participantsNotice.scss');
     @include meta.load-css('_participantsBlock.scss');
 
-    &-wrapper{
+    &-wrapper {
         display: grid;
         position: relative;
         width: calc(100% - 32px);
-        height: calc(100% - 160px);
+        height: calc(100% - 32px);
         margin: 0 auto;
-        padding-top: 64px;
-        padding-bottom: 96px;
+        padding-top: 16px;
+        padding-bottom: 16px;
 
         &.with-participants-block {
             float: left;
@@ -34,6 +34,11 @@
             @include mixins.small-screen {
                 width: calc(100% - 230px);
             }
+        }
+        .hovered & {
+            padding-top: 64px;
+            padding-bottom: 96px;
+            height: calc(100% - 160px);
         }
     }
 

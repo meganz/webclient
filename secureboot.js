@@ -48,10 +48,6 @@ var is_mobile = (function isMobile() {
     }
 })();
 
-if (self.is_mobile && location.search.includes('?autoplay=')) {
-    is_mobile = false;
-}
-
 var is_android = is_mobile && ua.indexOf('android') > 0;
 var is_uc_browser = is_mobile && ua.indexOf('ucbrowser') > 0;
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
@@ -2650,6 +2646,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile-help.css', n: 'mobile_help_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-media-viewer.css', n: 'mobile_media_viewer_css', j:2,w:5});
+        jsl.push({f:'css/context-menu.css', n: 'context_menu_css', j:2, w:5});
         jsl.push({f:'css/mobile/mobile.tab.css', n: 'mobile_tab_css', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.public.link.css', n: 'mobile_public_linkcss', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.datepicker.css', n: 'mobile_datepicker_css', j: 2, w: 1});
@@ -2742,6 +2739,8 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.albums.js', n: 'mobile_albums_js', j: 1, w:1});
 
         jsl.push({f:'js/ui/components/meganz/MDialogMobile.js', n: 'mobile_m_dialog_mobile_js', j:1});
+
+        jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
     }
     jsl.push({f:'html/chatlink.html', n: 'chatlink', j: 0});
 

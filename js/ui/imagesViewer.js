@@ -35,6 +35,9 @@ var slideshowid;
         }
     };
 
+    // Check cached menus attached after mobile FM reinit
+    const isStaleMenu = (menu, $overlay) => !menu || !$overlay.has(menu).length;
+
     // function invoked when previews[] becomes available, or if there was some error
     // from gfsfetch() or getfileattr() while on slideshow-play mode, and we need to
     // move to the next slide (since we may be awaiting a media to load from a timeereset() call)
@@ -699,7 +702,7 @@ var slideshowid;
         });
 
         // Bind Slideshow Close button
-        $('.sl-btn.close', is_mobile ? $slideshowControls : $slideshowControlsUpper).rebind('click.mediaviewer', () => {
+        $('.sl-btn.close', $slideshowControlsUpper).rebind('click.mediaviewer', () => {
             slideshowplay_close();
             if (is_mobile && is_ios) {
                 // Due to the handling of the onload event with the previous image in iOS,
@@ -1271,9 +1274,10 @@ var slideshowid;
         }
 
         // Options context menu
-        if (!optionsMenu && self.contextMenu) {
+        const optionsTemplate = $('#media-viewer-options-menu', $overlay)[0];
+        if (optionsTemplate && self.contextMenu && isStaleMenu(optionsMenu, $overlay)) {
             optionsMenu = contextMenu.create({
-                template: $('#media-viewer-options-menu', $overlay)[0],
+                template: optionsTemplate,
                 sibling: $('.v-btn.options', $overlay)[0],
                 animationDuration: 150,
                 boundingElement: $overlay[0]
@@ -1416,7 +1420,8 @@ var slideshowid;
                     }
                 });
             }
-            else if (self.contextMenu) {
+
+            if (self.contextMenu) {
                 // Options icon
                 $('.v-btn.options, .sl-btn.settings', $overlay).rebind('click.media-viewer-settings', function() {
                     var $this = $(this);
@@ -1716,12 +1721,13 @@ var slideshowid;
         if (!slideshowplay || mega.slideshow.settings.manager.hasToUpdateRender(settingsMenu)) {
 
             // Settings menu initialization
-            if (!settingsMenu) {
+            if (isStaleMenu(settingsMenu, $overlay)) {
                 settingsMenu = contextMenu.create({
                     template: $('#media-viewer-settings-menu', $overlay)[0],
                     sibling: $('.sl-btn.settings', $overlay)[0],
                     animationDuration: 150,
-                    boundingElement: $overlay[0]
+                    boundingElement: $overlay[0],
+                    position: {my: 'center bottom', at: 'right top-8'}
                 });
             }
 
@@ -1790,11 +1796,10 @@ var slideshowid;
 
         if (is_mobile) {
             eventlog(pfcol ? 500841 : 99835);
-            if (is_ios) {
-                // Due to the handling of the onload event with the previous image in iOS,
-                // force the call to img position
-                slideshow_imgPosition();
-            }
+
+            // Header and footer collapse in slideshow mode, so update the media position
+            // Also handles the previous image's onload event on iOS
+            slideshow_imgPosition();
         }
         else {
             eventlog(501131);

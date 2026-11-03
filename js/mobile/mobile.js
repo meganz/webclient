@@ -1116,12 +1116,6 @@ accountUI.account = {
         render: nop
     }
 };
-contextMenu = {
-    create: nop,
-    open: nop,
-    close: nop
-};
-
 function bindDropdownEvents() {}
 
 mega.gallery = {

@@ -108,6 +108,18 @@
     display: none;
 }
 
+.mobile .media-viewer .slideshow-controls .bar {
+    transform: none;
+}
+
+.mobile .media-viewer .context-menu.slideshow-context-settings {
+    max-width: calc(100vw - 16px);
+}
+
+.mobile .media-viewer .slideshow-context-settings .context-menu {
+    z-index: 1;
+}
+
 .mobile .media-viewer button.gallery-btn {
     background-color: rgba(0, 0, 0, 0.6);
     border-radius: 0;
@@ -117,13 +129,13 @@
     top: 50%;
 }
 
+.mobile .slideshow-controls-upper button i,
 .mobile .media-viewer button.gallery-btn i,
 .mobile .media-viewer button.gallery-btn:hover i,
 .mobile .media-viewer button.gallery-btn:active i {
     --mask-color: #fff;
     color: #fff;
 }
-
 
 .mobile .media-viewer button.gallery-btn.next {
     left: auto;

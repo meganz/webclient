@@ -34,6 +34,9 @@ lazy(window, 'contextMenu', () => {
     const defaultAnimationDuration = 150;
     const defaultIsRTL = document.body.classList.contains('rtl');
 
+    // Default submenu position when the root uses position options
+    const defaultSubmenuPosition = {my: 'left top', at: 'right top'};
+
     /**
      * Attaches the menu to the DOM.
      *
@@ -121,10 +124,30 @@ lazy(window, 'contextMenu', () => {
      * @returns {undefined}
      */
     function setOpenDirection(menu) {
+        const menuRoot = menu.closest('[data-menu-root]');
+
+        // Flipping when options are provided
+        if (menuRoot.positionOptions) {
+            const isRoot = menu === menuRoot;
+            const {submenu, ...rootPosition} = menuRoot.positionOptions;
+
+            // Prevent the menu from animating from its previous position.
+            menu.style.transition = 'none';
+
+            $(menu).position({
+                collision: 'flipfit',
+                of: isRoot ? menuRoot.anchorElement : menu.previousElementSibling,
+                within: menuRoot.boundingElement,
+                ...(isRoot ? rootPosition : submenu || defaultSubmenuPosition)
+            });
+
+            menu.getBoundingClientRect();
+            menu.style.transition = '';
+            return;
+        }
 
         // Handle RTL and keeping within bottom boundary
         if (menu.classList.contains('open-horizontal') || menu.classList.contains('avoid-bottom')) {
-            const menuRoot = menu.closest('[data-menu-root]');
             const boundingElement = menuRoot.boundingElement;
             const isRTL = menuRoot.style.direction === 'rtl';
             const parentRect = menu.parentNode.getBoundingClientRect();
@@ -166,6 +189,46 @@ lazy(window, 'contextMenu', () => {
     }
 
     /**
+     * Watches for layout changes while positioned menus are open
+     * @private
+     * @returns {void}
+     */
+    function watchResize() {
+        $(window).rebind('resize.contextmenu', () => {
+            delay('contextmenu:reposition', repositionOpenMenus, 100);
+        });
+    }
+
+    /**
+     * Repositions all open menus
+     * @private
+     * @returns {void}
+     */
+    function repositionOpenMenus() {
+        const menus = document.querySelectorAll('[data-menu-positioned]');
+
+        if (!menus.length) {
+            $(window).off('resize.contextmenu');
+            return;
+        }
+
+        for (let i = menus.length; i--;) {
+            if (menus[i].getAttribute('aria-expanded') !== 'true') {
+                continue;
+            }
+
+            // The root first, a submenu is placed against a row within it
+            setOpenDirection(menus[i]);
+
+            const submenus = menus[i].querySelectorAll('nav[aria-expanded="true"]');
+
+            for (let j = 0; j < submenus.length; j++) {
+                setOpenDirection(submenus[j]);
+            }
+        }
+    }
+
+    /**
      * Create the menu from a template and append it to a parent element
      *
      * @private
@@ -183,9 +246,19 @@ lazy(window, 'contextMenu', () => {
         callback,
         isRTL = defaultIsRTL,
         boundingElement = window,
-        animationDuration = defaultAnimationDuration
+        animationDuration = defaultAnimationDuration,
+        position
     }) {
         const menuElement = createMenuElement(template, isRTL, boundingElement, animationDuration);
+
+        if (position) {
+            menuElement.dataset.menuPositioned = true;
+            menuElement.positionOptions = position;
+            menuElement.anchorElement = sibling;
+
+            watchResize();
+        }
+
         submenuHovers(menuElement);
         attach(menuElement, sibling);
         if (callback) {
@@ -284,6 +357,12 @@ lazy(window, 'contextMenu', () => {
     async function destroy(menu, callback) {
         await close(menu);
         menu.remove();
+
+        if (!document.querySelector('[data-menu-positioned]')) {
+            delay.cancel('contextmenu:reposition');
+            $(window).off('resize.contextmenu');
+        }
+
         if (callback) {
             callback();
         }

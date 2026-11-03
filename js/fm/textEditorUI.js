@@ -212,15 +212,17 @@ mega.textEditorUI = new function TextEditorUI() {
         $menuBar = $('.text-editor-bars', $editorContainer);
         $saveButton = $('.save-btn', $editorContainer);
 
-        const fileMenu = contextMenu.create({
-            template: $('#text-editor-file-menu', $containerDialog)[0],
+        const fileTemplate = $('#text-editor-file-menu', $containerDialog)[0];
+        const fileMenu = fileTemplate && contextMenu.create({
+            template: fileTemplate,
             sibling: $('.file-btn', $containerDialog)[0],
             animationDuration: 150,
             boundingElement: $containerDialog[0]
         });
 
-        const formatMenu = contextMenu.create({
-            template: $('#text-editor-format-menu', $containerDialog)[0],
+        const formatTemplate = $('#text-editor-format-menu', $containerDialog)[0];
+        const formatMenu = formatTemplate && contextMenu.create({
+            template: formatTemplate,
             sibling: $('.format-btn', $containerDialog)[0],
             animationDuration: 150,
             boundingElement: $containerDialog[0]

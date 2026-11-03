@@ -83,6 +83,11 @@ class MegaMobilePromoBanner extends MegaOverlay {
 mBroadcaster.once('fm:initialized', () => {
     'use strict';
 
+    // Skip for links autoplay
+    if (typeof window.autoplayOptions === 'string') {
+        return;
+    }
+
     if (!mega.ui.promoBanner) {
         mega.ui.promoBanner = new MegaMobilePromoBanner({
             parentNode: document.body,

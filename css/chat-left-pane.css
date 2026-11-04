@@ -1689,6 +1689,9 @@ td.verification .contact-item {
 .profile-shared-folders .contact-item-controls {
     display: block;
 }
+.profile-shared-folders .contact-item-controls .mega-button {
+    pointer-events: auto;
+}
 
 .dropdown .dropdown-credentials {
     width: 180px;

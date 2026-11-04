@@ -98,6 +98,12 @@ export default class ContactsPanel extends MegaRenderMixin {
 
     handleToggle = ({ keyCode }) => {
         if (keyCode === 27 /* ESC */) {
+            const fmContextMenu = document.querySelector('.fm-context-menu');
+            if (fmContextMenu && fmContextMenu.offsetHeight > 0) {
+                $.hideContextMenu();
+                return keyCode;
+            }
+
             const HAS_DIALOG_OPENED =
                 $.dialog ||
                 ['.contact-nickname-dialog', '.fingerprint-dialog', '.context'].some(selector => {

@@ -1205,7 +1205,7 @@ MegaData.prototype.adjustContextMenuPosition = function(ev, menuNode) {
             }
         }
         delegate.classList.add('ctx-source', 'active');
-        const icoPos = getHtmlElemPos(delegate);
+        const icoPos = ev.useClientRect ? delegate.getBoundingClientRect() : getHtmlElemPos(delegate);
         mPos = M.reCalcMenuPosition(menuNode, icoPos.x, icoPos.y, ico);
     }
     else {

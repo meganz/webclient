@@ -3211,8 +3211,8 @@ accountUI.transfers = {
 
                 'use strict';
 
-                // LITE/PRO account
-                if (u_attr.p && !u_attr.b && !u_attr.pf) {
+                // Pro/flexi/business master
+                if (u_attr.p && !(u_attr.b && !u_attr.b.m)) {
                     var bandwidthLimit = Math.round(account.servbw_limit | 0);
 
                     var $slider = $('#bandwidth-slider').slider({
@@ -3224,7 +3224,16 @@ accountUI.transfers = {
                                 if (parseInt($.bandwidthLimit) !== bandwidthLimit) {
 
                                     var done = delay.bind(null, 'bandwidthLimit', function() {
-                                        api_req({"a": "up", "srvratio": Math.round(bandwidthLimit)});
+                                        api.req(u_attr.pf || u_attr.b ?
+                                            {
+                                                a: 'sbpl',
+                                                srv: Math.round(bandwidthLimit),
+                                            } :
+                                            {
+                                                a: 'up',
+                                                srvratio: Math.round(bandwidthLimit),
+                                            }
+                                        ).catch(dump);
                                         if ($.bandwidthLimit !== undefined) {
                                             showToast('settings', l[16168]);
                                         }
@@ -3272,7 +3281,7 @@ accountUI.transfers = {
                     $('.slider-percentage-bl', accountUI.$contentBlock).removeClass('hidden');
                     $('.band-grn-noti', accountUI.$contentBlock).addClass('hidden');
                 }
-                // Business account or Pro Flexi
+                // Business sub, or Business/Pro Flexi without an active plan
                 else if (u_attr.b || u_attr.pf) {
                     $('.bandwith-settings', accountUI.$contentBlock).addClass('hidden');
                     $('.slider-percentage-bl', accountUI.$contentBlock).addClass('hidden');

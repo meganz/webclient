@@ -1700,7 +1700,7 @@ function logExportEvt(evtId, data) {
 
             if ($.isCtrlShift && counts[1] && !folderlink) {
                 MegaButton.factory({
-                    parentNode: footerElements[1],
+                    parentNode: footerElement,
                     text: l.repair,
                     componentClassname: 'secondary mx-2 slim simpletip',
                     type: 'normal',

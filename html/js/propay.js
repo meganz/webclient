@@ -28,6 +28,8 @@ pro.propay = {
     // the Continue button; cleared when the user changes country or gateway.
     countryMismatchAttempted: false,
 
+    s4WarningConfirmed: false,
+
     pageInfo: {
         'initialized': false,
     },
@@ -3203,7 +3205,39 @@ pro.propay = {
         pro.propay.$continueButton.rebind('click.propay', () => {
 
             if (pro.propay.$continueButton.hasClass('loading')
-                || pro.propay.$continueButton.hasClass('disabled')) {
+                || pro.propay.$continueButton.hasClass('disabled')
+                // Prevent re-entry while the async billing/discount refresh is in progress
+                // loadMembershipPlans() replaces the button, losing its loading state
+                || pro.propay.continueInFlight) {
+                return;
+            }
+
+            if (self.u_attr && u_attr.s4 && !pro.propay.s4WarningConfirmed
+                && (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_II
+                    || pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_III)) {
+
+                msgDialog(
+                    `*warningb:!^${l.view_plans}!${l.continue_upgrade}`, '', '',
+                    l.enabled_s4_when_upg_acc,
+                    (res) => {
+                        if (res === true) {
+                            pro.propay.s4WarningConfirmed = true;
+                            pro.propay.$continueButton.trigger('click.propay');
+                            eventlog(501436);
+                        }
+                        else if (res === false) {
+                            // Scroll to the Pro Flexi plan
+                            sessionStorage.mScrollTo = 'flexi';
+                            loadSubPage('pro');
+                            eventlog(501437);
+                        }
+                        else {
+                            eventlog(501438);
+                        }
+                    }
+                );
+
+                eventlog(501435);
                 return;
             }
 
@@ -3214,6 +3248,7 @@ pro.propay = {
                 return;
             }
 
+            pro.propay.continueInFlight = true;
             pro.propay.skItems.continueBtn.startLoad();
 
             pro.propay.billing.hasAttemptedSubmit = true;
@@ -3319,6 +3354,7 @@ pro.propay = {
                 pro.propay.showErrors();
                 console.error(ex);
             }).finally(() => {
+                pro.propay.continueInFlight = false;
                 pro.propay.skItems.continueBtn.endLoad();
             });
 
@@ -3756,6 +3792,10 @@ pro.propay = {
 
         // A re-render detaches the node a previous visit cached
         this.scrollBlock = null;
+
+        // Reset the guard in case a previous flow was abandoned before reaching
+        this.continueInFlight = false;
+        this.s4WarningConfirmed = false;
 
         if (is_mobile) {
             document.body.classList.remove('psa-notification');

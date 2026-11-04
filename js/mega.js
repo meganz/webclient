@@ -888,11 +888,6 @@ scparser.$add('s', {
             }
         }
         else {
-            if (a.u === 'EXP') {
-
-                mega.Share.ExportLink.pullShareLink(a.h, true).catch(dump);
-            }
-
             if ('o' in a) {
                 if (!('r' in a)) {
                     // share deletion

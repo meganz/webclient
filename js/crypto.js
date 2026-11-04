@@ -2462,7 +2462,7 @@ function crypto_makecr(source, shares, source_is_nodes) {
     return cr;
 }
 
-async function api_updfkey(sn) {
+async function api_updfkey(sn, imp) {
     'use strict';
 
     if (typeof sn === 'string') {
@@ -2476,7 +2476,9 @@ async function api_updfkey(sn) {
             const h = sn[i];
             const n = M.getNodeByHandle(h);
 
-            if (n.u && n.u !== u_handle && crypto_keyok(n)) {
+            // A cloud import adds files owned by the user but encrypted to the import folder's share key only,
+            // so they also need an owner key before that share goes, or they rely on the share key alone
+            if ((imp === -0x4ff71e || n.u && n.u !== u_handle) && crypto_keyok(n)) {
 
                 nk.push(h, a32_to_base64(encrypt_key(u_k_aes, n.k)));
             }

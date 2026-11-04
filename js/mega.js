@@ -1685,6 +1685,14 @@ scparser.$add('pses', function(a) {
     }
 });
 
+// Cloud import reached a terminal state
+scparser.$add('msc', (a) => {
+    'use strict';
+    if (!folderlink && fminitialized) {
+        mega.migrate.importEnd(a.id).catch(dump);
+    }
+});
+
 scparser.mcsmp = a => {
     'use strict';
     if (folderlink) {

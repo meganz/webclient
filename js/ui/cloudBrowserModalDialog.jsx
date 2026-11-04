@@ -279,7 +279,7 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
 
         if (folderIsHighlighted) {
             const { highlighted } = this.state;
-            const className = `${share && share.down ? 'disabled' : ''}`;
+            const className = `${share && share.down || mega.migrate.isImporting(highlighted) ? 'disabled' : ''}`;
             const highlightedNode = highlighted && highlighted.length && highlighted[0];
             const allowAttachFolders = (
                 this.props.allowAttachFolders &&

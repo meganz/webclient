@@ -3498,6 +3498,7 @@ accountUI.transfers = {
                                             eventlog(500946, `${m.p} ${m.id}`);
                                             mega.migrate.cancelMigration(m.id).finally(() => {
                                                 this.renderMigrations();
+                                                mega.migrate.getActiveImports(M.RootID).catch(dump);
                                             });
                                         }
                                     }

@@ -3495,6 +3495,10 @@ function logExportEvt(evtId, data) {
 
         "use strict";
 
+        if (mega.migrate.isImportFolder(M.getNodeByHandle(nodeId))) {
+            return false;
+        }
+
         var self = this;
         var $nodeId = $('#' + nodeId);
         var $tree = $('#treea_' + nodeId).add('#treea_os_' + nodeId).add('#treea_pl_' + nodeId);

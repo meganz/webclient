@@ -3552,7 +3552,7 @@ mBroadcaster.addListener('fm:initialized', () => {
 mBroadcaster.once('mega:openfolder', () => {
     'use strict';
 
-    const {previewNode, statsHandle: ph, s4Setup, mtool} = sessionStorage;
+    const {previewNode, statsHandle: ph, s4Setup, mtool, mtoolAuth} = sessionStorage;
     if (previewNode) {
         sessionStorage.removeItem('previewNode');
 
@@ -3572,7 +3572,14 @@ mBroadcaster.once('mega:openfolder', () => {
         sessionStorage.removeItem('mtool');
 
         if (mega.migrate) {
-            mega.migrate.showDialog();
+            mega.migrate.showDialog(true);
+        }
+    }
+    else if (mtoolAuth) {
+        sessionStorage.removeItem('mtoolAuth');
+
+        if (is_mobile) {
+            mobile.migrate.resume(mtoolAuth).catch(dump);
         }
     }
 

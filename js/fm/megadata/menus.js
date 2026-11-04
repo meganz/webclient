@@ -664,6 +664,17 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         delete items['.remove-item'];
     }
 
+    // A share or link change on a folder being imported into would break or leak the import
+    if (mega.migrate.isImporting($.selected)) {
+        delete items['.getlink-item'];
+        delete items['.embedcode-item'];
+        delete items['.removelink-item'];
+        delete items['.sh4r1ng-item'];
+        delete items['.removeshare-item'];
+        delete items['.file-request-create'];
+        delete items['.send-to-contact-item'];
+    }
+
     if (!mega.xferit) {
         delete items['.transferit-item'];
     }
@@ -865,6 +876,12 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
             delete noSubItems['.getlink-nosub'];
             delete noSubItems['.share-nosub'];
             delete noSubItems['.sendchat-nosub'];
+        }
+        if (mega.migrate.isImporting(forcedSelection)) {
+            delete noSubItems['.getlink-nosub'];
+            delete noSubItems['.share-nosub'];
+            delete noSubItems['.sendchat-nosub'];
+            delete noSubItems['.filerequestcreate-nosub'];
         }
         if (mega.lite.inLiteMode && (M.currentrootid === 'shares' || M.currentrootid === 'out-shares')) {
             delete noSubItems['.share-nosub'];

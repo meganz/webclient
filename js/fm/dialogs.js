@@ -146,6 +146,13 @@
             }
         }
 
+        if ($.shareFolderNew) {
+            for (const {h} of mega.migrate.getImportFolders(M.RootID)) {
+                $(`#mctreea_${h}`, $dialog).addClass('disabled');
+                M.disableDescendantFolders(h, '#mctreea_');
+            }
+        }
+
         disableReadOnlySharedFolders();
     };
 
@@ -2361,7 +2368,7 @@
      * @global
      */
     global.openNewSharedFolderDialog = async function openNewSharedFolderDialog() {
-        const target = await selectFolderDialog().catch(dump);
+        const target = await selectFolderDialog('selectFolder', 'shareFolderNew').catch(dump);
         if (target) {
             return mega.ui.mShareDialog.init(target);
         }

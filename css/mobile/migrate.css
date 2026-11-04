@@ -1,0 +1,389 @@
+/* Import from another cloud service */
+.mega-overlay.migrate-overlay .overlay {
+    padding: 16px 0 0;
+}
+
+.mega-overlay.migrate-overlay .header {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0 16px;
+}
+
+.mega-overlay.migrate-overlay .header-title {
+    min-height: 40px;
+    margin-bottom: 0;
+    padding-inline-end: 40px;
+    box-sizing: border-box;
+}
+
+.mega-overlay.migrate-overlay .header-title h2 {
+    font: var(--mobile-font-copy-semibold);
+}
+
+.mega-overlay.migrate-overlay .header .close {
+    top: 0;
+    right: 8px;
+}
+
+.rtl .mega-overlay.migrate-overlay .header .close {
+    left: 8px;
+    right: auto;
+}
+
+.migrate-stepper {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-regular);
+}
+
+.migrate-stepper .migrate-progress {
+    display: flex;
+    margin: 8px -2px 0;
+}
+
+.migrate-stepper .migrate-progress i {
+    flex: 1;
+    height: 4px;
+    margin: 0 2px;
+    border-radius: 2px;
+    background: var(--mobile-border-subtle);
+}
+
+.migrate-stepper .migrate-progress i.active {
+    background: var(--mobile-brand-default);
+}
+
+.mega-overlay.migrate-overlay .main {
+    flex: 1 1 auto;
+    align-items: stretch;
+    min-height: 0;
+    margin: 24px 0 0;
+}
+
+.mega-overlay.migrate-overlay .content {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    padding: 0 16px 16px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.migrate-overlay .content h2 {
+    margin: 0 0 16px;
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-heading-h2);
+}
+
+.migrate-overlay .content h2:empty {
+    display: none;
+}
+
+/* Footer */
+.mega-overlay.migrate-overlay.action-button-bottom .overlay {
+    padding-bottom: 0;
+}
+
+.mega-overlay.migrate-overlay.action-button-bottom .actions {
+    position: static;
+    align-items: stretch;
+    padding: 12px 16px 16px;
+    border-top: 1px solid var(--mobile-border-subtle);
+    background: var(--mobile-page-background);
+}
+
+.mega-overlay.migrate-overlay .actions > *:not(:first-child) {
+    margin-top: 12px;
+}
+
+.migrate-note {
+    display: flex;
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-regular);
+}
+
+.migrate-note.hidden {
+    display: none;
+}
+
+.migrate-note i {
+    --icon-size: 16px;
+    flex: none;
+    margin: 2px 8px 0 0;
+    color: var(--mobile-icon-secondary);
+}
+
+.rtl .migrate-note i {
+    margin: 2px 0 0 8px;
+}
+
+.migrate-buttons {
+    display: flex;
+    flex-direction: column;
+}
+
+.migrate-buttons > *:not(:first-child) {
+    margin-top: 12px;
+}
+
+.mega-overlay.migrate-overlay .migrate-buttons .button {
+    max-width: none;
+}
+
+.mega-overlay.migrate-overlay .migrate-buttons .button.primary:not(.disabled):hover {
+    background: var(--mobile-button-primary);
+}
+
+/* Step 1 */
+.migrate-providers .migrate-provider {
+    margin-bottom: 8px;
+    padding: 11px 15px;
+    border: 1px solid var(--mobile-border-strong);
+    border-radius: var(--mobile-border-radius-medium);
+}
+
+.migrate-providers .migrate-provider.on {
+    padding: 10px 14px;
+    border: 2px solid var(--mobile-border-strong-selected);
+}
+
+.migrate-providers .migrate-provider .label-wrapper {
+    align-items: center;
+}
+
+.migrate-providers .migrate-provider .radio-action {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-semibold);
+}
+
+.migrate-providers .migrate-provider-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    margin-inline-end: 12px;
+    border-radius: var(--mobile-border-radius-small);
+    background: var(--mobile-surface-2);
+}
+
+.migrate-providers .migrate-provider-icon .icon-size-24 {
+    --icon-size: 24px;
+}
+
+.migrate-select .links-container {
+    margin-top: 16px;
+}
+
+.migrate-overlay .migrate-select .links-container h2 {
+    margin: 0 0 4px;
+    font: var(--mobile-font-copy-semibold);
+}
+
+.migrate-select .links-container p {
+    margin: 0;
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-regular);
+}
+
+.migrate-select .links-body a {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    color: var(--mobile-link-primary);
+    font: var(--mobile-font-caption-large-semibold);
+    text-decoration: underline;
+}
+
+.migrate-select .links-body a > i:first-child {
+    display: none;
+}
+
+.migrate-select .links-body a > i:last-child {
+    --icon-size: 16px;
+    margin-left: 4px;
+}
+
+.rtl .migrate-select .links-body a > i:last-child {
+    margin: 0 4px 0 0;
+}
+
+/* Step 2 */
+.migrate-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+    min-height: 240px;
+    text-align: center;
+}
+
+.migrate-state > i {
+    --icon-size: 48px;
+    margin-bottom: 16px;
+    color: var(--mobile-icon-primary);
+}
+
+.migrate-state > i.warning {
+    color: var(--mobile-support-warning);
+}
+
+.migrate-overlay .migrate-state h2 {
+    margin: 0 0 8px;
+}
+
+.migrate-state p {
+    margin: 0;
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-copy-regular);
+}
+
+.migrate-summary {
+    border: 1px solid var(--mobile-border-strong);
+    border-radius: var(--mobile-border-radius-medium);
+}
+
+.migrate-summary .summary-header,
+.migrate-summary .summary-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-regular);
+}
+
+.migrate-summary .summary-header {
+    font: var(--mobile-font-copy-semibold);
+}
+
+.migrate-summary > :not(:first-child) {
+    border-top: 1px solid var(--mobile-border-subtle);
+}
+
+.migrate-summary .summary-row i {
+    --icon-size: 24px;
+    flex: none;
+    margin-right: 12px;
+    color: var(--mobile-icon-primary);
+}
+
+.rtl .migrate-summary .summary-row i {
+    margin: 0 0 0 12px;
+}
+
+.migrate-review .estimate-note {
+    margin: 12px 0 0;
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-regular);
+}
+
+.migrate-review .destination {
+    margin: 16px 0 0;
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-regular);
+    overflow-wrap: anywhere;
+}
+
+.migrate-started .green-check {
+    display: block;
+    width: 96px;
+    height: 96px;
+    margin-bottom: 24px;
+    background: url("../../images/onboarding/green-check-3d.png") center / contain no-repeat;
+}
+
+.migrate-overlay .migrate-started h2 {
+    margin-bottom: 8px;
+    font: var(--mobile-font-heading-h1);
+}
+
+.migrate-started p {
+    margin: 0;
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-copy-regular);
+}
+
+/* Dialogs */
+.mega-sheet.migrate-dialog .image i.migration-warning-image {
+    width: 96px;
+    height: 96px;
+    background: url("../../images/mega/migration-warning.webp") center / contain no-repeat;
+}
+
+/* Tablet */
+@media only screen and (min-width: 744px) {
+    .mega-overlay.migrate-overlay {
+        justify-content: center;
+    }
+
+    .mega-overlay.migrate-overlay .overlay {
+        width: 600px;
+        height: auto;
+        max-height: calc(100% - 48px);
+        padding-top: 24px;
+        border-radius: var(--mobile-border-radius-large);
+        overflow: hidden;
+    }
+
+    .mega-overlay.migrate-overlay .header {
+        padding: 0 24px;
+    }
+
+    .mega-overlay.migrate-overlay .header .close {
+        right: 16px;
+    }
+
+    .rtl .mega-overlay.migrate-overlay .header .close {
+        left: 16px;
+    }
+
+    .mega-overlay.migrate-overlay .content {
+        padding: 0 24px 24px;
+    }
+
+    .mega-overlay.migrate-overlay.action-button-bottom .actions {
+        padding: 16px 24px 24px;
+    }
+
+    .migrate-buttons {
+        flex-direction: row-reverse;
+        justify-content: flex-start;
+        margin: 0 -4px;
+    }
+
+    .migrate-buttons > *,
+    .migrate-buttons > *:not(:first-child) {
+        margin: 0 4px;
+    }
+
+    .mega-overlay.migrate-overlay .migrate-buttons .button {
+        width: auto;
+        height: 40px;
+        padding: 0 16px;
+    }
+
+    .mega-sheet.migrate-dialog {
+        justify-content: center;
+    }
+
+    .mega-sheet.migrate-dialog .sheet {
+        width: 560px;
+        border-radius: var(--mobile-border-radius-large);
+    }
+
+    .mega-sheet.migrate-dialog .actions {
+        flex-direction: row;
+        justify-content: center;
+        gap: 16px;
+    }
+
+    .mega-sheet.migrate-dialog .actions > *:not(:first-child) {
+        margin-top: 0;
+    }
+
+    .mega-sheet.migrate-dialog .actions .button {
+        flex: 1;
+        height: 40px;
+    }
+}

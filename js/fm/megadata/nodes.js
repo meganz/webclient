@@ -966,6 +966,11 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree, extra) {
         throw EINTERNAL;
     }
 
+    // Copy+delete would drop the upload link of an active import
+    if (del && !await mega.migrate.confirmMove(cn)) {
+        throw EBLOCKED;
+    }
+
     if (contact) {
         await api_cachepubkeys([t]);
     }
@@ -3602,6 +3607,11 @@ MegaData.prototype.createPublicLink = async function(handle) {
     'use strict';
 
     await this.collectNodes(handle);
+
+    if (mega.migrate.isImporting([handle])) {
+        throw EBLOCKED;
+    }
+
     const n = this.getNodeByHandle(handle);
     const ns = this.getNodeShare(n);
     let ph = n.ph || ns.ph;

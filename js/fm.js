@@ -1733,6 +1733,7 @@ function closeDialog(ev) {
         delete $.saveAsDialog;
         delete $.nodeSaveAs;
         delete $.fileRequestNew;
+        delete $.shareFolderNew;
         onIdle(() => {
             delete $.albumUpload;
         });

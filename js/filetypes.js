@@ -690,6 +690,11 @@ function folderIcon(node, root) {
         folderIcon = 'rubbish-';
     }
 
+    // Cloud import in progress
+    if (node.ph && mega.migrate && mega.migrate.isImportFolder(node)) {
+        return `${folderIcon}folder-sync`;
+    }
+
     if (node.t & M.IS_SHARED || M.isOutShare(node, 'EXP')) {
 
         if (M.getS4NodeType(node) === 'bucket') {

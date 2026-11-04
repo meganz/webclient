@@ -779,6 +779,7 @@ mega['tp' + 'w'] = {
 };
 
 var notify = {
+    notifications: [],
     init: function() {},
     async notifyFromActionPacket() {
     },

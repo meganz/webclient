@@ -943,7 +943,28 @@ pro.propay.billing = {
         if (!this.isProFlexi()) {
             $checkbox.removeClass('hidden');
             $requireInvoiceNote.removeClass('hidden');
+            this.updateRequireInvoiceNote(
+                $requireInvoiceNote,
+                personalFields.includes(this.TAX_CODE_FIELD) || invoiceFields.includes(this.TAX_CODE_FIELD)
+            );
         }
+    },
+
+    /**
+     * Swap the note below the tax invoice checkbox for a warning once it is ticked, as the invoice
+     * carries no tax number unless the gateway collects one for personal use (e.g. AstroPay CPF).
+     * @param {jQuery} $note - The note row below the checkbox
+     * @param {boolean} collectsTaxNumber - Whether the ticked form shows the tax number field
+     * @returns {void}
+     */
+    updateRequireInvoiceNote($note, collectsTaxNumber) {
+        'use strict';
+        const warn = !!this.requiresInvoice && !collectsTaxNumber;
+        $note.toggleClass('warning', warn);
+        $('i', $note).toggleClass('icon-info', !warn).toggleClass('icon-alert-triangle', warn);
+        $('span', $note).text(warn
+            ? l.tax_invoice_no_vat_note.replace('%1', this.getTaxFieldLabel())
+            : l.tax_invoice_purchase_note);
     },
 
     /**

@@ -968,6 +968,9 @@
     flex-shrink: 0;
     margin-top: 2px;
 }
+#propay .left-block .billing-wrapper .require-invoice-note.warning {
+    color: var(--mobile-text-warning);
+}
 #propay .left-block .billing-wrapper .cconsent-input-wrapper {
     display: flex;
     align-items: center;

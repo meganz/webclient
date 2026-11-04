@@ -1221,6 +1221,11 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
                 mega.fileRequestUpload.onItemUploadProgress(ul, bps, remainingTime, perc, bl);
                 return;
             }
+
+            // Transfer.it has its own progress UI
+            if (ul.xput) {
+                return;
+            }
             mega.tpw.updateDownloadUpload(mega.tpw.UPLOAD, gid, perc, bl, bt, bps, ul.pos, ul.starttime);
         }
     });
@@ -1612,8 +1617,10 @@ function tfsheadcalc(update) {
     const o = tfsheadupdate.checkState(type, update[key], STATE.OVERQUOTA);
     const e = tfsheadupdate.checkState(type, update[key], STATE.ERROR);
     const p = tfsheadupdate.checkState(type, update[key], STATE.PAUSE);
-    if (typeof tfsheadupdate.stats[type][update[key]] === 'undefined' && ['t', 'f', 'p', 'r'].includes(key)) {
-        // Update for an unknown transfer so add it first.
+    if (tfsheadupdate.stats[type][update[key]] === undefined
+        && ['t', 'f', 'p', 'r'].includes(key) && !Object(GlobalProgress[update[key]]).xput) {
+        // Update for an unknown transfer so add it first,
+        // Skip if it has own progress UI, as Transfer.it uploads do
         tfsheadcalc({a: update[key]});
     }
 

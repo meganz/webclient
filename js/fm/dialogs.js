@@ -146,6 +146,13 @@
             }
         }
 
+        if ($.shareFolderNew) {
+            for (const {h} of mega.migrate.getImportFolders(M.RootID)) {
+                $(`#mctreea_${h}`, $dialog).addClass('disabled');
+                M.disableDescendantFolders(h, '#mctreea_');
+            }
+        }
+
         disableReadOnlySharedFolders();
     };
 
@@ -2361,7 +2368,7 @@
      * @global
      */
     global.openNewSharedFolderDialog = async function openNewSharedFolderDialog() {
-        const target = await selectFolderDialog().catch(dump);
+        const target = await selectFolderDialog('selectFolder', 'shareFolderNew').catch(dump);
         if (target) {
             return mega.ui.mShareDialog.init(target);
         }
@@ -2662,7 +2669,8 @@
                         const elem = document.createElement('div');
                         elem.className = 'chat-separator search';
                         elem.textContent = l.search_results;
-                        chatSeparators[0].parentNode.prepend(elem);
+                        // eslint-disable-next-line local-rules/jquery-replacements -- DOM node, not markup
+                        $lis.parent().prepend(elem);
                     }
                     else {
                         scroller.classList.add('hidden');

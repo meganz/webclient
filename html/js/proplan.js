@@ -1713,11 +1713,16 @@ function showLoginDialog(email, password) {
     if (!loginBtn && submitWrap) {
         loginBtn = new MegaButton({
             parentNode: submitWrap,
-            componentClassname: 'mega-button block top-dialog-login-button dialog-login-button primary',
+            componentClassname: 'mega-button block top-dialog-login-button dialog-login-button primary no-max',
             text: l[16345],
             type: 'normal'
         });
     }
+
+    mega.ui.login.initPasskeyButton(submitWrap, $dialog, null, {
+        onPasskeyLogin: completeProLogin,
+        onReopen: () => showLoginDialog(email, password)
+    });
 
     $('.input-email', $dialog).val(email || '');
     $('.input-password', $dialog).val(password || '');

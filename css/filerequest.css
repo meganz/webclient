@@ -550,6 +550,9 @@
 .file-request-upload-page .page-copyright .copyright-wrapper a {
     color: var(--mobile-text-primary);
 }
+.mega-component.context-menu.fr-upload-menu .context-menu-items {
+    padding: 0;
+}
 
 @media only screen and (max-width: 740px),
     only screen and (orientation: landscape) and (max-height: 600px) {

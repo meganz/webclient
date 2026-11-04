@@ -21,12 +21,11 @@ lazy(mega.slideshow.settings, 'switch', () => {
         }
 
         /**
-         * Return current config value or default value if undefined or is_mobile
-         * TODO: new slideshow not implemented in mobile version
+         * Return current config value or default value if undefined
          * @returns {*} - current config value
          */
         getValue() {
-            if (!is_mobile && this._isImplemented) {
+            if (this._isImplemented) {
                 const {override} = mega.slideshow.settings;
                 if (override && override[this.name] !== undefined) {
                     return override[this.name];

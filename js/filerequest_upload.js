@@ -172,6 +172,9 @@ lazy(mega, 'fileRequestUpload', () => {
             let files = event.target.files || dataTransfer.files;
 
             if (!files || !files.length) {
+                if (event.target && event.target.webkitdirectory) {
+                    mega.ui.toast.show(l.fr_empty_folders);
+                }
                 return false;
             }
 
@@ -352,18 +355,17 @@ lazy(mega, 'fileRequestUpload', () => {
             this.$wrapper.parent().addClass('page-file-request-upload');
             this.currentUploadBlock = this.$wrapper[0].querySelector('.current-upload-block');
             this.uploadSize = this.currentUploadBlock.querySelector('.upload-size');
+            this.folderUpload = !is_mobile && !Object(mega.fileRequestUpload.puHandleObjectData).f;
             this.addMoreButton = new MegaButton({
                 parentNode: this.currentUploadBlock,
                 prepend: true,
                 type: 'normal',
-                text: l.add_more_files,
+                text: this.folderUpload ? l.file_request_upload_summary_button_add : l.add_more_files,
                 icon: 'sprite-fm-mono icon-plus-thin-outline',
                 componentClassname: 'text-icon fr-add-more',
-                onClick: () => {
-                    if (this.isLocked()) {
-                        return false;
-                    }
-                    this.$selectFileButton.click();
+                onClick: (ev) => {
+                    this.promptDownload(ev);
+                    return false;
                 }
             });
             this.actionBlock = this.$wrapper[0].querySelector('.content-wrapper .action-block');
@@ -407,6 +409,7 @@ lazy(mega, 'fileRequestUpload', () => {
             this.$labelUploadIdWrapper = $('.detail-upload-id', this.$wrapper);
 
             this.$selectFileButton = $('#fileselect5', document.body);
+            this.$selectFolderButton = $('#fileselect6', document.body);
             this.$uploadItems = $('.block-uploading-scroll', this.$wrapper);
 
             this.$labelLanguage = $('.language-text', this.$wrapper);
@@ -426,12 +429,10 @@ lazy(mega, 'fileRequestUpload', () => {
             MegaButton.factory({
                 parentNode: this.$wrapperEmptyBlock[0],
                 type: 'normal',
-                text: l.transferit_add_files,
-                onClick: () => {
-                    if (this.isLocked()) {
-                        return false;
-                    }
-                    this.$selectFileButton.click();
+                icon: 'sprite-fm-mono icon-plus-thin-outline',
+                text: this.folderUpload ? l.add : l.transferit_add_files,
+                onClick: (ev) => {
+                    this.promptDownload(ev);
                     return false;
                 }
             });
@@ -458,12 +459,10 @@ lazy(mega, 'fileRequestUpload', () => {
             MegaButton.factory({
                 parentNode: this.finishedBlock,
                 type: 'normal',
-                text: l.transferit_up_more_files,
-                onClick: () => {
-                    if (this.isLocked()) {
-                        return false;
-                    }
-                    this.$selectFileButton.click();
+                icon: 'sprite-fm-mono icon-plus-thin-outline',
+                text: this.folderUpload ? l.add : l.transferit_up_more_files,
+                onClick: (ev) => {
+                    this.promptDownload(ev);
                     return false;
                 }
             });
@@ -474,6 +473,67 @@ lazy(mega, 'fileRequestUpload', () => {
             this.sentKey = `fr.sent.${mega.fileRequestUpload.getUploadPagePuHandle()}`;
             this.sent = parseFloat(sessionStorage[this.sentKey]) || 0;
             this.pageCaption = this.$wrapper[0].querySelector('.page-caption');
+        }
+
+        promptDownload(ev) {
+            if (this.isLocked()) {
+                return;
+            }
+
+            if (!this.folderUpload) {
+                this.$selectFileButton.click();
+                return;
+            }
+
+            const name = 'fr-upload-menu';
+            if (mega.ui.menu.name === name) {
+                mega.ui.menu.hide();
+                return;
+            }
+
+            const items = document.createElement('div');
+            items.className = 'context-menu-items';
+            MegaButton.factory({
+                parentNode: items,
+                type: 'fullwidth',
+                text: l[99],
+                icon: 'sprite-fm-mono icon-file-upload-thin-outline',
+                iconSize: 24,
+                componentClassname: 'context-button text-icon',
+                onClick: () => {
+                    mega.ui.menu.hide();
+                    this.$selectFileButton.click();
+                }
+            });
+            MegaButton.factory({
+                parentNode: items,
+                type: 'fullwidth',
+                text: l[98],
+                icon: 'sprite-fm-mono icon-folder-upload-thin-outline',
+                iconSize: 24,
+                componentClassname: 'context-button text-icon',
+                onClick: () => {
+                    mega.ui.menu.hide();
+                    this.$selectFolderButton.click();
+                }
+            });
+
+            mega.ui.menu.show({
+                name,
+                event: ev,
+                pos: 'bottomRight',
+                contents: [items],
+                resizeHandler: true
+            });
+
+            const target = ev.currentTarget instanceof MegaComponent ? ev.currentTarget.domNode : ev.currentTarget;
+            $(document).rebind('mousedown.frupmenu', (e) => {
+                if (mega.ui.menu.domNode.contains(e.target) || target.contains(e.target)) {
+                    return;
+                }
+                $(document).off('mousedown.frupmenu');
+                mega.ui.menu.hide(name);
+            });
         }
 
         addEventHandlers() {
@@ -493,7 +553,7 @@ lazy(mega, 'fileRequestUpload', () => {
             });
 
             const selectFileEvent = is_mobile ? 'tap, click' : 'click';
-            this.$selectFileButton.rebind(selectFileEvent, (evt) => {
+            this.$selectFileButton.add(this.$selectFolderButton).rebind(selectFileEvent, (evt) => {
                 if (evt && evt.target) {
                     evt.target.value = null;
                 }
@@ -555,7 +615,7 @@ lazy(mega, 'fileRequestUpload', () => {
             const eventHandler = this.uploadEventHandler;
             const isLocked = this.isLocked.bind(this);
 
-            this.$selectFileButton.rebind(
+            this.$selectFileButton.add(this.$selectFolderButton).rebind(
                 'change.frup',
                 (...args) => {
                     if (isLocked()) {
@@ -1265,7 +1325,7 @@ lazy(mega, 'fileRequestUpload', () => {
         }
 
         showFinished() {
-            const subtext = escapeHTML(l.fr_upload_done_subtext)
+            const subtext = escapeHTML(this.folderUpload ? l.fr_upload_done_f_subtext : l.fr_upload_done_subtext)
                 .replace('[B]', '<b>')
                 .replace('[/B]', '</b>')
                 .replace('%1', escapeHTML(this.ownerName));

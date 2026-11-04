@@ -2283,6 +2283,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         'tfw_obq_text',
         's4_recommended_plans',
         's4_supported_plans',
+        'enabled_s4_when_upg_acc',
     ];
     for (let i = common.length; i--;) {
         var num = common[i];

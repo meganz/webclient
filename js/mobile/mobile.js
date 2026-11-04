@@ -779,6 +779,7 @@ mega['tp' + 'w'] = {
 };
 
 var notify = {
+    notifications: [],
     init: function() {},
     async notifyFromActionPacket() {
     },
@@ -901,6 +902,10 @@ function accountUI() {
     }
     else if (subpath === 'security/two-factor-authentication') {
         mobile.settings.account.twofactorSettings.init();
+    }
+    else if (subpath === 'security/passkeys') {
+        mobile.settings.passkeys.init();
+        mega.ui.toast.rack.addClass('above-btn');
     }
     else if (subpath.startsWith('sms')) {
 
@@ -1112,12 +1117,6 @@ accountUI.account = {
         render: nop
     }
 };
-contextMenu = {
-    create: nop,
-    open: nop,
-    close: nop
-};
-
 function bindDropdownEvents() {}
 
 mega.gallery = {

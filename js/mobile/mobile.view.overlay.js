@@ -120,6 +120,20 @@ class MegaMobileViewOverlay extends MegaComponent {
     }
 
     /**
+     * Returns the preview type supported by this overlay
+     * On dl page, only nodes with fa are previewed; others show the info UI
+     * @returns {String|Boolean} type or false
+     */
+    get previewType() {
+        // Text previews are read from the file and no need in fa
+        if (page !== 'download' || this.nodeComponent.previewable === 'text') {
+            return this.nodeComponent.previewable;
+        }
+
+        return !!this.nodeComponent.node.fa && this.nodeComponent.previewable;
+    }
+
+    /**
      * Show the layout when it fails to load the first time (e.g. for deactivated accounts visiting a file link)
      * @param {String} nodeHandle A public or regular node handle
      * @returns {void}
@@ -275,9 +289,13 @@ class MegaMobileViewOverlay extends MegaComponent {
      * @returns {void}
      */
     async updateContent(nodeHandle) {
-        const isPreviewable = !this.isInfo && this.nodeComponent.previewable;
+        const isPreviewable = !this.isInfo && this.previewType;
         const isLink = this.nodeComponent.node.link;
         const downloadSupport = await MegaMobileViewOverlay.checkSupport(this.nodeComponent.node);
+
+        if (!this.nodeComponent) {
+            return;
+        }
 
         // Build bottom bar
         if (this.bottomBar) {

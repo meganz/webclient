@@ -3,7 +3,6 @@ var usk;
 var u_handle;
 var u_privk;
 var u_k_aes;
-var missingkeys;
 var vkey = new Set();
 var ckey = new Set();
 var nkey = new Set();
@@ -96,21 +95,7 @@ if (typeof importScripts !== 'undefined') {
         }
         jobs++;
 
-        if (req.scqi >= 0) {
-            // actionpacket - we do CPU-intensive stuff here, e.g. decrypting share-keys
-            if ((req.a === 's' || req.a === 's2') && req.n && req.k) {
-                const k = crypto_process_sharekey(req.n, req.k);
-
-                if (k === false) {
-                    log(`Failed to decrypt RSA share key for ${req.n}: ${req.k}`);
-                }
-                else if (crypto_setsharekey2(req.n, k)) {
-                    req.k = k;
-                }
-            }
-            self.postMessage(req);
-        }
-        else if (req.t >= 0) {
+        if (req.t >= 0) {
             // node
             crypto_decryptnode(req);
             self.queueMessage(req);
@@ -118,20 +103,6 @@ if (typeof importScripts !== 'undefined') {
         else if (req.sk) {
             // existing sharekey
             crypto_setsharekey2(req.h, req.sk);
-        }
-        else if (req.ha) {
-            // ownerkey (ok element)
-            let ok = false;
-            if (crypto_handleauthcheck(req.h, req.ha)) {
-                if (d) {
-                    log(`Successfully decrypted sharekeys for ${req.h}`);
-                }
-                const key = decrypt_key(u_k_aes, base64_to_a32(req.k));
-                ok = crypto_setsharekey2(req.h, key);
-            }
-            if (!ok && d) {
-                log(`handleauthcheck failed for ${req.h}`);
-            }
         }
         else if (req.u_k) {
             // setup for user account
@@ -165,12 +136,6 @@ if (typeof importScripts !== 'undefined') {
             dsp();
         }
         else {
-            // unfortunately, we have to discard the SJCL AES cipher
-            // because it does not fit in a worker message
-            const sharekeys = Object.create(null);
-            for (const h in u_sharekeys) {
-                sharekeys[h] = u_sharekeys[h][0];
-            }
             jobs--;
 
             if (self.d) {
@@ -179,7 +144,8 @@ if (typeof importScripts !== 'undefined') {
 
             dsp();
             // done - post state back to main thread
-            self.postMessage({done: 1, jobs, sharekeys});
+            const nosharekeys = Object.create(null);
+            self.postMessage({done: 1, jobs, nosharekeys});
             init(self);
         }
     };
@@ -222,21 +188,6 @@ function crypto_setsharekey2(h, sk) {
     return false;
 }
 
-function crypto_process_sharekey(handle, key) {
-    if (self.secureKeyMgr) {
-        return false;
-    }
-
-    if (key.length > 43) {
-        key = base64urldecode(key);
-        var k = crypto_rsadecrypt(key, u_privk);
-        if (k === false) return k;
-        return str_to_a32(k.substr(0, 16));
-    }
-
-    return decrypt_key(u_k_aes, base64_to_a32(key));
-}
-
 // decrypt a node received via `f`, in response to a `p` or in an actionpacket
 // no-op if the node object has previously been decrypted successfully
 // node states and their attributes:
@@ -254,21 +205,6 @@ function crypto_decryptnode(n) {
     }
 
     if (typeof n.k == 'string') {
-        // inbound share root? set parent to sharing user; extract & store sharekey.
-        if (n.su && typeof n.sk == 'string') {
-            key = crypto_process_sharekey(n.h, n.sk);
-
-            if (key) {
-                if (key.length !== 4 && key.length !== 8) {
-                    srvlog2('invalid-aes-key-size', n.h, n.k.length, n.sk.length, key.length);
-                }
-                else {
-                    delete n.sk;
-                    u_sharekeys[n.h] = [key, new sjcl.cipher.aes(key)];
-                }
-            }
-        }
-
         // does the logged in user own the node? (user key is guaranteed to be located first in .k)
         if (n.k.length === 43 || n.k.length === 22) {
             id = u_handle;
@@ -389,7 +325,8 @@ function crypto_decryptnode(n) {
             }, 4000);
         }
 
-        if (missingkeys) {
+        // report missingkeys when ran over the main thread
+        if (self.missingkeys) {
             crypto_reportmissingkey(n);
         }
     }
@@ -768,12 +705,6 @@ function decrypt_key(cipher, a) {
         x = x.concat(cipher.decrypt([a[i], a[i + 1], a[i + 2], a[i + 3]]));
     }
     return x;
-}
-
-function crypto_handleauthcheck(h, ha) {
-    var a = base64_to_a32(ha);
-    var b = encrypt_key(u_k_aes, str_to_a32(h + h));
-    return a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3];
 }
 
 /**
@@ -1290,7 +1221,7 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
     /** @class decWorkerPool */
     return new class extends Array {
         get url() {
-            const WORKER_VERSION = 16;
+            const WORKER_VERSION = 17;
             return `${window.is_extension || window.is_karma ? '' : '/'}nodedec.js?v=${WORKER_VERSION}`;
         }
 
@@ -1509,33 +1440,22 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
 
             if (n.t >= 0) {
                 ++head;
-            }
-            const worker = this[slot];
-            if (worker.queue.push(n) > 10000) {
-                worker.postMessage(worker.queue);
-                worker.queue.length = 0;
-            }
 
-            if (n.sk || n.ha) {
-                parentWorker.set(n.h, slot);
+                const worker = this[slot];
+                if (worker.queue.push(n) > 10000) {
+                    worker.postMessage(worker.queue);
+                    worker.queue.length = 0;
+                }
+
+                if (n.sk || n.ha) {
+                    parentWorker.set(n.h, slot);
+                }
             }
 
             return slot;
         }
 
-        /** post action packet for sharekey decryption */
         postPacket(a, slot) {
-            // set scq slot number
-            a.scqi = slot;
-
-            slot = a.scqi % this.length;
-
-            // pin the nodes of this share to the same worker
-            // (it is the only one that knows the sharekey)
-            shareWorker.set(a.n, slot);
-
-            ++head;
-            this[slot].postMessage(a);
         }
     };
 });

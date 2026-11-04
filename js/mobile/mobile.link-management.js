@@ -111,28 +111,8 @@ mobile.linkManagement = {
             ],
             [
                 ['qrcode-button', 'icon-qr-thin-outline', () => {
-
-                    const link = this.pwdProtectedLink || this.formatLink();
-                    const qrCode = mCreateElement('div', {class: 'qrcode'});
-
-                    $(qrCode).empty().qrcode({
-                        width: 168,
-                        height: 168,
-                        correctLevel: QRErrorCorrectLevel.H,
-                        background: 'rgba(255, 255, 255, 1)',
-                        foreground: 'rgba(0, 0, 0, 1)',
-                        text: link
-                    });
-
+                    MegaQrPopup.showSheet(this.pwdProtectedLink || this.formatLink());
                     eventlog(500907);
-
-                    mega.ui.sheet.show({
-                        name: 'qrcode',
-                        type: 'modal',
-                        showClose: true,
-                        title: l[17754],
-                        contents: [qrCode]
-                    });
                 }]
             ]
         ];

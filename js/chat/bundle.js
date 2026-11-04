@@ -10411,7 +10411,7 @@ class CloudBrowserDialog extends modalDialogs.A.SafeShowDialogController {
       const {
         highlighted
       } = this.state;
-      const className = `${share && share.down ? 'disabled' : ''}`;
+      const className = `${share && share.down || mega.migrate.isImporting(highlighted) ? 'disabled' : ''}`;
       highlighted && highlighted.length && highlighted[0];
       const allowAttachFolders = this.props.allowAttachFolders && !isIncomingShare && !isS4Cn;
       buttons.push(allowAttachFolders ? {
@@ -11554,6 +11554,7 @@ class ChatlinkDialog extends REaCt()().Component {
   constructor(...args) {
     super(...args);
     this.domRef = REaCt()().createRef();
+    this.qrButtonRef = REaCt()().createRef();
     this.state = {
       link: l[5533],
       newTopic: ''
@@ -11562,6 +11563,19 @@ class ChatlinkDialog extends REaCt()().Component {
       if (this.props.onClose) {
         this.props.onClose();
       }
+    };
+    this.toggleQR = () => {
+      if (this.qrPopup && this.qrPopup.visible) {
+        this.qrPopup.hide();
+        return;
+      }
+      this.qrPopup = this.qrPopup || new MegaQrPopup({
+        parentNode: document.getElementById(ChatlinkDialog.NAMESPACE),
+        targetNode: this.qrButtonRef.current,
+        link: () => this.state.link,
+        fileName: () => this.props.chatRoom.getRoomTitle()
+      });
+      this.qrPopup.show();
     };
   }
   retrieveChatLink(forced) {
@@ -11586,6 +11600,32 @@ class ChatlinkDialog extends REaCt()().Component {
       }
     });
   }
+  renderQRButton() {
+    const {
+      chatRoom
+    } = this.props;
+    if (this.loading || !chatRoom.topic || !(chatRoom.publicLink || is_chatlink)) {
+      return null;
+    }
+    return REaCt()().createElement("button", {
+      ref: this.qrButtonRef,
+      className: `
+                    mega-component
+                    nav-elem
+                    button
+                    icon-only
+                    transparent-icon
+                    text-icon
+                    secondary
+                    show-qrcode
+                    simpletip
+                `,
+      "data-simpletip": l[17754],
+      onClick: this.toggleQR
+    }, REaCt()().createElement("i", {
+      className: "sprite-fm-mono icon-qr-thin-outline icon-size-20"
+    }));
+  }
   componentDidMount() {
     this.retrieveChatLink();
     M.safeShowDialog(ChatlinkDialog.NAMESPACE, () => {
@@ -11596,6 +11636,9 @@ class ChatlinkDialog extends REaCt()().Component {
     });
   }
   componentWillUnmount() {
+    if (this.qrPopup) {
+      this.qrPopup.destroy();
+    }
     if ($.dialog === ChatlinkDialog.NAMESPACE) {
       closeDialog();
     }
@@ -11674,7 +11717,7 @@ class ChatlinkDialog extends REaCt()().Component {
       type: "text",
       readOnly: true,
       value: this.loading ? l[5533] : !chatRoom.topic ? l[20660] : link
-    })), REaCt()().createElement("div", {
+    }), this.renderQRButton()), REaCt()().createElement("div", {
       className: "info"
     }, chatRoom.publicLink || is_chatlink ? publicLinkDetails : null)))), REaCt()().createElement("footer", null, REaCt()().createElement("div", {
       className: "footer-container"
@@ -23360,6 +23403,7 @@ class Call extends mixins.w9 {
     this.recordingConsentDialog = `${NAMESPACE}-consent`;
     this.ephemeralAddListener = undefined;
     this.delayProcID = null;
+    this.idleProcID = null;
     this.pCallTimer = null;
     this.offlineDelayed = undefined;
     this.callStartTimeout = undefined;
@@ -23916,9 +23960,14 @@ class Call extends mixins.w9 {
         className: "record-label"
       }, l.record_start_button));
     };
-    this.setActiveElement = activeElement => this.setState({
-      activeElement
-    });
+    this.setActiveElement = activeElement => {
+      const {
+        activeElement: prevActiveElement
+      } = this.state;
+      this.setState({
+        activeElement
+      }, () => prevActiveElement && !activeElement && this.handleMouseMove());
+    };
     const {
       SOUNDS
     } = megaChat;
@@ -23936,6 +23985,13 @@ class Call extends mixins.w9 {
       delay.cancel(this.delayProcID);
       this.delayProcID = null;
     }
+    this.idleProcID = delay('meetings-call-mouse-idle', () => {
+      if (!this.state.activeElement && this.isMounted()) {
+        this.setState({
+          hovered: false
+        });
+      }
+    }, 5000);
   }
   handleMouseOut() {
     if (this.state.hovered) {
@@ -23946,6 +24002,10 @@ class Call extends mixins.w9 {
           });
         }
       }, MOUSE_OUT_DELAY);
+    }
+    if (this.idleProcID) {
+      delay.cancel(this.idleProcID);
+      this.idleProcID = null;
     }
   }
   handleCallOffline() {
@@ -23960,7 +24020,7 @@ class Call extends mixins.w9 {
   setOnboarding() {
     this.state.onboardingUI = this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_UI);
     if (!this.state.onboardingUI) {
-      this.state.onboardingRecording = this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RECORDING);
+      this.state.onboardingRecording = this.state.hovered = this.flagMap && Call.isModerator(this.props.chatRoom, u_handle) && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RECORDING);
     }
     if (!this.state.onboardingUI && !this.state.onboardingRecording) {
       this.state.onboardingRaise = this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RAISE);
@@ -29459,7 +29519,7 @@ const mixin_namespaceFn = () => {
 };
 
 // MODULE: ./js/chat/ui/messages/types/partials/metaRichPreviewLoading.jsx
-const metaRichPreviewLoading_namespaceFn = REQ_.cw((module, EXP_) => {
+const metaRichPreviewLoading_namespaceFn = REQ_.cw((_, EXP_) => {
 REQ_.d(EXP_, {
 a: () => MetaRichpreviewLoading
 });

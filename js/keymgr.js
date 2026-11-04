@@ -1578,6 +1578,9 @@ lazy(mega, 'keyMgr', () => {
             // decrypt trusted keys, store the remaining ones
             await this.acceptPendingInShares(stub, this.shouldWaitForMKCompletion);
 
+            // decrypt undecrypted nodes
+            crypto_fixmissingkeys(missingkeys);
+
             // we can now delete the fetched inshare keys from the queue
             // (if this operation fails, no problem, it's all idempotent)
             return rem && api.req({a: 'pk', d: rem});

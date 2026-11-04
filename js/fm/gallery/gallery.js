@@ -220,10 +220,10 @@ class MegaGallery {
             return [];
         }
 
-        const cameraTree = M.getTreeHandles(M.CameraId);
+        let cameraTree = M.getTreeHandles(M.CameraId);
 
         if (M.SecondCameraId) {
-            cameraTree.push(...M.getTreeHandles(M.SecondCameraId));
+            cameraTree = array.extend(cameraTree, M.getTreeHandles(M.SecondCameraId));
         }
 
         return cameraTree;
@@ -1826,6 +1826,10 @@ class MegaGallery {
     getGroupMonthNodes(id, group) {
         if (!group) {
             group = this.getGroupById(id);
+        }
+
+        if (!group) {
+            return [];
         }
 
         const monthNodes = [...group.n];

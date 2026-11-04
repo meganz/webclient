@@ -1730,6 +1730,8 @@ var dlmanager = {
         }
         eventlog(99648);
         dlmanager._overquotaClickListeners(flags);
+        // Schedules the retry for when the transfer quota is available again
+        dlmanager._overquotaInfo();
         mega.ui.quotaDialogs.bandwidthExceeded().catch(tell);
     },
 

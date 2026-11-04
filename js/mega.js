@@ -888,11 +888,6 @@ scparser.$add('s', {
             }
         }
         else {
-            if (a.u === 'EXP') {
-
-                mega.Share.ExportLink.pullShareLink(a.h, true).catch(dump);
-            }
-
             if ('o' in a) {
                 if (!('r' in a)) {
                     // share deletion
@@ -1687,6 +1682,14 @@ scparser.$add('pses', function(a) {
     if (!folderlink) {
         notify.notifyFromActionPacket(a).catch(dump);
         M.showPlanExpiringBanner({ expiry: a.ts }).catch(dump);
+    }
+});
+
+// Cloud import reached a terminal state
+scparser.$add('msc', (a) => {
+    'use strict';
+    if (!folderlink && fminitialized) {
+        mega.migrate.importEnd(a.id).catch(dump);
     }
 });
 

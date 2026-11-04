@@ -54,6 +54,12 @@ lazy(T.ui, 'transferItOverlay', () => {
         init() {
             const cn = this.data.cn = gn.querySelector('.js-transferit-overlay');
 
+            // Handle drops here to prevent the webclient's body handlers from uploading files to MEGA
+            // Preventing the default dragover behavior also allows the drop event to fire
+            gn.addEventListener('dragenter', stop);
+            gn.addEventListener('dragover', stop);
+            gn.addEventListener('drop', stop);
+
             closeBtn.addEventListener('click', () => history.back());
 
             visitBtn.addEventListener('click', (ev) => {

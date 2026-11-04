@@ -839,7 +839,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                     return;
                 }
 
-                if (pfid) {
+                if (pfid || u_type < 3) {
                     return;
                 }
 
@@ -1554,6 +1554,10 @@ mBroadcaster.addListener('fm:initialized', () => {
             "use strict";
 
             const currSec = mega.ui.onboarding.currentSection;
+
+            if (!currSec) {
+                return;
+            }
 
             M.safeShowDialog('ob-promo-dialog', () => {
 

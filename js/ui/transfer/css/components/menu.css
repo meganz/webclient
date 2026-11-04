@@ -99,11 +99,13 @@
     padding: 4px;
     position: fixed;
     margin: 0;
+    transition: none;
     z-index: 250;
 }
 
 .it-menu.context.visible {
     position: absolute;
+    transition: var(--transition-opacity), var(--transition-visibility);
 }
 
 .it-menu.context .it-menu-item {

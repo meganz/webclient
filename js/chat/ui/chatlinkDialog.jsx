@@ -4,6 +4,7 @@ import { Emoji } from '../../ui/utils';
 
 export class ChatlinkDialog extends React.Component {
     domRef = React.createRef();
+    qrButtonRef = React.createRef();
 
     static defaultProps = {
         requiresUpdateOnResize: true,
@@ -44,6 +45,49 @@ export class ChatlinkDialog extends React.Component {
         }
     };
 
+    toggleQR = () => {
+        if (this.qrPopup && this.qrPopup.visible) {
+            this.qrPopup.hide();
+            return;
+        }
+
+        this.qrPopup = this.qrPopup || new MegaQrPopup({
+            parentNode: document.getElementById(ChatlinkDialog.NAMESPACE),
+            targetNode: this.qrButtonRef.current,
+            link: () => this.state.link,
+            fileName: () => this.props.chatRoom.getRoomTitle()
+        });
+        this.qrPopup.show();
+    };
+
+    renderQRButton() {
+        const { chatRoom } = this.props;
+
+        if (this.loading || !chatRoom.topic || !(chatRoom.publicLink || is_chatlink)) {
+            return null;
+        }
+
+        return (
+            <button
+                ref={this.qrButtonRef}
+                className={`
+                    mega-component
+                    nav-elem
+                    button
+                    icon-only
+                    transparent-icon
+                    text-icon
+                    secondary
+                    show-qrcode
+                    simpletip
+                `}
+                data-simpletip={l[17754] /* `QR code` */}
+                onClick={this.toggleQR}>
+                <i className="sprite-fm-mono icon-qr-thin-outline icon-size-20"/>
+            </button>
+        );
+    }
+
     componentDidMount() {
         this.retrieveChatLink();
         M.safeShowDialog(ChatlinkDialog.NAMESPACE, () => {
@@ -56,6 +100,9 @@ export class ChatlinkDialog extends React.Component {
     }
 
     componentWillUnmount() {
+        if (this.qrPopup) {
+            this.qrPopup.destroy();
+        }
         if ($.dialog === ChatlinkDialog.NAMESPACE) {
             closeDialog();
         }
@@ -142,6 +189,7 @@ export class ChatlinkDialog extends React.Component {
                                             readOnly={true}
                                             value={this.loading ? l[5533] : !chatRoom.topic ? l[20660] : link}
                                         />
+                                        {this.renderQRButton()}
                                     </div>
                                     <div className="info">
                                         {chatRoom.publicLink || is_chatlink ? publicLinkDetails : null}

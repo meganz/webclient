@@ -54,6 +54,27 @@
 .fm-right-account-block .data-table span.break-word {
     word-break: break-word;
 }
+.fm-right-account-block .passkeys-list {
+    padding-top: 18px;
+    width: 100%;
+}
+.fm-right-account-block .passkeys-table td:last-child:not(.data-table-empty) {
+    text-align: end;
+    white-space: nowrap;
+}
+.fm-right-account-block .passkeys-table .mega-button span {
+    white-space: nowrap;
+}
+.fm-right-account-block .passkeys-table .passkey-ren {
+    margin-inline-end: 8px;
+}
+.fm-right-account-block .passkeys-table td.passkey-name {
+    max-width: 0;
+    width: 100%;
+}
+.fm-right-account-block .passkeys-table .passkey-row-name {
+    white-space: nowrap;
+}
 
 /* Settings. Common styles. Inputs/ Selectboxes */
 .fm-right-account-block form {

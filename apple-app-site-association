@@ -18,6 +18,8 @@
                     "NOT /linux/*",
                     "NOT /MEGAsync*",
                     "NOT /MEGAvpn*",
+                    "NOT /mtool*",
+                    "NOT /oauth.html*",
                     "*"
                 ]
             },
@@ -39,6 +41,8 @@
                     "NOT /linux/*",
                     "NOT /MEGAsync*",
                     "NOT /MEGAvpn*",
+                    "NOT /mtool*",
+                    "NOT /oauth.html*",
                     "*"
                 ]
             },
@@ -60,6 +64,8 @@
                     "NOT /linux/*",
                     "NOT /MEGAsync*",
                     "NOT /MEGAvpn*",
+                    "NOT /mtool*",
+                    "NOT /oauth.html*",
                     "*"
                 ]
             }

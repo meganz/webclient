@@ -685,8 +685,7 @@ lazy(mega.utils, 'subtitles', () => {
             else {
                 $(document).fullScreen(false);
 
-                const content = escapeHTML(l.video_player_display_subtitles_error_msg)
-                    .replace('%s', escapeHTML(this._nodes[index].name));
+                const content = l.video_player_display_subtitles_error_msg.replace('%s', this._nodes[index].name);
 
                 toaster.main.show({
                     content,
@@ -781,7 +780,7 @@ lazy(mega.utils, 'subtitles', () => {
                 this._nodes.shift();
                 toaster.main.show({
                     icons: ['error sprite-fm-uni icon-error'],
-                    content: escapeHTML(l.video_player_add_subtitles_error_msg).replace('%s', escapeHTML(node.name)),
+                    content: l.video_player_add_subtitles_error_msg.replace('%s', node.name),
                     classes: ['theme-dark-forced']
                 });
                 eventlog(99991);

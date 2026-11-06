@@ -94,9 +94,11 @@ class NodeNameControl {
 
             mega.ui.sheet.addContent(container);
 
-            nameInput.setValue(nodeName);
-
             const {$input} = nameInput;
+
+            // setValue() fires 'input', drop the previous show's handlers so they don't run with stale callbacks
+            $input.off('.nameControl');
+            nameInput.setValue(nodeName);
 
             const actionButton = new MegaButton({
                 parentNode: mega.ui.sheet.actionsNode,

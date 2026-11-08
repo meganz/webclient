@@ -290,12 +290,20 @@
                     $('#versioning-status').removeClass('toggle-on').trigger('update.accessibility');
                     fileversioning.dvState = 1;
                 }
+
+                if (fileversioning.isOpen) {
+                    fileversioning.fileVersioningDialog(selections.handles);
+                }
             }).fail(e => {
                 if (e === ENOENT) {
                     $('#versioning-status').addClass('toggle-on').trigger('update.accessibility');
                     fileversioning.dvState = 0;
                 }
             });
+
+            if (!M.account) {
+                return;
+            }
 
             var data = M.getDashboardData();
 
@@ -327,11 +335,11 @@
             }
             const $versioning = $('.fm-versioning');
             const $versionOverlay = $versioning.filter('.overlay');
+            if (!handles.some(h => M.d[h])) {
+                return fileversioning.closeFileVersioningDialog();
+            }
             clearSelections();
             selections.handles = handles.filter(h => M.d[h]);
-            if (!selections.handles.length) {
-                return;
-            }
             const revertVersion = (handle, current_node) => {
                 if (M.isInvalidUserStatus()) {
                     return;
@@ -476,7 +484,7 @@
                         </div>`;
                     const isInbox = M.getNodeRoot(version.h) === M.InboxID;
                     // if the user does not have full access of the shared folder.
-                    const revertDisabled = noSharePerm || isCurrentVersion ? 'disabled' : '';
+                    const revertDisabled = fileversioning.dvState || noSharePerm || isCurrentVersion ? 'disabled' : '';
                     const revertBtnHtml = isInbox ?
                         '' :
                         `<div class="mega-button small action revert-file simpletip ${revertDisabled}"
@@ -602,6 +610,7 @@
                     selections.versions.length > 1
                     || selections.versions[0] === topNodeHandle
                     || noSharePerm
+                    || fileversioning.dvState
                 ) {
                     $rvtBtn.addClass('disabled');
                 }

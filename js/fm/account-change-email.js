@@ -102,7 +102,7 @@ var accountChangeEmail = {
                         if (result) {
 
                             // Show the verify 2FA dialog to collect the user's PIN
-                            return twofactor.verifyActionDialog.init();
+                            return twofactor.verifyActionDialog.init(l.twofa_verify_email);
                         }
                     })
                     .then((twoFactorPin) => accountChangeEmail.continueChangeEmail(newEmail, twoFactorPin || null))

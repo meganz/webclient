@@ -255,6 +255,9 @@ function removeUInode(h, parent) {
     }
 
     M.nodeRemovalUIRefresh(h,  parent);
+
+    delay.cancel(`gallery:node-update(${h})`);
+    delay.cancel(`sensitives.updateDomNode${h}`);
 }
 
 /**
@@ -459,7 +462,11 @@ async function fmremove(selectedNodes, skipDelWarning) {
         }
     }
     else {
-        var moveToRubbish = function() {
+        var moveToRubbish = async function() {
+
+            if (!await mega.migrate.confirmRemove(selectedNodes).catch(tell)) {
+                return;
+            }
             mLoadingSpinner.show('move-to-rubbish');
             mBroadcaster.sendMessage('trk:event', 'move-to-rubbish', 'remove', selectedNodes);
 

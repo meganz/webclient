@@ -10,6 +10,7 @@
 
 .page-header .it-box > .body > * {
     flex: 1 1 calc(100% / 3);
+    min-width: 0;
 }
 
 
@@ -60,7 +61,13 @@ a.logo-group.mega:visited {
 /*Section buttons */
 
 .page-header .it-button {
+    overflow: hidden;
     white-space: nowrap;
+}
+
+.page-header .it-button span {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .page-header .sections {
@@ -88,7 +95,6 @@ a.logo-group.mega:visited {
     margin-inline-start: 24px;
 }
 
-
 /* Account menu */
 
 .page-header .it-menu.account {
@@ -109,6 +115,20 @@ a.logo-group.mega:visited {
 
 @media only screen and (max-width: 960px) {
 
+    .page-header .it-box > .body > *,
+    .logged .page-header .it-box > .body > *.account {
+        flex: 0 0 auto;
+    }
+
+    .page-header .it-box > .body > *.account,
+    .page-header .it-box > .body > *.sections {
+        flex: 1 1 auto;
+    }
+
+    .page-header .it-button {
+        white-space: normal;
+    }
+
     .page-header .section.logged-out {
         display: none;
     }
@@ -118,6 +138,15 @@ a.logo-group.mega:visited {
 @media only screen and (max-width: 600px) {
 
     .page-header .it-logo {
+        width: 32px;
+    }
+    
+    .page-header .account > * + * {
+        margin-inline-start: 8px;
+    }
+    
+    .page-header .it-avatar.lg-size {
+        height: 32px;
         width: 32px;
     }
 

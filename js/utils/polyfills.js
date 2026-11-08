@@ -31,7 +31,7 @@ mBroadcaster.once('boot_done', function() {
                 }
             }
             else if (uad.is64bit) {
-                value = 2;
+                value = window.safari && parseInt(uad.version) > 16 ? 6 : 2;
             }
 
             return value;

@@ -1318,7 +1318,6 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[20858] = escapeHTML(l[20858])
         .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
-    l[20189] = escapeHTML(l[20189]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20192] = escapeHTML(l[20192]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20193] = escapeHTML(l[20193]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20194] = escapeHTML(l[20194]).replace('[B]', '<b>').replace('[/B]', '</b>');
@@ -1491,6 +1490,9 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
     l.no_payment_providers = escapeHTML(l.no_payment_providers)
+        .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
+        .replace('[/A]', '</a>');
+    l.tax_price_rise_declined = escapeHTML(l.tax_price_rise_declined)
         .replace('[A]', '<a class="clickurl" target="_blank" href="/support">')
         .replace('[/A]', '</a>');
     l.agree_s4_tos = escapeHTML(l.agree_s4_tos)
@@ -2250,7 +2252,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,
-        18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813, 19814, 19854, 19821, 20402,
+        18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813, 19814, 19821, 20402,
         20462, 20969, 20970, 20971, 20973, 10637,
         23524, 23534, 23819, 24077, 24099,
         24680, 24849, 24850,
@@ -2281,6 +2283,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         'tfw_obq_text',
         's4_recommended_plans',
         's4_supported_plans',
+        'enabled_s4_when_upg_acc',
     ];
     for (let i = common.length; i--;) {
         var num = common[i];

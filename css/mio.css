@@ -44,6 +44,7 @@
     --color-primary-red-800: #8E2114;
     --color-secondary-cobalt-50: #F5F9FF;
     --color-secondary-cobalt-600: #003C9C;
+    --color-secondary-cobalt-700: #004BB5;
     --color-secondary-cobalt-900: #00174C;
 
     --color-system-error: #E40046;
@@ -56,6 +57,7 @@
 
 /* dark theme */
 .theme-dark {
+    --color-bg-page: #1a1f26;
     --color-bg-surface-1: #1F242A;
     --color-bg-surface-2: #23282F;
     --color-bg-tinted-peach: #3E2527;
@@ -83,6 +85,7 @@
     --color-primary-red-800: #DC796E;
     --color-secondary-cobalt-50: #00174C;
     --color-secondary-cobalt-600: #5784D1;
+    --color-secondary-cobalt-700: #82A2DD;
     --color-secondary-cobalt-900: #D9E1F5;
 
     --color-system-error: #F5828B;

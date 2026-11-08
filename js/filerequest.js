@@ -60,6 +60,7 @@ lazy(mega, 'fileRequest', () => {
             this.puPagePublicHandle = null;
             this.puPageLink = null;
             this.linkUpdated = false;
+            this.linkBannerTimer = null;
 
             this.$dialog = $('.file-request', document.body);
             this.dialogClassBackup = this.$dialog.prop('class');
@@ -238,21 +239,16 @@ lazy(mega, 'fileRequest', () => {
             });
 
             this.qrPopup = null;
-            this.qrCodeNode = null;
             this.qrButton = new MegaButton({
                 parentNode: this.$dialog[0].querySelector('.input-share'),
                 icon: 'sprite-fm-mono icon-qr-thin-outline',
                 type: 'icon',
-                componentClassname: 'transparent-icon text-icon secondary icon-only qr',
+                componentClassname: 'transparent-icon text-icon secondary icon-only qr simpletip',
                 dataset: { simpletip: l[17754] },
                 onClick: () => this.toggleShareLinkQR()
             });
 
             this.$dialog.rebind('click.frpopups', (ev) => {
-                if (this.qrPopup && !this.qrPopup.classList.contains('hidden')
-                    && !this.qrPopup.contains(ev.target) && !this.qrButton.domNode.contains(ev.target)) {
-                    this.hideShareLinkQR();
-                }
                 const sizeUnit = ev.target.closest('.file-size-unit');
                 if (mega.ui.menu.name === 'picker-fr-size-unit' && !sizeUnit) {
                     this.$dialog[0].querySelector('.file-size-unit').classList.remove('active');
@@ -417,6 +413,10 @@ lazy(mega, 'fileRequest', () => {
             // Reset section
             this.$sectionSecondary.addClass('hidden');
             this.linkBanner.classList.add('hidden');
+            if (this.linkBannerTimer) {
+                this.linkBannerTimer.abort();
+                this.linkBannerTimer = null;
+            }
 
             // Footer
             this.$previewButtonFooter.getInput().addClass('hidden');
@@ -428,8 +428,7 @@ lazy(mega, 'fileRequest', () => {
             this.saveButton.text = l.msg_dlg_save;
 
             if (this.qrPopup) {
-                this.qrPopup.classList.add('hidden');
-                this.qrButton.removeClass('active');
+                this.qrPopup.hide();
             }
 
             // dialog
@@ -520,6 +519,16 @@ lazy(mega, 'fileRequest', () => {
         setSectionSecondary() {
             this.$sectionSecondary.removeClass('hidden');
             this.linkBanner.classList.toggle('hidden', !this.linkUpdated);
+            if (this.linkBannerTimer) {
+                this.linkBannerTimer.abort();
+                this.linkBannerTimer = null;
+            }
+            if (this.linkUpdated) {
+                (this.linkBannerTimer = tSleep(8)).then(() => {
+                    this.linkBannerTimer = null;
+                    this.linkBanner.classList.add('hidden');
+                });
+            }
             this.linkUpdated = false;
         }
 
@@ -573,58 +582,19 @@ lazy(mega, 'fileRequest', () => {
             });
         }
 
-        hideShareLinkQR() {
-            if (this.qrPopup) {
-                this.qrPopup.classList.add('hidden');
-            }
-            this.qrButton.removeClass('active');
-        }
-
         toggleShareLinkQR() {
-            if (this.qrPopup && !this.qrPopup.classList.contains('hidden')) {
-                this.hideShareLinkQR();
+            if (this.qrPopup && this.qrPopup.visible) {
+                this.qrPopup.hide();
                 return;
             }
 
-            if (!this.qrPopup) {
-                let content;
-                this.qrPopup = mCreateElement('div', { class: 'qrcode-popup hidden' }, [
-                    content = mCreateElement('div', { class: 'qrcode-popup-content' }, [
-                        mCreateElement('div', { class: 'qrcode-popup-content-header' }, [
-                            document.createTextNode(l[17754])
-                        ]),
-                        this.qrCodeNode = mCreateElement('div', { class: 'qrcode-popup-content-body' })
-                    ])
-                ], this.$dialog[0]);
-
-                MegaButton.factory({
-                    parentNode: content,
-                    icon: 'sprite-fm-mono icon-dialog-close-thin',
-                    type: 'icon',
-                    componentClassname: 'text-icon close-qrcode',
-                    onClick: () => this.hideShareLinkQR()
-                });
-            }
-
-            const text = this.puPageLink
-                || mega.fileRequest.generator.generateUrl(this.puPagePublicHandle);
-
-            $(this.qrCodeNode).empty().qrcode({
-                width: 168,
-                height: 168,
-                correctLevel: QRErrorCorrectLevel.H,
-                background: 'rgba(255, 255, 255, 1)',
-                foreground: 'rgba(0, 0, 0, 1)',
-                text,
+            this.qrPopup = this.qrPopup || new MegaQrPopup({
+                parentNode: this.$dialog[0],
+                targetNode: this.qrButton.domNode,
+                link: () => this.puPageLink || mega.fileRequest.generator.generateUrl(this.puPagePublicHandle),
+                fileName: () => mega.fileRequest.storage.getPuPageByPageId(this.puPagePublicHandle).d.t
             });
-
-            const rect = this.qrButton.domNode.getBoundingClientRect();
-            const x = lang === 'ar' ? rect.left - 26 : rect.right + 26;
-            const y = rect.top - 24;
-            this.qrPopup.style.cssText = `top: ${y}px; left: ${x}px`;
-
-            this.qrPopup.classList.remove('hidden');
-            this.qrButton.addClass('active');
+            this.qrPopup.show();
         }
     }
 
@@ -1080,7 +1050,6 @@ lazy(mega, 'fileRequest', () => {
         }
 
         async saveSettings() {
-            const previousLink = this.commonDialog.puPageLink;
             const password = this.passwordSwitch.checked && this.validatePassword()
                 ? this.passwordInput.value
                 : '';
@@ -1092,7 +1061,7 @@ lazy(mega, 'fileRequest', () => {
                 password,
             });
 
-            this.commonDialog.linkUpdated = this.commonDialog.puPageLink !== previousLink;
+            this.commonDialog.linkUpdated = true;
 
             this.puHandleObject =
                 mega.fileRequest.storage.getPuHandleByNodeHandle(this.puHandleObject.h) || this.puHandleObject;

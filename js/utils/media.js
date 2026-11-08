@@ -221,8 +221,12 @@ var mThumbHandler = {
 mThumbHandler.add('DOCX,XLSX,XLSM,XLTX,XLTM,CSV', function MSThumbHandler(ab, cb) {
     'use strict';
 
-    // @todo ..
-    cb(null);
+    (self.officeThumbnail ? officeThumbnail(ab) : Promise.resolve(null)).then(cb).catch((ex) => {
+        if (d) {
+            console.warn('MS thumbnail failed.', ex);
+        }
+        cb(null);
+    });
 });
 
 mThumbHandler.add('PSD', function PSDThumbHandler(ab, cb) {
@@ -623,6 +627,9 @@ function getID3CoverArt(entry) {
                         result = u8.slice(--offset, frame.size);
                         break;
                     }
+                    if (!(frame.size > 9)) {
+                        break;
+                    }
                     offset += frame.size;
                 }
             }
@@ -970,7 +977,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         return freeze({
             destroy,
             get isVisible() {
-                return $.dialog === 'subtitles-dialog' || menu.classList.contains('visible');
+                return $.dialog === 'add-subtitles-dialog' || menu.classList.contains('visible');
             },
             fire(ev) {
                 if (ev.type === 'mouseup') {
@@ -1152,6 +1159,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         // Changes the button state of certain button's so the correct visuals can be displayed with CSS
         var changeButtonState = function(type) {
+            if (!videoElement) {
+                return;
+            }
 
             // Play/Pause button
             if (type === 'playpause' && !timeDrag) {
@@ -1350,9 +1360,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
         if (is_embed !== 2 && self.contextMenu) {
             // Playback Speed context menu
             speedMenu = $('.context-menu.playback-speed', $wrapper).get(0);
-            if (!speedMenu) {
+            const speedTemplate = $('#media-viewer-speed-menu', $wrapper)[0];
+            if (!speedMenu && speedTemplate) {
                 speedMenu = contextMenu.create({
-                    template: $('#media-viewer-speed-menu', $wrapper)[0],
+                    template: speedTemplate,
                     sibling: $('.speed-wrapper .tooltip', $wrapper)[0],
                     animationDuration: 150,
                     boundingElement: $wrapper[0]
@@ -1361,9 +1372,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
             // Settings context menu
             settingsMenu = $('.context-menu.settings', $wrapper).get(0);
-            if (!settingsMenu) {
+            const settingsTemplate = $('#media-viewer-video-settings-menu', $wrapper)[0];
+            if (!settingsMenu && settingsTemplate) {
                 settingsMenu = contextMenu.create({
-                    template: $('#media-viewer-video-settings-menu', $wrapper)[0],
+                    template: settingsTemplate,
                     sibling: $('.settings-wrapper .tooltip', $wrapper)[0],
                     animationDuration: 150,
                     boundingElement: $wrapper[0]
@@ -1683,7 +1695,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 `${SPRITE} icon-playback-${String(rate).replace('.', '')}x-small-regular-outline`
             );
 
-            streamer.playbackRate = rate;
+            if (streamer) {
+                streamer.playbackRate = rate;
+            }
         };
 
         const updateSpeedSlider = (pageX) => {

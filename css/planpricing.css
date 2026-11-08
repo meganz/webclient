@@ -105,14 +105,35 @@
     /* End unnamed fonts */
 
     /* Colors*/
-    --color-disabled: #D5D5D5;
     --selected-tab-border: rgba(221, 20, 5, 1);
-    --tabs-bottom-border: rgba(216, 217, 219, 1);
-    --color-text-success: rgba(0, 124, 62, 1);
     /* End Colors*/
 }
 
+/* /cookie and propay share the class but not the layout, so only this page scrolls as one block */
+.planpricing-page .bottom-page.pricing-pg {
+    background: var(--color-bg-page);
+    height: 100vh;
+    overflow: hidden;
+}
+.bottom-page.pricing-pg.ps > .ps__rail-y {
+    margin-top: 118px;
+}
+
+.mobile .bottom-page.pricing-pg {
+    overflow: auto;
+}
+
+.bottom-page.pricing-pg .pages-menu.body,
+.bottom-page.pricing-pg .top-head,
+.bottom-page.pricing-pg .top-head.floating {
+    background: var(--color-bg-page);
+    background-color: var(--color-bg-page);
+}
+
 /* End CSS variables in the page*/
+.bottom-page.planpricing-page .mobile.fm-header {
+    background: var(--color-bg-page);
+}
 .bottom-page.pricing-pg .bottom-page.full-block {
     color: var(--color-heading);
     max-width: 1320px;
@@ -125,6 +146,15 @@
 }
 .bottom-page.pricing-pg .bottom-page.full-block .pro-plans-cards-container {
     position: relative;
+}
+.planpricing-page {
+    --pricing-link-color: var(--color-secondary-cobalt-600);
+}
+.theme-dark .planpricing-page {
+    --pricing-link-color: var(--color-secondary-cobalt-700);
+}
+.planpricing-page .bottom-page.full-block > .pricing-pg a {
+    color: var(--pricing-link-color);
 }
 .pricing-pg .pricing-pg.hero-section {
     padding-top: 118px;
@@ -148,7 +178,7 @@
     word-break: break-word;
     cursor: pointer;
     text-align: center;
-    border-bottom: 1px solid var(--tabs-bottom-border);
+    border-bottom: 1px solid var(--color-grey-200);
 }
 .pricing-pg .pricing-pg.tabs-module .tabs-module-block.selected {
     position: relative;
@@ -312,10 +342,10 @@
 }
 .pricing-pg .pricing-currency-options .pricing-currency-option.selected {
     font: var(--text-copy-medium-bold-pricing);
+    color: var(--color-secondary-cobalt-900);
 }
 .pricing-pg .pricing-pg.pro-plans-cards-container .all-plans-promotional-info {
-    color: var(--color-primary-red-500);
-    background: rgba(252, 232, 230, 1);
+    background: var(--color-discount-primary-bg);
     height: 36px;
     font: var(--text-inter-600-14);
     display: flex;
@@ -323,6 +353,7 @@
     justify-content: center;
     width: calc(100% - var(--right-padding) - var(--left-padding) + 2px);
     margin: 32px auto 0;
+    color: var(--color-discount-primary-text);
 }
 .pricing-pg .pricing-pg.pro-plans-cards-container:not(.promo) .all-plans-promotional-info {
     display: none;
@@ -506,7 +537,7 @@
 .pricing-plan-card .pricing-plan-more span,
 .pricing-plan-card .vpn-read-more,
 .pricing-plan-card .pwm-read-more {
-    color: var(--color-secondary-cobalt-600);
+    color: var(--pricing-link-color);
     text-decoration: underline;
     cursor: pointer;
 }
@@ -550,7 +581,7 @@
 .pro-plans-cards-container:not(.promo-all) .pricing-plan-card.sale .pricing-plan-btn,
 .pricing-flexi-block-card-contianer .pricing-plan-btn {
     background-color: var(--color-primary-red-500);
-    color: var(--color-grey-50);
+    color: var(--mobile-text-on-color);
     border: unset;
     padding: 12px 24px;
 }
@@ -601,29 +632,17 @@
 .pricing-get-free-banner .pricing-get-free-storage {
     padding-top: 32px;
 }
-i.grey-small-check-tick {
-    background-image: url("../images/mega/grey-small-check-tick.svg");
+.planpricing-page i.icon-dialog-close,
+.planpricing-page i.icon-check-small-regular-outline,
+.planpricing-page i.icon-minus-regular-outline {
     width: 24px;
     height: 24px;
-    background-repeat: no-repeat;
-    background-position: center;
+    --icon-size: 24px;
 }
-i.black-small-check-tick {
-    background-image: url("../images/mega/black-small-check-tick.svg");
-}
-i.black-small-cross-tick {
-    background-image: url("../images/mega/black-small-cross-tick.svg");
-}
-i.minus-icon {
-    background-image: url("../images/mega/minus-icon.svg");
-    width: 24px;
-    height: 24px;
-    background-repeat: no-repeat;
-    background-position: center;
-}
+
 .pricing-get-free-banner a.pricing-get-free-transfer-txt {
     text-decoration: underline;
-    color: var(--color-secondary-cobalt-600);
+    color: var(--pricing-link-color);
 }
 .pricing-get-free-banner .pricing-get-free-banner-price {
     display: flex;
@@ -653,14 +672,12 @@ i.minus-icon {
     display: none;
 }
 i.chevron-down-icon {
-    background-image: url("../images/mega/chevron-down-icon.svg");
     width: 24px;
     height: 24px;
-    background-repeat: no-repeat;
-    background-position: center;
+    --icon-size: 24px;
 }
 i.chevron-down-icon.inv {
-    transform: scaleY(-1);
+    transform: rotate(180deg);
 }
 .pricing-pg .pricing-why-store-with-us-container {
     padding: 0 var(--right-padding) 0 var(--left-padding);
@@ -900,6 +917,8 @@ i.dropbox-icon {
 .pricing-social-refs-container i.active {
     opacity: unset;
 }
+
+/* Deliberately the asset's own light grey in both themes: the quote mark reads as bright on dark */
 .pricing-social i.quote-icon {
     width: 48px;
     height: 48px;
@@ -907,14 +926,6 @@ i.dropbox-icon {
     background-position: center;
     background-size: contain;
     background-image: url("../images/mega/quote-icon.svg");
-}
-i.pricing-i-icon {
-    width: 14px;
-    height: 24px;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    background-image: url("../images/mega/pricing-info-icon.svg");
 }
 .pricing-social .quote-icon-container {
     display: flex;
@@ -992,9 +1003,9 @@ i.pricing-i-icon {
     text-decoration: underline;
 }
 .pricing-pg.faq-container .faq-item-title i {
-    margin-left: 10px;
-    width: 20px;
-    height: 20px;
+    margin-inline-start: 10px;
+    --icon-size: 20px;
+    --mask-color: var(--color-primary-black-700);
 }
 .pricing-pg .pricing-get-started-container {
     background-color: var(--color-secondary-cobalt-900);
@@ -1020,7 +1031,7 @@ i.pricing-i-icon {
 .pricing-get-started .pricing-get-started-subtxt {
     font: var(--text-copy-medium-pricing);
     margin: 20px 24px -24px;
-    color: var(--text-color-white-high);
+    color: var(--text-color-high-inverted);
 }
 .pricing-get-started .pricing-plan-btn-container {
     margin: 56px 24px var(--right-padding) 24px;
@@ -1081,7 +1092,7 @@ i.pricing-i-icon {
     padding: 24px 16px;
 }
 .pricing-plans-compare-table .pricing-plans-compare-table-item.light {
-    color: var(--color-disabled);
+    color: var(--color-link-disabled);
 }
 .pricing-plans-compare-table .pricing-plans-compare-table-item.line {
     border-bottom: 1px solid var(--color-grey-150);
@@ -1108,7 +1119,7 @@ i.pricing-i-icon {
     gap: 10px;
 }
 .pricing-plans-compare-table .pricing-plans-compare-table-item.bg-gr {
-    background-color: var(--color-grey-50);
+    background-color: var(--color-bg-surface-1);
 }
 .pricing-pg .pricing-plans-compare-table button {
     display: none;
@@ -1131,7 +1142,7 @@ i.pricing-i-icon {
 .pricing-pg .pricing-plans-compare-table button.experiment-button.primary {
     background-color: var(--color-primary-red-500);
     border: none;
-    color: var(--color-grey-50);
+    color: var(--mobile-text-on-color);
 }
 .pricing-pg .pricing-plans-compare-table button.experiment-button.primary:hover {
     background-color: var(--color-primary-red-600);
@@ -1167,7 +1178,6 @@ i.pricing-i-icon {
 }
 .pricing-flexi-block-card-contianer .pricing-plan-card .pricing-plan-trasfer a.learn-more-flexi {
     text-decoration: underline;
-    color: var(--color-secondary-cobalt-600);
 }
 .pricing-flexi-block-card-contianer .pricing-plan-card .pricing-plan-trasfer .ex-desc {
     margin-bottom: 8px;
@@ -1239,9 +1249,9 @@ i.pricing-i-icon {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: #FFFFFF;
+    background: var(--color-bg-page);
     cursor: pointer;
-    border: 8px solid #00174C;
+    border: 8px solid var(--color-secondary-cobalt-900);
     box-sizing: border-box;
 }
 .pricing-flexi-block-estimator-slider-marks input.pricing-flexi-slider::-moz-range-thumb {
@@ -1274,7 +1284,7 @@ i.pricing-i-icon {
 }
 .pricing-flexi-block-estimator-slider-headers-container .pricing-flexi-block-estimator-slider-input-container span {
     font: var(--text-copy-medium-pricing);
-    color: var(--color-disabled);
+    color: var(--color-link-disabled);
     padding-inline-end: 12px;
 }
 .pricing-flexi-block-estimator-contianer .pricing-flexi-block-estimator-total-container {

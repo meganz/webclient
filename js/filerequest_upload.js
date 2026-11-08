@@ -172,6 +172,9 @@ lazy(mega, 'fileRequestUpload', () => {
             let files = event.target.files || dataTransfer.files;
 
             if (!files || !files.length) {
+                if (event.target && event.target.webkitdirectory) {
+                    mega.ui.toast.show(l.fr_empty_folders);
+                }
                 return false;
             }
 
@@ -225,6 +228,24 @@ lazy(mega, 'fileRequestUpload', () => {
                 entries.filter((c) => c.found),
                 (entry, name) => {
                     entry.skip = !name;
+                },
+                (entry) => {
+                    // This should be rare i.e: the client could manipulate file names into the same in the drop
+                    const prior = entries.slice(0, entries.indexOf(entry))
+                        .find((e) => !e.skip && e.target === entry.target && e.file.name === entry.name);
+                    if (prior) {
+                        return () => {
+                            prior.skip = true;
+                        };
+                    }
+
+                    // Typical path to find in already queued uploads. Don't consider prior batches.
+                    const queued = fileconflict.locateFileInUploadQueue(entry.target, entry.name);
+                    const gid = queued && `ul_${queued.id}`;
+                    if (!gid || uploadPage.rows[gid] !== `#${gid}`) {
+                        return null;
+                    }
+                    return () => uploadPage.removeItem(gid);
                 }
             );
 
@@ -334,18 +355,17 @@ lazy(mega, 'fileRequestUpload', () => {
             this.$wrapper.parent().addClass('page-file-request-upload');
             this.currentUploadBlock = this.$wrapper[0].querySelector('.current-upload-block');
             this.uploadSize = this.currentUploadBlock.querySelector('.upload-size');
+            this.folderUpload = !is_mobile && !Object(mega.fileRequestUpload.puHandleObjectData).f;
             this.addMoreButton = new MegaButton({
                 parentNode: this.currentUploadBlock,
                 prepend: true,
                 type: 'normal',
-                text: l.add_more_files,
+                text: this.folderUpload ? l.file_request_upload_summary_button_add : l.add_more_files,
                 icon: 'sprite-fm-mono icon-plus-thin-outline',
                 componentClassname: 'text-icon fr-add-more',
-                onClick: () => {
-                    if (this.isLocked()) {
-                        return false;
-                    }
-                    this.$selectFileButton.click();
+                onClick: (ev) => {
+                    this.promptDownload(ev);
+                    return false;
                 }
             });
             this.actionBlock = this.$wrapper[0].querySelector('.content-wrapper .action-block');
@@ -389,6 +409,7 @@ lazy(mega, 'fileRequestUpload', () => {
             this.$labelUploadIdWrapper = $('.detail-upload-id', this.$wrapper);
 
             this.$selectFileButton = $('#fileselect5', document.body);
+            this.$selectFolderButton = $('#fileselect6', document.body);
             this.$uploadItems = $('.block-uploading-scroll', this.$wrapper);
 
             this.$labelLanguage = $('.language-text', this.$wrapper);
@@ -408,12 +429,10 @@ lazy(mega, 'fileRequestUpload', () => {
             MegaButton.factory({
                 parentNode: this.$wrapperEmptyBlock[0],
                 type: 'normal',
-                text: l.transferit_add_files,
-                onClick: () => {
-                    if (this.isLocked()) {
-                        return false;
-                    }
-                    this.$selectFileButton.click();
+                icon: 'sprite-fm-mono icon-plus-thin-outline',
+                text: this.folderUpload ? l.add : l.transferit_add_files,
+                onClick: (ev) => {
+                    this.promptDownload(ev);
                     return false;
                 }
             });
@@ -440,12 +459,10 @@ lazy(mega, 'fileRequestUpload', () => {
             MegaButton.factory({
                 parentNode: this.finishedBlock,
                 type: 'normal',
-                text: l.transferit_up_more_files,
-                onClick: () => {
-                    if (this.isLocked()) {
-                        return false;
-                    }
-                    this.$selectFileButton.click();
+                icon: 'sprite-fm-mono icon-plus-thin-outline',
+                text: this.folderUpload ? l.add : l.transferit_up_more_files,
+                onClick: (ev) => {
+                    this.promptDownload(ev);
                     return false;
                 }
             });
@@ -456,6 +473,67 @@ lazy(mega, 'fileRequestUpload', () => {
             this.sentKey = `fr.sent.${mega.fileRequestUpload.getUploadPagePuHandle()}`;
             this.sent = parseFloat(sessionStorage[this.sentKey]) || 0;
             this.pageCaption = this.$wrapper[0].querySelector('.page-caption');
+        }
+
+        promptDownload(ev) {
+            if (this.isLocked()) {
+                return;
+            }
+
+            if (!this.folderUpload) {
+                this.$selectFileButton.click();
+                return;
+            }
+
+            const name = 'fr-upload-menu';
+            if (mega.ui.menu.name === name) {
+                mega.ui.menu.hide();
+                return;
+            }
+
+            const items = document.createElement('div');
+            items.className = 'context-menu-items';
+            MegaButton.factory({
+                parentNode: items,
+                type: 'fullwidth',
+                text: l[99],
+                icon: 'sprite-fm-mono icon-file-upload-thin-outline',
+                iconSize: 24,
+                componentClassname: 'context-button text-icon',
+                onClick: () => {
+                    mega.ui.menu.hide();
+                    this.$selectFileButton.click();
+                }
+            });
+            MegaButton.factory({
+                parentNode: items,
+                type: 'fullwidth',
+                text: l[98],
+                icon: 'sprite-fm-mono icon-folder-upload-thin-outline',
+                iconSize: 24,
+                componentClassname: 'context-button text-icon',
+                onClick: () => {
+                    mega.ui.menu.hide();
+                    this.$selectFolderButton.click();
+                }
+            });
+
+            mega.ui.menu.show({
+                name,
+                event: ev,
+                pos: 'bottomRight',
+                contents: [items],
+                resizeHandler: true
+            });
+
+            const target = ev.currentTarget instanceof MegaComponent ? ev.currentTarget.domNode : ev.currentTarget;
+            $(document).rebind('mousedown.frupmenu', (e) => {
+                if (mega.ui.menu.domNode.contains(e.target) || target.contains(e.target)) {
+                    return;
+                }
+                $(document).off('mousedown.frupmenu');
+                mega.ui.menu.hide(name);
+            });
         }
 
         addEventHandlers() {
@@ -475,7 +553,7 @@ lazy(mega, 'fileRequestUpload', () => {
             });
 
             const selectFileEvent = is_mobile ? 'tap, click' : 'click';
-            this.$selectFileButton.rebind(selectFileEvent, (evt) => {
+            this.$selectFileButton.add(this.$selectFolderButton).rebind(selectFileEvent, (evt) => {
                 if (evt && evt.target) {
                     evt.target.value = null;
                 }
@@ -537,7 +615,7 @@ lazy(mega, 'fileRequestUpload', () => {
             const eventHandler = this.uploadEventHandler;
             const isLocked = this.isLocked.bind(this);
 
-            this.$selectFileButton.rebind(
+            this.$selectFileButton.add(this.$selectFolderButton).rebind(
                 'change.frup',
                 (...args) => {
                     if (isLocked()) {
@@ -673,6 +751,7 @@ lazy(mega, 'fileRequestUpload', () => {
                 .removeClass('transfer-started transfer-error')
                 .addClass('transfer-completed');
             $itemElement.progress.css('width', `100%`);
+            $itemElement.size.text(bytesToSize(item.totalSize, 1));
             item.completed = true;
             item.error = false;
             $('.item-details i', $itemElement.element)
@@ -719,6 +798,11 @@ lazy(mega, 'fileRequestUpload', () => {
             $item.currentSize = loaded;
             $item.percent = $item.totalSize ? Math.min(loaded / $item.totalSize * 100, 100) : perc;
             $item.$.progress.css('width', `${$item.percent}%`);
+            $item.$.size.text(
+                l.tfw_byte_progress
+                    .replace('%2', bytesToSize($item.totalSize, 1))
+                    .replace('%1', bytesToSize($item.currentSize))
+            );
 
             if ($item.$.element) {
                 $item.$.element.removeClass('transfer-initiliazing transfer-queued');
@@ -1040,13 +1124,14 @@ lazy(mega, 'fileRequestUpload', () => {
             }
         }
 
-        async resolveClashes(clashes, done) {
+        async resolveClashes(clashes, done, locate) {
             let repeatOp = null;
 
             for (let i = 0; i < clashes.length; i++) {
                 const { file, name, found, target } = clashes[i];
+                const swap = locate && locate(clashes[i]);
                 const res = await this
-                    .resolveName(file, name, found, target, clashes.length - i - 1, repeatOp)
+                    .resolveName(file, name, found, target, clashes.length - i - 1, repeatOp, swap)
                     .catch(dump);
 
                 if (res && res.repeat) {
@@ -1137,8 +1222,12 @@ lazy(mega, 'fileRequestUpload', () => {
             return `${id}/${from.slice(0, MAX_TAG_LENGTH - id.length - 1)}`;
         }
 
-        async resolveName(file, name, found, target, remaining, repeat) {
-            if (repeat) {
+        async resolveName(file, name, found, target, remaining, repeat, swap) {
+            if (repeat === fileconflict.REPLACE && swap) {
+                swap();
+                return { name: this.reserveName(file, name, target), repeat };
+            }
+            if (repeat && repeat !== fileconflict.REPLACE) {
                 return {
                     name: repeat === fileconflict.KEEPBOTH
                         && this.reserveName(file, this.findName(name, target), target),
@@ -1152,15 +1241,23 @@ lazy(mega, 'fileRequestUpload', () => {
             return new Promise((resolve) => {
                 fileconflict.prompt('upload', queued, found, remaining, target)
                     .always((res, chosen, action, checked) => {
+                        if (action === fileconflict.REPLACE) {
+                            swap();
+                        }
                         resolve({
-                            name: action === fileconflict.KEEPBOTH && this.reserveName(file, chosen, target),
+                            name: (action === fileconflict.REPLACE || action === fileconflict.KEEPBOTH)
+                                && this.reserveName(file, chosen, target),
                             repeat: checked && action
                         });
                     });
 
                 // Forcibly hide dialog section and update with non-reserved name
                 const $dialog = fileconflict.getDialog();
-                $('.action-block.a1', $dialog).addClass('hidden');
+                const $a1 = $('.action-block.a1', $dialog).toggleClass('hidden', !swap);
+                if (swap) {
+                    $('.red-header', $a1).text(l.fr_replace_title);
+                    $('.light-grey:not(.file-size)', $a1).text(l.fr_replace_text);
+                }
                 const $a3 = $('.action-block.a3', $dialog);
                 $('.file-name', $a3).text(suggestion);
                 fileconflict.customNames($a3[0]);
@@ -1228,7 +1325,7 @@ lazy(mega, 'fileRequestUpload', () => {
         }
 
         showFinished() {
-            const subtext = escapeHTML(l.fr_upload_done_subtext)
+            const subtext = escapeHTML(this.folderUpload ? l.fr_upload_done_f_subtext : l.fr_upload_done_subtext)
                 .replace('[B]', '<b>')
                 .replace('[/B]', '</b>')
                 .replace('%1', escapeHTML(this.ownerName));
@@ -1491,6 +1588,13 @@ lazy(mega, 'fileRequestUpload', () => {
             return handle;
         }
 
+        getUploadPageOwnerPublicKey(ownerHandle) {
+            if (ownerHandle !== this.ownerHandle) {
+                return false;
+            }
+            return this.ownerPublicKey;
+        }
+
         onItemUploadProgress(id, bps, retime, perc, bl) {
             return this.uploadPage.onItemUploadProgress(id, bps, retime, perc, bl);
         }
@@ -1541,8 +1645,6 @@ lazy(mega, 'fileRequestUpload', () => {
                 api_create_u_k();
                 u_k_aes = new sjcl.cipher.aes(u_k);
             }
-            u_pubkeys[this.ownerHandle] = this.ownerPublicKey; // Store public key for owner
-
             this.uploadPage.initUploadEventHandler();
             InitFileDrag(); // Init file drag upload
             this.uploadPage.initLanguage();
@@ -1568,14 +1670,34 @@ lazy(mega, 'fileRequestUpload', () => {
             mega.ui.setTheme(theme);
             this.uploadPage.setLabel(name, title, description);
 
-            return this.fileRequestApi
-                .getOwnerPublicKey(this.ownerHandle)
-                .then((pubk) => {
+            this.ownerPublicKey = await this.fetchOwnerPublicKey();
 
-                    this.ownerPublicKey = crypto_decodepubkey(base64urldecode(pubk));
+            return this.handleInitialized();
+        }
 
-                    return this.handleInitialized();
-                });
+        /**
+         * Retrieves the owner's RSA pub key to encrypt the uploaded nodes' keys to.
+         * Anonymous/failed to verify shall still be able to upload to the API provided key
+         * accepting the downgraded security as before
+         *
+         * @returns {Promise} fulfilled with the owner's pub key.
+         */
+        async fetchOwnerPublicKey() {
+            const { ownerHandle, fileRequestApi } = this;
+            if (u_type !== false) {
+                const pubKey = await Promise.resolve(authring.getContacts('RSA'))
+                    .then(() => crypt.getPubRSA(ownerHandle))
+                    .catch((ex) => {
+                        logger.warn('Unverified pub key for owner %s, falling back...', ownerHandle, ex);
+                    });
+                if (pubKey) {
+                    return pubKey;
+                }
+            }
+
+            // Don't store this in u_pubkeys as it hasn't been verified
+            const pubk = await fileRequestApi.getOwnerPublicKey(ownerHandle);
+            return crypto_decodepubkey(base64urldecode(pubk));
         }
 
         handlePreview(parameters) {
@@ -1596,6 +1718,7 @@ lazy(mega, 'fileRequestUpload', () => {
             this.uploadPage.initLanguage();
 
             this.uploadPage.showEmpty();
+            this.uploadPage.uNameInput.disabled = true;
         }
 
         handle(puPageObject, puPagePublicHandle) {

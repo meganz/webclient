@@ -44,7 +44,6 @@ lazy(mega.slideshow.settings, 'options', () => {
 
         /**
          * Return current config or default value if undefined
-         * TODO: new slideshow not implemented in mobile version
          * @returns {Object} - current config
          */
         getConfig() {
@@ -59,12 +58,10 @@ lazy(mega.slideshow.settings, 'options', () => {
 
             let id = this._defaultConfig;
 
-            if (!is_mobile) {
-                for (const [k, v] of Object.entries(this._config)) {
-                    if (v.cfg === cfg) {
-                        id = k;
-                        break;
-                    }
+            for (const [k, v] of Object.entries(this._config)) {
+                if (v.cfg === cfg) {
+                    id = k;
+                    break;
                 }
             }
 

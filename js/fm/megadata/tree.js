@@ -897,6 +897,8 @@ MegaData.prototype.addTreeUI = function() {
                     $.draggerWidth = $('#draghelper .dragger-content').outerWidth();
                 },
                 drag(e, ui) {
+                    $.ddReleaseTreeTarget(e);
+
                     if (ui.position.top + $.draggerHeight - 28 > $(window).height()) {
                         ui.position.top = $(window).height() - $.draggerHeight + 26;
                     }
@@ -907,8 +909,20 @@ MegaData.prototype.addTreeUI = function() {
                 stop() {
                     $.treeDragging = false;
                     $('body').removeClass('dragging').removeClassWith("dndc-");
+                    $.currentOver = false;
+                    clearTimeout($.liTimerK);
                 }
             });
+
+        // Remove droppables for tree rows that were removed during a rebuild
+        for (const list of Object.values($.ui.ddmanager.droppables)) {
+
+            for (let i = list.length; i--;) {
+                if (!list[i].element[0].isConnected) {
+                    list.splice(i, 1);
+                }
+            }
+        }
 
         $(
             '.fm-tree-panel .nw-fm-tree-item,' +
@@ -1054,6 +1068,72 @@ MegaData.prototype.onTreeUIExpand = function(id, force) {
     }
 
     M.addTreeUIDelayed();
+};
+
+/**
+ * Resolves a tree row to a known handle
+ *
+ * Unknown tree folders may not be in M.d yet. In that case, use the nearest known ancestor
+ * Rows that are not present in M.tree or are not folders are not valid targets
+ *
+ * @param {Element} node The tree row
+ * @param {String} handle The row handle
+ * @returns {String|false} A known handle or false
+ */
+MegaData.prototype.getTreeRowHandle = function(node, handle) {
+    "use strict";
+
+    if (this.getNodeByHandle(handle)) {
+        return handle;
+    }
+    let isTreeFolder = null;
+
+    for (let parent = node.parentNode; parent; parent = parent.parentNode) {
+        if (!String(parent.id).startsWith('treesub_')) {
+            continue;
+        }
+        const parentHandle = parent.id.replace('treesub_', '').replace(/^(os_|pl_)/, '');
+
+        if (isTreeFolder === null) {
+            // Confirm that the row exists in M.tree and represents a folder
+            const treeNode = this.tree[parentHandle] && this.tree[parentHandle][handle];
+
+            isTreeFolder = !!(treeNode && treeNode.t);
+        }
+
+        if (!isTreeFolder) {
+            return false;
+        }
+
+        if (this.getNodeByHandle(parentHandle)) {
+            return parentHandle;
+        }
+    }
+
+    return false;
+};
+
+/**
+ * Expand collapsed items in the left panel
+ *
+ * @param {Element} elm An element within a section
+ * @returns {Boolean} Whether a section to expand was found
+ */
+MegaData.prototype.expandTreeSection = function(elm) {
+    "use strict";
+
+    // direct children only: an ancestor panel must not match a nested pane's own tree
+    const panel = elm && elm.closest && elm.closest('.fm-tree-panel');
+    const tree = panel && panel.querySelector(':scope > .content-panel');
+    const expander = panel && panel.querySelector(':scope > .tree-expander');
+
+    if (!tree || !expander) {
+        return false;
+    }
+    if (!tree.classList.contains('active')) {
+        expander.click();
+    }
+    return true;
 };
 
 /**

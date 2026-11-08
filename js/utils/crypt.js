@@ -91,6 +91,21 @@ var crypt = (function() {
         }
     };
 
+    ns.dropPubKeyCaches = function() {
+        pubEd25519 = {};
+        pubCu25519 = {};
+        u_pubkeys = Object.create(null);
+    };
+
+    ns._dropCachedPubKey = function(userHandle, keyType) {
+        delete ns.getPubKeyCacheMapping(keyType)[userHandle];
+
+        // Also clear invalid RSA cached attributes.
+        if (keyType === 'RSA' && window.attribCache) {
+            attribCache.removeItem(`${userHandle}_@uk`);
+        }
+    };
+
     // getPubKeyAttribute's async/await helper
     ns.getRSAPubKeyAttribute = function(user, type = 'RSA') {
         return new Promise((resolve, reject) => {
@@ -138,9 +153,6 @@ var crypt = (function() {
                     }
 
                     var pubKey = crypto_decodepubkey(base64urldecode(res.pubk));
-
-                    // cache it, the legacy way.
-                    u_pubkeys[userhandle] = u_pubkeys[res.u] = pubKey;
 
                     if (d > 1 || is_karma) {
                         logger.debug('Got ' + keyType + ' pub key of user ' + debugUserHandle);
@@ -213,7 +225,6 @@ var crypt = (function() {
 
             pubKeyPromise.done(function(result) {
                 result = base64urldecode(result);
-                ns.getPubKeyCacheMapping(keyType)[userhandle] = result;
                 if (d > 1) {
                     logger.debug('Got ' + keyType + ' pub key of user ' + userhandle + '.');
                 }
@@ -273,14 +284,9 @@ var crypt = (function() {
      * @param signingKey {string}
      *     Ed25519 key needed to verify the signature.
      * @return {MegaPromise}
-     *     The signature verification result. true for success, false for
-     *     failure and null for a missing signature.
+     *     The signature verification result. true for success, false for failure
      */
     ns._checkSignature = function(signature, pubKey, keyType, signingKey) {
-        if (signature === '') {
-            return MegaPromise.resolve(null);
-        }
-
         return authring.verifyKey(signature, pubKey, keyType, signingKey);
     };
 
@@ -291,6 +297,16 @@ var crypt = (function() {
     ns._pubKeyRetrievalPromises = {};
 
     ns.getPubKeyViaChatHandle = function(userhandle, keyType, chathandle, callback) {
+        if (u_type !== false) {
+            logger.error(
+                'Refusing to retrieve an unverified %s pub key for %s, use getPubKey().',
+                keyType,
+                userhandle
+            );
+
+            return MegaPromise.reject(EARGS);
+        }
+
         // This promise will be the one which is going to be returned.
         var masterPromise = new MegaPromise();
         // Some things we need to progress.
@@ -400,7 +416,7 @@ var crypt = (function() {
             }
         };
 
-        if (!is_chatlink && (authring.hadInitialised() === false || typeof u_authring === 'undefined')) {
+        if (u_type !== false && (authring.hadInitialised() === false || typeof u_authring === 'undefined')) {
             // Need to initialise the authentication system (authring).
             if (d > 1) {
                 logger.debug('Waiting for authring to initialise first.', 'Tried to access: ', userhandle, keyType);
@@ -520,50 +536,32 @@ var crypt = (function() {
             var signature = base64urldecode(result[2]);
             ns._checkSignature(signature, pubKey, keyType, signingKey)
                 .done(function(signatureVerification) {
-                    if (authMethod === false) {
-                        // Authring check fails, but could be a new key.
-                        if (signatureVerification === true) {
-                            // Record good (new) signature.
-                            newAuthMethod = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
-                            pubKeyCache[userhandle] = pubKey;
-                            masterPromise.resolve(pubKey);
-                        }
-                        else {
-                            // Mismatch on authring, but no new signature,
-                            // or failed signature verification: Choke!
-                            newAuthMethod = undefined;
-                            ns._showKeySignatureFailureException(userhandle, keyType);
-                            masterPromise.reject(EINTERNAL);
-                        }
+                    if (signatureVerification === true) {
+                        // Record good signature.
+                        newAuthMethod = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
+                        pubKeyCache[userhandle] = pubKey;
+                        masterPromise.resolve(pubKey);
                     }
                     else {
-                        // Not seen previously or not verified, yet.
-                        if (signatureVerification === null) {
-                            var authRecord = authring.getContactAuthenticated(userhandle, keyType);
-                            if ((authRecord === false) || (fingerprint === authRecord.fingerprint)) {
-                                // Can only record it seen.
-                                newAuthMethod = authring.AUTHENTICATION_METHOD.SEEN;
-                                pubKeyCache[userhandle] = pubKey;
-                                masterPromise.resolve(pubKey);
-                            }
-                            else {
-                                newAuthMethod = undefined;
-                                ns._showFingerprintMismatchException(userhandle, keyType, authMethod,
-                                    authRecord.fingerprint,
-                                    fingerprint);
-                                masterPromise.reject(EINTERNAL);
-                            }
-                        }
-                        else if (signatureVerification === true) {
-                            // Record good signature.
-                            newAuthMethod = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
-                            pubKeyCache[userhandle] = pubKey;
-                            masterPromise.resolve(pubKey);
+                        // Missing, malformed or failed signature verification: Choke!
+                        newAuthMethod = undefined;
+
+                        var authRecord = authring.getContactAuthenticated(userhandle, keyType);
+                        if (authMethod === false && authRecord) {
+                            // We got no valid signature *and* the key does not match what we got on record.
+                            ns._showFingerprintMismatchException(
+                                userhandle,
+                                keyType,
+                                authMethod,
+                                authRecord.fingerprint,
+                                fingerprint
+                            );
                         }
                         else {
-                            // Failed signature verification: Choke!
                             ns._showKeySignatureFailureException(userhandle, keyType);
                         }
+
+                        masterPromise.reject(EINTERNAL);
                     }
 
                     // Finish off.
@@ -881,7 +879,7 @@ var crypt = (function() {
 
         // Remove the cached key, so the key will be fetched and checked against
         // the stored fingerprint again next time.
-        delete ns.getPubKeyCacheMapping(keyType)[userHandle];
+        ns._dropCachedPubKey(userHandle, keyType);
 
         logger.warn(keyType + ' fingerprint does not match the previously authenticated one!\n'
             + 'Previous fingerprint: ' + prevFingerprint + '.\nNew fingerprint: ' + newFingerprint + '.');
@@ -903,6 +901,8 @@ var crypt = (function() {
         // Show warning dialog if it hasn't been locally overriden (as need by poor user Fiup who added 600
         // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
         authring.showCryptoWarningDialog('signature', userHandle, keyType).dump('sign-fail');
+
+        ns._dropCachedPubKey(userHandle, keyType);
 
         logger.error(keyType + ' signature does not verify for user ' + userHandle + '!');
     };

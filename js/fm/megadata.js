@@ -185,7 +185,9 @@ function MegaData() {
     /** @name M.IS_TAKENDOWN */
     /** @name M.IS_SEN */
     /** @name M.IS_S4CRT */
-    makeEnum(['TREE', 'FAV', 'LINKED', 'SHARED', 'TAKENDOWN', 'SEN', 'S4CRT'], 'IS_', this);
+    /** @name M.IS_VIDEO */
+    /** @name M.IS_IMAGE */
+    makeEnum(['TREE', 'FAV', 'LINKED', 'SHARED', 'TAKENDOWN', 'SEN', 'S4CRT', 'VIDEO', 'IMAGE'], 'IS_', this);
 
     const seal = new Set();
     (function shield(ctx) {

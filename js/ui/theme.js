@@ -16,6 +16,9 @@
         if (!document.body.classList.contains(themeClass)) {
             document.body.classList.remove('theme-dark', 'theme-light');
             document.body.classList.add('theme-' + theme);
+
+            // CSS variables cannot reach into a cross-origin iframe, so embeds need telling
+            mBroadcaster.sendMessage('theme:changed', theme);
         }
     };
 
@@ -35,6 +38,9 @@
                 || page === 'download'
                 || page.substr(0, 11) === 'filerequest'
                 || page === 'support'
+                || page.substr(0, 3) === 'pro'
+                || page.substr(0, 8) === 'discount'
+                || page.substr(0, 2) === 's/'
             )
         ) {
             return;

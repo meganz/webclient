@@ -220,8 +220,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
     function checkCurrentView() {
         document.body.classList.add('info-panel-visible');
         const media = document.querySelector('.media-viewer-container');
+        const isMediaShown = !!media && !media.classList.contains('hidden');
         let shouldStretch = false;
-        if (media && !media.classList.contains('hidden')) {
+        if (isMediaShown) {
             shouldStretch = true;
         }
         if (document.body.classList.contains('in-call')) {
@@ -236,6 +237,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         if (mega.rewindUi && mega.rewindUi.sidebar.active) {
             mega.rewindUi.sidebar.forceClose();
         }
+        mega.ui.flyout.flyoutMenu.parentNode.classList.toggle('info-panel-media', isMediaShown);
     }
 
     class MegaInfoBlock extends MegaComponent {
@@ -384,7 +386,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
         showImage() {
             this.showMime();
-            getImage(this.node)
+            const {node} = this;
+            const type = fileIcon(node) === 'audio' && !String(node.fa).includes(':0*') ? 1 : 0;
+            getImage(node, type)
                 .then(url => {
                     if (url) {
                         this.showMime(true);
@@ -1455,6 +1459,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
     function hasThumbnail(node) {
         const nodeIcon = fileIcon(node);
+        if (nodeIcon === 'audio') {
+            return /:[01]\*/.test(node.fa);
+        }
         return ['image', 'video', 'raw', 'photoshop', 'vector'].includes(nodeIcon) &&
             (is_image3(node) || nodeIcon === 'video' && M.isGalleryVideo(node));
     }
@@ -1569,6 +1576,11 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 delay.cancel('infoPanelsc');
             }
             handles = handles || [];
+
+            if (handles.length === 1 && !M.d[handles[0]] && handles[0].length === 8) {
+                return dbfetch.geta(handles).then(() => M.d[handles[0]] && this.show(handles)).catch(dump);
+            }
+
             const toResize = !mega.ui.flyout.name;
             mega.ui.flyout.showInfoFlyout(handles);
             if (toResize) {
@@ -1760,7 +1772,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
         cleanup() {
             document.body.classList.remove('info-panel-visible');
-            mega.ui.flyout.flyoutMenu.domNode.parentNode.classList.remove('info-panel-stretch');
+            mega.ui.flyout.flyoutMenu.domNode.parentNode.classList.remove('info-panel-stretch', 'info-panel-media');
         },
 
         MegaInfoBlock,

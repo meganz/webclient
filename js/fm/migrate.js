@@ -95,6 +95,8 @@ lazy(mega, 'migrate', () => {
         ERROR: 4
     };
 
+    const notifiedFolders = new Set();
+    const progressPending = new Set();
     const guidesDomain = 'blog.mega.io';
     const guidesPrefix = 'how-to-export-files-from-google-drive-and-other-cloud-storage-services#';
 
@@ -104,27 +106,27 @@ lazy(mega, 'migrate', () => {
             icon: 'icon-dropbox',
             name: 'Dropbox',
             link: 'h-how-to-export-files-from-dropbox',
-            eventName: 501368
+            eventName: is_mobile ? 501431 : 501368
         },
         {
             providerId: 3,
             icon: 'icon-onedrive',
             name: 'OneDrive',
             link: 'h-how-to-export-files-from-onedrive',
-            eventName: 501369
+            eventName: is_mobile ? 501432 : 501369
         },
         {
             providerId: 4,
             icon: 'icon-box',
             name: 'Box',
             link: 'h-how-to-export-files-from-box',
-            eventName: 501370
+            eventName: is_mobile ? 501433 : 501370
         },
         {
             icon: 'icon-icloud',
             name: 'iCloud',
             link: 'h-how-to-export-files-from-apple-icloud-and-airdrop',
-            eventName: 501371
+            eventName: is_mobile ? 501434 : 501371
         },
     ];
 
@@ -284,7 +286,18 @@ lazy(mega, 'migrate', () => {
 
                             const warning = ce('div', cn, {class: 'banner'});
                             ce('i', warning, {class: 'sprite-fm-mono icon-info-thin-outline'});
-                            ce('span', warning).textContent = l.mig_ongoing;
+                            const [before, link = '', after = ''] = l.mig_ongoing_history.split(/\[A]|\[\/A]/);
+                            const historyPage = 'fm/account/transfers/migrate-cloud-provider-settings';
+                            const linkNode = ce('a', null, {href: `/${historyPage}`});
+
+                            linkNode.textContent = link;
+                            linkNode.addEventListener('click', (ev) => {
+                                ev.preventDefault();
+                                navigate.hide();
+                                loadSubPage(historyPage);
+                            });
+
+                            ce('span', warning).append(before, linkNode, after);
                         }
 
                         renderServiceGuides(cn, providers);
@@ -513,6 +526,7 @@ lazy(mega, 'migrate', () => {
                         }
 
                         eventlog(501378, `${selectedProviderId} ${migrationId} ${prefetch.d.fc} ${prefetch.d.b}`);
+                        mega.migrate.notifyProgress(migrationId, true).catch(dump);
 
                         navigate.goToStep(3);
                     },
@@ -549,6 +563,7 @@ lazy(mega, 'migrate', () => {
         constructor() {
             this.knownProviders = knownProviders;
             this.states = migrationStates;
+            this.renderServiceGuides = renderServiceGuides;
         }
 
         getOnboardingInfo(offset) {
@@ -560,7 +575,7 @@ lazy(mega, 'migrate', () => {
             };
         }
 
-        async showDialog() {
+        async showDialog(fromApp) {
 
             if (M.isInvalidUserStatus()) {
                 return;
@@ -577,6 +592,10 @@ lazy(mega, 'migrate', () => {
 
             importingProgress = Array.isArray(migrations) && migrations.some(m =>
                 m.s === migrationStates.PENDING || m.s === migrationStates.IN_PROGRESS);
+
+            if (is_mobile) {
+                return mobile.migrate.show(fromApp, importingProgress);
+            }
 
             onboardingOffset = 0;
 
@@ -642,9 +661,7 @@ lazy(mega, 'migrate', () => {
                 clearInterval(oAuthPoll);
                 oAuthPoll = null;
             }
-            if (oAuthPopup && !oAuthPopup.closed) {
-                oAuthPopup.close();
-            }
+            mega.migrate.closeOAuthPopup();
 
             // Pre-open within the user gesture to avoid Safari shenanigans
             // eslint-disable-next-line local-rules/open
@@ -673,9 +690,20 @@ lazy(mega, 'migrate', () => {
 
             const popupResults = await mega.migrate._openOAuthPopup(oAuthUrl.toString(), receiverId, 480, 640);
 
+            // Chrome on iOS reloads this tab once back in front, so mobile closes it after using the code
+            if (!is_mobile || !popupResults.code) {
+                mega.migrate.closeOAuthPopup();
+            }
+
             popupResults.redirectUri = redirectUri;
 
             return popupResults;
+        }
+
+        closeOAuthPopup() {
+            if (oAuthPopup && !oAuthPopup.closed) {
+                oAuthPopup.close();
+            }
         }
 
         _popupFeatures(width, height) {
@@ -704,7 +732,7 @@ lazy(mega, 'migrate', () => {
             const popup = window.open(authUrl, `${receiverId}_oauth_popup`, features);
 
             if (!popup) {
-                eventlog(500952);
+                eventlog(is_mobile ? 501427 : 500952);
                 if (d) {
                     console.error('Popup blocked');
                 }
@@ -715,6 +743,9 @@ lazy(mega, 'migrate', () => {
             return new Promise((resolve) => {
                 // throws cross-origin while on OAuth provider; discard
                 const reachedRedirect = tryCatch(() => popup.location.pathname.endsWith('oauth.html'), false);
+                // the provider opened as a tab over ours, not as a separate window; always so on mobile
+                const inTab = is_mobile || document.hidden;
+                let back = 0;
 
                 oAuthPoll = setInterval(() => {
                     if (popup.closed) {
@@ -724,6 +755,15 @@ lazy(mega, 'migrate', () => {
                     }
 
                     if (!reachedRedirect()) {
+                        back = inTab && !document.hidden ? back || Date.now() : 0;
+
+                        // a provider page with COOP detaches the tab, which iOS then keeps unreadable and never closed
+                        if (back && Date.now() - back > 3e3) {
+                            clearInterval(oAuthPoll);
+                            popup.close();
+                            resolve({error: 'closed'});
+                        }
+
                         return; // still on OAuth provider
                     }
 
@@ -735,8 +775,6 @@ lazy(mega, 'migrate', () => {
                     const code = params.get('code') || hashParams.get('code');
                     const error = params.get('error') || hashParams.get('error');
                     const errorDescription = params.get('error_description') || hashParams.get('error_description');
-
-                    popup.close();
 
                     const rawState = params.get('state');
                     const [state, eReceiverId, providerId] = base64urldecode(rawState || '').split('|');
@@ -781,7 +819,7 @@ lazy(mega, 'migrate', () => {
         }
 
         async createImportFolder(parent, name) {
-            const n = { name };
+            const n = { name, ar: { imp: 1 } };
             const attr = ab_to_base64(crypto_makeattr(n));
             const sk = [...crypto.getRandomValues(new Uint32Array(4))];
 
@@ -804,7 +842,10 @@ lazy(mega, 'migrate', () => {
                 return null;
             }
 
-            crypto_setsharekey(h, sk);
+            // The share-key must be in ^!keys before the import uploads
+            crypto_setsharekey(h, sk, false, true);
+
+            await mega.keyMgr.createShare(h, true).catch(reportError);
 
             return {
                 tph: ph,
@@ -814,7 +855,7 @@ lazy(mega, 'migrate', () => {
             };
         }
 
-        async enqueueMigration(prefetchId, target) {
+        async enqueueMigration(prefetchId, target, sn = nodeList) {
             const {tph, tek, tak} = target;
             const {result} = await api.req({
                 a: 'msq',
@@ -824,7 +865,7 @@ lazy(mega, 'migrate', () => {
                     tph,
                     tek,
                     tak,
-                    sn: nodeList
+                    sn
                 }
             }).catch((ex) => {
                 console.error(`Error enqueuing migration: ${ex}`);
@@ -872,5 +913,248 @@ lazy(mega, 'migrate', () => {
                 console.error('Migration job does not exist, or does not belong to user');
             }
         }
+
+        // Imports made before the imp flag have no flag, but still have the writable link the server imported
+        // through; links users create are read-only, and S4 buckets are the only other writable ones
+        isImportFolder(n) {
+            return !!(n.t && n.ph && (n.ar && n.ar.imp || M.getNodeShare(n).w && !M.getS4NodeType(n)));
+        }
+
+        getImportFolders(handles) {
+
+            const sel = new Set(Array.isArray(handles) ? handles : [handles]);
+            const res = [];
+
+            for (const h of Object.keys(M.su.EXP || {})) {
+                const n = M.getNodeByHandle(h);
+
+                if (n && this.isImportFolder(n)) {
+                    for (let p = n; p; p = M.getNodeByHandle(p.p)) {
+                        if (sel.has(p.h)) {
+                            res.push(n);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return res;
+        }
+
+        // Whether any of these folders is, or is inside, a folder still being imported into
+        isImporting(handles) {
+
+            for (const h of handles) {
+                for (let n = M.getNodeByHandle(h); n && n.t; n = M.getNodeByHandle(n.p)) {
+                    if (this.isImportFolder(n)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        async getActiveImports(handles) {
+
+            const folders = this.getImportFolders(handles).map(n => [n, n.ph]);
+
+            for (const [n] of folders) {
+                if (sharemissing[n.h]) {
+                    crypto_fixmissingkeys(sharemissing[n.h]);
+                }
+            }
+
+            if (!folders.length) {
+                return [];
+            }
+
+            const {result} = await api.req({a: 'msl'});
+            const res = [];
+
+            // A link import may run several jobs into the same folder
+            for (const [n, ph] of folders) {
+                const jobs = result.filter(m => m.ph === ph);
+                const active = jobs.filter(m => m.s === migrationStates.PENDING || m.s === migrationStates.IN_PROGRESS);
+
+                if (active.length) {
+                    res.push(...active);
+                }
+                else {
+                    this.clearImportFolder(n, jobs).catch(dump);
+                }
+            }
+
+            return res;
+        }
+
+        async clearImportFolder(n, jobs) {
+
+            const imp = n.ar && n.ar.imp;
+            const job = jobs.find(m => m.s === migrationStates.ERROR) ||
+                jobs.find(m => m.s === migrationStates.SUCCESS);
+
+            if (notifiedFolders.has(n.h)) {
+                return;
+            }
+            notifiedFolders.add(n.h);
+
+            // A link without a job was created by the user
+            if (jobs.length) {
+                const nodes = await M.getNodes(n.h, true);
+
+                // The server encrypts imported files to the folder's share key only, and removing the import link
+                // removes that share, so give them owner keys first or they rely on the share key alone
+                await api_updfkey(nodes, -0x4ff71e);
+
+                await api.screq({a: 's2', n: n.h, s: [{u: 'EXP', r: ''}], ha: ''}).catch(dump);
+            }
+
+            if (imp) {
+                await api.setNodeAttributes(n, {ar: {...n.ar, imp: undefined}}).catch(dump);
+            }
+
+            await notify.initialLoading;
+
+            const prev = notify.notifications.find(m => m.type === 'msc' && m.data.n === n.h);
+            const shown = prev && prev.data.s === migrationStates.IN_PROGRESS;
+
+            // Imports made before the imp flag ended long ago, so only report those this session showed as running
+            if (job && (imp || shown)) {
+                return notify.notifyFromActionPacket({a: 'msc', n: n.h, p: job.p, s: job.s});
+            }
+
+            // Cancelled, so don't leave the progress notification behind
+            if (shown) {
+                return notify.notifyFromActionPacket({
+                    ...prev.data,
+                    s: migrationStates.CANCELLED,
+                    seen: prev.seen,
+                    timestamp: prev.timestamp
+                });
+            }
+        }
+
+        async notifyProgress(mid, now) {
+
+            if (progressPending.has(mid)) {
+                return;
+            }
+            progressPending.add(mid);
+
+            // Uploads arrive in bursts, refresh at most every few seconds
+            if (!now) {
+                await tSleep(5);
+            }
+
+            progressPending.delete(mid);
+
+            const {result} = await api.req({a: 'msf', id: mid}).catch(echo);
+
+            await notify.initialLoading;
+
+            const prev = result && notify.notifications.find(m => m.type === 'msc' && m.data.n === result.h);
+
+            if (!result || result.s > migrationStates.IN_PROGRESS ||
+                prev && prev.data.s !== migrationStates.IN_PROGRESS) {
+                return;
+            }
+
+            let {p} = prev ? prev.data : {};
+
+            if (!prev) {
+                const jobs = await this.getMigrations().catch(dump) || [];
+                const job = jobs.find(m => m.id === mid);
+
+                p = job && job.p;
+            }
+
+            return notify.notifyFromActionPacket({
+                a: 'msc',
+                n: result.h,
+                p,
+                s: migrationStates.IN_PROGRESS,
+                fp: result.fp,
+                ft: result.ft,
+                seen: prev && prev.seen,
+                timestamp: prev && prev.timestamp
+            });
+        }
+
+        async importEnd(mid) {
+
+            const folders = new Set(this.getImportFolders(M.RootID).map(n => n.h));
+            const gone = notify.notifications.filter(m => m.type === 'msc' && !folders.has(m.data.n) &&
+                m.data.s === migrationStates.IN_PROGRESS);
+
+            await this.getActiveImports(M.RootID).catch(dump);
+
+            if (!gone.length) {
+                return;
+            }
+
+            const {result} = await api.req({a: 'msf', id: mid}).catch(echo);
+            const prev = result && gone.find(m => m.data.n === result.h);
+
+            if (prev) {
+                return notify.notifyFromActionPacket({a: 'msc', n: result.h, p: prev.data.p, s: result.s});
+            }
+        }
+
+        async confirmRemove(handles) {
+
+            const active = await this.getActiveImports(handles);
+
+            if (!active.length) {
+                return true;
+            }
+
+            const provider = knownProviders[active[0].p];
+            const yes = await asyncMsgDialog(
+                `confirmation:!^${l.mig_acc_cancel}!${l.schedule_cancel_abort}`,
+                '',
+                l.mig_acc_cancel_confirm_title,
+                provider ?
+                    l.mig_acc_cancel_confirm_desc.replace('%1', provider.name) :
+                    l.mig_acc_cancel_confirm_desc_nameless
+            );
+
+            if (yes) {
+                await Promise.all(active.map(m => this.cancelMigration(m.id)));
+
+                // msr leaves the import flag and link in place
+                await this.getActiveImports(handles).catch(dump);
+            }
+
+            return yes;
+        }
+
+        async confirmMove(handles) {
+
+            const active = await this.getActiveImports(handles);
+
+            if (active.length) {
+                const provider = knownProviders[active[0].p];
+
+                await asyncMsgDialog(
+                    'warninga',
+                    '',
+                    l.mig_folder_in_use,
+                    provider ? l.mig_move_in_use.replace('%1', provider.name) : l.mig_move_in_use_nameless
+                );
+            }
+
+            return !active.length;
+        }
     };
+});
+
+mBroadcaster.once('fm:initialized', () => {
+    'use strict';
+
+    // Clear import folders whose job ended while we were away, and show the ones still running
+    if (!folderlink && M.su.EXP) {
+        mega.migrate.getActiveImports(M.RootID)
+            .then(jobs => is_mobile || Promise.all(jobs.map(m => mega.migrate.notifyProgress(m.id, true)))).catch(dump);
+    }
 });

@@ -1351,7 +1351,7 @@
             }
         };
         uaPacketParserHandler['^!dv'] = function() {
-            if (fminitialized && M.account) {
+            if (fminitialized) {
                 delay('fv:uvi^dv', fileversioning.updateVersionInfo.bind(fileversioning), 4e3);
             }
         };
@@ -1401,7 +1401,11 @@
         uaPacketParserHandler['^!webtheme'] = function(userHandle) {
 
             mega.attr.get(userHandle, 'webtheme', -2, 1, function(res, ctx) {
-
+                // Logged out while fetching.
+                // @todo Guard other handlers if this appears in them.
+                if (!u_attr) {
+                    return;
+                }
                 u_attr[ctx.ua] = res;
 
                 if (is_fm()) {

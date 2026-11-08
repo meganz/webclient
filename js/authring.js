@@ -57,6 +57,8 @@ var authring = (function () {
     };
     var _ALLOWED_AUTHENTICATION_METHODS = [0x00, 0x01, 0x02];
 
+    const _SIGNATURE_LENGTH = 72;
+
     const isUserHandle = tryCatch((userHandle) => {
         return typeof userHandle === 'string' && base64urldecode(userHandle).length === 8;
     });
@@ -588,12 +590,12 @@ var authring = (function () {
         if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupported key type: ' + keyType);
 
-            return MegaPromise.resolve(null);
+            return MegaPromise.resolve(false);
         }
-        if (!signature) {
-            logger.warn('Cannot verify an empty signature.');
+        if (typeof signature !== 'string' || signature.length !== _SIGNATURE_LENGTH) {
+            logger.warn('Cannot verify a missing or malformed signature.');
 
-            return MegaPromise.resolve(null);
+            return MegaPromise.resolve(false);
         }
 
         var signatureValue = signature.substring(8);
@@ -602,7 +604,7 @@ var authring = (function () {
         if (timestampValue > Math.round(Date.now() / 1000)) {
             logger.error('Bad timestamp: In the future!');
 
-            return MegaPromise.resolve(null);
+            return MegaPromise.resolve(false);
         }
         var value = pubKey;
         if (keyType === 'RSA') {
@@ -828,6 +830,9 @@ var authring = (function () {
         if (d) {
             console.time('authring.initAuthenticationSystem');
         }
+
+        // Drop any unverified data now that authring is going to be available
+        crypt.dropPubKeyCaches();
 
         // The promise to return.
         var masterPromise = ns._initialisingPromise = new MegaPromise();

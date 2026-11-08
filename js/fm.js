@@ -485,7 +485,10 @@ function setContactLink($container) {
         var linkData = $(this).attr('data-lnk') || '';
 
         if (linkData.length) {
-            copyToClipboard(linkData, `${l[371]}<span class="link-text">${linkData}</span>`);
+            const toast = mCreateElement('span', {class: 'message'});
+            toast.textContent = l[371];
+            mCreateElement('span', {class: 'link-text'}, toast).textContent = linkData;
+            copyToClipboard(linkData, toast);
         }
     });
 }
@@ -1730,6 +1733,7 @@ function closeDialog(ev) {
         delete $.saveAsDialog;
         delete $.nodeSaveAs;
         delete $.fileRequestNew;
+        delete $.shareFolderNew;
         onIdle(() => {
             delete $.albumUpload;
         });
@@ -2240,6 +2244,9 @@ function sharedFolderUI() {
             if (r === 2) {
                 buttons.push('.rename-item');
             }
+            if (!M.getNodeByHandle(p)) {
+                buttons.push('.leaveshare-item');
+            }
             M.contextMenuUI(ev, 8, buttons.join(','), [h]);
         };
         if (h === M.currentdirid) {
@@ -2536,7 +2543,15 @@ function fingerprintDialog(userid, isAdminVerify, callback) {
 
                 // Only push the sub-user's key once the credentials were actually verified
                 if (verified) {
-                    new BusinessAccount().sendSubMKey().catch(tell);
+                    const admin = u_attr && u_attr.b && !u_attr.b.m && u_attr.b.mu[0];
+
+                    // Admin changed while open, verify the current one
+                    if (admin && admin !== userid) {
+                        fingerprintDialog(admin, true);
+                    }
+                    else {
+                        new BusinessAccount().sendSubMKey(userid).catch(tell);
+                    }
                 }
             }
             else {

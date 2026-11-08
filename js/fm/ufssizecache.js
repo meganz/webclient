@@ -236,8 +236,13 @@ UFSSizeCache.prototype.addToDB = function(n) {
             M.onFolderSizeChangeUIUpdate(n);
         }
     }
-    else {
-        this.link(n);
+    else if (!missingkeys[n.h]) {
+        if (self.d) {
+            console.assert(n.name, `Invalid node ${n.h} found.`, n);
+        }
+        if (n.name) {
+            this.link(n);
+        }
     }
 };
 
@@ -246,18 +251,40 @@ UFSSizeCache.prototype.link = function(n) {
     'use strict';
 
     if (self.fmdb && !fmdb.crashed) {
+        let t, ext;
 
         for (let m = this.famap, i = m.length; i--;) {
             const k = m[i];
 
             if (n[k] !== undefined) {
 
-                fmdb.add(k, {
-                    h: n.h,
-                    p: n.p,
-                    ts: n.mtime || n.ts,
-                    d: {[k]: n[k], t: this.bitfield(n)}
-                });
+                // Nothing to weigh up until a table actually takes a row, and then but once
+                if (t === undefined) {
+                    ext = n.name.slice(n.name.lastIndexOf('.') + 1).toLowerCase();
+                    t = this.bitfield(n, ext);
+                }
+
+                const row = {h: n.h, p: n.p, ts: n.mtime || n.ts, d: {[k]: n[k]}};
+
+                // The media index alone holds these as columns of its own
+                if (k === 'fa') {
+                    row.t = t;
+                    row.s = n.s;
+                    row.ext = ext;
+                    row.mts = n.mts || row.ts * 1000;
+
+                    if (t & M.IS_VIDEO) {
+                        row.d.k = n.k;
+                    }
+                    else {
+                        delete row.d;
+                    }
+                }
+                else {
+                    row.d.t = t;
+                }
+
+                fmdb.add(k, row);
             }
         }
     }
@@ -286,7 +313,7 @@ UFSSizeCache.prototype.unlink = function(n, a) {
 };
 
 // node flags
-UFSSizeCache.prototype.bitfield = function(n) {
+UFSSizeCache.prototype.bitfield = function(n, ext) {
     'use strict';
 
     let t = +!!n.t;
@@ -306,6 +333,16 @@ UFSSizeCache.prototype.bitfield = function(n) {
     }
     if (M.isOutShare(n, s ? 'EXP' : null)) {
         t |= M.IS_SHARED;
+    }
+
+    if (n.fa && ext !== undefined) {
+
+        if (n.fa.includes(':8*') || /^m[\dkpv]+$/.test(ext)) {
+            t |= M.IS_VIDEO;
+        }
+        if (M.isGalleryImage(n, ext)) {
+            t |= M.IS_IMAGE;
+        }
     }
     return t;
 };
@@ -561,10 +598,13 @@ lazy(UFSSizeCache, 'link', () => {
      */
 
     const schema = '&h, p, ts';
+
+    // The gallery answers from these alone, so they are columns rather than payload
+    const media = '&h, p, ts, t, ext, s, mts';
     const removable = freeze({des: 1, tags: 1});
 
     const map = new Map([
-        ['fa', schema],
+        ['fa', media],
         ...Object.keys(removable).map((k) => [k, schema])
     ]);
 

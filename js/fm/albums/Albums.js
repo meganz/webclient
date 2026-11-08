@@ -390,7 +390,7 @@ lazy(mega.gallery, 'albums', () => {
      * @returns {void}
      */
     const sortInAlbumNodes = (nodes) => {
-        const sort = M.sortByModTimeFn();
+        const sort = M.sortByMediaTsFn();
         nodes.sort((a, b) => sort(a, b, -1));
     };
 
@@ -882,48 +882,6 @@ lazy(mega.gallery, 'albums', () => {
         }
     }
 
-    class RemoveShareDialog extends MDialog {
-        constructor(albumIds) {
-            super({
-                ok: {
-                    label: albumIds.length > 1 ? l[8735] : l[6821],
-                    callback: () => {
-                        scope.albums.removeShare(albumIds);
-                    },
-                    classes: ['mega-button', 'branded-green']
-                },
-                cancel: {
-                    label: l.msg_dlg_cancel
-                },
-                dialogClasses: null,
-                icon: 'sprite-fm-uni icon-question icon-size-16'
-            });
-
-            this.setContent(albumIds);
-            this.addConfirmationCheckbox(
-                () => mega.config.get('nowarnpl'),
-                (val) => {
-                    const currentVal = !!mega.config.get('nowarnpl');
-
-                    if (val !== currentVal) {
-                        mega.config.setn('nowarnpl', val ? 1 : undefined);
-                    }
-                },
-                l.do_not_show_this_again
-            );
-        }
-
-        setContent(albumIds) {
-            const p = document.createElement('p');
-            p.className = 'px-6';
-
-            p.textContent = mega.icu.format(l.plink_remove_dlg_text_album, albumIds.length);
-
-            this.slot = p;
-            this.title = mega.icu.format(l.plink_remove_dlg_title_album, albumIds.length);
-        }
-    }
-
     const removeShareWithConfirmation = (albumIds) => {
         if (M.isInvalidUserStatus()) {
             return;
@@ -931,11 +889,23 @@ lazy(mega.gallery, 'albums', () => {
 
         if (mega.config.get('nowarnpl')) {
             scope.albums.removeShare(albumIds);
+            return;
         }
-        else {
-            const dialog = new RemoveShareDialog(albumIds);
-            dialog.show();
-        }
+
+        const okLabel = albumIds.length > 1 ? l[8735] : l[6821];
+
+        msgDialog(
+            `>*remove:!^${okLabel}!${l.msg_dlg_cancel}`,
+            false,
+            mega.icu.format(l.plink_remove_dlg_title_album, albumIds.length),
+            mega.icu.format(l.plink_remove_dlg_text_album, albumIds.length),
+            (res) => {
+                if (res === true) {
+                    scope.albums.removeShare(albumIds);
+                }
+            },
+            'nowarnpl'
+        );
     };
 
     class AlbumShareDialog {
@@ -1067,6 +1037,13 @@ lazy(mega.gallery, 'albums', () => {
                         tSleep(3).then(() => {
                             banner.classList.remove('max-h-100');
                             banner.classList.add('max-h-0');
+                            tSleep(0.3).then(() => {
+                                const activeQR = document.componentSelector('.qrcode-popup:not(.hidden)');
+
+                                if (activeQR) {
+                                    activeQR.position();
+                                }
+                            });
                         });
                     }
                     addSettingsBtn(
@@ -1119,6 +1096,35 @@ lazy(mega.gallery, 'albums', () => {
                     copyToClipboard(text);
                     mega.ui.toast.show(copiedMsg, 4);
                     eventlog(copyEvtId);
+                });
+
+                // Decryption key row doesn't need a QR code button
+                if (klass === 'decr-key-value') {
+                    return row;
+                }
+
+                let qrPopup;
+
+                MegaButton.factory({
+                    parentNode: row,
+                    icon: 'sprite-fm-mono icon-qr-thin-outline icon-size-20',
+                    componentClassname: 'transparent-icon text-icon show-qrcode simpletip secondary',
+                    type: 'icon',
+                    dataset: {simpletip: l[17754]}
+                }).on('click.qrcode', function() {
+
+                    if (qrPopup && qrPopup.visible) {
+                        qrPopup.hide();
+                        return;
+                    }
+
+                    qrPopup = qrPopup || new MegaQrPopup({
+                        parentNode: mega.ui.sheet.contentNode,
+                        targetNode: this.domNode,
+                        link: text,
+                        fileName: label
+                    });
+                    qrPopup.show();
                 });
 
                 return row;
@@ -3441,6 +3447,29 @@ lazy(mega.gallery, 'albums', () => {
 
             this.timeline = new scope.AlbumTimeline({
                 onSelectToggle: () => {
+
+                    delay(
+                        'gallery-hydrate:album',
+                        () => {
+
+                            const tl = this.timeline;
+
+                            if (tl) {
+
+                                const sels = Object.keys(tl.selections);
+
+                                mega.gallery.hydrateSelection(sels).then(() => {
+
+                                    const now = this.timeline === tl && Object.keys(tl.selections);
+
+                                    if (now && now.length === sels.length && now.every((h, i) => h === sels[i])) {
+                                        mega.ui.mInfoPanel.reRenderIfVisible(sels);
+                                    }
+                                }).catch(nop);
+                            }
+                        }
+                    );
+
                     delay(
                         'timeline:update_selected_count',
                         () => {
@@ -4024,6 +4053,8 @@ lazy(mega.gallery, 'albums', () => {
         }
     }
 
+    const _mediaExt = n => n.ext || n.fa && fileext(n.name, false, true);
+
     /**
      * Creates a controlling class for AlbumsGrid and AlbumScroll
      */
@@ -4034,21 +4065,20 @@ lazy(mega.gallery, 'albums', () => {
                 gif: {
                     id: 'gif',
                     label: l.album_key_gif,
-                    filterFn: n => n.fa && fileext(n.name || '', true, true) === 'GIF'
+                    filterFn: n => _mediaExt(n) === 'gif'
                 },
                 raw: {
                     id: 'raw',
                     label: l.album_key_raw,
-                    filterFn: n => n.fa
-                        && is_rawimage(n.name) !== undefined
-                        && !ignoreRaws[fileext(n.name || '', true, true)]
+                    filterFn: n => {
+                        const ext = (_mediaExt(n) || '').toUpperCase();
+                        return ext && is_rawimage(n, ext) !== undefined && !ignoreRaws[ext];
+                    }
                 },
                 fav: {
                     id: 'fav',
                     label: l.gallery_favourites,
-                    filterFn: n => n.fa
-                        && n.fav
-                        && M.isGalleryNode(n)
+                    filterFn: n => n.fav && M.isGalleryNode(n)
                 }
             };
 
@@ -4656,7 +4686,10 @@ lazy(mega.gallery, 'albums', () => {
             }
 
             if (slideshowid) {
-                tmpMv.splice(tmpMv.indexOf(node), 1);
+                const index = tmpMv.indexOf(node);
+                if (index > -1) {
+                    tmpMv.splice(index, 1);
+                }
             }
 
             if ($.timelineDialog) {
@@ -4692,7 +4725,10 @@ lazy(mega.gallery, 'albums', () => {
             ) {
                 removeNodeFromAlbum('fav', node.h);
                 if (slideshowid) {
-                    tmpMv.splice(tmpMv.indexOf(node), 1);
+                    const index = tmpMv.indexOf(node);
+                    if (index > -1) {
+                        tmpMv.splice(index, 1);
+                    }
                 }
                 if ($.timelineDialog) {
                     removeNodeFromTimelineDialog(node.h);

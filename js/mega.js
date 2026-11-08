@@ -70,6 +70,7 @@ Object.defineProperty(mega, 'halt', {
 
             getsc.stop = nop;
             getsc.validate = nop;
+            waitsc.setURL = nop;
 
             // shutdown chat..
             if (self.megaChatIsReady) {
@@ -719,7 +720,7 @@ function sc_packet(a) {
 function sc_node(n) {
     "use strict";
 
-    crypto_rsacheck(n);
+    // crypto_rsacheck(n);
 
     if (!decWorkerPool.ok) {
         crypto_decryptnode(n);
@@ -884,47 +885,9 @@ scparser.$add('s', {
                         console.assert(a.a === 's2', `INVALID SHARE, missing user-handle for ${a.n}`, a);
                     }
                 }
-                else if (M.su[a.n] && M.su[a.n].has(a.u) || a.ha === crypto_handleauth(a.n)) {
-
-                    // I updated or created my share
-                    const k = decrypt_key(u_k_aes, base64_to_a32(a.ok));
-
-                    if (k) {
-                        crypto_setsharekey(a.n, k);
-
-                        if (d) {
-                            console.assert(a.u || a.a === 's2', 'INVALID SHARE, missing user handle', a);
-                        }
-
-                        if (a.u) {
-                            M.nodeShare(a.n, {h: a.n, r: a.r, u: a.u, ts: a.ts});
-                        }
-                        else if (a.a === 's2' && fmdb) {
-                            // this must be a pending share, store ownerkey
-                            fmdb.add('ok', {h: a.n, d: {k: a.ok, ha: a.ha}});
-                        }
-                    }
-                }
             }
         }
         else {
-            if (a.n && typeof a.k !== 'undefined' && !u_sharekeys[a.n] && !self.secureKeyMgr) {
-                if (Array.isArray(a.k)) {
-                    // a.k has been processed by the worker
-                    crypto_setsharekey(a.n, a.k);
-                    prockey = true;
-                }
-                else if (d) {
-                    // XXX: misdirected actionpackets?
-                    console.warn('Got share action-packet with invalid key, wait for it.', a.n, a.k, [a]);
-                }
-            }
-
-            if (a.u === 'EXP') {
-
-                mega.Share.ExportLink.pullShareLink(a.h, true).catch(dump);
-            }
-
             if ('o' in a) {
                 if (!('r' in a)) {
                     // share deletion
@@ -997,7 +960,6 @@ scparser.$add('s', {
                         scinshare.skip = false;
                         scinshare.h = a.n;
                         scinshare.r = a.r;
-                        scinshare.sk = a.k;
                         scinshare.su = a.o;
 
                         if (!folderlink && fminitialized) {
@@ -1065,10 +1027,6 @@ scparser.$add('s2', {
         // 's2' still requires the logic for 's'
         this.s(a);
 
-        // store ownerkey
-        if (fmdb && !self.secureKeyMgr) {
-            fmdb.add('ok', {h: a.n, d: {k: a.ok, ha: a.ha}});
-        }
         processPS([a]);
     }
 });
@@ -1422,6 +1380,19 @@ scparser.$add('ua', (a) => {
     }
 });
 
+scparser.$add('ute', (a) => {
+    'use strict';
+
+    // `taxnum` is not an attribute, so no `ua` carries it - only a fresh ug has the new value.
+    // Read now, not after that ug: by then the save that caused this has finished and cleared it.
+    const local = a.st === api.currst || !!Object(mega.buinsessController).savingProfile;
+
+    // Caught before the broadcast: a failed refresh still has to reach the open page.
+    M.getAccountDetails()
+        .catch(dump)
+        .then(() => mBroadcaster.sendMessage('business:subuserUpdate', {external: !local}));
+});
+
 scparser.$add('sd', {
     b: function() {
         "use strict";
@@ -1714,6 +1685,14 @@ scparser.$add('pses', function(a) {
     }
 });
 
+// Cloud import reached a terminal state
+scparser.$add('msc', (a) => {
+    'use strict';
+    if (!folderlink && fminitialized) {
+        mega.migrate.importEnd(a.id).catch(dump);
+    }
+});
+
 scparser.mcsmp = a => {
     'use strict';
     if (folderlink) {
@@ -1781,13 +1760,14 @@ scparser.mcpc = scparser.mcc = function (a) {
         eventlog(
             99779,
             JSON.stringify([
-                1,
+                2,
                 buildVersion && buildVersion.website || 'dev',
                 sessionStorage.updateRequiredBy | 0,
                 loadfm.chatmcf === null ? 'null' : typeof loadfm.chatmcf,
                 u_type | 0,
                 (!!owner) | 0,
-                Object(actors).length | 0
+                Object(actors).length | 0,
+                fmdb ? fmdb.crashed | 0 : -1
             ])
         );
     }
@@ -1848,17 +1828,28 @@ scparser.$add('_fm', function() {
 scparser.$add('ssc', process_businessAccountSubUsers_SC);
 
 // business account change which requires reload (such as payment against expired account)
-scparser.$add('ub', function() {
+scparser.$add('ub', (a) => {
     "use strict";
     if (!folderlink && !addressDialog.paymentInProcess) {
+
+        // Reloading would restart from that same tree and replay it again.
+        if (loadfm.loading && u_attr && u_attr.b && u_attr.b.s === a.s && Boolean(u_attr.b.m) === Boolean(a.m)) {
+            return;
+        }
         scfullreload = 'ub-business';
     }
 });
 
 // Pro Flexi account change which requires reload (such as payment against expired account)
-scparser.$add('upf', () => {
+scparser.$add('upf', (a) => {
     "use strict";
     if (!folderlink && !addressDialog.paymentInProcess) {
+        const pf = u_attr && u_attr.pf;
+
+        // As for 'ub'. s is 1 when the account is now Pro Flexi, 0 when that was removed.
+        if (loadfm.loading && (a.s === 1 && pf && pf.s === pro.ACCOUNT_STATUS_ENABLED || a.s === 0 && !pf)) {
+            return;
+        }
         scfullreload = 'upf-proflexi';
     }
 });
@@ -2186,40 +2177,6 @@ async function fm_fullreload(light, logMsg) {
     ]).then(() => location.reload(true));
 }
 
-// this receives the ok elements one by one as per the filter rule
-// to facilitate the decryption of outbound shares, the API now sends ok before f
-function tree_ok0(ok) {
-    "use strict";
-
-    if (self.secureKeyMgr) {
-        if (d > 2) {
-            console.warn('Secure environment, moving on...', ok);
-        }
-        return;
-    }
-
-    if (fmdb) {
-        fmdb.add('ok', { h : ok.h, d : ok });
-    }
-
-    // bind outbound share root to specific worker, post ok element to that worker
-    // FIXME: check if nested outbound shares are returned with all shareufskeys!
-    // if that is not the case, we need to bind all ok handles to the same worker
-    if (decWorkerPool.ok) {
-        decWorkerPool.postNode(ok);
-    }
-    else if (crypto_handleauthcheck(ok.h, ok.ha)) {
-        if (d) {
-            console.log(`Successfully decrypted sharekeys for ${ok.h}`);
-        }
-        const key = decrypt_key(u_k_aes, base64_to_a32(ok.k));
-        crypto_setsharekey2(ok.h, key);
-    }
-    else {
-        console.error(`handleauthcheck() failed for ${ok.h}`);
-    }
-}
-
 /**
  * Emplace node into M.d and M.c
  *
@@ -2265,7 +2222,7 @@ function emplacenode(node, noc) {
             M.c[node.p][node.h] = node.t + 1;
         }
     }
-    else if (node.t > 1 && node.t < 5) {
+    else if (node.t > 1 && node.t < 5 && String(node.h).length === 8) {
         if (!M.c[node.h]) {
             M.c[node.h] = Object.create(null);
         }
@@ -2302,17 +2259,29 @@ function tree_node(node) {
                 allowNullKeys: self.allowNullKeys
             });
         }
-        else {
-            crypto_setsharekey2(node.h, base64_to_a32(pfkey));
-        }
 
         M.RootID = node.h;
+
+        // Ensure the link is decryptable before passing through workers all its nodes.
+        crypto_setsharekey2(node.h, base64_to_a32(pfkey));
+
+        const n = crypto_decryptnode({...node});
+
+        if (!n.k || typeof n.k === 'string' || n.k.length !== 4) {
+            (missingkeys = (missingkeys || {}))[n.h] = {[n.h]: true};
+
+            api.reset();
+            decWorkerPool.kill();
+            self.folderreqerr = dump;
+            return loadfm_callback(false);
+        }
     }
-    else if (M.d[node.h] && (M.d[node.h].name || M.d[node.h].k === undefined)) {
+    else if (M.d[node.h] && (M.d[node.h].name || M.d[node.h].k === undefined) || missingkeys[M.RootID]) {
         // already decrypted
         return;
     }
 
+    /**
     if (!mega.keyMgr.secure) {
         crypto_rsacheck(node);
 
@@ -2321,6 +2290,7 @@ function tree_node(node) {
             rsasharekeys[node.h] = true;
         }
     }
+     **/
 
     // children inherit their parents' worker bindings; unbound inshare roots receive a new binding
     // unbound nodes go to a random worker (round-robin assignment)
@@ -2544,7 +2514,7 @@ function loadfm(force) {
             // is this a folder link? or do we have no valid cache for this session?
             if (pfid) {
                 fmdb = false;
-                fetchfm(false).catch(folderreqerr);
+                fetchfm(false).catch((ex) => folderreqerr(ex));
             }
             else if (!u_k_aes) {
                 console.error('No master key found... please contact support@mega.io');
@@ -2776,15 +2746,10 @@ function dbfetchfm(residual) {
     var tableProc = function(t) {
         return function(r) {
             if (tables[t] === 1) {
-                if (r.length > 0) {
-                    loadfm.chatmcf = r;
-                }
-                else {
-                    loadfm.chatmcf = -1;
-                }
+                loadfm.chatmcf = r;
             }
             else if (tables[t] === 2) {
-                loadfm.chatmcsm = r.length > 0 ? r : -1;
+                loadfm.chatmcsm = r;
             }
             else {
                 return tables[t](r, true);
@@ -2833,8 +2798,6 @@ function dbfetchfm(residual) {
 
     return Promise.all([fmdb.get('ok'), dbfetch.init()])
         .then(([ok]) => {
-            process_ok(ok, true);
-
             loadReport('recvNodes');
             return Promise.all([fmdb.get('mk'), fmdb.get('u'), fmdb.get('s')]);
         })
@@ -3648,21 +3611,6 @@ function process_businessAccountSubUsers_SC(packet) {
     }
 }
 
-function process_ok(ok, ignoreDB) {
-    "use strict";
-
-    for (var i = ok.length; i--; ) {
-        if (ok[i].ha === crypto_handleauth(ok[i].h))
-        {
-            if (fmdb && !pfkey && !ignoreDB) {
-                fmdb.add('ok', { h : ok[i].h, d : ok[i] });
-            }
-            crypto_setsharekey(ok[i].h, decrypt_key(u_k_aes, base64_to_a32(ok[i].k)), ignoreDB);
-        }
-    }
-}
-
-
 function processMCF(mcfResponse, ignoreDB) {
     'use strict';
 
@@ -3826,10 +3774,6 @@ function loadfm_callback(res) {
     }
     if (res.tct) {
         mega.loadReport.tct = res.tct;
-    }
-    if (res.ok && !res.ok0) {
-        // this is a legacy cached tree without an ok0 element
-        process_ok(res.ok);
     }
 
     if (res.suba) {
@@ -4061,7 +4005,7 @@ function loadfm_done(mDBload) {
         }
 
         // Check Business (or Pro Flexi) account is expired on initial phase in desktop web
-        if (!pfid && !is_mobile && u_attr && (u_attr.b || u_attr.pf)) {
+        if (!pfid && !is_mobile && u_attr && (u_attr.b || u_attr.pf) && u_type) {
 
             M.require('businessAcc_js', 'businessAccUI_js').done(() => {
 

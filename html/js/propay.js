@@ -28,6 +28,8 @@ pro.propay = {
     // the Continue button; cleared when the user changes country or gateway.
     countryMismatchAttempted: false,
 
+    s4WarningConfirmed: false,
+
     pageInfo: {
         'initialized': false,
     },
@@ -55,6 +57,9 @@ pro.propay = {
     useSavedCard: null,
     savedCardInitiated: false,
     sca: false,
+
+    // Cached by getScrollBlock(), dropped when leaving the page
+    scrollBlock: null,
 
     trial: 1,
 
@@ -149,6 +154,35 @@ pro.propay = {
         return pro.propay.userOnPropayPage;
     },
 
+    /**
+     * The scrolling block of the page, which holds the header so that it scrolls too
+     * @returns {Element|null} The perfect scrollbar container
+     */
+    getScrollBlock() {
+        'use strict';
+
+        if (!this.scrollBlock) {
+            this.scrollBlock = document.querySelector('#startholder .bottom-page.propay > .bottom-page.content');
+        }
+
+        return this.scrollBlock;
+    },
+
+    /**
+     * Scrolls the desktop page back to the top, remeasuring the scrollbar with it
+     * @returns {void}
+     */
+    scrollToTop() {
+        'use strict';
+
+        const scrollBlock = is_mobile ? null : this.getScrollBlock();
+
+        if (scrollBlock) {
+            scrollBlock.scrollTop = 0;
+            Ps.update(scrollBlock);
+        }
+    },
+
     initSwitchers() {
         'use strict';
 
@@ -220,11 +254,6 @@ pro.propay = {
             $billingAddressInfo.addClass('error');
         }
 
-        if (reasons.s4TosNeeded) {
-            const locationSelector = $('body').innerWidth() >= 1080 ? 'footer.desktop' : 'footer.mobile';
-            $(`${locationSelector} .s4-tos`, this.$page).addClass('error');
-        }
-
         if (this.isNewAccount) {
             const $accountDetails = $('.account-details', this.$page);
 
@@ -263,10 +292,6 @@ pro.propay = {
         }
 
         const currentGateway = this.currentGateway && this.currentGateway.gatewayId;
-
-        if (window.s4ac && this.s4Active && !this.s4TosAccepted) {
-            reasons.s4TosNeeded = 1;
-        }
 
         if (this.isNewAccount && !skipAccountDetails) {
             const {name, email, password} = this.signup.getNewAccountDetails();
@@ -316,6 +341,16 @@ pro.propay = {
         }
 
         return this.savedCard;
+    },
+
+    /**
+     * Whether the purchase in flight charges the saved card, i.e. the utc call carries extra.pmid
+     * @returns {Boolean} True when the saved card is the selected payment method
+     */
+    usedSavedCard() {
+        'use strict';
+
+        return !!(this.useSavedCard && this.savedCard.id && !this.paymentButton);
     },
 
     /**
@@ -684,13 +719,6 @@ pro.propay = {
             utsRequest.dc = discountInfo.dc;
         }
 
-        // Add S4 parameters
-        const s4Flexi = this.s4Active && window.s4ac && pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI;
-
-        if (s4Flexi) {
-            utsRequest.s4 = 1;
-        }
-
         const setValues = (extra, saleId) => {
 
             const enteredBillingInfo = pro.propay.billing.getEnteredBillingInfo();
@@ -764,7 +792,7 @@ pro.propay = {
                 pro.lastPaymentProviderId = addressDialog.gatewayId_stripe;
 
                 // Do not set pmid if user is not using a saved card
-                if (this.useSavedCard && this.savedCard.id && !this.paymentButton) {
+                if (this.usedSavedCard()) {
                     extra.pmid = this.savedCard.id;
                 }
                 if (!this.currentGateway.supportsRecurring) {
@@ -775,6 +803,9 @@ pro.propay = {
 
             return true;
         };
+
+        // Set once the utc call carries a pmid, so the catch below can confirm a reported failure
+        let savedCardSaleId = null;
 
         // Setup the 'uts' API request
         api.screq(utsRequest)
@@ -800,6 +831,10 @@ pro.propay = {
 
                 // If saleId is already an array of sale IDs use that, otherwise add to an array
                 const saleIdArray = Array.isArray(saleId) ? saleId : [saleId];
+
+                if (extra.pmid) {
+                    savedCardSaleId = saleIdArray;
+                }
 
                 extra.taxCode = pro.propay.billing.getTaxNumberForApiReq();
 
@@ -871,16 +906,27 @@ pro.propay = {
             })
             .catch((ex) => {
 
+                if (savedCardSaleId) {
+                    return addressDialog.recoverSavedCardSale(savedCardSaleId)
+                        .catch(() => {
+                            throw ex;
+                        })
+                        .then((recovered) => {
+                            if (!recovered && this.onPropayPage()) {
+                                throw ex;
+                            }
+                        });
+                }
+                throw ex;
+            })
+            .catch((ex) => {
                 console.error(ex);
+
                 // Default error is "Something went wrong. Try again later..."
                 let errorMessage;
 
-                // Get S4 error messages
-                if (s4Flexi && (errorMessage = ActivateS4.instance.getErrorMsg(ex))) {
-                    delete window.s4ac;
-                }
                 // Handle specific discount errors
-                else if (ex === EEXPIRED) {
+                if (ex === EEXPIRED) {
                     // The discount code has expired.
                     errorMessage = l[24675];
                 }
@@ -1733,16 +1779,6 @@ pro.propay = {
                 $includesContent.safeAppend(HTMLString);
             }
 
-            if ((this.planObj.level === pro.ACCOUNT_LEVEL_PRO_FLEXI) && window.s4ac) {
-                $includesContent
-                    .safeAppend(
-                        `<div class="plan-card-s4">
-                            <i class="sprite-fm-mono icon-bucket-triangle-thin-outline"></i>
-                            ${l.ri_s4_tab}
-                        </div>`
-                    );
-            }
-
             // S4-flagged discount codes get an extra egress feature line
             if (this.discountInfo && this.discountInfo.s4) {
                 $includesContent
@@ -2536,9 +2572,7 @@ pro.propay = {
         let shouldBlockFlow = false;
         const blockFlowReasons = this.blockFlow(true);
 
-        // If s4Tos needed but not accepted, still load payment option
         if (blockFlowReasons) {
-            delete blockFlowReasons.s4TosNeeded;
             shouldBlockFlow = Object.keys(blockFlowReasons).length;
         }
 
@@ -2654,7 +2688,7 @@ pro.propay = {
 
         if (option.tooltip) {
             const tooltip = document.createElement('i');
-            tooltip.className = 'pricing-i-icon simpletip';
+            tooltip.className = 'sprite-fm-mono icon-info-thin-outline simpletip';
             tooltip.dataset.simpletip = option.tooltip;
             tooltip.dataset.simpletipposition = 'bottom';
             tooltip.dataset.simpletipoffset = '3';
@@ -2840,6 +2874,7 @@ pro.propay = {
             const options = this.paymentGateways[type];
 
             $('.payment-method .selected').removeClass('selected');
+            $('#propay-payment-dropdown-pri').addClass('selected');
 
             pro.propay.showErrors(true);
 
@@ -3170,7 +3205,39 @@ pro.propay = {
         pro.propay.$continueButton.rebind('click.propay', () => {
 
             if (pro.propay.$continueButton.hasClass('loading')
-                || pro.propay.$continueButton.hasClass('disabled')) {
+                || pro.propay.$continueButton.hasClass('disabled')
+                // Prevent re-entry while the async billing/discount refresh is in progress
+                // loadMembershipPlans() replaces the button, losing its loading state
+                || pro.propay.continueInFlight) {
+                return;
+            }
+
+            if (self.u_attr && u_attr.s4 && !pro.propay.s4WarningConfirmed
+                && (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_II
+                    || pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_III)) {
+
+                msgDialog(
+                    `*warningb:!^${l.view_plans}!${l.continue_upgrade}`, '', '',
+                    l.enabled_s4_when_upg_acc,
+                    (res) => {
+                        if (res === true) {
+                            pro.propay.s4WarningConfirmed = true;
+                            pro.propay.$continueButton.trigger('click.propay');
+                            eventlog(501436);
+                        }
+                        else if (res === false) {
+                            // Scroll to the Pro Flexi plan
+                            sessionStorage.mScrollTo = 'flexi';
+                            loadSubPage('pro');
+                            eventlog(501437);
+                        }
+                        else {
+                            eventlog(501438);
+                        }
+                    }
+                );
+
+                eventlog(501435);
                 return;
             }
 
@@ -3181,6 +3248,7 @@ pro.propay = {
                 return;
             }
 
+            pro.propay.continueInFlight = true;
             pro.propay.skItems.continueBtn.startLoad();
 
             pro.propay.billing.hasAttemptedSubmit = true;
@@ -3286,6 +3354,7 @@ pro.propay = {
                 pro.propay.showErrors();
                 console.error(ex);
             }).finally(() => {
+                pro.propay.continueInFlight = false;
                 pro.propay.skItems.continueBtn.endLoad();
             });
 
@@ -3629,50 +3698,10 @@ pro.propay = {
         return this.paymentGateways;
     },
 
-    handleS4() {
-        'use strict';
-
-        const $s4 = $('.s4-wrapper', this.$page);
-
-        this.s4Active = !!window.s4ac;
-        this.s4TosAccepted = false;
-
-        const $button = $('button', $s4);
-        const $s4Checkbox = $('.s4-tos', this.$page).removeClass('hidden');
-        const $checkboxParts = $('.checkbox-item', $s4Checkbox);
-
-        $button.rebind('click', () => {
-
-            this.s4Active = !this.s4Active;
-
-            $('.plan-card-s4', this.pageInfo.$planCard).toggleClass('hidden', !this.s4Active);
-
-            $button.toggleClass('active', this.s4Active);
-            $s4Checkbox.toggleClass('hidden', !this.s4Active);
-        });
-
-        $('div.tos', $s4Checkbox).rebind('click', () => {
-            this.s4TosAccepted = !this.s4TosAccepted;
-
-            $checkboxParts.removeClass('checkboxOn checkboxOff');
-            $checkboxParts.addClass(this.s4TosAccepted ? 'checkboxOn' : 'checkboxOff');
-
-            const currentGatewayName = pro.propay.currentGateway && pro.propay.currentGateway.gatewayName;
-
-            if ((currentGatewayName === 'stripeGP') || (currentGatewayName === 'stripeAP')) {
-                pro.propay.updatePayment();
-            }
-            else {
-                pro.propay.updatePageInfo();
-            }
-        });
-    },
-
     updateContinueDisabled() {
         'use strict';
-        const s4Blocked = !!(window.s4ac && this.blockFlow());
         const countryBlocked = this.countryMismatchAttempted && this.hasGatewayCountryMismatch();
-        $('.continue', this.$page).toggleClass('disabled', s4Blocked || countryBlocked);
+        $('.continue', this.$page).toggleClass('disabled', countryBlocked);
     },
 
     hasGatewayCountryMismatch() {
@@ -3749,10 +3778,24 @@ pro.propay = {
         this.setContinuebuttonText();
         this.pageInitialised = true;
         this.sk.endLoadAll();
+        if (!is_mobile) {
+            // Content is only sized once loading finishes, so the scrollbar needs a second pass.
+            initPerfectScrollbar(
+                $(this.getScrollBlock()),
+                {suppressScrollX: true}
+            );
+        }
     },
 
     init() {
         'use strict';
+
+        // A re-render detaches the node a previous visit cached
+        this.scrollBlock = null;
+
+        // Reset the guard in case a previous flow was abandoned before reaching
+        this.continueInFlight = false;
+        this.s4WarningConfirmed = false;
 
         if (is_mobile) {
             document.body.classList.remove('psa-notification');
@@ -3791,11 +3834,6 @@ pro.propay = {
         if (userFlexiInfo) {
             // If Pro Flexi account is not expired/grace period, don't allow access to propay
             if (!userExpOrGrace) {
-                // Unless they have entered the S4 Object Storage RYI flow, in which case send them to that page.
-                if (window.s4ac) {
-                    loadSubPage('activate-s4');
-                    return;
-                }
                 loadSubPage('start');
                 return;
             }
@@ -3807,12 +3845,6 @@ pro.propay = {
         // If a current Pro Flexi user (not expired/grace period), don't allow
         // access to this Pro Pay page or they would end up purchasing a new plan
         if (u_attr && u_attr.pf && !pro.isExpiredOrInGracePeriod(u_attr.pf.s)) {
-            // Unless they have entered the S4 Object Storage RYI flow, in which case send them to that landing page.
-            if (window.s4ac) {
-                loadSubPage('activate-s4');
-                return;
-            }
-
             loadSubPage('start');
             return;
         }
@@ -3834,6 +3866,17 @@ pro.propay = {
         if (!this.setPlanFromUrl()) {
             loadSubPage('pro');
             return;
+        }
+
+        // Scopes the holder and the dialogs, which CSS cannot reach from the page itself.
+        // Past the redirecting guards above, or it outlives the page on every one of them.
+        document.body.classList.add('propay-page');
+
+        if (!is_mobile) {
+            initPerfectScrollbar(
+                $(this.getScrollBlock()),
+                {suppressScrollX: true}
+            );
         }
 
         this.preloadAnimation();
@@ -3870,7 +3913,8 @@ pro.propay = {
         pro.propay.pageChangeHandler = mBroadcaster.addListener('pagechange', () => {
             if (!pro.propay.onPropayPage()) {
                 pro.propay.hideLoadingOverlay();
-                delete window.s4ac;
+                pro.propay.scrollBlock = null;
+                document.body.classList.remove('propay-page');
                 // Reset country so a return visit picks up IP-detected again, not the prior pick.
                 pro.propay.billing.initialCountry = undefined;
                 mBroadcaster.removeListener(pro.propay.pageChangeHandler);
@@ -3908,8 +3952,7 @@ pro.propay = {
                 .toggleClass('discount', !!discountInfo)
                 .toggleClass('euro', this.planObj.currency === 'EUR')
                 .toggleClass('flexi', isFlexi)
-                .toggleClass('mobile-device', !!is_mobile)
-                .toggleClass('s4', !!(window.s4ac && isFlexi));
+                .toggleClass('mobile-device', !!is_mobile);
             // AR class is driven by the user-selected billing country - refreshed after
             // billing.init resolves and on every country-dropdown change.
 
@@ -3949,10 +3992,6 @@ pro.propay = {
                 this.renderPropayPage();
 
                 this.initResizeHandler();
-
-                if (window.s4ac && isFlexi) {
-                    this.handleS4();
-                }
 
                 const propayPageVisitEventId = pro.propay.getPropayPageEventId(pro.propay.planNum);
 
@@ -4018,11 +4057,16 @@ pro.propay = {
         let previousWidth = $(window).width();
         let newWidth;
 
+        // Stale scrollbar rails prop up scrollHeight, leaving blank scrollable space below the page
+        const updateScrollbar = is_mobile ? nop : SoonFc(40, () => Ps.update(this.getScrollBlock()));
+
         $(window).rebind('resize.propay-page', () => {
             if (page.slice(0, 7) !== 'propay_') {
                 $(window).off('resize.propay-page');
                 return;
             }
+
+            updateScrollbar();
 
             if (!this.paymentButton) {
                 return;
@@ -4081,7 +4125,7 @@ pro.propay = {
         extra.b2b = pro.propay.billing.isBusinessUse ? 1 : 0;
         extra.inv = ['business', 'invoice'].includes(pro.propay.billing.getBillingType()) ? 1 : 0;
 
-        if (this.useSavedCard && this.savedCard.id && !this.paymentButton) {
+        if (this.usedSavedCard()) {
             extra.pmid = this.savedCard.id;
         }
 
@@ -4312,6 +4356,13 @@ pro.propay = {
         };
     },
 
+    /**
+     * Find the regular plan a targeted discount applies to (its discounted price is in the dci).
+     * @param {Number} al Account level
+     * @param {Number} [m] Months, default 12; falls back to the level's 1-month plan
+     * @returns {Promise<Array|undefined>} utqa plan array for pro.getPlanObj, or undefined when this country
+     * has no plan at that level (e.g. Pro Lite where it is not sold)
+     */
     async getDiscountedPlanInfo(al, m) {
         'use strict';
 
@@ -4457,7 +4508,7 @@ pro.propay = {
         for (let i = 0; i < dcis.length; i++) {
             const dci = dcis[i];
             const matchedPlan = await pro.propay.getDiscountedPlanInfo(dci.al, dci.m);
-            const matchedPlanObj = pro.getPlanObj(matchedPlan);
+            const matchedPlanObj = matchedPlan && pro.getPlanObj(matchedPlan);
 
             if (matchedPlanObj) {
                 offers.push({ dci, matchedPlanObj });

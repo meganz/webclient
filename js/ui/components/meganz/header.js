@@ -441,7 +441,7 @@ class MegaHeader extends MegaMobileHeader {
             let best = null;
             for (let i = dcis.length; i--;) {
                 const {al, pd} = dcis[i];
-                const matchedPlanObj = pro.getPlanObj(plans[i]);
+                const matchedPlanObj = plans[i] && pro.getPlanObj(plans[i]);
                 if (matchedPlanObj) {
                     const percentageDiscount = pro.calculateSavings(
                         [pd, matchedPlanObj.hasYearlyDiscount ? pro.yearlyDiscountPercentage : 0]

@@ -51,8 +51,8 @@
     position: relative;
 }
 .info-panel-block .info-image {
-    height: 160px;
-    object-fit: cover;
+    height: 272px;
+    object-fit: contain;
     object-position: center;
     width: 272px;
 }

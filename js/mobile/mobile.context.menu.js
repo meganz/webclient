@@ -241,7 +241,7 @@ class MegaMobileContextMenu extends MegaComponentGroup {
             MegaNodeComponent.label.set(node, copyImage.querySelector('i'));
             // title node
             this.sheet.clearTitle();
-            this.sheet.titleNode.classList.add('context-menu');
+            this.sheet.titleNode.classList.add('context-menu-title');
             this.sheet.titleNode.append(copyImage, itemInfo);
             const thumbTag = this.sheet.titleNode.querySelector('img'); // remove thumbnails if it has
             if (thumbTag) {

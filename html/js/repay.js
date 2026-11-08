@@ -84,20 +84,13 @@ RepayPage.prototype.initPage = function() {
     // If necessary attributes are not loaded, load them then comeback.
     if (!u_attr.pf && (!u_attr['%name'] || !u_attr['%email'])) {
 
-        // u_attr.taxnum arrives plain-text from ug; only decode when the value came from
-        // mega.attr.get (base64-encoded).
-        const hadTaxnum = !!(u_attr && u_attr.taxnum);
         Promise.allSettled([
             u_attr['%name'] || mega.attr.get(u_attr.b.bu, '%name', -1),
             u_attr['%email'] || mega.attr.get(u_attr.b.bu, '%email', -1),
-            u_attr.taxnum || mega.attr.get(u_attr.b.bu, '%taxnum', -1),
-        ]).then(([{value: name}, {value: email}, {value: taxnum}]) => {
+        ]).then(([{value: name}, {value: email}]) => {
 
             name = u_attr['%name'] = name && from8(base64urldecode(name) || name) || '';
             email = u_attr['%email'] = email && from8(base64urldecode(email) || email) || u_attr.email;
-            if (!hadTaxnum) {
-                u_attr.taxnum = taxnum && from8(base64urldecode(taxnum) || taxnum) || '';
-            }
 
             assert(name && email, `Invalid account state (${name}:${email})`);
 
@@ -136,11 +129,19 @@ RepayPage.prototype.initPage = function() {
 
     // event handler for repay button
     $repayBtn.rebind('click', function repayButtonHandler() {
-        if ($(this).hasClass('disabled')) {
+        if ($(this).hasClass('disabled') || !mySelf.planInfo) {
             return false;
         }
 
+        // init makes several requests before processPayment shows its own spinner.
+        $(this).addClass('disabled');
+        loadingDialog.show();
+
+        // Closing the gateway dialog without paying has to leave them able to try again.
+        mBroadcaster.once('closedialog', () => $repayBtn.removeClass('disabled'));
+
         if (is_mobile) {
+            // mobile.html carries the gateway dialogs; dialogs.html is desktop only.
             parsepage(pages.mobile);
         }
 
@@ -153,7 +154,17 @@ RepayPage.prototype.initPage = function() {
         newBusinessRegister.paymentGateways = mySelf.paymentGateways;
         newBusinessRegister.planInfo = mySelf.planInfo;
 
-        addressDialog.init(mySelf.planInfo, mySelf.userInfo, newBusinessRegister);
+        // Set up but never shown: repay collects no billing details.
+        addressDialog.init(mySelf.planInfo, mySelf.userInfo, newBusinessRegister, true).always(() => {
+
+            // The gateway dialog needs this backdrop, which showDialog skipped.
+            addressDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+
+            // The stripe iframe reads `recurring` back for `r=1`.
+            addressDialog.extraDetails = {recurring: true};
+
+            newBusinessRegister.processPayment(addressDialog.extraDetails, mySelf.planInfo);
+        });
         return false;
     });
 

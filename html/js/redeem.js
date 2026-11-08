@@ -1083,7 +1083,7 @@ var redeem = {
                 reject(ENOENT);
             };
 
-            if (promo === undefined) {
+            if (promo === undefined && /^\d+$/.test(localStorage[code])) {
                 promo = localStorage[code];
             }
 

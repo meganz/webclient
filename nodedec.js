@@ -3,7 +3,6 @@ var usk;
 var u_handle;
 var u_privk;
 var u_k_aes;
-var missingkeys;
 var vkey = new Set();
 var ckey = new Set();
 var nkey = new Set();
@@ -96,21 +95,7 @@ if (typeof importScripts !== 'undefined') {
         }
         jobs++;
 
-        if (req.scqi >= 0) {
-            // actionpacket - we do CPU-intensive stuff here, e.g. decrypting share-keys
-            if ((req.a === 's' || req.a === 's2') && req.n && req.k) {
-                const k = crypto_process_sharekey(req.n, req.k);
-
-                if (k === false) {
-                    log(`Failed to decrypt RSA share key for ${req.n}: ${req.k}`);
-                }
-                else if (crypto_setsharekey2(req.n, k)) {
-                    req.k = k;
-                }
-            }
-            self.postMessage(req);
-        }
-        else if (req.t >= 0) {
+        if (req.t >= 0) {
             // node
             crypto_decryptnode(req);
             self.queueMessage(req);
@@ -118,20 +103,6 @@ if (typeof importScripts !== 'undefined') {
         else if (req.sk) {
             // existing sharekey
             crypto_setsharekey2(req.h, req.sk);
-        }
-        else if (req.ha) {
-            // ownerkey (ok element)
-            let ok = false;
-            if (crypto_handleauthcheck(req.h, req.ha)) {
-                if (d) {
-                    log(`Successfully decrypted sharekeys for ${req.h}`);
-                }
-                const key = decrypt_key(u_k_aes, base64_to_a32(req.k));
-                ok = crypto_setsharekey2(req.h, key);
-            }
-            if (!ok && d) {
-                log(`handleauthcheck failed for ${req.h}`);
-            }
         }
         else if (req.u_k) {
             // setup for user account
@@ -165,12 +136,6 @@ if (typeof importScripts !== 'undefined') {
             dsp();
         }
         else {
-            // unfortunately, we have to discard the SJCL AES cipher
-            // because it does not fit in a worker message
-            const sharekeys = Object.create(null);
-            for (const h in u_sharekeys) {
-                sharekeys[h] = u_sharekeys[h][0];
-            }
             jobs--;
 
             if (self.d) {
@@ -179,7 +144,8 @@ if (typeof importScripts !== 'undefined') {
 
             dsp();
             // done - post state back to main thread
-            self.postMessage({done: 1, jobs, sharekeys});
+            const nosharekeys = Object.create(null);
+            self.postMessage({done: 1, jobs, nosharekeys});
             init(self);
         }
     };
@@ -222,21 +188,6 @@ function crypto_setsharekey2(h, sk) {
     return false;
 }
 
-function crypto_process_sharekey(handle, key) {
-    if (self.secureKeyMgr) {
-        return false;
-    }
-
-    if (key.length > 43) {
-        key = base64urldecode(key);
-        var k = crypto_rsadecrypt(key, u_privk);
-        if (k === false) return k;
-        return str_to_a32(k.substr(0, 16));
-    }
-
-    return decrypt_key(u_k_aes, base64_to_a32(key));
-}
-
 // decrypt a node received via `f`, in response to a `p` or in an actionpacket
 // no-op if the node object has previously been decrypted successfully
 // node states and their attributes:
@@ -254,21 +205,6 @@ function crypto_decryptnode(n) {
     }
 
     if (typeof n.k == 'string') {
-        // inbound share root? set parent to sharing user; extract & store sharekey.
-        if (n.su && typeof n.sk == 'string') {
-            key = crypto_process_sharekey(n.h, n.sk);
-
-            if (key) {
-                if (key.length !== 4 && key.length !== 8) {
-                    srvlog2('invalid-aes-key-size', n.h, n.k.length, n.sk.length, key.length);
-                }
-                else {
-                    delete n.sk;
-                    u_sharekeys[n.h] = [key, new sjcl.cipher.aes(key)];
-                }
-            }
-        }
-
         // does the logged in user own the node? (user key is guaranteed to be located first in .k)
         if (n.k.length === 43 || n.k.length === 22) {
             id = u_handle;
@@ -389,7 +325,8 @@ function crypto_decryptnode(n) {
             }, 4000);
         }
 
-        if (missingkeys) {
+        // report missingkeys when ran over the main thread
+        if (self.missingkeys) {
             crypto_reportmissingkey(n);
         }
     }
@@ -604,6 +541,13 @@ function crypto_procattr(n, key) {
                 tryCatch(() => decode_coords(n, o))();
             }
 
+            if (n.fa && n.name) {
+                n.mts = getMediaTSFromFilename(n.name);
+                if (n.mts < 1e3) {
+                    delete n.mts;
+                }
+            }
+
             n.k = key;
             n.ar = o;
             delete n.a;
@@ -651,6 +595,83 @@ function decode_coords(n, o) {
     }
 }
 
+/**
+ * Compute the media timestamp of a node, same as SDK
+ * @param {String} name The node's file name
+ * @returns {Number} Milliseconds since the Unix epoch or ENOENT to use the fallbacks
+ * @name getMediaTSFromFilename
+ * @global
+ */
+self.getMediaTSFromFilename = (() => {
+    'use strict';
+
+    // YYYY MM DD HH MM SS, starting at the first digit and allowing non-digits in between the groups
+    const DATE = /^\D*(\d{4})\D*(\d\d)\D*(\d\d)\D*(\d\d)\D*(\d\d)\D*(\d\d)/;
+    const ENOENT = self.ENOENT || -9;
+
+    // Fractional seconds, separated by either '.' or '_'
+    const FRACTION = /^[._](\d+)/;
+
+    // The +HHMM/-HHMM offset, being looked for within a short window only, so that unrelated
+    // +/- characters deeper in the filename suffix are not being matched
+    const TZ = /^[^+-]{0,5}([+-])(\d\d)(\d\d)/;
+
+    // Extract and validate filename against a proper date.
+    const extract = (name) => {
+        const date = DATE.exec(name);
+        if (!date) {
+            return false;
+        }
+
+        const [year, month, day, hour, minute, second] = date.slice(1).map(Number);
+        if (year < 1970 || month < 1 || month > 12 || day < 1 || hour > 23 || minute > 59 || second > 59) {
+            return false;
+        }
+
+        return {date: date[0], year, month, day, hour, minute, second};
+    };
+
+    return (name) => {
+
+        const dot = name.lastIndexOf('.');
+        const stem = dot > 0 ? name.substring(0, dot) : name;
+
+        const {date, year, month, day, hour, minute, second} = extract(stem);
+        if (!date) {
+            return ENOENT;
+        }
+
+        const tail = stem.substring(date.length);
+        const fraction = FRACTION.exec(tail);
+
+        // Up to 3 digits, right-padded to milliseconds, i.e. "1" -> 100, "12" -> 120
+        const ms = fraction ? parseInt(`${fraction[1]}00`.slice(0, 3), 10) : 0;
+        const utcMs = Date.UTC(year, month - 1, day, hour, minute, second, ms);
+
+        // Reject overflowing days, such as the 30th of February, plus the exact epoch,
+        // which the SDK is treating as no result at all
+        if (!utcMs || new Date(utcMs).getUTCDate() !== day) {
+            return ENOENT;
+        }
+
+        const tz = TZ.exec(fraction ? tail.substring(fraction[0].length) : tail);
+        let offset = 0;
+
+        if (tz) {
+            const tzHours = Number(tz[2]);
+            const tzMinutes = Number(tz[3]);
+            // Offsets are capped at 14:00 and are a quarter of an hour at the very least
+            if (tzHours <= 14 && (tzHours < 14 || tzMinutes === 0) && [0, 15, 30, 45].includes(tzMinutes)) {
+                offset = (tzHours * 60 + tzMinutes) * (tz[1] === '-' ? -1 : 1);
+            }
+        }
+
+        // UTC = local - offset, and no further than 2 days in the future
+        const adjusted = utcMs - offset * 60000;
+        return adjusted > 0 && adjusted <= Date.now() + 2 * 864e5 ? adjusted : ENOENT;
+    };
+})();
+
 // encrypt/decrypt 4- or 8-element 32-bit integer array
 function encrypt_key(cipher, a) {
     if (!a) {
@@ -684,12 +705,6 @@ function decrypt_key(cipher, a) {
         x = x.concat(cipher.decrypt([a[i], a[i + 1], a[i + 2], a[i + 3]]));
     }
     return x;
-}
-
-function crypto_handleauthcheck(h, ha) {
-    var a = base64_to_a32(ha);
-    var b = encrypt_key(u_k_aes, str_to_a32(h + h));
-    return a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3];
 }
 
 /**
@@ -1169,6 +1184,12 @@ class MegaNode {
 
 Object.setPrototypeOf(MegaNode.prototype, null);
 
+class GalleryNode extends MegaNode {
+    get [Symbol.toStringTag]() {
+        return 'GalleryNode';
+    }
+}
+
 class TransferNode extends MegaNode {
     constructor(n, value) {
         if (n.a) {
@@ -1200,7 +1221,7 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
     /** @class decWorkerPool */
     return new class extends Array {
         get url() {
-            const WORKER_VERSION = 15;
+            const WORKER_VERSION = 17;
             return `${window.is_extension || window.is_karma ? '' : '/'}nodedec.js?v=${WORKER_VERSION}`;
         }
 
@@ -1419,33 +1440,22 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
 
             if (n.t >= 0) {
                 ++head;
-            }
-            const worker = this[slot];
-            if (worker.queue.push(n) > 10000) {
-                worker.postMessage(worker.queue);
-                worker.queue.length = 0;
-            }
 
-            if (n.sk || n.ha) {
-                parentWorker.set(n.h, slot);
+                const worker = this[slot];
+                if (worker.queue.push(n) > 10000) {
+                    worker.postMessage(worker.queue);
+                    worker.queue.length = 0;
+                }
+
+                if (n.sk || n.ha) {
+                    parentWorker.set(n.h, slot);
+                }
             }
 
             return slot;
         }
 
-        /** post action packet for sharekey decryption */
         postPacket(a, slot) {
-            // set scq slot number
-            a.scqi = slot;
-
-            slot = a.scqi % this.length;
-
-            // pin the nodes of this share to the same worker
-            // (it is the only one that knows the sharekey)
-            shareWorker.set(a.n, slot);
-
-            ++head;
-            this[slot].postMessage(a);
         }
     };
 });

@@ -1172,32 +1172,6 @@
     </div>
 </div>
 
-<!-- Select Authenticator App tooltip launched on the Setup 2FA dialog -->
-<div class="mobile auth-app-select-tooltip hidden">
-    <i class="dropdown-white-arrow"></i>
-    <div class="mobile explanation">[$19566]</div>
-    <a class="mobile app-link authy" href="https://authy.com/download/" target="_blank" rel="noopener noreferrer">
-        <span class="mobile app-link-icon"></span>
-        <span class="mobile app-link-text">Authy</span>
-        <i class="mobile app-arrow sprite-fm-mono icon-arrow-right"></i>
-    </a>
-    <a class="mobile app-link duomobile" href="https://duo.com/product/trusted-users/two-factor-authentication/duo-mobile" target="_blank" rel="noopener noreferrer">
-        <span class="mobile app-link-icon"></span>
-        <span class="mobile app-link-text">Duo Mobile</span>
-        <i class="mobile app-arrow sprite-fm-mono icon-arrow-right"></i>
-    </a>
-    <a class="mobile app-link googleauthenticator" href="https://support.google.com/accounts/answer/1066447" target="_blank" rel="noopener noreferrer">
-        <span class="mobile app-link-icon"></span>
-        <span class="mobile app-link-text">Google Authenticator</span>
-        <i class="mobile app-arrow sprite-fm-mono icon-arrow-right"></i>
-    </a>
-    <a class="mobile app-link microsoftauthenticator" href="https://www.microsoft.com/en-us/account/authenticator#getapp" target="_blank" rel="noopener noreferrer">
-        <span class="mobile app-link-icon"></span>
-        <span class="mobile app-link-text">Microsoft Authenticator</span>
-        <i class="mobile app-arrow sprite-fm-mono icon-arrow-right"></i>
-    </a>
-</div>
-
 <!-- left-click onboarding-like hint to tell users about double-click and right-click -->
 <div class="dropdown body hint click-hint dropdown-arrow left-arrow high-top-pos-arrow short hidden">
     <i class="dropdown-white-arrow"></i>
@@ -3644,166 +3618,6 @@
         </footer>
     </div>
 
-    <!-- Dialog: setup-two-factor -->
-    <!-- Setup Two-Factor Authentication !-->
-    <div class="mega-dialog dialog-template-action two-factor-dialog setup-two-factor hidden"
-         role="dialog"
-         aria-labelledby="setup-two-factor-title"
-         aria-modal="true">
-
-        <button class="close js-close" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
-        </button>
-
-        <header>
-            <h2 id="setup-two-factor-title">[$19289]</h2>
-        </header>
-
-        <section class="content">
-            <div class="content-block">
-                <div class="instruction-message">
-                    <div class="text">[$19205]</div>
-                    <div class="no-auth-app-button">[$19565]</div>
-                </div>
-                <div class="two-factor-qr-code"></div>
-                <div class="fm-account-input disabled">
-                    <input class="two-factor-qr-seed" type="text" value="" readonly>
-                </div>
-            </div>
-        </section>
-
-        <footer>
-            <div class="footer-container">
-                <button class="mega-button large positive two-factor-next-btn">
-                    <span>[$556]</span>
-                </button>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Dialog: setup-two-factor-verify -->
-    <!-- Set up Two factor verify the code from Authentication app -->
-    <div class="mega-dialog dialog-template-action two-factor-dialog setup-two-factor-verify hidden"
-         role="dialog"
-         aria-labelledby="-title"
-         aria-modal="true">
-
-        <button class="close js-close" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
-        </button>
-
-        <header>
-            <h2 id="setup-two-factor-verify-title"></h2>
-        </header>
-
-        <section class="content">
-            <div class="content-block">
-                <div class="dialog-body-subheader">
-                    <span>[$19196]</span>
-                </div>
-                <div class="fm-account-input">
-                    <input class="pin-input" type="text" value="" placeholder="[$19193]" maxlength="6">
-                </div>
-                <div class="information-highlight warning failed hidden">
-                    <span>[$19197]</span>
-                </div>
-                <div class="information-highlight warning empty hidden">
-                    <span>[$19191]</span>
-                </div>
-                <div class="information-highlight success hidden">
-                    <span>[$19198]</span>
-                </div>
-            </div>
-        </section>
-
-        <footer>
-            <div class="footer-container">
-                <button class="mega-button large back-button">
-                    <span>[$822]</span>
-                </button>
-                <button class="mega-button large positive next-button">
-                    <span>[$556]</span>
-                </button>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Dialog: setup-two-factor-backup-key -->
-    <!-- Post set up of Two Factor Authentication to backup the recovery key -->
-    <div class="mega-dialog dialog-template-action two-factor-dialog setup-two-factor-backup-key hidden"
-         role="dialog"
-         aria-labelledby="setup-two-factor-backup-key-title"
-         aria-modal="true">
-
-        <button class="close js-close" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
-        </button>
-
-        <header>
-            <h2 id="setup-two-factor-backup-key-title">[$8963]</h2>
-        </header>
-
-        <section class="content">
-            <div class="content-block dialog-bottom">
-                <div class="recovery-key-container">
-                    <i class="recovery-key-icon sprite-fm-mime icon-text-24"></i>
-                    <div class="recovery-key-info-block">
-                        [$backup_setup_2fa_recovery_key]
-                    </div>
-                    <button class="mega-button positive recovery-key-button">
-                        <span>[$1988]</span>
-                    </button>
-                </div>
-                <div class="information-highlight warning">
-                    <span>[$19199]</span>
-                </div>
-                <div class="dialog-body-centre-text">[$19200]</div>
-            </div>
-        </section>
-    </div>
-
-    <!-- Dialog: two-factor-verify-action -->
-    <!-- Verify an account action with two-factor authentication PIN required !-->
-    <div class="mega-dialog dialog-template-action two-factor-dialog two-factor-verify-action hidden"
-         role="dialog"
-         aria-labelledby="two-factor-verify-action-title"
-         aria-modal="true">
-
-        <button class="close js-close" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
-        </button>
-
-        <header>
-            <h2 id="two-factor-verify-action-title"></h2>
-        </header>
-
-        <section class="content">
-            <div class="content-block">
-                <div class="dialog-body-subheader">
-                    <span>[$19191]:</span>
-                </div>
-                <div class="fm-account-input">
-                    <input class="pin-input" type="text" value="" placeholder="[$19193]" maxlength="6">
-                </div>
-                <div class="information-highlight warning hidden">[$19191]</div>
-            </div>
-        </section>
-
-        <footer>
-            <div class="footer-container">
-                <div>
-                    <button class="mega-button positive large submit-button">
-                        <span>[$1694]</span>
-                    </button>
-                </div>
-            </div>
-
-            <aside>
-                <div class="lost-authenticator-button">[$19215]</div>
-            </aside>
-        </footer>
-    </div>
-
     <!-- Dialog: verify-phone -->
     <!-- Verify phone number super dialog -->
     <div class="mega-dialog dialog-template-tool verify-phone hidden"
@@ -3918,57 +3732,6 @@
         </footer>
     </div>
 
-    <!-- Dialog: recovery-key-dialog -->
-    <!-- Recover Account (Display recover key) !-->
-    <div class="mega-dialog dialog-template-graphic recovery-key-dialog backup-recover improved-recovery-steps hidden"
-         role="dialog"
-         aria-labelledby="-title"
-         aria-modal="true">
-
-        <button class="close js-close" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
-        </button>
-
-        <header>
-            <div class="graphic pre-register sprite-fm-illustration img-dialog-account-lock"></div>
-            <div class="graphic post-register sprite-fm-illustration img-dialog-account-recovery"></div>
-            <h2 id="-title">[$19826]</h2>
-        </header>
-
-        <section class="content">
-            <div class="content-block">
-                <h3 class="step-main-question pre-register">[$19852]</h3>
-                <p class="first-paragraph pre-register">[$19853]</p>
-                <p class="second-paragraph pre-register">[$19854]</p>
-                <p class="second-paragraph post-register">[$20189]<br /><a href="https://help.mega.io/accounts/password-management/recovery-key" class="info" target="_blank" rel="noopener noreferrer">[$8742]</a>.</p>
-                <div class="recover-paste-block">
-                    <div class="left-section">
-                        <h3 class="backup-key-header">[$8963]</h3>
-                        <div class="account input-wrapper recovery-key">
-                            <i class="js-key sprite-fm-mono icon-key"></i>
-                            <input id="backup_keyinput_2fa" type="text" value="u1i34fieinf13ifhf98dfasdfji" readonly>
-                        </div>
-                    </div>
-                    <div class="account right-section button-wrapper">
-                        <button class="mega-button copy-recovery-key-button">
-                            <span>[$17386]</span>
-                        </button>
-                        <button class="mega-button positive save-recovery-key-button">
-                            <span>[$58]</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <footer>
-            <aside>
-                <p class="reset-account">[$19840]</p>
-                <p class="skip-button">[$20190]</p>
-            </aside>
-        </footer>
-    </div>
-
     <!-- Dialog: contact-verification-dialog -->
     <div class="mega-dialog dialog-template-graphic contact-verification-dialog hidden"
          role="dialog"
@@ -4010,7 +3773,7 @@
          aria-modal="true">
 
         <button class="close js-close" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
+            <i class="sprite-fm-mono icon-dialog-close-thin"></i>
         </button>
 
         <header>
@@ -4022,21 +3785,21 @@
                 <p>[$20192]</p>
                 <div class="backup-key-info">
                     <div class="col-3 inline-block">
-                        <i class="illustration-block sprite-fm-illustration img-dialog-printer"></i>
+                        <i class="illustration-block recovery-img-printed"></i>
                         <div class="backup-key-info-text">
                             [$20193]
                         </div>
                     </div>
                     <div></div>
                     <div class="col-3 inline-block">
-                        <i class="illustration-block sprite-fm-illustration img-dialog-pw-manager"></i>
+                        <i class="illustration-block recovery-img-pwm"></i>
                         <div class="backup-key-info-text">
                             [$20194]
                         </div>
                     </div>
                     <div></div>
                     <div class="col-3 inline-block">
-                        <i class="illustration-block sprite-fm-illustration img-dialog-usb"></i>
+                        <i class="illustration-block recovery-img-usb"></i>
                         <div class="backup-key-info-text">
                             [$20195]
                         </div>
@@ -4047,8 +3810,10 @@
 
         <footer>
             <div class="footer-container">
-                <button class="mega-button positive close-dialog">
-                    <span>[$81]</span>
+                <button class="mega-component button nav-elem normal primary close-dialog">
+                    <div class="text-box-wrapper sk-elm">
+                        <span class="primary-text">[$81]</span>
+                    </div>
                 </button>
             </div>
         </footer>

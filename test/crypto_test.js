@@ -238,11 +238,13 @@ describe("crypto unit test", function() {
             });
 
             it("empty signature", function(done) {
-                mStub(authring, 'verifyKey').returns(origMegaPromise.resolve(null));
+                mStub(authring, 'verifyKey').returns(origMegaPromise.resolve(false));
                 ns._checkSignature('', 'RSA key', 'RSA', 'Ed key')
                     .done(function(result) {
-                        assert.strictEqual(result, null);
-                        assert.strictEqual(authring.verifyKey.callCount, 0);
+                        assert.strictEqual(result, false);
+                        assert.strictEqual(authring.verifyKey.callCount, 1);
+                        assert.deepEqual(authring.verifyKey.args[0],
+                            ['', 'RSA key', 'RSA', 'Ed key']);
                         done();
                     });
             });
@@ -308,6 +310,9 @@ describe("crypto unit test", function() {
                 mStub(window, 'u_attr', {});
                 mStub(window, 'u_authring', {Ed25519: undefined});
                 mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
+                mStub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
+                mStub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
+                mStub(authring, 'computeFingerprint').returns('smudge');
 
                 mStub(window, 'api_req').callsFake(function(apiCallDetails, ctx) {
                     console.error("Not implemented - api call:", apiCallDetails, ctx);
@@ -585,67 +590,21 @@ describe("crypto unit test", function() {
                     });
             });
 
-            it("uncached Cu25519 key, seen, no signature", function(done) {
+            it("uncached Cu25519 key, new key, bad signature", function(done) {
                 mStub(window, 'u_authring', {Cu25519: {}});
                 mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
                 mStub(window, 'pubCu25519', {});
 
                 mStub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
-                mStub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
-                mStub(authring, 'getContactAuthenticated').returns({fingerprint: 'smudge'});
-                mStub(mega.attr, 'get').returns('');
+                mStub(ns, '_getPubKeyAuthentication').returns(false);
+                mStub(authring, 'getContactAuthenticated').returns({fingerprint: 'bad smudge'});
+                mStub(mega.attr, 'get').returns('squiggle');
                 mStub(authring, 'computeFingerprint').returns('smudge');
                 mStub(window, 'base64urldecode').callsFake(_echo);
                 mStub(window, 'assertUserHandle');
-                mStub(ns, '_checkSignature').returns(origMegaPromise.resolve(null));
-
-                // This is to pass through the first call directly, then stub on subsequent ones.
-                var _getPubKey = ns.getPubKey;
-                var callCount = 0;
-                mStub(ns, 'getPubKey').callsFake(function __getPubKey(userhandle, keyType, callback) {
-                    callCount++;
-                    if (callCount === 1) {
-                        return _getPubKey(userhandle, keyType, callback);
-                    }
-                    else {
-                        return 'Ed placebo';
-                    }
-                });
-
-                var result = ns.getPubKey('you456789xw', 'Cu25519');
-                result
-                    .done(function() {
-                        assert.strictEqual(ns.getPubKeyAttribute.callCount, 1);
-                        assert.strictEqual(ns.getPubKey.callCount, 2);
-                        assert.strictEqual(mega.attr.get.callCount, 1);
-                        assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
-                        assert.strictEqual(authring.computeFingerprint.callCount, 1);
-
-                        assert.strictEqual(base64urldecode.callCount, 1);
-                        assert.strictEqual(ns._checkSignature.callCount, 1);
-                        assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
-                        assert.deepEqual(pubEd25519, { 'you456789xw': 'the key' });
-
-                        done();
-                    })
-                    .fail(function() {
-                        assert.fail('failed to retrv. uncached, seen Cu key, no sig.');
-                    });
-            });
-
-            it("uncached Cu25519 key, unseen, no signature", function(done) {
-                mStub(window, 'u_authring', {Cu25519: {}});
-                mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
-                mStub(window, 'pubCu25519', {});
-
-                mStub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
-                mStub(ns, '_getPubKeyAuthentication').returns(null);
-                mStub(authring, 'getContactAuthenticated').returns(false);
-                mStub(mega.attr, 'get').returns('');
-                mStub(authring, 'computeFingerprint').returns('smudge');
-                mStub(window, 'base64urldecode').callsFake(_echo);
-                mStub(window, 'assertUserHandle');
-                mStub(ns, '_checkSignature').returns(origMegaPromise.resolve(null));
+                mStub(ns, '_checkSignature').returns(origMegaPromise.resolve(false));
+                mStub(ns, '_showFingerprintMismatchException');
+                mStub(ns, '_showKeySignatureFailureException');
                 mStub(authring, 'setContactAuthenticated');
 
                 // This is to pass through the first call directly, then stub on subsequent ones.
@@ -664,6 +623,113 @@ describe("crypto unit test", function() {
                 var result = ns.getPubKey('you456789xw', 'Cu25519');
                 result
                     .done(function() {
+                        assert.fail('accepted a Cu key mismatching the authring, with a bad signature.');
+                    })
+                    .fail(function(err) {
+                        assert.strictEqual(err, EINTERNAL);
+                        assert.strictEqual(ns._checkSignature.callCount, 1);
+
+                        // The key contradicts the fingerprint on record, so that is what gets reported.
+                        assert.strictEqual(ns._showFingerprintMismatchException.callCount, 1);
+                        assert.deepEqual(ns._showFingerprintMismatchException.args[0],
+                            ['you456789xw', 'Cu25519', false, 'bad smudge', 'smudge']);
+                        assert.strictEqual(ns._showKeySignatureFailureException.callCount, 0);
+
+                        assert.strictEqual(authring.setContactAuthenticated.callCount, 0);
+                        assert.deepEqual(pubCu25519, {});
+                        assert.deepEqual(pubEd25519, { 'you456789xw': 'the key' });
+
+                        done();
+                    });
+            });
+
+            it("uncached Cu25519 key, seen, no signature", function(done) {
+                mStub(window, 'u_authring', {Cu25519: {}});
+                mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
+                mStub(window, 'pubCu25519', {});
+
+                mStub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
+                mStub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
+                mStub(authring, 'getContactAuthenticated').returns({fingerprint: 'smudge'});
+                mStub(mega.attr, 'get').returns('');
+                mStub(authring, 'computeFingerprint').returns('smudge');
+                mStub(window, 'base64urldecode').callsFake(_echo);
+                mStub(window, 'assertUserHandle');
+                mStub(ns, '_checkSignature').returns(origMegaPromise.resolve(false));
+                mStub(ns, '_showKeySignatureFailureException');
+
+                // This is to pass through the first call directly, then stub on subsequent ones.
+                var _getPubKey = ns.getPubKey;
+                var callCount = 0;
+                mStub(ns, 'getPubKey').callsFake(function __getPubKey(userhandle, keyType, callback) {
+                    callCount++;
+                    if (callCount === 1) {
+                        return _getPubKey(userhandle, keyType, callback);
+                    }
+                    else {
+                        return 'Ed placebo';
+                    }
+                });
+
+                var result = ns.getPubKey('you456789xw', 'Cu25519');
+                result
+                    .done(function() {
+                        assert.fail('accepted a seen Cu key with no signature.');
+                    })
+                    .fail(function(err) {
+                        assert.strictEqual(err, EINTERNAL);
+                        assert.strictEqual(ns.getPubKeyAttribute.callCount, 1);
+                        assert.strictEqual(ns.getPubKey.callCount, 2);
+                        assert.strictEqual(mega.attr.get.callCount, 1);
+                        assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
+                        assert.strictEqual(authring.computeFingerprint.callCount, 1);
+
+                        assert.strictEqual(base64urldecode.callCount, 1);
+                        assert.strictEqual(ns._checkSignature.callCount, 1);
+                        assert.strictEqual(ns._showKeySignatureFailureException.callCount, 1);
+                        assert.deepEqual(pubCu25519, {});
+                        assert.deepEqual(pubEd25519, { 'you456789xw': 'the key' });
+
+                        done();
+                    });
+            });
+
+            it("uncached Cu25519 key, unseen, no signature", function(done) {
+                mStub(window, 'u_authring', {Cu25519: {}});
+                mStub(window, 'pubEd25519', {'you456789xw': 'the key'});
+                mStub(window, 'pubCu25519', {});
+
+                mStub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
+                mStub(ns, '_getPubKeyAuthentication').returns(null);
+                mStub(authring, 'getContactAuthenticated').returns(false);
+                mStub(mega.attr, 'get').returns('');
+                mStub(authring, 'computeFingerprint').returns('smudge');
+                mStub(window, 'base64urldecode').callsFake(_echo);
+                mStub(window, 'assertUserHandle');
+                mStub(ns, '_checkSignature').returns(origMegaPromise.resolve(false));
+                mStub(ns, '_showKeySignatureFailureException');
+                mStub(authring, 'setContactAuthenticated');
+
+                // This is to pass through the first call directly, then stub on subsequent ones.
+                var _getPubKey = ns.getPubKey;
+                var callCount = 0;
+                mStub(ns, 'getPubKey').callsFake(function __getPubKey(userhandle, keyType, callback) {
+                    callCount++;
+                    if (callCount === 1) {
+                        return _getPubKey(userhandle, keyType, callback);
+                    }
+                    else {
+                        return 'Ed placebo';
+                    }
+                });
+
+                var result = ns.getPubKey('you456789xw', 'Cu25519');
+                result
+                    .done(function() {
+                        assert.fail('accepted an unseen Cu key with no signature.');
+                    })
+                    .fail(function(err) {
+                        assert.strictEqual(err, EINTERNAL);
                         assert.strictEqual(ns.getPubKeyAttribute.callCount, 1);
                         assert.strictEqual(ns.getPubKey.callCount, 2);
                         assert.strictEqual(mega.attr.get.callCount, 1);
@@ -671,18 +737,15 @@ describe("crypto unit test", function() {
                         assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                         assert.strictEqual(authring.computeFingerprint.callCount, 1);
 
-
                         assert.strictEqual(base64urldecode.callCount, 1);
                         assert.strictEqual(ns._checkSignature.callCount, 1);
+                        assert.strictEqual(ns._showKeySignatureFailureException.callCount, 1);
 
-                        assert.strictEqual(authring.setContactAuthenticated.callCount, 1);
-                        assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
+                        assert.strictEqual(authring.setContactAuthenticated.callCount, 0);
+                        assert.deepEqual(pubCu25519, {});
                         assert.deepEqual(pubEd25519, { 'you456789xw': 'the key' });
 
                         done();
-                    })
-                    .fail(function() {
-                        assert.fail('failed to retrv. uncached, unseen Cu key, no sig.');
                     });
             });
 

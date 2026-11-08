@@ -2070,7 +2070,8 @@ function invalidLinkError() {
     }
     else {
         // Show file/folder not found overlay
-        mobile.notFound.show();
+        parsepage(pages.placeholder);
+        mega.ui.linkAccess.showErrorUI([l[8531], l[17557]]);
     }
 }
 

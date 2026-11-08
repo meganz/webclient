@@ -910,8 +910,9 @@ var dlmanager = {
             });
 
             if (M.chat) {
+                const msg = {[EKEY]: l.dl_decryption_failed, [ENOENT]: l[22], [EACCESS]: l[23]}[code] || l[20228];
                 window.toaster.main.hideAll().then(() => {
-                    showToast('download', eekey ? l[24] : l[20228]);
+                    showToast('download', msg);
                 });
             }
             else if (code === ETOOMANY) {
@@ -1729,6 +1730,8 @@ var dlmanager = {
         }
         eventlog(99648);
         dlmanager._overquotaClickListeners(flags);
+        // Schedules the retry for when the transfer quota is available again
+        dlmanager._overquotaInfo();
         mega.ui.quotaDialogs.bandwidthExceeded().catch(tell);
     },
 

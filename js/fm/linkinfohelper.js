@@ -402,7 +402,7 @@ LinkInfoHelper.prototype.getLink = function() {
             this._url = `${getBaseUrl()}/chat/${this.node_handle}#${this.node_key}`;
         }
         else {
-            this._url = `${getBaseUrl()}/#${this.is_dir ? "F" : ""}!${this.node_handle}!${this.node_key}`;
+            this._url = `${getBaseUrl()}/${this.is_dir ? 'folder' : 'file'}/${this.node_handle}#${this.node_key}`;
         }
     }
     return this._url;

@@ -38,6 +38,14 @@ mobile.settings.privacyAndSecurity = Object.create(mobile.settingsHelper, {
                 }
             ];
 
+            if (security.passkey.isEnabled()) {
+                menuItems1.splice(2, 0, {
+                    text: l.passkey_section_title,
+                    icon: 'sprite-fm-mono icon-key-01-thin-outline',
+                    href: 'fm/account/security/passkeys'
+                });
+            }
+
             for (const item of menuItems1) {
                 this.generateMenuItem(this.domNode, item);
             }

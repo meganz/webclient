@@ -242,8 +242,13 @@ label.inv-input input:focus ~ span {
 }
 
 .it-input.fl-label .input-field .chips-body:not(:empty) ~ input {
+    height: 0;
     opacity: 0;
     position: absolute;
+}
+
+.it-input.fl-label.focused .input-field .chips-body:not(:empty) ~ input {
+    height: auto;
 }
 
 .it-input.fl-label .input-field .chips-body:not(:empty) ~ input::placeholder {

@@ -28,6 +28,11 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
                 mobile.downloadOverlay.handleFatalError(dl, status);
             }
         }
+
+        if (mega.tpw && id && lock !== 2) {
+            tfsheadupdate({e: id});
+            mega.tpw.errorDownloadUpload(id, text);
+        }
     }
 
     if (lock) {

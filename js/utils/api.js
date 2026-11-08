@@ -1380,7 +1380,6 @@ lazy(self, 'api', () => {
             '[': self.tree_residue,     // tree residue
             '[{[f{': self.tree_node,    // tree node
             '[{[f2{': self.tree_node,   // tree node (versioned)
-            '[{[ok0{': self.tree_ok0    // tree share owner key
         }),
         sc: freeze({
             '{': self.sc_residue,       // SC residue

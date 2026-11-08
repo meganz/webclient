@@ -214,15 +214,21 @@ class MegaOverlay extends MegaComponent {
                 }
             }
 
+            if (mega.ui.toast) {
+                mega.ui.toast.rack.removeClass('above-actions');
+            }
+
+            if (this instanceof MegaSheet) {
+                this.close();
+                return;
+            }
+
             this.hide();
 
             if (typeof this.onClose === 'function') {
                 this.onClose();
             }
 
-            if (mega.ui.toast) {
-                mega.ui.toast.rack.removeClass('above-actions');
-            }
             this.trigger('close');
         });
 

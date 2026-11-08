@@ -290,14 +290,18 @@ BusinessAccount.prototype.getSharedKey = function(myPrivate, theirPublic, data) 
     return asmCrypto.string_to_bytes(keyString);
 };
 
-BusinessAccount.prototype.encryptKey = function() {
+BusinessAccount.prototype.encryptKey = function(recipient) {
     'use strict';
 
     if (!u_attr || !u_attr.b || u_attr.b.m || !u_attr.b.mu[0]) {
         throw new SecurityError('Trying to encrypt key in an invalid account state.');
     }
 
-    if (!pubCu25519[u_attr.b.mu[0]]) {
+    if (recipient !== u_attr.b.mu[0]) {
+        throw new SecurityError('Trying to encrypt key for a recipient other than the current administrator.');
+    }
+
+    if (!pubCu25519[recipient]) {
         throw new SecurityError('Trying to encrypt key without prior or invalid verification.');
     }
 
@@ -308,7 +312,7 @@ BusinessAccount.prototype.encryptKey = function() {
     const msgString = a32_to_str(u_k);
     const msgBytes = asmCrypto.string_to_bytes(msgString);
 
-    const cryptoHash = this.getSharedKey(u_attr.prCu255, pubCu25519[u_attr.b.mu[0]], u_handle);
+    const cryptoHash = this.getSharedKey(u_attr.prCu255, pubCu25519[recipient], u_handle);
 
     const EncMsg = asmCrypto.AES_ECB.encrypt(msgBytes, cryptoHash, false);
 
@@ -345,16 +349,17 @@ BusinessAccount.prototype.decryptKey = function(key, userHandle) {
 /**
  * Function that send the master-key of the sub-user to Master
  * Encrypted using Ed25519
+ * @param {String} recipient        The verified administrator handle
  * @returns {Promise}               Operation result
  */
-BusinessAccount.prototype.sendSubMKey = async function() {
+BusinessAccount.prototype.sendSubMKey = async function(recipient) {
     'use strict';
 
     if (!u_attr || !u_attr.b || u_attr.b.m || !u_attr.b.mu[0]) {
         throw new SecurityError('Invalid business attributes.');
     }
 
-    const encryptedMKey = this.encryptKey();
+    const encryptedMKey = this.encryptKey(recipient);
     assert(encryptedMKey && encryptedMKey.length, 'Encrypting submaster-k failed');
 
     const b64Encoded = base64urlencode(encryptedMKey);
@@ -1421,16 +1426,15 @@ BusinessAccount.prototype.setMasterUserAttributes =
 /**
  * update the business account attributes (company)
  * @param {Object[]} attrs              array of key,val of attributes to update
+ * @param {Object} [fields]             top-level upb fields, sent as given - `taxnum` is reserved
+ *                                      and already base64, `pwarn` is a plain flag
  */
-BusinessAccount.prototype.updateBusinessAttrs = function (attrs) {
+BusinessAccount.prototype.updateBusinessAttrs = function(attrs, fields) {
     "use strict";
     var operationPromise = new MegaPromise();
 
     if (!attrs) {
         return operationPromise.reject(0, 19, 'Empty attributes array');
-    }
-    if (!attrs.length) {
-        return operationPromise.resolve(1); // as nothing to change.
     }
 
     var request = {
@@ -1441,13 +1445,22 @@ BusinessAccount.prototype.updateBusinessAttrs = function (attrs) {
         request[attrs[k].key] = base64urlencode(to8(attrs[k].val));
     }
 
+    Object.assign(request, fields);
+
+    if (Object.keys(request).length < 2) {
+        return operationPromise.resolve(1); // as nothing to change.
+    }
+
     api.screq(request)
         .then(({result}) => {
             assert(typeof result === 'string', `Unexpected response ${result}`);
             operationPromise.resolve(1, result); // update success
         })
         .catch((ex) => {
-            operationPromise.reject(0, 4, `API returned error, ${ex}`);
+            // APIRequestError carries its code on valueOf(), never on `.result`.
+            const code = Number(ex);
+
+            operationPromise.reject(0, code < 0 ? code : 4, `API returned error, ${ex}`);
         });
 
     return operationPromise;
@@ -1471,6 +1484,11 @@ BusinessAccount.prototype.doPaymentWithAPI = async function(payDetails, business
         boughtItemPrice = businessPlan.currInvoice.et;
     }
 
+    const isRepay = page === 'repay';
+
+    // Repay collects no billing details; the sale belongs to the invoice's own country.
+    const country = payDetails.country || businessPlan.txcc || (u_attr && (u_attr.country || u_attr.ipcc));
+
     var request = {
         a: 'uts',
         it: businessPlan.it,
@@ -1482,12 +1500,12 @@ BusinessAccount.prototype.doPaymentWithAPI = async function(payDetails, business
         pbq: 0,
         num: [businessPlan.totalUsers | 0, 0, 0],        // number of users
         b2b: pro.propay.billing.isBusinessUse ? 1 : 0,
-        iso: payDetails.country,
-        cc: payDetails.country,
+        iso: country,
+        cc: country,
         inv: 1,
     };
 
-    if (page !== 'repay') {
+    if (!isRepay) {
         request.tn = pro.propay.billing.getTaxNumberForApiReq();
     }
 
@@ -1504,6 +1522,7 @@ BusinessAccount.prototype.doPaymentWithAPI = async function(payDetails, business
     if (mega.uaoref) {
         request.uao = escapeHTML(mega.uaoref);
     }
+
     const salesIDs = [];
     const {pastInvoice = false, totalUsers, usedGatewayId, currInvoice} = businessPlan;
 
@@ -1529,10 +1548,15 @@ BusinessAccount.prototype.doPaymentWithAPI = async function(payDetails, business
         bq: 0,                      // Log for bandwidth quota triggered
         extra: payDetails,          // Extra information for the specific gateway
         inv: 1,
-        iso: payDetails.country,
-        cc: payDetails.country,
+        iso: country,
+        cc: country,
     };
-    if (page !== 'repay') {
+
+    if (isRepay) {
+        // Repay cannot edit billing details, so the API keeps the ones already saved.
+        utcRequest.sbi = 1;
+    }
+    else {
         utcRequest.tn = pro.propay.billing.getTaxNumberForApiReq();
     }
     if (payDetails.state) {

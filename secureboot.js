@@ -48,10 +48,6 @@ var is_mobile = (function isMobile() {
     }
 })();
 
-if (self.is_mobile && location.search.includes('?autoplay=')) {
-    is_mobile = false;
-}
-
 var is_android = is_mobile && ua.indexOf('android') > 0;
 var is_uc_browser = is_mobile && ua.indexOf('ucbrowser') > 0;
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
@@ -417,14 +413,14 @@ function getCleanSitePath(path) {
             if (path.cjevent) {
                 sessionStorage.cjevent = path.cjevent;
             }
-            // Google Ads click: capture gclid/wbraid/gbraid/ts from the URL.
+            // Google/Meta Ads click: capture gclid/wbraid/gbraid/fbclid/fbc/fbp/ts from the URL.
             var gAds = {};
-            var gAKeys = ['gclid', 'wbraid', 'gbraid', 'gclts', 'gap'];
+            var gAKeys = ['gclid', 'wbraid', 'gbraid', 'gclts', 'gap', 'fbclid', 'fbc', 'fbp'];
             for (var i = 0; i < gAKeys.length; i++) {
                 if (path[gAKeys[i]]) {
                     gAds[gAKeys[i]] = path[gAKeys[i]];
                 }
-                else if (gAKeys[i] === 'gclts' && (path.gclid || path.wbraid || path.gbraid)) {
+                else if (gAKeys[i] === 'gclts' && (path.gclid || path.wbraid || path.gbraid || path.fbclid)) {
                     gAds.gclts = Math.floor(Date.now() / 1000);
                 }
             }
@@ -742,6 +738,7 @@ var mega = {
     ui: {},
     state: 0,
     utils: {},
+    gallery: {},
     slideshow: {settings: {}},
     devices: {rootId: 'device-centre', sections: {}, uiElems: {}},
     uaoref: window.uaoref,
@@ -2121,6 +2118,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/account-switcher.js', n: 'account_switcher_js', j:1});
     jsl.push({f:'js/security.js', n: 'security_js', j: 1, w: 5});
     jsl.push({f:'js/two-factor-auth.js', n: 'two_factor_auth_js', j: 1, w: 5});
+    jsl.push({f:'js/fm/passkey.js', n: 'fm_passkey_js', j: 1, w: 5});
+    jsl.push({f:'js/passkeys-account.js', n: 'passkeys_account_js', j: 1, w: 5});
     jsl.push({f:'js/attr.js', n: 'mega_attr_js', j:1});
     jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j: 1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
@@ -2155,7 +2154,6 @@ else if (!browserUpdate) {
     jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5});
     jsl.push({f:'css/propay.css', n: 'propay_css', j:2,w:5});
     jsl.push({f:'css/planpricing.css', n: 'planpricing_css', j:2,w:5});
-    jsl.push({f:'css/activate-s4.css', n: 'activates4_css', j:2,w:5});
     jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5});
     jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5});
     jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5});
@@ -2280,14 +2278,11 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/propay-signup.js', n: 'propay_signup_js', j:1});
     jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
     jsl.push({f:'html/js/propay-billing.js', n: 'propay_billing_js', j:1});
+    jsl.push({f:'html/js/tax-handling.js', n: 'taxhandling_js', j:1});
     jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
 
     // Plan pages for features
     jsl.push({f:'html/js/planpricing/vpn-pricing.js', n: 'vpn_pricing_js', j:1});
-
-    // Activate S4 feature
-    jsl.push({f:'html/activates4.html', n: 'activates4', j:0});
-    jsl.push({f:'html/js/activate-s4.js', n: 'activates4_js', j:1});
 
     jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
     jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j:1, w:5});
@@ -2383,6 +2378,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/components/checkbox-group.js', n: 'checkbox_select_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/radial.js', n: 'radial_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/tooltip.js', n: 'tooltip_js', j: 1, w:1});
+    jsl.push({f:'js/ui/components/qr-popup.js', n: 'qr_popup_js', j: 1, w:1});
     jsl.push({f:'js/ui/components/tabgroup.js', n: 'tabgroup_js', j: 1, w: 1});
     jsl.push({f:'css/components/tabgroup.css', n: 'tabgroup_css', j: 2, w: 5});
 
@@ -2614,6 +2610,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/components/radial.css', n: 'radial_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/components/textarea.css', n: 'comp_textarea_css', j:2, w:1});
     jsl.push({f:'css/components/tooltip.css', n: 'tooltip_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/components/qr-popup.css', n: 'qr_popup_css', j:2, w:1});
     jsl.push({f:'css/components/banner.css', n: 'banner_css', j:2, w:30, c:1, d:1, cache:1});
 
     // Load files common to all mobile pages
@@ -2646,10 +2643,12 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile/mobile.settings.css', n: 'mobile_settings_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile/mobile.settings.history.css', n: 'mobile_settings_history_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile/mobile.settings.passkeys.css', n: 'mobile_settings_passkeys_css', j: 2, w: 30});
         jsl.push({f:'css/mobile/mobile.link-management.css', n: 'mobile_link_management_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-help.css', n: 'mobile_help_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-media-viewer.css', n: 'mobile_media_viewer_css', j:2,w:5});
+        jsl.push({f:'css/context-menu.css', n: 'context_menu_css', j:2, w:5});
         jsl.push({f:'css/mobile/mobile.tab.css', n: 'mobile_tab_css', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.public.link.css', n: 'mobile_public_linkcss', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.datepicker.css', n: 'mobile_datepicker_css', j: 2, w: 1});
@@ -2660,6 +2659,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile/mobile.achieve.invite-bonuses.css', n: 'mobile_achieve_inv_bonuses_css', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.file-request-management.css', n: 'mobile_fr_mgmt_css', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.conflict-resolution.css', n: 'mobile_conflict_resolution_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/migrate.css', n: 'mobile_migrate_css', j: 2, w: 1});
 
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
@@ -2700,6 +2700,8 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.radio.button.js', n: 'mobile_radio_button_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.radio.group.js', n: 'mobile_radio_group_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.footer.js', n: 'mobile_footer_js', j: 1, w:1});
+        jsl.push({f:'js/fm/migrate.js', n: 'fmmigrate_js', j: 1});
+        jsl.push({f:'js/mobile/migrate.js', n: 'mobile_migrate_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/appearance.js', n: 'mobile_settings_appearance_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/settingsHelper.js', n: 'mobile_settings_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/settings.js', n: 'mobile_settings_js', j: 1, w:1});
@@ -2722,6 +2724,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/verifyDelete.js', n: 'mobile_verify_delete_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/privacyAndSecurity.js', n: 'mobile_privacy_security_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/history.js', n: 'mobile_session_history_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/passkeys.js', n: 'mobile_settings_passkeys_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/backupRecovery.js', n: 'mobile_backup_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/fileManagement.js', n: 'mobile_file_management_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/notifications.js', n: 'mobile_account_notifications_js', j: 1, w: 1});
@@ -2741,6 +2744,8 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.albums.js', n: 'mobile_albums_js', j: 1, w:1});
 
         jsl.push({f:'js/ui/components/meganz/MDialogMobile.js', n: 'mobile_m_dialog_mobile_js', j:1});
+
+        jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
     }
     jsl.push({f:'html/chatlink.html', n: 'chatlink', j: 0});
 

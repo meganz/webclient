@@ -610,3 +610,63 @@
     }
 }
 
+.theme-dark .pages-menu-wrap .top-menu-popup {
+    background-color: var(--mobile-page-background);
+    border-left-color: var(--mobile-border-strong);
+}
+.theme-dark .pages-menu-wrap .top-menu-popup .sprite-fm-mono {
+    --mask-color: var(--mobile-icon-primary);
+}
+
+/* Raster sprite: its glyphs have to be flipped, minus the social logos, whose knockouts fill in */
+.theme-dark .pages-menu-wrap .top-menu-popup > .menus-sprite,
+.theme-dark .pages-menu-wrap .top-menu-item > .menus-sprite:not(.mega):not(.export),
+.theme-dark .pages-menu-wrap .top-menu-logged .loader.menus-sprite {
+    filter: brightness(0) invert(1);
+}
+.theme-dark .pages-menu-wrap .top-menu-item span,
+.theme-dark .pages-menu-wrap .top-social-txt,
+.theme-dark .pages-menu-wrap .top-menu-logged .user-info .name {
+    color: var(--mobile-text-primary);
+}
+.theme-dark .pages-menu-wrap .top-menu-item.expanded span,
+.theme-dark .pages-menu-wrap .top-menu-logged .plan,
+.theme-dark .pages-menu-wrap .top-menu-logged .storage-txt {
+    color: var(--mobile-text-accent);
+}
+.theme-dark .pages-menu-wrap .top-submenu .top-menu-item,
+.theme-dark .pages-menu-wrap .top-submenu .top-menu-item span,
+.theme-dark .pages-menu-wrap .top-mega-version,
+.theme-dark .pages-menu-wrap .top-menu-logged .user-info .email {
+    color: var(--mobile-text-secondary);
+}
+.theme-dark .pages-menu-wrap .top-menu-divider,
+.theme-dark .pages-menu-wrap .register:not(.hidden) + .top-menu-divider.small-pad,
+.theme-dark .pages-menu-wrap .top-menu-divider.bg {
+    background-color: var(--mobile-border-strong);
+}
+.theme-dark .pages-menu-wrap .top-submenu .top-menu-item.active {
+    background-color: var(--mobile-neutral-container-default);
+    border-color: var(--mobile-border-brand);
+    color: var(--mobile-text-primary);
+}
+.theme-dark .pages-menu-wrap .top-menu-item.active {
+    border-color: var(--mobile-border-brand);
+}
+.theme-dark .pages-menu-wrap .top-menu-logged .storage {
+    background-color: var(--mobile-surface-3);
+}
+.theme-dark .pages-menu-wrap .top-white-button {
+    background-color: var(--mobile-page-background);
+    border-color: var(--mobile-border-strong);
+    color: var(--mobile-text-brand);
+}
+.theme-dark .pages-menu-wrap .mobile.pages-menu-dropdown span {
+    color: var(--mobile-text-primary);
+}
+
+/* Raster sprite sat beside the title, so it takes that text's full strength, not the menu icons' 0.77 */
+.theme-dark .pages-menu-wrap .mobile.pages-menu-dropdown > .menus-sprite {
+    filter: brightness(0) invert(1);
+    opacity: 1;
+}

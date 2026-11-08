@@ -936,7 +936,7 @@ class MegaFlyoutMenu extends MegaComponent {
         showContactFlyout(contactHandle) {
             flyoutState.clearListeners();
             const name = `contact-${contactHandle}`;
-            const uName = escapeHTML(M.getNameByHandle(contactHandle));
+            const uName = M.getNameByHandle(contactHandle);
             const actions = [
                 {
                     icon: 'sprite-fm-mono icon-message-chat-circle-thin',
@@ -1078,7 +1078,7 @@ class MegaFlyoutMenu extends MegaComponent {
                             name,
                             icon: 'folder',
                             title: l.contact_no_share_title.replace('%s', uName),
-                            subtitle: l.contact_no_share_text.replace('%s', uName),
+                            subtitle: escapeHTML(l.contact_no_share_text.replace('%s', uName)),
                         });
                         return;
                     }

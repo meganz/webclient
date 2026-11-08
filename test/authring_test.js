@@ -428,9 +428,9 @@ describe("authring unit test", function() {
                 mStub(ns._logger, '_log');
                 var result = ns.verifyKey('', RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY)
                     .done(function(r) {
-                        assert.strictEqual(r, null);
+                        assert.strictEqual(r, false);
                         assert.strictEqual(ns._logger._log.args[0][0],
-                            'Cannot verify an empty signature.');
+                            'Cannot verify a missing or malformed signature.');
                     })
                     .fail(function() {
                         assert.strictEqual(true, false);
@@ -446,7 +446,7 @@ describe("authring unit test", function() {
                 });
                 ns.verifyKey(RSA_SIGNED_PUB_KEY, RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY)
                     .done(function(result) {
-                        assert.strictEqual(result, null);
+                        assert.strictEqual(result, false);
                         assert.strictEqual(ns._logger._log.args[0][0],
                             'Bad timestamp: In the future!');
                     })
@@ -474,7 +474,7 @@ describe("authring unit test", function() {
                 mStub(ns._logger, '_log');
                 ns.verifyKey(RSA_SIGNED_PUB_KEY, RSA_PUB_KEY, 'DSA', ED25519_PUB_KEY)
                     .done(function(result) {
-                        assert.strictEqual(result, null);
+                        assert.strictEqual(result, false);
                         assert.strictEqual(ns._logger._log.args[0][0],
                             'Unsupported key type: DSA');
                     })

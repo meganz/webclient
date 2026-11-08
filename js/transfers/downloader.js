@@ -428,7 +428,7 @@ ClassFile.prototype.destroy = function() {
     }
     else {
         const skipMacIntegrityCheck = (self.skipcheck | 0) > 0;
-        var macIntegritySuccess = this.emptyFile || dlmanager.checkLostChunks(this.dl);
+        const macIntegritySuccess = dlmanager.checkLostChunks(this.dl);
 
         if (skipMacIntegrityCheck && !macIntegritySuccess) {
             console.warn('MAC Integrity failed, but ignoring...', this.dl);
@@ -651,7 +651,7 @@ ClassFile.prototype.run = function(task_done) {
             error = true;
         }
         else if (error) {
-            var fatal = (error === EBLOCKED || error === ETOOMANY);
+            var fatal = error === EBLOCKED || error === ETOOMANY || error === ENOENT || error === EACCESS;
 
             this.dlGetUrlErrors = (this.dlGetUrlErrors | 0) + 1;
 

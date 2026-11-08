@@ -1140,7 +1140,8 @@ MegaUtils.prototype.fmSearchNodes = async function(searchTerm, customFn, path) {
  * */
 MegaUtils.prototype.checkForDuplication = function(id) {
     'use strict';
-    if (M.currentrootid === M.RubbishID
+    if (M.currentdirid !== id // race protection
+        || M.currentrootid === M.RubbishID
         || !M.d[id]
         || M.getNodeRights(id) < 2) {
         return;

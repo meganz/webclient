@@ -690,6 +690,11 @@ function folderIcon(node, root) {
         folderIcon = 'rubbish-';
     }
 
+    // Cloud import in progress
+    if (node.ph && mega.migrate && mega.migrate.isImportFolder(node)) {
+        return `${folderIcon}folder-sync`;
+    }
+
     if (node.t & M.IS_SHARED || M.isOutShare(node, 'EXP')) {
 
         if (M.getS4NodeType(node) === 'bucket') {
@@ -751,7 +756,7 @@ function fileIcon(node) {
     if (node.t || M.dcd[node.h] || node.isDeviceFolder) {
         return folderIcon(node, root);
     }
-    else if ((icon = ext[fileext(node.name, 0, 1)]) && icon[0] !== 'mega') {
+    else if ((icon = ext[node.ext || fileext(node.name, 0, 1)]) && icon[0] !== 'mega') {
         return rubPrefix + icon[0];
     }
     else if ((icon = is_video(node)) > 0) {

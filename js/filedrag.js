@@ -8,13 +8,32 @@
         removeOverlay: removeOverlay
     };
 
+    /**
+     * Returns the current chat room that can accept an upload.
+     *
+     * @returns {Object|false} The current room, or false
+     */
+    function chatRoom() {
+        return M.chat && window.megaChatIsReady && megaChat.getCurrentRoom() || false;
+    }
+
+    /**
+     * Returns the fallback destination name
+     *
+     * @returns {String} The destination name, unescaped
+     */
+    function fallbackName() {
+        return folderlink && M.getNameByHandle(M.RootID) || l[164];
+    }
+
     function pathInfo() {
         if (optionReference.fileRequestEnabled) {
             return 'nop';
         }
-        if (M.chat) {
-            const room = window.megaChatIsReady && megaChat.getCurrentRoom();
-            return room ? megaChat.html(room.getRoomTitle()) : escapeHTML(l[7997]);
+        const room = chatRoom();
+
+        if (room) {
+            return megaChat.html(room.getRoomTitle());
         }
         if (M.isGalleryPage()) {
             return escapeHTML(l.photos_timeline);
@@ -26,8 +45,8 @@
             }
             return escapeHTML(l.albums);
         }
-        if (M.currentCustomView && M.currentCustomView.type === 'pwm') {
-            return escapeHTML(l[164]);
+        if (isRestrictedSection()) {
+            return escapeHTML(fallbackName());
         }
         const name = (handle) => {
             switch (handle) {
@@ -43,7 +62,7 @@
                     if (M.dcd[handle]) {
                         return M.dcd[handle].name || l[7381];
                     }
-                    return M.getNameByHandle(handle) || l[164];
+                    return M.getNameByHandle(handle) || fallbackName();
             }
         };
         const id = M.currentCustomView ? M.currentCustomView.nodeID
@@ -62,28 +81,37 @@
         if (path.length > 4) {
             path.splice(1, path.length - 3, '...');
         }
-        return path.join(' > ') || escapeHTML(l[164]);
+        return path.join(' > ') || escapeHTML(fallbackName());
     }
+    const blockSelector = [
+        '.files-grid-view',
+        '.fm-blocks-view',
+        '.meetings-call',
+        '.messages-block',
+        '.gallery-view',
+        '#albums-view',
+        '.device-centre-grid-view',
+        '.fm-recents:not(.emptied) .fm-recents.scroll',
+        '.s4-grid-view',
+        '.empty-state:not(.meetings-alert)',
+        '.file-request-upload-page .content-upload-block',
+        '.fm-empty-section',
+        '.contacts-list',
+        '.shared-grid-view',
+        '.shared-blocks-view',
+        '.out-shared-grid-view',
+        '.conversations-empty',
+    ].join(',');
 
     function addOverlay() {
         if (is_mobile && optionReference.fileRequestEnabled) {
             return;
         }
         const $overlay = $('.drag-n-drop.overlay');
-        const $block = document.body.classList.contains('overlayed') ? $() : $(`
-            .files-grid-view:visible, 
-            .fm-blocks-view:visible, 
-            .meetings-call:visible,
-            .messages-block:visible, 
-            .gallery-view:visible, 
-            #albums-view:visible,
-            .device-centre-grid-view:visible,
-            .fm-recents:not(.emptied) .fm-recents.scroll:visible,
-            .s4-grid-view:visible,
-            .empty-state:visible,
-            .file-request-upload-page .content-upload-block:visible,
-            .fm-empty-section:visible
-        `);
+        const isDialogOpen = document.body.classList.contains('overlayed')
+            || document.documentElement.classList.contains('overlayed');
+        const $block = isDialogOpen ? $() : $(blockSelector)
+            .filter((i, el) => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length));
         const setOverlaySize = () => {
             if ($block.length) {
                 const { height, left, width, top } = $block[0].getBoundingClientRect();
@@ -94,23 +122,30 @@
                     return;
                 }
 
+                // Limit the height to the visible part of the block
+                const onScreen = Math.min(top + height, document.documentElement.clientHeight)
+                    - Math.max(top, 0);
+
                 $overlay.removeClass('chat-offset fr-offset');
                 if (M.chat && $block.parent('.with-pane').length) {
                     $overlay.addClass('chat-offset');
-                    $overlay.height(height - 32);
+                    $overlay.height(onScreen - 32);
                 }
                 else if (
                     M.currentCustomView && M.currentCustomView.type === 's4' ||
                     M.onDeviceCenter && mega.devices.ui.isCustomRender()
                 ) {
-                    $overlay.height(height - 32);
+                    $overlay.height(onScreen - 32);
                 }
                 else {
-                    $overlay.height(height - 20);
+                    $overlay.height(onScreen - 20);
                 }
                 $overlay.toggleClass('flyout-offset', !!(mega.ui && mega.ui.flyout && mega.ui.flyout.name));
                 const maxWidth = $overlay[0].getBoundingClientRect().right - left - 16;
-                $overlay.width(Math.min(width - 32, maxWidth));
+
+                if (width > 0 && maxWidth > 0) {
+                    $overlay.width(Math.min(width - 32, maxWidth));
+                }
             }
             else {
                 const { width, height } = document.body.getBoundingClientRect();
@@ -120,7 +155,7 @@
             }
         };
         $overlay.removeClass('hidden');
-        setOverlaySize();
+        requestAnimationFrame(() => setOverlaySize());
         $(window).rebind('resize.filedrag', setOverlaySize);
         let hasItems = M.v && M.v.length;
         if (M.albums) {
@@ -140,11 +175,178 @@
     function removeOverlay() {
         optionReference.touchedElement = 0;
 
+        clearDropTarget();
         $(window).off('resize.filedrag');
         $('.drag-n-drop.overlay').addClass('hidden');
     }
 
+    // Left panel targets
+    const dropTargetSel =
+        '.fm-tree-panel .nw-fm-tree-item,' +
+        '.js-myfile-tree-panel > .menu-item.cloud-drive,' +
+        '.js-s4-tree-panel > .menu-item.s4';
+    let dropTarget = null;
+    let expandTimer = null;
+
+    function canUploadTo(h) {
+        if (h === M.RootID) {
+            return true;
+        }
+        const n = M.getNodeByHandle(h);
+        if (!n || !n.t || (M.getNodeRights(h) | 0) < 1) {
+            return false;
+        }
+        const root = M.getNodeRoot(h);
+        return root !== M.RubbishID && root !== M.InboxID;
+    }
+
+
+    function dialogTab(h) {
+        const root = M.getNodeRoot(h);
+
+        return root === 's4' ? 's4' : root === 'shares' ? 'shared-with-me' : 'cloud-drive';
+    }
+
+    /**
+     * Finds the drop target under the pointer
+     *
+     * @param {Element} el The element under the pointer
+     * @returns {Object|null} Drop target with the node to highlight and destination details
+     */
+    function findDropTarget(el) {
+        if (!self.fminitialized || folderlink || optionReference.fileRequestEnabled) {
+            return null;
+        }
+        const node = el && el.closest && el.closest(dropTargetSel);
+        if (!node || node.closest('.mega-dialog') || node.closest('.mega-sheet')) {
+            return null;
+        }
+        if (node.classList.contains('nw-fm-tree-item')) {
+            if (!String(node.id).startsWith('treea_')) {
+                return null;
+            }
+            const h = node.id.replace('treea_', '').replace(/^(os_|pl_)/, '');
+            const knownHandle = M.getTreeRowHandle(node, h);
+
+            return canUploadTo(knownHandle) ? {node, h, tab: dialogTab(knownHandle), dir: h} : null;
+        }
+
+        if (node.getAttribute('name') === 'cloud-drive') {
+            return canUploadTo(M.RootID) ? {node, h: M.RootID, tab: 'cloud-drive', dir: M.RootID} : null;
+        }
+
+        const cn = M.tree.s4 ? s4.utils.getContainersList() : [];
+        const h = cn.length === 1 && canUploadTo(cn[0].h) && cn[0].h;
+
+        return {node, h, tab: 's4', dir: h || undefined};
+    }
+
+    /**
+     * Returns key for the drop target
+     *
+     * @param {Object|null} target The drop target
+     * @returns {String|Element|null} Target key
+     */
+    function targetKey(target) {
+        if (!target) {
+            return null;
+        }
+        return target.node.classList.contains('nw-fm-tree-item') ? target.h : target.node;
+    }
+
+    /**
+     * Expand collapsed items in the left panel
+     *
+     * @param {Object} target The drop target being hovered
+     * @returns {void}
+     */
+    function expandTarget(target) {
+        const {node, h} = target;
+
+        if (node.classList.contains('nw-fm-tree-item')) {
+            M.onTreeUIExpand(h, 1);
+            return;
+        }
+
+        M.expandTreeSection(node);
+    }
+
+    /**
+     * Updates the current drop target and its hover state
+     *
+     * @param {Object|null} target The drop target with node and handle
+     * @returns {void}
+     */
+    function setDropTarget(target) {
+        const node = target && target.node || null;
+        const prevNode = dropTarget && dropTarget.node || null;
+        const key = targetKey(target);
+        const prevKey = targetKey(dropTarget);
+
+        dropTarget = target;
+
+        if (prevNode !== node) {
+            if (prevNode) {
+                prevNode.classList.remove('ui-droppable-hover', 'pointer-auto');
+            }
+            if (node) {
+                node.classList.add('ui-droppable-hover', 'pointer-auto');
+            }
+            // Hide overlay if l-pane target is selected
+            $('.drag-n-drop.overlay').toggleClass('hidden', !!node);
+        }
+
+        // Reset the expand timer only when the drop target changes
+        if (prevKey !== key) {
+            clearTimeout(expandTimer);
+            expandTimer = null;
+
+            if (key) {
+                expandTimer = setTimeout(() => expandTarget(target), 890);
+            }
+        }
+    }
+
+    /**
+     * Returns the current drop target or a Cloud Drive fallback for restricted sections.
+     *
+     * @param {Event} e The drop or file-input event
+     * @returns {Object|false} The drop target or false if no fallback applies
+     */
+    function dropDestination(e) {
+        if (dropTarget) {
+            return dropTarget;
+        }
+        if (e.type === 'drop' && isRestrictedSection()) {
+            return {h: M.RootID, tab: 'cloud-drive', dir: M.RootID};
+        }
+        return false;
+    }
+
+    function clearDropTarget() {
+        clearTimeout(expandTimer);
+        expandTimer = null;
+
+        if (dropTarget) {
+            dropTarget.node.classList.remove('ui-droppable-hover', 'pointer-auto');
+            dropTarget = null;
+        }
+    }
+
     function addUpload(files, emptyFolders) {
+        const dropTo = $.onDroppedTreeFolder;
+        const dropDialog = $.onDroppedTarget;
+        delete $.onDroppedTreeFolder;
+        delete $.onDroppedTarget;
+
+        if (dropDialog) {
+            if (dropTo && Object(window.fmconfig).ulddd) {
+                M.addUpload(files, false, emptyFolders, dropTo);
+                return start_upload();
+            }
+            return self.fminitialized && openCopyUploadDialog(files, emptyFolders, dropDialog);
+        }
+
         const straight = $.doStraightUpload || Object(window.fmconfig).ulddd
             || M.currentrootid === M.RubbishID || files.length === 0;
 
@@ -261,12 +463,32 @@
 
     }
 
+    /**
+     * Handles file drag-over events.
+     */
     function FileDragHover(e) {
         if (d) {
             console.log('DragOver');
         }
+
+        // Prevent the browser from opening the dropped file
         e.preventDefault();
         e.stopPropagation();
+
+        if (!optionReference.touchedElement) {
+            // Reject the drop and show the system's "not allowed" cursor
+            if (e.dataTransfer) {
+                e.dataTransfer.dropEffect = 'none';
+            }
+            return;
+        }
+
+        setDropTarget(findDropTarget(e.target));
+
+        if (e.dataTransfer) {
+            // dropEffect is reset on each dragover
+            e.dataTransfer.dropEffect = 'copy';
+        }
     }
     var useMegaSync = -1;
     var usageMegaSync = 0;
@@ -367,6 +589,8 @@
         // Clear drag element
         optionReference.touchedElement = 0;
 
+        const dropTo = dropDestination(e);
+
         removeOverlay();
 
         if (M.isInvalidUserStatus()) {
@@ -394,7 +618,7 @@
         // Log that User selected a folder (or file) for upload from the file explorer
         eventlog(isFolderUpload ? 500010 : 500012);
 
-        var currentDir = M.currentCustomView ? M.currentCustomView.nodeID : M.currentdirid;
+        var currentDir = dropTo && dropTo.h || (M.currentCustomView ? M.currentCustomView.nodeID : M.currentdirid);
 
         if ($.awaitingLoginToUpload) {
             mega.ui.login.openDialog();
@@ -402,7 +626,10 @@
         }
 
         let noUploadTarget = currentDir && currentDir !== 'dashboard' && (M.getNodeRights(currentDir) | 0) < 1;
-        if (String(M.currentdirid).includes('albums')) {
+        if (dropTo) {
+            noUploadTarget = false;
+        }
+        else if (String(M.currentdirid).includes('albums')) {
             noUploadTarget = !mega.gallery.albums.getUploadTarget();
         }
         else if (M.currentCustomView && M.currentCustomView.type === 'gallery') {
@@ -417,7 +644,7 @@
             return true;
         }
 
-        if (M.InboxID && M.currentrootid && (M.currentrootid === M.InboxID
+        if (!dropTo && M.InboxID && M.currentrootid && (M.currentrootid === M.InboxID
             || M.getNodeRoot(M.currentdirid.split('/').pop()) === M.InboxID)) {
 
             msgDialog('error', l[882], l.upload_to_restricted_folder, l.upload_to_backup_info);
@@ -509,6 +736,11 @@
                 return true;
             }
         };
+        if (dropTo) {
+            $.onDroppedTreeFolder = dropTo.h;
+            $.onDroppedTarget = {tab: dropTo.tab, dir: dropTo.dir};
+        }
+
         factory.require('file-list').getFileList(e, filter)
             .then((files) => {
 
@@ -525,6 +757,9 @@
             })
             .catch(tell)
             .finally(() => {
+                delete $.onDroppedTreeFolder;
+                delete $.onDroppedTarget;
+
                 if (self.InitFileDrag) {
                     const $fileAndFolderUploadWrap = $('.fm-right-header');
                     const html = `
@@ -553,6 +788,31 @@
     }
 
     /**
+     * Returns whether the current section has no upload target of its own
+     *
+     * @return {Boolean} Whether the current section is restricted
+     */
+    function isRestrictedSection() {
+        if (M.currentrootid === M.RubbishID) {
+            return true;
+        }
+        if (chatRoom() || M.isGalleryPage() || M.isAlbumsPage()) {
+            // These sections have their own upload target
+            return false;
+        }
+
+        const id = M.currentCustomView ? M.currentCustomView.nodeID : M.currentdirid;
+
+        // Real folders handle their own write errors
+        if (M.getNodeByHandle(id)) {
+            return false;
+        }
+
+        // Sections such as Dashboard, Favs, Shares and S4 container pages
+        return (M.getNodeRights(id) | 0) < 1;
+    }
+
+    /**
      * Check current page is allowed on drag and drop to upload file
      *
      * @return {Boolean} Is allowed or not
@@ -564,17 +824,13 @@
         if (String(page).startsWith('pro') || page === 'support') {
             return false;
         }
+        if (M.currentCustomView && M.currentCustomView.type === 'pwm'
+            || M.currentdirid === 'pwm') {
+            return false;
+        }
         return !(is_fm() && // if page is fm,
             (window.slideshowid || !$('.feedback-dialog').hasClass('hidden') || // preview and feedback dialog show
-                !$('.mega-dialog.duplicate-conflict', 'body').hasClass('hidden') || // conflict dialog show
-                M.currentdirid === 'shares' || // Share root page
-                M.currentdirid === 'out-shares' || // Out-share root page
-                M.currentdirid === 'public-links' || // Public-link root page
-                M.currentdirid === 'file-requests' || // File request page
-                M.currentdirid === 'pwm' || // Password manager
-                String(M.currentdirid).startsWith('chat/contacts') || // Contacts pages
-                M.currentrootid === M.RubbishID || // Rubbish bin
-                M.currentrootid === undefined // Dashboard and Settings pages
+                !$('.mega-dialog.duplicate-conflict', 'body').hasClass('hidden') // conflict dialog show
             ));
     }
 

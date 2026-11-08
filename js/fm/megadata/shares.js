@@ -24,6 +24,10 @@ MegaData.prototype.getUndecryptedLabel = function(node) {
         return l.allownullkeys_tooltip;
     }
 
+    if (pfid) {
+        return node.t ? l.undecryptable_lfolder_tip : l.undecryptable_lfile_tip;
+    }
+
     const isShared = M.getNodeRoot(node.p) !== M.RootID;
 
     if (node.t) {

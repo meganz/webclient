@@ -326,6 +326,9 @@ lazy(mega.gallery, 'albums', () => {
 
             dynamicList.batchAdd([...rows.keys()]);
             dynamicList.initialRender();
+
+            // Autoplay links wait for this to kick the slideshow off
+            mBroadcaster.sendMessage('albums:public:ready');
         }
     };
 });

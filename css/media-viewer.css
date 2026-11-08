@@ -260,6 +260,7 @@
                 border: 0;
                 border-radius: 32px;
                 bottom: 100%;
+                direction: ltr; /* Until we flip all prev/next/play buttons too */
                 left: 50%;
                 margin-bottom: 16px;
                 padding: 16px;
@@ -267,6 +268,9 @@
                 width: auto;
                 z-index: 10;
                 transform: translateX(-50%);
+            }
+            .slideshow.video .media-viewer .viewer-bars.slideshow-controls {
+                margin-bottom: 66px;
             }
             .media-viewer .slideshow-controls .bar > button {
                 display: inline-flex;
@@ -294,10 +298,7 @@
             }
 
             .media-viewer .context-menu.slideshow-context-settings {
-                top: -184px;
                 min-width: 240px;
-                position: absolute;
-                left: 190px;
             }
 
             .context-menu.slideshow-context-settings button.disabled i::before {
@@ -515,9 +516,8 @@
             background: var(--mobile-background-blur);
         }
         .autoplay-overlay i {
-            width: 64px;
-            height: 64px;
             border-radius: 100%;
+            box-sizing: content-box;
             background: var(--mobile-page-background);
             cursor: pointer;
             margin: auto;

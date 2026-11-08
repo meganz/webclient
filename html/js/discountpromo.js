@@ -105,6 +105,28 @@ class DiscountPromo {
         return false;
     }
 
+    /**
+     * Follows the user's theme on the discount routes, which show their dialogs without parsepage
+     * @returns {void}
+     */
+    static initTheme() {
+        mega.ui.setTheme();
+
+        if (document.body.classList.contains('discount-page')) {
+            return;
+        }
+
+        // Scopes the dialog link colour, as propay-page does on the page these routes lead to
+        document.body.classList.add('discount-page');
+
+        const listener = mBroadcaster.addListener('pagechange', () => {
+            if (page.substr(0, 8) !== 'discount' && page.substr(0, 2) !== 's/') {
+                document.body.classList.remove('discount-page');
+                mBroadcaster.removeListener(listener);
+            }
+        });
+    }
+
     static storeDiscountInfo(res) {
         if (res.al === pro.ACCOUNT_LEVEL_FEATURE) {
             res.al += pro.getStandaloneBits(res.f);

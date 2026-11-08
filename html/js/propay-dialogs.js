@@ -25,12 +25,24 @@ var closeStripeDialog = (blockPaymentRefresh, skipCloseFunc) => {
 var resizeDlgScrollBar = function($targetDialog) {
     'use strict';
 
-    const $contentSection = $('section.content', $targetDialog);
-    if ($contentSection.is('.ps')) {
-        Ps.update($contentSection[0]);
+    const [contentSection] = $('section.content', $targetDialog);
+
+    if (!contentSection) {
+        return;
+    }
+
+    // Rounding can leave a pixel or two of overflow, which does not warrant a scrollbar
+    if (contentSection.scrollHeight - contentSection.clientHeight <= 2) {
+        Ps.destroy(contentSection);
+        return;
+    }
+
+    if (contentSection.classList.contains('ps')) {
+        Ps.update(contentSection);
     }
     else {
-        Ps.initialize($contentSection[0]);
+        // Suppressing X stops the content sliding sideways when a dropdown overhangs it
+        Ps.initialize(contentSection, {suppressScrollX: true});
     }
 };
 
@@ -1241,6 +1253,9 @@ var addressDialog = {
             else if (pageCountry && !addressDialog.lastSelectedCountry && page !== 'repay') {
                 billingInfo.country = pageCountry;
             }
+            if (page !== 'repay' && pro.propay.billing.isBlockedCountry(billingInfo.country)) {
+                billingInfo.country = '';
+            }
 
             const selectedState =
                 (billingInfo.country === 'US' || billingInfo.country === 'CA') && billingInfo.state || false;
@@ -1264,10 +1279,11 @@ var addressDialog = {
                     || (u_attr && (u_attr.country || u_attr.ipcc))
                     || pro.propay.billing.defaultCountry
                     || '';
-                if (prefilled && prefilled !== self.businessRegPage.lastPricedCountry) {
+                if (prefilled && prefilled !== self.businessRegPage.lastPricedCountry
+                    && !pro.propay.billing.isBlockedCountry(prefilled)) {
                     pro.propay.billing.country = prefilled;
                     if (selectedState) {
-                        pro.propay.billing.state = `${prefilled}-${selectedState}`;
+                        pro.propay.billing.state = pro.taxHandling.stateKey(prefilled, selectedState);
                     }
                     pro.propay.billing.refreshPricingForPage().catch(dump);
                 }
@@ -1581,7 +1597,19 @@ var addressDialog = {
             });
         }
         else {
-            bindDropdownEvents($select, undefined, !is_mobile && this.$dialog);
+            // Suppressing X stops the list sliding sideways once scrolled to the bottom
+            bindDropdownEvents($select, undefined, !is_mobile && this.$dialog, {suppressScrollX: true});
+
+            // Otherwise scrolling the open list carries on into the dialog behind it
+            const [contentSection] = $('section.content', this.$dialog);
+
+            $('.mega-input-dropdown', $select)
+                .rebind('mouseenter.lockDlgScroll', () => Ps.disable(contentSection))
+                .rebind('mouseleave.lockDlgScroll', () => Ps.enable(contentSection));
+
+            // Closing hides the list under the pointer, and not every browser then sends its
+            // mouseleave - without this the dialog stays unscrollable for the rest of the session
+            $select.rebind('mouseleave.lockDlgScroll', () => Ps.enable(contentSection));
         }
     },
 
@@ -1710,8 +1738,13 @@ var addressDialog = {
             $('*:not(.default)', $optionsContainer).remove();
         }
 
+        // Repay sells in the invoice's own country, so it keeps the whole list.
+        const countries = page === 'repay'
+            ? M.getCountries()
+            : pro.propay.billing.saleCountries(M.getCountries(), pro.propay.billing.blockedCountries);
+
         // Build options
-        $.each(M.getCountries(), function(isoCode, countryName) {
+        for (const [isoCode, countryName] of Object.entries(countries)) {
 
             var itemNode;
 
@@ -1731,7 +1764,7 @@ var addressDialog = {
                     $countriesSelect.val(countryName);
                 }
             }
-        });
+        }
 
         // Initialise the selectmenu
         this.bindPaymentSelectEvents($countriesSelect);
@@ -2150,6 +2183,10 @@ var addressDialog = {
                     const attributes = ["address1", "address2", "city", "state", "country", "postcode"];
 
                     businessInfo = businessInfo || Object.create(null);
+
+                    // %state is the bare code, and the state dropdown is keyed `CC-SS`.
+                    businessInfo['%state'] = pro.taxHandling.stateKey(businessInfo['%country'], businessInfo['%state']);
+
                     for (var i = 0; i < attributes.length; i++) {
                         var attr = attributes[i];
                         var battr = attr === "postcode" ? '%zip' : '%' + attr;
@@ -2326,6 +2363,9 @@ var addressDialog = {
             this.$dialog.removeClass('active').addClass('hidden');
         }
         $('.tax-validation-popover', this.$dialog).addClass('hidden');
+
+        Ps.enable($('section.content', this.$dialog)[0]);
+
         if (typeof callback === 'function') {
             callback();
         }
@@ -2938,6 +2978,72 @@ var addressDialog = {
         return $(`footer.${isWide ? 'desktop' : 'mobile'} .stripe-button`, pro.propay.$page);
     },
 
+    resizeStripeIframe(height) {
+        'use strict';
+
+        const $stripeDialog = addressDialog.getStripeDialog();
+        const $stripeIframe = $('.iframe-container', $stripeDialog);
+        if (!$stripeIframe.length) {
+            return;
+        }
+
+        const delta = height - $stripeIframe.height();
+        const node = pro.propay.getScrollBlock();
+
+        // Measure before the resize, or the box has already moved
+        const boxTop = node
+            ? $stripeIframe[0].getBoundingClientRect().top - node.getBoundingClientRect().top
+            : 0;
+
+        $stripeIframe.css('height', `${height}px`);
+
+        // The iframe sits in the scrollable propay page, so PS has to be told it moved
+        if (node && node.Ps) {
+            node.scrollTop += addressDialog.scrollShiftForResize(boxTop, delta);
+            Ps.update(node);
+        }
+    },
+
+    /**
+     * Only growth above the fold moves what the user is looking at. Compensating for a box whose
+     * top is still on screen is what jumps the page on the gateway's first 0 -> full-height message.
+     *
+     * @param {Number} boxTop The box's top edge, relative to the scroll container's visible top
+     * @param {Number} delta How much the box grew, negative when it shrank
+     * @returns {Number} The scroll adjustment to apply
+     */
+    scrollShiftForResize(boxTop, delta) {
+        'use strict';
+
+        return boxTop < 0 ? delta : 0;
+    },
+
+    /**
+     * The gateway reads its palette from the `dark` search param once, at load, so a theme switch
+     * needs a reload. Guarded on the flag moving, because the reload clears anything typed in.
+     * @returns {void}
+     */
+    rethemeStripeIframe() {
+        'use strict';
+
+        const frame = document.getElementById('stripe-widget');
+
+        if (!frame || !addressDialog.stripeIframeSrc) {
+            return;
+        }
+
+        // Absent on the registerb/repay flows, which never asked for a theme in the first place
+        const src = addressDialog.stripeIframeSrc
+            .replace(/([&?]dark=)[01]/, `$1${mega.ui.isDarkTheme() ? '1' : '0'}`);
+
+        if (src === addressDialog.stripeIframeSrc) {
+            return;
+        }
+
+        addressDialog.stripeIframeSrc = src;
+        frame.src = src;
+    },
+
     showPaymentSuccess() {
         'use strict';
 
@@ -3183,6 +3289,55 @@ var addressDialog = {
             });
     },
 
+    /**
+     * Check whether a saved-card sale the API reported as failed has since completed.
+     * The API retries a failed saved-card charge through the Stripe webhook that follows moments
+     * later, so inviting an immediate retry can charge the user twice.
+     * utd replies with the sale handle once granted, ENOENT while incomplete, EARGS if malformed.
+     * @param {String|Array} saleId Sale ID(s) returned by the uts call
+     * @returns {Promise<Boolean>} True when the sale completed and the success screen was shown
+     */
+    async recoverSavedCardSale(saleId) {
+        'use strict';
+
+        const s = Array.isArray(saleId) ? saleId : [saleId];
+        const startTime = performance.now();
+        const elapsed = () => Math.round(performance.now() - startTime);
+
+        for (let i = 0; i < 4; i++) {
+            await tSleep(i + 1);
+
+            if (!pro.propay.onPropayPage()) {
+                pro.log('savedCardRecoveryLeft', JSON.stringify({polls: i, elapsed: elapsed()}));
+                return false;
+            }
+
+            const res = await api.screq({a: 'utd', s}).then(({result}) => result).catch(echo);
+
+            if (typeof res === 'string') {
+                pro.log('savedCardRecovered', JSON.stringify({polls: i + 1, elapsed: elapsed()}));
+                eventlog(501393);
+
+                this.showPaymentSuccess();
+
+                if (pro.propay.skItems.continueBtn) {
+                    pro.propay.skItems.continueBtn.endLoad('purchase');
+                }
+                return true;
+            }
+
+            // ENOENT only means the sale has not landed yet; any other error will not change
+            if (res !== ENOENT) {
+                pro.log('savedCardRecoveryError', JSON.stringify({polls: i + 1, res: String(res)}));
+                return false;
+            }
+        }
+
+        pro.log('savedCardRecoveryTimeout', JSON.stringify({polls: 4, elapsed: elapsed()}));
+
+        return false;
+    },
+
     stripeFrameHandler: function(event) {
         'use strict';
         if (d) {
@@ -3306,12 +3461,7 @@ var addressDialog = {
                     return;
                 }
                 if (eventData.type === 'resize') {
-                    // Resize the stripe iframe
-                    const $stripeDialog = addressDialog.getStripeDialog();
-                    const $stripeIframe = $('.iframe-container', $stripeDialog);
-                    if ($stripeIframe) {
-                        $stripeIframe.css('height', eventData.height + 'px');
-                    }
+                    addressDialog.resizeStripeIframe(eventData.height);
                 }
                 if (eventData.type === 'loading' && eventData.action === 'end') {
                     if (addressDialog.stripeStartTime && pro.propay.onPropayPage() && pro.propay.currentGateway) {
@@ -3532,6 +3682,27 @@ var addressDialog = {
             utcResult.EUR = false;
         }
 
+        const failSale = () => {
+            // Hidden here rather than at entry, so the recovery check below keeps the spinner up.
+            const fail = () => {
+                pro.propay.hideLoadingOverlay();
+                this.showError(utcResult);
+            };
+            if (saleId && pro.propay.onPropayPage() && !pro.propay.shouldShowTrial()
+                && pro.propay.usedSavedCard()) {
+                // catch before then, so a check that errors still ends in the failure dialog
+                this.recoverSavedCardSale(saleId)
+                    .catch(dump)
+                    .then((recovered) => {
+                        if (!recovered && pro.propay.onPropayPage()) {
+                            fail();
+                        }
+                    });
+                return;
+            }
+            fail();
+        };
+
         if (isStripe && !((typeof utcResult.EUR === 'object') && utcResult.EUR.error)) {
             this.stripeSaleId = null;
             if (utcResult.EUR) {
@@ -3598,6 +3769,7 @@ var addressDialog = {
                     // rtc (returnToClient): Have client handle stripe success/failure
                     if (pro.propay.onPropayPage()) {
                         iframeSrc += `&v=2`;
+                        iframeSrc += `&dark=${mega.ui.isDarkTheme() ? '1' : '0'}`;
                     }
                     iframeSrc += `&rtc=${(d && localStorage.rtc) || 0}`;
                 }
@@ -3664,6 +3836,13 @@ var addressDialog = {
                 $stripeIframe.src = iframeSrc;
                 $stripeIframe.id = 'stripe-widget';
 
+                addressDialog.stripeIframeSrc = iframeSrc;
+
+                if (!addressDialog.themeChangeHandler) {
+                    addressDialog.themeChangeHandler =
+                        mBroadcaster.addListener('theme:changed', () => addressDialog.rethemeStripeIframe());
+                }
+
                 if (!pro.propay.useSavedCard) {
                     pro.propay.hideLoadingOverlay();
                     loadingDialog.hide();
@@ -3693,16 +3872,14 @@ var addressDialog = {
                 });
             }
             else {
-                this.showError(utcResult);
+                failSale();
             }
         }
         else {
             if (utcResult.EUR.url) {
                 return this.redirectToSite(utcResult, isStripe);
             }
-            // Hide the loading animation and show the error
-            pro.propay.hideLoadingOverlay();
-            this.showError(utcResult);
+            failSale();
         }
     },
 
@@ -3723,6 +3900,12 @@ var addressDialog = {
             mBroadcaster.removeListener(addressDialog.iframePageChangeHandler);
             delete addressDialog.iframePageChangeHandler;
         }
+
+        if (addressDialog.themeChangeHandler) {
+            mBroadcaster.removeListener(addressDialog.themeChangeHandler);
+            delete addressDialog.themeChangeHandler;
+        }
+        delete addressDialog.stripeIframeSrc;
     },
 
     /**
@@ -3785,10 +3968,19 @@ var addressDialog = {
             pro.propay.skItems.continueBtn.endLoad('purchase');
         }
 
-        // Propay renders billing inline, so reopening the legacy address dialog is wrong here.
-        const fallback = pro.propay.onPropayPage()
-            ? addressDialog.closeDialog.bind(addressDialog)
-            : addressDialog.showDialog.bind(addressDialog);
+        // Only registerb still has a dialog to send the user back to.
+        let fallback = addressDialog.showDialog.bind(addressDialog);
+
+        if (page === 'repay') {
+            // On mobile the page was parsed away to pay, so rebuild it.
+            callbackFn = () => {
+                page = '';
+                loadSubPage('repay');
+            };
+        }
+        else if (pro.propay.onPropayPage()) {
+            fallback = addressDialog.closeDialog.bind(addressDialog);
+        }
         msgDialog('warninga', l[7235], message, '', callbackFn || fallback);
     },
 

@@ -1299,9 +1299,8 @@ lazy(mega, 'keyMgr', () => {
             }
 
             if (!this.manualVerification) {
-                // if no manual verification required, still check Ed25519 public key is SEEN
-
-                return ed && ed.method >= authring.AUTHENTICATION_METHOD.SEEN;
+                return ed && ed.method >= authring.AUTHENTICATION_METHOD.SEEN
+                    && cu && cu.method >= authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
             }
 
             return cu && cu.method >= authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED
@@ -1578,6 +1577,9 @@ lazy(mega, 'keyMgr', () => {
 
             // decrypt trusted keys, store the remaining ones
             await this.acceptPendingInShares(stub, this.shouldWaitForMKCompletion);
+
+            // decrypt undecrypted nodes
+            crypto_fixmissingkeys(missingkeys);
 
             // we can now delete the fetched inshare keys from the queue
             // (if this operation fails, no problem, it's all idempotent)

@@ -791,33 +791,6 @@
     margin-top: 32px;
 }
 
-/* Post register recovery key dialog */
-.improved-recovery-steps .post-register,
-.improved-recovery-steps.post-register .pre-register {
-    display: none !important;
-}
-.improved-recovery-steps.post-register .post-register {
-    display: block !important;
-}
-.improved-recovery-steps.post-register .reset-account {
-    display: none;
-}
-.improved-recovery-steps.recovery-key-dialog .skip-button {
-    display: none;
-}
-.improved-recovery-steps.recovery-key-dialog.post-register .skip-button {
-    display: block;
-    cursor: pointer;
-}
-.improved-recovery-steps.post-register .skip-button:hover {
-    text-decoration: underline;
-}
-.mega-dialog.recovery-key-dialog.post-register {
-    height: auto;
-}
-.mega-dialog.recovery-key-dialog.post-register a.info {
-    color: var(--text-color-info);
-}
 
 @media only screen and (max-width: 1250px) {
     .improved-recovery-steps .password-tooltip.tooltip-block {

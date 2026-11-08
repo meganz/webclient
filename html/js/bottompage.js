@@ -593,6 +593,10 @@ var bottompage = {
     initFloatingTop: function() {
 
         const $fmHolder = $('.fmholder', 'body.bottom-pages');
+
+        // Pages that scroll an inner block instead of the holder, so the holder never fires
+        const $scrollBlocks = $('.bottom-page.pricing-pg, .bottom-page.propay > .bottom-page.content',
+                                'body.bottom-pages');
         const $topHeader = $('.bottom-page .top-head, .pages-menu-wrap .pages-menu.body', $fmHolder);
         const $productPagesMenu = $('.pages-menu.body', $fmHolder);
 
@@ -626,9 +630,7 @@ var bottompage = {
         });
 
         // Select bottom pages scrolling block or window for mobile
-        $fmHolder.rebind('scroll.topmenu', () => {
-
-            const topPos = $fmHolder.scrollTop();
+        const handleTopMenuScroll = (topPos) => {
 
             if (topPos > 400) {
 
@@ -653,9 +655,18 @@ var bottompage = {
             else if (topPos <= 200) {
 
                 // Return menus static positions
-                $topHeader.removeClass('floating activated').css('width',  '');
+                $topHeader.removeClass('floating activated').css('width', '');
             }
-        });
+        };
+
+        const bindTopMenuScroll = ($el) => {
+            $el.rebind('scroll.topmenu', (ev) => {
+                handleTopMenuScroll(ev.currentTarget.scrollTop);
+            });
+        };
+
+        bindTopMenuScroll($fmHolder);
+        bindTopMenuScroll($scrollBlocks);
     },
 
     videoResizing: function() {

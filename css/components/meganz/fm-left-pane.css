@@ -130,15 +130,13 @@
     margin: 1px 0;
 }
 .nw-fm-tree-item.selected {
-    border-radius: 4px;
-    background-color: var(--stroke-grey-1);
     color: var(--stroke-main-inverted);
+    background-color: var(--stroke-grey-1);
 }
 .nw-fm-tree-item:hover,
 .nw-fm-tree-item.hovered {
-    background-color: var(--stroke-grey-1);
-    border-radius: 4px;
     cursor: pointer;
+    background-color: var(--stroke-grey-1);
 }
 .nw-fm-tree-item:hover .nw-fm-tree-folder,
 .nw-fm-tree-item.dragover .nw-fm-tree-folder {

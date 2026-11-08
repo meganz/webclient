@@ -2,198 +2,482 @@
 lazy(mega.utils, 'subtitles', () => {
     'use strict';
 
-    /**
-     * @type {MutationObserver?}
-     */
-    let rowsObserver = null;
+    const fileName = (node) => node.name.substring(0, node.name.lastIndexOf('.'));
+    const fileExt = (node) => node.name.substring(node.name.lastIndexOf('.'));
 
-    /**
-     * @type {String}
-     */
-    let selectedHandle = '';
-
-    /**
-     * @param {AddSubtitlesDialog} dialog
-     * @param {jQuery.Event} evt
-     */
-    const selectTableRow = (dialog, { currentTarget }) => {
-        const currentlySelected = currentTarget.parentNode.querySelector('tr.ui-selected');
-        selectedHandle = currentTarget.id;
-
-        currentTarget.classList.toggle(
-            'ui-selected',
-            !currentlySelected
-                || currentlySelected.id === selectedHandle
-                || !currentlySelected.classList.remove('ui-selected') // If landed here, it's always true
-        );
-
-        dialog.enable();
+    const templates = {
+        grid: ['subtitles-dialog-subtitles-grid-table', '.subtitles-grid-table'],
+        empty: ['subtitles-dialog-empty-subtitles', '.empty-subtitles']
     };
 
-    const fileName = (node) => {
-        return node.name.substring(0, node.name.lastIndexOf('.'));
+    /**
+     * Clone a dialog template
+     * @param {String} name The template key
+     * @returns {HTMLElement|false} The cloned node, or false
+     */
+    const cloneTemplate = (name) => {
+        const [id, selector] = templates[name];
+        const tpl = document.getElementById(id);
+        const node = tpl && tpl.content && tpl.content.querySelector(selector);
+
+        if (!node) {
+            console.error(`Subtitles template "${id}" (${selector}) is not around.`);
+            return false;
+        }
+
+        return node.cloneNode(true);
     };
 
-    const fileExt = (node) => {
-        return node.name.substring(node.name.lastIndexOf('.'));
-    };
+    class AddSubtitlesDialog {
+        constructor(manager, continuePlay) {
 
-    const subtitlesGridTable = document.getElementById('subtitles-dialog-subtitles-grid-table')
-        .content.querySelector("div");
-    const emptySubtitles = document.getElementById('subtitles-dialog-empty-subtitles').content.querySelector("div");
+            this.continuePlay = continuePlay;
+            this.name = 'add-subtitles-dialog';
+            this.manager = manager;
 
-    class AddSubtitlesDialog extends MDialog {
-        constructor(subtitlesManager, continuePlay) {
-            super({
-                ok: {
-                    label: l.album_done,
-                    callback: async() => {
-                        const node = selectedHandle && M.d[selectedHandle];
+            // Use sheet component in MEGA or html-based dialog in transfer.it
+            this.useSheet = !!(mega.ui && mega.ui.sheet);
 
-                        if (!node) {
-                            return false;
-                        }
-                        mBroadcaster.sendMessage('trk:event', 'media-journey', 'subtitles', 'add', node);
+            this.nodes = [];
+            this.selectedIndex = -1;
 
-                        this.disable();
-                        await this.subtitlesManager.addSubtitles(node).catch(dump);
-                    }
-                },
-                cancel: true,
-                dialogClasses: 'add-subtitles-dialog theme-dark-forced',
-                contentClasses: 'px-2 border-top border-bottom',
-                onclose: () => {
-                    if (this.continuePlay) {
-                        $('.media-viewer-container .video-controls .playpause').trigger('click');
-                    }
+            this.nodeIndex = Object.create(null);
 
-                    if (rowsObserver) {
-                        rowsObserver.disconnect();
-                        rowsObserver = null;
-                    }
+            this.closed = false;
 
-                    $(this.el).off('click.subtitle_row');
-                    $(document).off('keydown.subtitle_row');
-                    $('.mega-button:not(.positive)', this.el).off('click.cancel');
-                    $('.close', this.el).off('click.close');
-                    delete window.disableVideoKeyboardHandler;
-                    delete $.subtitlesMegaRender;
-                },
-                dialogName: 'subtitles-dialog'
+            // Tracking event to send on close, if any. Set by the cancel/close buttons only.
+            this.evtName = null;
+
+            this.slideshowToken = null;
+
+            this.domNode = null;
+            this.addButton = null;
+            this.cancelButton = null;
+            this.closeButton = null;
+            this.sheetCloseButton = null;
+            this.rowsObserver = null;
+            this.headerOffset = 0;
+
+            this.slot = document.createElement('div');
+            this.slot.className = 'files-grid-view js-subtitles-section';
+        }
+
+        setNodes(nodes) {
+            this.nodes = nodes || [];
+            this.selectedIndex = -1;
+            this.nodeIndex = Object.create(null);
+
+            for (let i = 0; i < this.nodes.length; i++) {
+                this.nodeIndex[this.nodes[i].h] = i;
+            }
+        }
+
+        selectByHandle(handle) {
+            const i = this.nodeIndex[handle];
+            this.selectedIndex = typeof i === 'number' ? i : -1;
+        }
+
+        move(delta) {
+            if (!this.nodes.length) {
+                return null;
+            }
+
+            if (this.selectedIndex === -1) {
+                this.selectedIndex = 0;
+            }
+            else {
+                this.selectedIndex += delta;
+
+                if (this.selectedIndex < 0) {
+                    this.selectedIndex = 0;
+                }
+                else if (this.selectedIndex >= this.nodes.length) {
+                    this.selectedIndex = this.nodes.length - 1;
+                }
+            }
+
+            return this.getSelectedNode();
+        }
+
+        getSelectedNode() {
+            return this.nodes[this.selectedIndex] || null;
+        }
+
+        show() {
+            M.safeShowDialog(this.name, () => {
+                this[this.useSheet ? '_initSheetUI' : '_initHtmlUI']();
+
+                // Close along with the media viewer
+                this.slideshowToken = mBroadcaster.addListener('slideshow:close', () => {
+                    this.slideshowToken = null;
+                    this._close();
+                });
+
+                this._render();
+            });
+        }
+
+        _on(el, event, handler) {
+            if (el) {
+                (el.rebind ? el : $(el)).rebind(event, handler);
+            }
+        }
+
+        /**
+         * Render sheet for MEGA
+         * @returns {void}
+         */
+        _initSheetUI() {
+            const sheet = mega.ui.sheet;
+
+            sheet.clear();
+            sheet.type = is_mobile ? 'modal' : 'normal';
+            sheet.name = this.name;
+            sheet.showClose = true;
+
+            sheet.addTitle(l.video_player_add_subtitle_files);
+            sheet.addContent(this.slot);
+
+            this.domNode = sheet.domNode;
+
+            const footer = mCreateElement('div', {
+                class: 'flex flex-row-reverse'
+            }, sheet.footerNode);
+
+            this.addButton = MegaButton.factory({
+                parentNode: footer,
+                componentClassname: 'add-subtitles slim font-600',
+                type: 'normal',
+                text: l.album_done,
+                disabled: true
             });
 
-            this.subtitlesManager = subtitlesManager;
-            this.continuePlay = continuePlay;
-            this.setContent();
-            this._title.classList.add('text-center');
+            this.cancelButton = MegaButton.factory({
+                parentNode: footer,
+                componentClassname: 'cancel secondary slim font-600 mx-2',
+                type: 'normal',
+                text: l[82]
+            });
+
+            sheet.addFooter({slot: [footer]});
+            sheet.safeShow = true;
+
+            // Drop any onClose left over by a previous consumer of the shared sheet.
+            sheet.onClose = null;
+
+            // MegaSheet.hide() is the single exit point of every closing path, whether it is
+            // ours or an external one (backdrop, ESC, popstate, closeDialog() elsewhere.)
+            sheet.rebind('hide.subtitles', () => this._onClose());
+
+            // Bound before show() so that it runs ahead of the component's own close handler,
+            // which hides the sheet right away.
+            this.sheetCloseButton = sheet.closeButton;
+            this._on(this.sheetCloseButton, 'click.closeSubtitles', () => {
+                this.evtName = 'close';
+            });
+
+            sheet.show();
         }
 
-        setContent() {
-            this.slot = document.createElement('div');
-            this.slot.className = 'files-grid-view';
-            this.title = l.video_player_add_subtitle_files;
+        /**
+         * Render html dialog for transfer.it (will be used after the viewer UI update)
+         * @returns {void}
+         */
+        _initHtmlUI() {
+            this.domNode = document.querySelector(`.${this.name}`);
+
+            if (!this.domNode) {
+                return;
+            }
+
+            const content = this.domNode.querySelector('.content');
+            const footer = this.domNode.querySelector('footer');
+
+            if (content) {
+                content.textContent = '';
+                content.appendChild(this.slot);
+            }
+
+            if (footer) {
+                footer.classList.remove('hidden');
+            }
+
+            this.addButton = this.domNode.querySelector('.add-subtitles');
+            this.cancelButton = this.domNode.querySelector('.cancel');
+            this.closeButton = this.domNode.querySelector('.close');
         }
 
-        async onMDialogShown() {
-            document.activeElement.blur();
+        async _render() {
+            if (document.activeElement) {
+                document.activeElement.blur();
+            }
             window.disableVideoKeyboardHandler = true;
 
-            this.disable();
+            const nodes = await this.manager.searchSubtitles();
 
-            const nodes = await this.subtitlesManager.searchSubtitles();
-            this.nodes = nodes;
+            // The dialog may have been closed while the search was running
+            if (this.closed) {
+                return;
+            }
 
-            if (this.nodes.length) {
-                const container = subtitlesGridTable.cloneNode(true);
-                this.slot.appendChild(container);
+            this.setNodes(nodes);
+            this.slot.textContent = '';
 
-                const megaRender = new MegaRender('subtitles');
-                megaRender.renderLayout(undefined, this.nodes);
+            const container = cloneTemplate(nodes.length ? 'grid' : 'empty');
+
+            if (!container) {
+                this._close();
+                return;
+            }
+
+            this.slot.appendChild(container);
+
+            const rows = nodes.length && container.querySelector('tbody, .megaList-content');
+
+            if (rows) {
+                const render = new MegaRender('subtitles');
+                render.renderLayout(undefined, nodes);
+
+                // Used by removenode.js to remove nodes from dialog
+                $.subtitlesMegaRender = render;
+
                 Ps.initialize(container);
-                const table = this.el.querySelector('.subtitles-grid-table');
-                const rows = table.querySelector('tbody');
-                $.subtitlesMegaRender = megaRender;
 
-                rowsObserver = new MutationObserver(() => {
-                    const el = rows.querySelector('tr.ui-selected');
+                const thead = container.querySelector('thead');
 
-                    if (!el) {
-                        selectedHandle = '';
-                        this.disable();
+                this.headerOffset = thead ? thead.offsetHeight : 0;
+
+                this.rowsObserver = new MutationObserver(() => {
+                    const selected = rows.querySelector('.ui-selected');
+
+                    if (!selected) {
+                        this.selectedIndex = -1;
+
+                        if (this.addButton) {
+                            this.addButton.disabled = true;
+                        }
                     }
                 });
 
-                rowsObserver.observe(rows, { childList: true });
+                this.rowsObserver.observe(rows, {childList: true});
 
-                $(this.el).rebind('click.subtitle_row', '.file', (e) => selectTableRow(this, e));
-
-                $(document).rebind('keydown.subtitle_row', tryCatch((e) => {
-                    const isDown = e.keyCode === 40;
-                    const isUp = !isDown && e.keyCode === 38;
-
-                    const specialKeysOn = e.metaKey || e.ctrlKey || e.altKey || e.shiftKey;
-
-                    if (specialKeysOn) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        return false;
-                    }
-
-                    if (!isDown && !isUp) {
-                        return;
-                    }
-
-                    const currentTarget = (selectedHandle)
-                        ? rows.querySelector(`tr.ui-selected`)[e.keyCode === 38
-                            ? 'previousElementSibling'
-                            : 'nextElementSibling'
-                        ]
-                        : rows.querySelector('tr:first-child');
-
-                    if (!currentTarget) {
-                        return;
-                    }
-
-                    selectTableRow(this, { currentTarget });
-
-                    const loc = (currentTarget.rowIndex - 1) * currentTarget.offsetHeight;
-
-                    if (loc < table.scrollTop) {
-                        table.scrollTop = loc;
-                    }
-                    else if (loc >= table.scrollTop + table.offsetHeight - 50) {
-                        table.scrollTop += currentTarget.offsetHeight;
-                    }
-
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return false;
-                }));
+                this._bindList(rows, container);
             }
             else {
-                const container = emptySubtitles.cloneNode(true);
-                this.slot.appendChild(container);
-
-                $('.add-subtitles-dialog .border-top.border-bottom').removeClass('border-bottom');
-                $('.add-subtitles-dialog footer').addClass('height-84');
-                $('.add-subtitles-dialog footer div').addClass('hidden');
+                // There is nothing to pick, hence nothing to confirm either
+                this._clearFooter();
             }
 
-            mBroadcaster.once('slideshow:close', () => {
-                this.hide();
+            this._bindUI();
+        }
+
+        _clearFooter() {
+            this.addButton = null;
+            this.cancelButton = null;
+
+            if (this.useSheet) {
+                mega.ui.sheet.clearFooter();
+            }
+            else if (this.domNode) {
+                const footer = this.domNode.querySelector('footer');
+
+                if (footer) {
+                    footer.classList.add('hidden');
+                }
+            }
+        }
+
+        _bindList(rows, scrollContainer) {
+            $(this.slot).rebind('click.subtitle_row', '.file', (ev) => {
+                this.selectByHandle(ev.currentTarget.id);
+                this._updateSelectionUI(rows, scrollContainer);
             });
 
-            $('.mega-button:not(.positive)', this.el).rebind('click.cancel', () => {
-                mBroadcaster.sendMessage('trk:event', 'media-journey', 'subtitles', 'cancel');
-            });
+            $(document).rebind('keydown.subtitleRowsNav', tryCatch((ev) => {
+                // Ignore shortcuts while the dialog is open
+                if (ev.metaKey || ev.ctrlKey || ev.altKey || ev.shiftKey) {
+                    return false;
+                }
 
-            $('.close', this.el).rebind('click.close', () => {
-                mBroadcaster.sendMessage('trk:event', 'media-journey', 'subtitles', 'close');
+                const isDown = ev.keyCode === 40;
+                const isUp = ev.keyCode === 38;
+
+                if (!isDown && !isUp) {
+                    return;
+                }
+
+                const node = this.move(isDown ? 1 : -1);
+
+                if (!node) {
+                    return;
+                }
+
+                this._updateSelectionUI(rows, scrollContainer);
+
+                return false;
+            }));
+        }
+
+        _updateSelectionUI(rows, scrollContainer) {
+            const node = this.getSelectedNode();
+            const selected = rows.querySelectorAll('.ui-selected');
+
+            for (let i = 0; i < selected.length; i++) {
+                selected[i].classList.remove('ui-selected');
+            }
+
+            const el = node ? rows.querySelector(`[id="${node.h}"]`) : null;
+
+            if (el) {
+                el.classList.add('ui-selected');
+                this._ensureVisible(el, scrollContainer);
+            }
+
+            if (this.addButton) {
+                this.addButton.disabled = !(node && !node.t);
+            }
+        }
+
+        _ensureVisible(el, container) {
+            const rect = el.getBoundingClientRect();
+            const cRect = container.getBoundingClientRect();
+
+            const topLimit = cRect.top + this.headerOffset;
+            const bottomLimit = cRect.bottom;
+
+            if (rect.top < topLimit) {
+                container.scrollTop += rect.top - topLimit;
+            }
+            else if (rect.bottom > bottomLimit) {
+                container.scrollTop += rect.bottom - bottomLimit;
+            }
+            else {
+                return;
+            }
+
+            Ps.update(container);
+        }
+
+        _bindUI() {
+            if (this.addButton) {
+                this._on(this.addButton, 'click.addSubtitles', () => {
+                    this._onAdd();
+                });
+            }
+
+            if (this.cancelButton) {
+                this._on(this.cancelButton, 'click.cancelSubtitles', () => {
+                    this._close('cancel');
+                });
+            }
+
+            if (this.closeButton) {
+                this._on(this.closeButton, 'click.closeSubtitles', () => {
+                    this._close('close');
+                });
+            }
+
+            if (this.domNode) {
+                $(this.domNode).rebind('dialog-closed.subtitles', () => {
+                    this._onClose();
+                });
+            }
+
+            $(document).rebind('keydown.subtitleDialogClose', (ev) => {
+                if (ev.keyCode === 27) {
+                    this._close();
+                    return false;
+                }
             });
         }
 
-        hide() {
-            super.hide();
+        async _onAdd() {
+            const node = this.getSelectedNode();
+
+            if (!node) {
+                return;
+            }
+
+            mBroadcaster.sendMessage('trk:event', 'media-journey', 'subtitles', 'add', node);
+
+            if (this.addButton) {
+                this.addButton.disabled = true;
+            }
+
+            await this.manager.addSubtitles(node).catch(dump);
+            this._close();
+        }
+
+        _close(evtName) {
+            if (this.closed) {
+                return;
+            }
+
+            this.evtName = evtName || this.evtName;
+
+            if (this.useSheet) {
+                // Cleanup runs from the sheet's `hide` handler bound in _initSheetUI()
+                mega.ui.sheet.hide();
+            }
+            else {
+                // ...and from the `dialog-closed` handler bound in _bindUI()
+                closeDialog();
+            }
+
+            // Fallback, in case neither of those was reached, i.e. it was hidden already
+            this._onClose();
+        }
+
+        _onClose() {
+            if (this.closed) {
+                return;
+            }
+            this.closed = true;
+
+            if (this.slideshowToken) {
+                mBroadcaster.removeListener(this.slideshowToken);
+                this.slideshowToken = null;
+            }
+
+            if (this.rowsObserver) {
+                this.rowsObserver.disconnect();
+                this.rowsObserver = null;
+            }
+
+            $(this.slot).off('click.subtitle_row');
+            $(this.domNode).off('dialog-closed.subtitles');
+            $(document).off('keydown.subtitleRowsNav keydown.subtitleDialogClose');
+
+            if (this.useSheet) {
+                mega.ui.sheet.off('hide.subtitles');
+            }
+
+            if (this.sheetCloseButton) {
+                this.sheetCloseButton.off('click.closeSubtitles');
+                this.sheetCloseButton = null;
+            }
+
+            if (this.continuePlay) {
+                $('.media-viewer-container .video-controls .playpause')
+                    .trigger('click');
+            }
+
+            this.nodes = [];
+            this.selectedIndex = -1;
+            this.nodeIndex = Object.create(null);
+            this.headerOffset = 0;
+            this.domNode = null;
+            this.addButton = null;
+            this.cancelButton = null;
+            this.closeButton = null;
+
+            delete window.disableVideoKeyboardHandler;
+            delete $.subtitlesMegaRender;
+
+            if (this.evtName) {
+                mBroadcaster.sendMessage('trk:event', 'media-journey', 'subtitles', this.evtName);
+                this.evtName = null;
+            }
         }
     }
 
@@ -303,7 +587,6 @@ lazy(mega.utils, 'subtitles', () => {
 
     class SubtitlesManager {
         constructor() {
-            /** @property SubtitlesManager._factory */
             lazy(this, '_factory', () => new SubtitlesFactory());
             this.init();
         }
@@ -448,7 +731,7 @@ lazy(mega.utils, 'subtitles', () => {
             const {extensions} = this._factory;
 
             for (const ext of extensions) {
-                if (folderlink) {
+                if (self.folderlink || self.is_transferit) {
                     for (let i = 0; i < M.v.length; i++) {
                         if (M.v[i].name && M.v[i].name.endsWith(ext) && !this._nodes.includes(M.v[i])) {
                             nodes.push(M.v[i]);
@@ -505,7 +788,7 @@ lazy(mega.utils, 'subtitles', () => {
             });
         }
 
-        addSubtitlesDialog(continuePlay) {
+        async addSubtitlesDialog(continuePlay) {
             $(document).fullScreen(false);
             const dialog = new AddSubtitlesDialog(this, continuePlay);
             dialog.show();

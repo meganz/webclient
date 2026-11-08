@@ -17,6 +17,8 @@ pro.propay.billing = {
 
     tngrRes: null,
 
+    blockedCountries: null,
+
     billingSections: null,
 
     lastValidatedErrorFields: {},
@@ -52,8 +54,9 @@ pro.propay.billing = {
         if (this.initialCountry !== undefined) {
             return this.initialCountry;
         }
-        await this.fetchDefaultCountry();
-        this.initialCountry = this.defaultCountry || (u_attr && u_attr.country) || '';
+        await Promise.all([this.fetchDefaultCountry(), this.getBlockedCountries()]);
+        const country = this.defaultCountry || (u_attr && u_attr.country) || '';
+        this.initialCountry = this.isBlockedCountry(country) ? '' : country;
         return this.initialCountry;
     },
 
@@ -399,7 +402,7 @@ pro.propay.billing = {
             return;
         }
 
-        const countries = M.getCountries();
+        const countries = this.saleCountries(M.getCountries(), this.blockedCountries);
         const sortedOptions = Object.fromEntries(Object.entries(countries)
             .sort((a, b) => a[1].localeCompare(b[1])));
         const selected = this.initialCountry || '';
@@ -940,7 +943,28 @@ pro.propay.billing = {
         if (!this.isProFlexi()) {
             $checkbox.removeClass('hidden');
             $requireInvoiceNote.removeClass('hidden');
+            this.updateRequireInvoiceNote(
+                $requireInvoiceNote,
+                personalFields.includes(this.TAX_CODE_FIELD) || invoiceFields.includes(this.TAX_CODE_FIELD)
+            );
         }
+    },
+
+    /**
+     * Swap the note below the tax invoice checkbox for a warning once it is ticked, as the invoice
+     * carries no tax number unless the gateway collects one for personal use (e.g. AstroPay CPF).
+     * @param {jQuery} $note - The note row below the checkbox
+     * @param {boolean} collectsTaxNumber - Whether the ticked form shows the tax number field
+     * @returns {void}
+     */
+    updateRequireInvoiceNote($note, collectsTaxNumber) {
+        'use strict';
+        const warn = !!this.requiresInvoice && !collectsTaxNumber;
+        $note.toggleClass('warning', warn);
+        $('i', $note).toggleClass('icon-info', !warn).toggleClass('icon-alert-triangle', warn);
+        $('span', $note).text(warn
+            ? l.tax_invoice_no_vat_note.replace('%1', this.getTaxFieldLabel())
+            : l.tax_invoice_purchase_note);
     },
 
     /**
@@ -1152,6 +1176,49 @@ pro.propay.billing = {
         this.tngrRes = res && res.result || false;
 
         return this.tngrRes;
+    },
+
+    /**
+     * Get and cache the countries the API takes no payments from
+     * @returns {Promise<Set<String>|false>} country codes, or false when utbc gave no usable list
+     */
+    async getBlockedCountries() {
+        'use strict';
+
+        if (this.blockedCountries) {
+            return this.blockedCountries;
+        }
+
+        // A failure counts as loaded, so nothing waits on it and nothing is filtered.
+        const res = await api.req({a: 'utbc'}).catch(dump);
+        this.blockedCountries = Array.isArray(res && res.result) ? new Set(res.result) : false;
+
+        return this.blockedCountries;
+    },
+
+    /**
+     * @param {Object} countries                The country list, code: name
+     * @param {Set<String>|false|null} blocked  Country codes to leave out
+     * @returns {Object}                        The countries a sale can be made in, code: name
+     */
+    saleCountries(countries, blocked) {
+        'use strict';
+
+        if (!blocked) {
+            return countries;
+        }
+
+        return Object.fromEntries(Object.entries(countries).filter(([cc]) => !blocked.has(cc)));
+    },
+
+    /**
+     * @param {String} country  Country code
+     * @returns {Boolean}       Whether the API takes no payments from it
+     */
+    isBlockedCountry(country) {
+        'use strict';
+
+        return !!this.blockedCountries && this.blockedCountries.has(country);
     },
 
     /**
@@ -2177,14 +2244,20 @@ pro.propay.billing = {
                     text: l.personal_use,
                     tabid: 'personal',
                     selected: !businessSelected,
-                    onClick: () => this.applyPersonalUse(),
+                    onClick: () => {
+                        pro.propay.scrollToTop();
+                        return this.applyPersonalUse();
+                    },
                 },
                 {
                     parentNode: tabGroupWrap,
                     text: l.business_use,
                     tabid: 'business',
                     selected: businessSelected,
-                    onClick: () => this.applyBusinessUse(),
+                    onClick: () => {
+                        pro.propay.scrollToTop();
+                        return this.applyBusinessUse();
+                    },
                 },
             ],
         });

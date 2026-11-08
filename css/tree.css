@@ -147,22 +147,45 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.dragover .nw-fm-tree-folder {
     color: white;
 }
-.nw-fm-tree-item.ui-droppable-hover::after {
+
+.nw-fm-tree-item.ui-droppable-hover,
+.mega-top-menu .menu-item.ui-droppable-hover {
+    pointer-events: none;
+    position: relative;
+}
+
+.nw-fm-tree-item.pointer-auto,
+.mega-top-menu .menu-item.pointer-auto {
+    pointer-events: auto;
+}
+
+.nw-fm-tree-item.ui-droppable-hover::before,
+.mega-top-menu .menu-item.ui-droppable-hover::before {
+    background: none;
+    border: var(--mobile-border-strong-selected) dashed 2px;
+    border-radius: 4px;
+    bottom: 0;
+    box-sizing: border-box;
     content: '';
+    left: 0;
+    pointer-events: none;
     position: absolute;
     top: 0;
-    bottom: 0;
-    left: 0;
-    width: calc(var(--dd-row-width, 100%) - 4px);
-    border: var(--mobile-border-strong-selected) dashed 2px;
-    border-radius: 8px;
-    pointer-events: none;
-    z-index: 900;
+    width: var(--dd-row-width, 100%);
+    z-index: 1;
 }
-.rtl .nw-fm-tree-item.ui-droppable-hover::after {
+
+.nw-fm-tree-item.selected.ui-droppable-hover::before,
+.mega-top-menu .menu-item.active.ui-droppable-hover::before {
+    width: calc(var(--dd-row-width, 100%) - 4px);
+}
+
+.rtl .nw-fm-tree-item.ui-droppable-hover::before,
+.rtl .mega-top-menu .menu-item.ui-droppable-hover::before {
     left: auto;
     right: 0;
 }
+
 .nw-fm-tree-icon-wrap > .item-type-icon {
     position: absolute;
     left: 0;

@@ -97,33 +97,27 @@ function resetSensitives() {
          * @returns {Promise<-1|1>}
          */
         const sensitivesConfirmationDialog = (dialogName, title, txt) => new Promise((resolve, reject) => {
-            const dialog = new MDialog({
-                dialogName,
-                ok: {
-                    label: l[507],
-                    callback: () => {
-                        resolve(mega.sensitives.SAFE_TO_SHARE);
-                    },
-                    classes: ['mega-button', 'branded-green']
-                },
-                cancel: {
-                    label: l.msg_dlg_cancel,
-                    callback: () => {
-                        reject(EBLOCKED);
-                    }
-                },
-                icon: 'sprite-fm-uni icon-info icon-size-16',
-                setContent() {
-                    const p = document.createElement('p');
-                    p.className = 'px-6';
-                    p.textContent = txt;
-
-                    this.slot = p;
+            const callback = (res) => {
+                // confirmation and warningb use opposite values to indicate confirmation
+                if (is_mobile ? !res : res || res === null) {
+                    reject(EBLOCKED);
+                    return;
                 }
-            });
 
-            dialog.title = title;
-            dialog.show();
+                resolve(mega.sensitives.SAFE_TO_SHARE);
+            };
+
+            // Mobile uses the visible title as the second argument; desktop uses the dialog name
+            if (is_mobile) {
+                msgDialog(
+                    `*confirmation:!^${l[507]}!${l.msg_dlg_cancel}`, title, txt, null, callback
+                );
+            }
+            else {
+                msgDialog(
+                    `*warningb:!^${l[507]}!${l.msg_dlg_cancel}`, dialogName, title, txt, callback
+                );
+            }
         });
 
         /**
@@ -299,8 +293,13 @@ function resetSensitives() {
             }
 
             if (sensitiveStatusCache[n.p] === undefined) {
-                const parent = M.getNodeByHandle(n.p);
-                sensitiveStatusCache[n.p] = parent.sen === 1 || isSensitiveInherited(parent);
+                // M.tree keys its folders by parent, so they are gathered by their own handle, flagged in t
+                sensitiveStatusCache.tree = sensitiveStatusCache.tree
+                    || Object.values(M.tree).reduce((t, s) => Object.assign(t, s), Object.create(null));
+
+                const parent = sensitiveStatusCache.tree[n.p] || M.getNodeByHandle(n.p);
+                sensitiveStatusCache[n.p] = parent.sen === 1 || !!(parent.t & M.IS_SEN)
+                    || isSensitiveInherited(parent);
             }
 
             return sensitiveStatusCache[n.p];
@@ -806,10 +805,10 @@ function resetSensitives() {
                             continue;
                         }
 
-                        const eHandles = Object.keys(album.eHandles);
+                        const nodes = await dbfetch.node(Object.keys(album.eHandles)).catch(dump) || [];
 
-                        for (let i = 0; i < eHandles.length; i++) {
-                            const n = M.d[eHandles[i]];
+                        for (let i = 0; i < nodes.length; i++) {
+                            const n = nodes[i];
 
                             if (
                                 n

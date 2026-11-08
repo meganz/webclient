@@ -1713,11 +1713,16 @@ function showLoginDialog(email, password) {
     if (!loginBtn && submitWrap) {
         loginBtn = new MegaButton({
             parentNode: submitWrap,
-            componentClassname: 'mega-button block top-dialog-login-button dialog-login-button primary',
+            componentClassname: 'mega-button block top-dialog-login-button dialog-login-button primary no-max',
             text: l[16345],
             type: 'normal'
         });
     }
+
+    mega.ui.login.initPasskeyButton(submitWrap, $dialog, null, {
+        onPasskeyLogin: completeProLogin,
+        onReopen: () => showLoginDialog(email, password)
+    });
 
     $('.input-email', $dialog).val(email || '');
     $('.input-password', $dialog).val(password || '');
@@ -1921,15 +1926,7 @@ async function checkPlanStorage(currentStored, planNum) {
 function showRegisterDialog(aPromise) {
     'use strict';
 
-    let s4Feature = null;
-
-    // Add S4 ToS and update strings if there is Auth Code and dialog is fired on pro flexi page
-    if (window.s4ac && pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
-        s4Feature = true;
-    }
-
     mega.ui.signup.showDialog({
-        s4Flag: s4Feature,
 
         onAccountCreated: function(gotLoggedIn, registerData) {
             // If true this means they do not need to confirm their email before continuing to step 2

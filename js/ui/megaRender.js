@@ -385,7 +385,7 @@ mBroadcaster.once('boot_done', () => {
             '.fm-blocks-view.fm .file-block-scrolling'
         ],
         'subtitles': [
-            '.mega-dialog .grid-table'
+            '.add-subtitles-dialog .grid-table'
         ],
         'migration': [
             '.mega-sheet.journey.migrate-dialog table',
@@ -1294,7 +1294,7 @@ mBroadcaster.once('boot_done', () => {
 
                 if (aExtendedInfo !== false) {
 
-                    if (share) {
+                    if (share && !mega.migrate.isImportFolder(aNode)) {
                         props.linked = true;
                         props.classNames.push('linked');
                     }
@@ -1599,6 +1599,7 @@ mBroadcaster.once('boot_done', () => {
                         elm = aTemplate.querySelector('.grid-status-icon');
                         elm.classList.remove('icon-heart-thin-outline', 'icon-heart-thin-solid');
                         elm.classList.add('icon-info');
+                        delete elm.dataset.simpletip;
                     }
                 }
 
@@ -1612,6 +1613,7 @@ mBroadcaster.once('boot_done', () => {
                         elm = aTemplate.querySelector('.grid-status-icon');
                         elm.classList.remove('icon-heart-thin-outline', 'icon-heart-thin-solid');
                         elm.classList.add('icon-takedown');
+                        delete elm.dataset.simpletip;
                     }
                 }
 

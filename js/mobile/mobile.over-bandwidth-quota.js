@@ -88,7 +88,7 @@ mobile.overBandwidthQuota = {
                     this.clearTimer();
                 }
             });
-        });
+        }).catch(dump);
     },
 
     clearTimer() {

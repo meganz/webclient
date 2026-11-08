@@ -17,7 +17,7 @@ class DiscountPromo {
         this.getDiscountInfo(page, () => {
 
             // Load Pro membership plans
-            pro.loadMembershipPlans(() => {
+            pro.loadMembershipPlans().then(() => {
 
                 // Get the matched plan
                 const matchedPlan = this.getMatchedPlan();
@@ -32,8 +32,7 @@ class DiscountPromo {
                 }
 
                 // Hide loading spinner
-                loadingDialog.hide('discountPromotionalPage');
-            });
+            }).catch(tell).finally(() => loadingDialog.hide('discountPromotionalPage'));
         });
     }
 

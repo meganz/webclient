@@ -144,7 +144,7 @@ var mobile = {
                         else if (mega.ui.sheet.name !== 'resume-download') { // don't proceed if resume dialog is open
                             mobile.overStorageQuota.quotaInfo = data;
                             if (data.isFull) {
-                                mobile.overStorageQuota.show();
+                                mobile.overStorageQuota.show().catch(dump);
                             }
                             else {
                                 ulmanager.ulOverStorageQuota = false;
@@ -189,7 +189,7 @@ var mobile = {
                     };
 
                     if (!pro.membershipPlans || !pro.membershipPlans.length) {
-                        pro.loadMembershipPlans(action);
+                        pro.loadMembershipPlans(action).catch(dump);
                     }
                     else {
                         action();

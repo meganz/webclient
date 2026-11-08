@@ -2092,20 +2092,13 @@ lazy(pro, 'proplan2', () => {
     };
 
     const fetchPlansData = () => {
-        return new Promise(resolve => {
-            pro.loadMembershipPlans(() => {
-                if (u_attr) {
-
-                    M.getStorageQuota().then(storage => {
-                        pro.proplan2.storageData = storage;
-                        resolve();
-                    });
-                }
-                else {
-                    resolve();
+        return pro.loadMembershipPlans()
+            .then(() => self.u_attr && M.getStorageQuota())
+            .then((storage) => {
+                if (storage) {
+                    pro.proplan2.storageData = storage;
                 }
             });
-        });
     };
 
     /**

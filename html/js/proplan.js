@@ -289,7 +289,7 @@ pro.proplan = {
         $('.payment-result.success', $(document.body)).addClass('hidden');
 
         // Load the membership plans
-        pro.loadMembershipPlans(function() {
+        pro.loadMembershipPlans().then(() => {
 
             // Render the plan details
             pro.proplan.populateMembershipPlans();
@@ -298,8 +298,7 @@ pro.proplan = {
             pro.proplan.checkApplicablePlans();
 
             // Close loading spinner
-            loadingDialog.hide();
-        });
+        }).catch(tell).finally(() => loadingDialog.hide());
     },
 
     /**
@@ -1849,11 +1848,10 @@ function completeProLogin(result) {
 
                 // Update the pro page after login based on whether the user
                 // is allowed to see the low tier section of the pro page
-                pro.loadMembershipPlans(() => {
+                pro.loadMembershipPlans().then(() => {
                     pro.updateLowTierProPage(!!pro.filter.excMin);
 
-                    loadingDialog.hide();
-                });
+                }).catch(tell).finally(() => loadingDialog.hide());
             }
         }
         else if (page.startsWith('propay_')) {
@@ -1879,7 +1877,7 @@ function completeProLogin(result) {
                         msgDialog('warninga', l[135],
                                   l.warn_head_not_enough_storage, l.warn_body_not_enough_storage, () => {
                                       loadSubPage('pro');
-                                      pro.proplan2.initPage();
+                                      pro.proplan2.initPage().catch(tell);
                                   });
                     }
                 });

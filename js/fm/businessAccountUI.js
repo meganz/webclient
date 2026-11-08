@@ -1943,7 +1943,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
     if (u_attr.pf || typeof M.account.b.v === 'undefined' || M.account.b.v === 0) {
 
         // Populate the next billing info into the overall usage section
-        pro.loadMembershipPlans(populateNextBillInfo);
+        pro.loadMembershipPlans().then(populateNextBillInfo).catch(tell);
 
         // Fill the last/next bill transfer data into the analytics section
         fillStgeTrfBillInfo(true);

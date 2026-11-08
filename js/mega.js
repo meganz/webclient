@@ -3728,7 +3728,7 @@ function init_chat(action) {
             resolve(EACCESS);
         }
         else {
-            authring.onAuthringReady('chat').then(__init_chat);
+            authring.onAuthringReady('chat').then(__init_chat).catch(reject);
         }
     });
 }
@@ -3998,7 +3998,7 @@ function loadfm_done(mDBload) {
                                 processMCSM(loadfm.chatmcsm, true);
                                 loadfm.chatmcsm = null;
                             }
-                            init_chat();
+                            init_chat().catch(dump);
                         }
                         else {
                             // FIXME: this won't be reached because the request will fail silently

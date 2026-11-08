@@ -810,7 +810,16 @@ lazy(T.ui, 'addFilesLayout', () => {
                     }
                 })().finally(() => {
                     this.data.files = [];
-                    T.ui.loadPage();
+
+                    // T.ui.loadPage() handles this for the standalone page,
+                    // but overlay only has a stub page, so restore the init state manually
+                    if (self.is_transferit) {
+                        T.ui.loadPage();
+                        return;
+                    }
+                    loadingDialog.hide();
+                    this.data.ko = [];
+                    this.renderAddedFiles();
                 });
             });
 

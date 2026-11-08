@@ -772,14 +772,16 @@ twofactor.setupDialog = {
                 // Set Base32 seed into text box
                 this.seedNode.textContent = res;
 
+                const ratio = window.devicePixelRatio || 1;
+
                 // Configure the QR code rendering library
                 // Appears as: MEGA (name@email.com) in authenticator app
-                var options = {
-                    width: 132,
-                    height: 132,
-                    correctLevel: QRErrorCorrectLevel.H,    // High
-                    background: '#f2f2f2',
+                const options = {
+                    width: 148 * ratio,
+                    height: 148 * ratio,
+                    background: '#ffffff',
                     foreground: '#151412',
+                    correctLevel: QRErrorCorrectLevel.H,    // High
                     text: `otpauth://totp/MEGA:${u_attr.email}?secret=${res}&issuer=MEGA`
                 };
 

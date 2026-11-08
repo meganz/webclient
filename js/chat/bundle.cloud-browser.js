@@ -439,35 +439,13 @@ class CloudBrowserDialog extends modalDialogs.A.SafeShowDialogController {
       const {
         highlighted
       } = this.state;
-      const className = `${share && share.down ? 'disabled' : ''}`;
-      const highlightedNode = highlighted && highlighted.length && highlighted[0];
+      const className = `${share && share.down || mega.migrate.isImporting(highlighted) ? 'disabled' : ''}`;
+      highlighted && highlighted.length && highlighted[0];
       const allowAttachFolders = this.props.allowAttachFolders && !isIncomingShare && !isS4Cn;
-      buttons.push({
-        label: this.props.openLabel,
-        key: 'select',
-        className: `${className} ${highlighted.length > 1 ? 'disabled' : ''}`,
-        defaultClassname: 'nav-elem normal button action',
-        onClick: e => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (highlighted.length > 1) {
-            return;
-          }
-          this.setState({
-            currentlyViewedEntry: highlightedNode
-          });
-          this.clearSelectionAndHighlight();
-          this.setState({
-            selected: [],
-            searchValue: '',
-            searchText: '',
-            highlighted: []
-          });
-        }
-      }, allowAttachFolders ? {
+      buttons.push(allowAttachFolders ? {
         label: l[8023],
         key: 'attach',
-        defaultClassname: 'nav-elem normal button action secondary',
+        defaultClassname: 'nav-elem normal button action',
         className,
         onClick: () => {
           this.props.onClose();
@@ -511,12 +489,18 @@ class CloudBrowserDialog extends modalDialogs.A.SafeShowDialogController {
         }
       } : null);
     }
-    if (!folderIsHighlighted || this.props.folderSelectable && (!this.props.noShareFolderAttach || !(isIncomingShare && folderIsHighlighted))) {
+    const {
+      folderSelectable,
+      noShareFolderAttach,
+      showDisabledSelect,
+      selectLabel
+    } = this.props;
+    if (showDisabledSelect || !folderIsHighlighted || folderSelectable && (!noShareFolderAttach || !(isIncomingShare && folderIsHighlighted))) {
       buttons.push({
-        label: this.props.selectLabel,
+        label: selectLabel,
         key: 'select',
         defaultClassname: 'nav-elem normal button action',
-        className: this.state.selected.length === 0 || share && share.down || isS4Cn ? "disabled" : "",
+        className: this.state.selected.length === 0 || share && share.down || isS4Cn ? 'disabled' : '',
         onClick: e => {
           if (this.state.selected.length > 0) {
             this.props.onSelected(this.state.selected);
@@ -537,6 +521,19 @@ class CloudBrowserDialog extends modalDialogs.A.SafeShowDialogController {
       });
     }
     const breadcrumbPath = M.getPath(entryId);
+    const renderTab = (tab, icon, label) => {
+      const selected = self.state.selectedTab === tab;
+      return JSX_("button", {
+        className: `nav-elem text-only full-width${selected ? ' active' : ''}`,
+        onClick: () => self.handleTabChange(tab)
+      }, JSX_("i", {
+        className: `sprite-fm-mono ${icon}-${selected ? 'solid' : 'outline'}`
+      }), JSX_("div", {
+        className: "text-box-wrapper"
+      }, JSX_("span", {
+        className: "primary-text"
+      }, label)));
+    };
     return JSX_(modalDialogs.A.ModalDialog, {
       className: `${classes} ${this.dialogName}`,
       onClose: () => {
@@ -551,43 +548,7 @@ class CloudBrowserDialog extends modalDialogs.A.SafeShowDialogController {
       className: "left-panel"
     }, JSX_("div", {
       className: "fm-picker-dialog-tree-panel"
-    }, JSX_("button", {
-      className: `nav-elem text-only full-width` + `${self.state.selectedTab === 'quick-access' ? ' active' : ''}`,
-      onClick: () => self.handleTabChange('quick-access')
-    }, JSX_("i", {
-      className: "sprite-fm-mono icon-clock-thin-solid"
-    }), JSX_("div", {
-      className: "text-box-wrapper"
-    }, JSX_("span", {
-      className: "primary-text"
-    }, l.frequent_access))), JSX_("button", {
-      className: `nav-elem text-only full-width` + `${self.state.selectedTab === M.RootID ? ' active' : ''}`,
-      onClick: () => self.handleTabChange(M.RootID)
-    }, JSX_("i", {
-      className: "sprite-fm-mono icon-cloud-thin-outline"
-    }), JSX_("div", {
-      className: "text-box-wrapper"
-    }, JSX_("span", {
-      className: "primary-text"
-    }, l[164]))), !self.props.hideIncoming && JSX_("button", {
-      className: `nav-elem text-only full-width` + `${self.state.selectedTab === 'shares' ? ' active' : ''}`,
-      onClick: () => self.handleTabChange('shares')
-    }, JSX_("i", {
-      className: "sprite-fm-mono icon-folder-users-thin-outline"
-    }), JSX_("div", {
-      className: "text-box-wrapper"
-    }, JSX_("span", {
-      className: "primary-text"
-    }, l[5542]))), JSX_("button", {
-      className: `nav-elem text-only full-width` + `${self.state.selectedTab === 's4' ? ' active' : ''}` + `${u_attr.s4 ? '' : ' hidden'}`,
-      onClick: () => self.handleTabChange('s4')
-    }, JSX_("i", {
-      className: "sprite-fm-mono icon-bucket-triangle-thin-outline"
-    }), JSX_("div", {
-      className: "text-box-wrapper"
-    }, JSX_("span", {
-      className: "primary-text"
-    }, l.obj_storage))))), JSX_("section", {
+    }, renderTab('quick-access', 'icon-clock-thin', l.frequent_access), renderTab(M.RootID, 'icon-cloud-thin', l[164]), !self.props.hideIncoming && renderTab('shares', 'icon-folder-users-thin', l[5542]), u_attr.s4 && renderTab('s4', 'icon-bucket-triangle-thin', l.obj_storage))), JSX_("section", {
       ref: this.domRef,
       className: "content"
     }, JSX_("div", {
@@ -1690,7 +1651,7 @@ class BrowserEntries extends mixins.w9 {
     }
   }
   _invalidKeydownTarget(e) {
-    return e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'TEXTAREA' && !e.target.classList.contains('messages-textarea') || e.target.tagName === 'SELECT');
+    return e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.isContentEditable || e.target.tagName === 'TEXTAREA' && !e.target.classList.contains('messages-textarea') || e.target.tagName === 'SELECT');
   }
   _isNavigationKeyDown(e, keyCode) {
     const {

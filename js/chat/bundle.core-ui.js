@@ -1586,6 +1586,7 @@ class ChatlinkDialog extends REaCt().Component {
   constructor(...args) {
     super(...args);
     this.domRef = REaCt().createRef();
+    this.qrButtonRef = REaCt().createRef();
     this.state = {
       link: l[5533],
       newTopic: ''
@@ -1594,6 +1595,19 @@ class ChatlinkDialog extends REaCt().Component {
       if (this.props.onClose) {
         this.props.onClose();
       }
+    };
+    this.toggleQR = () => {
+      if (this.qrPopup && this.qrPopup.visible) {
+        this.qrPopup.hide();
+        return;
+      }
+      this.qrPopup = this.qrPopup || new MegaQrPopup({
+        parentNode: document.getElementById(ChatlinkDialog.NAMESPACE),
+        targetNode: this.qrButtonRef.current,
+        link: () => this.state.link,
+        fileName: () => this.props.chatRoom.getRoomTitle()
+      });
+      this.qrPopup.show();
     };
   }
   retrieveChatLink(forced) {
@@ -1618,6 +1632,32 @@ class ChatlinkDialog extends REaCt().Component {
       }
     });
   }
+  renderQRButton() {
+    const {
+      chatRoom
+    } = this.props;
+    if (this.loading || !chatRoom.topic || !(chatRoom.publicLink || is_chatlink)) {
+      return null;
+    }
+    return JSX_("button", {
+      ref: this.qrButtonRef,
+      className: `
+                    mega-component
+                    nav-elem
+                    button
+                    icon-only
+                    transparent-icon
+                    text-icon
+                    secondary
+                    show-qrcode
+                    simpletip
+                `,
+      "data-simpletip": l[17754],
+      onClick: this.toggleQR
+    }, JSX_("i", {
+      className: "sprite-fm-mono icon-qr-thin-outline icon-size-20"
+    }));
+  }
   componentDidMount() {
     this.retrieveChatLink();
     M.safeShowDialog(ChatlinkDialog.NAMESPACE, () => {
@@ -1628,6 +1668,9 @@ class ChatlinkDialog extends REaCt().Component {
     });
   }
   componentWillUnmount() {
+    if (this.qrPopup) {
+      this.qrPopup.destroy();
+    }
     if ($.dialog === ChatlinkDialog.NAMESPACE) {
       closeDialog();
     }
@@ -1706,7 +1749,7 @@ class ChatlinkDialog extends REaCt().Component {
       type: "text",
       readOnly: true,
       value: this.loading ? l[5533] : !chatRoom.topic ? l[20660] : link
-    })), JSX_("div", {
+    }), this.renderQRButton()), JSX_("div", {
       className: "info"
     }, chatRoom.publicLink || is_chatlink ? publicLinkDetails : null)))), JSX_("footer", null, JSX_("div", {
       className: "footer-container"
@@ -4346,7 +4389,14 @@ class EmptyConversationsPanel extends react0___default().Component {
         }
       },
       onClickSecondary: () => {
-        copyToClipboard(linkData, `${l[371]}<span class="link-text">${linkData}</span>`);
+        const toast = mCreateElement('span', {
+          class: 'message'
+        });
+        toast.textContent = l[371];
+        mCreateElement('span', {
+          class: 'link-text'
+        }, toast).textContent = linkData;
+        copyToClipboard(linkData, toast);
         delay('chat-event-copy-contact-link', () => eventlog(500277));
       }
     }), JSX_(Tile, {

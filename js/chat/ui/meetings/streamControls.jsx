@@ -1,43 +1,12 @@
 import React from 'react';
 import { compose, MegaRenderMixin } from '../../mixins';
 import Button from './button.jsx';
-import { STREAM_ACTIONS } from './stream.jsx';
 import { withMicObserver } from './micObserver.jsx';
 import { withPermissionsObserver } from './permissionsObserver.jsx';
-import Call from './call.jsx';
+import { isModerator, STREAM_ACTIONS, renderLeaveConfirm } from './utils.jsx';
 import { withHostsObserver } from './hostsObserver.jsx';
 import { Dropdown, DropdownItem } from '../../../ui/dropdowns.jsx';
 import utils from '../../../ui/utils.jsx';
-
-export const renderLeaveConfirm = (onConfirm, onRecordingToggle) =>
-    msgDialog(
-        `confirmation:!^${l.leave_call_recording_dialog_cta}!${l.leave_call_recording_dialog_nop_cta}`,
-        undefined,
-        l.leave_call_recording_dialog_heading,
-        l.leave_call_recording_dialog_body,
-        cb => {
-            if (cb) {
-                onRecordingToggle();
-                onConfirm();
-            }
-        },
-        1
-    );
-
-export const renderEndConfirm = (onConfirm, onRecordingToggle) =>
-    msgDialog(
-        `confirmation:!^${l.end_call_recording_dialog_cta}!${l.end_call_recording_dialog_nop_cta}`,
-        undefined,
-        l.end_call_recording_dialog_heading,
-        l.end_call_recording_dialog_body,
-        cb => {
-            if (cb) {
-                onRecordingToggle();
-                onConfirm();
-            }
-        },
-        1
-    );
 
 // --
 
@@ -198,7 +167,7 @@ class StreamControls extends MegaRenderMixin {
                 onClick={() => {
                     // Host on a group call w/ other peers in the call -> show the end call options menu;
                     // see `renderEndCallOptions`
-                    if (chatRoom.type !== 'private' && peers.length && Call.isModerator(chatRoom, u_handle)) {
+                    if (chatRoom.type !== 'private' && peers.length && isModerator(chatRoom, u_handle)) {
                         return (
                             this.setState(state => ({ endCallOptions: !state.endCallOptions }), () => {
                                 if (this.endButtonRef) {

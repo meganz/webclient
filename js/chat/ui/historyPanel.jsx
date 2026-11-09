@@ -10,7 +10,7 @@ import { ChatHandleMessage } from "./messages/chatHandle.jsx";
 import GenericConversationMessage from "./messages/generic.jsx";
 import { PerfectScrollbar } from "../../ui/perfectScrollbar.jsx";
 import { RetentionChange } from "./messages/retentionChange.jsx";
-import Call from './meetings/call.jsx';
+import { isExpanded } from './meetings/utils.jsx';
 import ScheduleMetaChange from "./messages/scheduleMetaChange.jsx";
 
 export default class HistoryPanel extends MegaRenderMixin {
@@ -240,7 +240,7 @@ export default class HistoryPanel extends MegaRenderMixin {
             return;
         }
 
-        if (Call.isExpanded()) {
+        if (isExpanded()) {
             const $container = $('.meetings-call');
             const $messages = $('.js-messages-scroll-area', $container);
             const $textarea = $('.chat-textarea-block', $container);

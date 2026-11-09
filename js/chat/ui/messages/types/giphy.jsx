@@ -2,7 +2,7 @@ import React from 'react';
 import AbstractGenericMessage from '../abstractGenericMessage.jsx';
 import { Button} from '../../../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../../../ui/dropdowns.jsx';
-import { API } from '../../gifPanel/gifPanel.jsx';
+import { API } from '../../gifPanel/utils.jsx';
 
 export default class Giphy extends AbstractGenericMessage {
     gifRef = React.createRef();

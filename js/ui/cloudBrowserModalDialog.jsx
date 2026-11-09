@@ -514,8 +514,4 @@ class CloudBrowserDialog extends ModalDialogsUI.SafeShowDialogController {
     }
 }
 
-Object.defineProperty(mega, 'CloudBrowserDialog', {value: CloudBrowserDialog});
-
-export default {
-    CloudBrowserDialog
-};
+export default CloudBrowserDialog;

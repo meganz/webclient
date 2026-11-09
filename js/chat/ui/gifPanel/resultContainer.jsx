@@ -1,6 +1,6 @@
 import React from 'react';
 import Result from './result.jsx';
-import { API, LABELS } from './gifPanel.jsx';
+import { API, LABELS } from './utils.jsx';
 
 export const HAS_INTERSECTION_OBSERVER = typeof IntersectionObserver !== 'undefined';
 export const NODE_CONTAINER_CLASS = 'node-container';

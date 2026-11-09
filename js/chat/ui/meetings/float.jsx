@@ -2,7 +2,7 @@ import React from 'react';
 import { compose, MegaRenderMixin } from '../../mixins';
 import utils, { ParsedHTML } from '../../../ui/utils.jsx';
 import Button from './button.jsx';
-import { MODE, VIEW } from './call.jsx';
+import { MODE, VIEW, renderLeaveConfirm } from './utils.jsx';
 import {
     LocalVideoThumb,
     LocalVideoHiRes,
@@ -14,7 +14,6 @@ import FloatExtendedControls from './floatExtendedControls.jsx';
 import { withMicObserver } from './micObserver.jsx';
 import { withPermissionsObserver } from './permissionsObserver.jsx';
 import { withHostsObserver } from './hostsObserver.jsx';
-import { renderLeaveConfirm } from './streamControls';
 
 export default class FloatingVideo extends React.Component {
     collapseListener = null;

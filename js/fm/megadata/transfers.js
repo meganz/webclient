@@ -1222,8 +1222,11 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
                 return;
             }
 
-            // Transfer.it has its own progress UI
+            // Transfer.it has its own progress UI, and it is the only one these reach
             if (ul.xput) {
+                if (self.T && T.ui.ulprogress) {
+                    T.ui.ulprogress(ul, perc, bl, bt, bps);
+                }
                 return;
             }
             mega.tpw.updateDownloadUpload(mega.tpw.UPLOAD, gid, perc, bl, bt, bps, ul.pos, ul.starttime);
@@ -1342,6 +1345,11 @@ MegaData.prototype.ulcomplete = function(ul, h, faid) {
     tfsheadupdate({f: gid});
     mega.tpw.finishDownloadUpload(gid, ul, h);
 
+    // Small files may finish before the next progress tick, making this their only update
+    if (ul.xput && self.T && T.ui.ulprogress) {
+        T.ui.ulprogress(ul, 100, ul.size, ul.size, 0);
+    }
+
     if (ul.id && is_megadrop) {
         mega.fileRequestUpload.onItemUploadCompletion(ul.id);
     }
@@ -1356,15 +1364,7 @@ MegaData.prototype.ulfinalize = function(ul, status, h) {
         ulmanager.logger.info('finalising %s (%s)', ul.owner || ul.id, status, h, ul.promiseToInvoke, ul.wsfu, [ul]);
     }
 
-    if (ul.promiseToInvoke) {
-        ul.promiseToInvoke.resolve(h);
-        ul_queue[ul.pos] = Object.freeze({});
-        percent_megatitle();
-        return;
-    }
-
     var id = ul.id;
-    ul_queue[ul.pos] = Object.freeze({});
 
     if ($.transferprogress && $.transferprogress['ul_' + id]) {
         if (!$.transferprogress['ulc']) {
@@ -1374,7 +1374,13 @@ MegaData.prototype.ulfinalize = function(ul, status, h) {
         delete $.transferprogress['ul_' + id];
     }
 
-    if (h && !is_megadrop) {
+    ul_queue[ul.pos] = Object.freeze({});
+
+    if (ul.promiseToInvoke) {
+        ul.promiseToInvoke.resolve(h);
+        percent_megatitle();
+    }
+    else if (h && !is_megadrop) {
         // @todo better error handling..
         M.confirmNodesAtLocation(h).catch(tell);
     }
@@ -1397,6 +1403,12 @@ MegaData.prototype.ulstart = function(ul) {
     }
 
     ul.starttime = Date.now();
+
+    if (!$.transferprogress.ust) {
+        // Keep the start time to calculate average speed when no current speed is available
+        $.transferprogress.ust = ul.starttime;
+    }
+
     this.ulprogress(ul, 0, 0, 0);
     mBroadcaster.sendMessage('trk:event', 'upload', 'started');
 };

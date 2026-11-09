@@ -969,6 +969,8 @@ lazy(T.ui, 'addFilesLayout', () => {
                     if (T.ui.dashboardLayout) {
                         T.ui.dashboardLayout.data.refresh = true;
                     }
+                    // Skip any queued progress update that could show the hidden rows again
+                    tock++;
                     delete T.ui.ulprogress;
                     this.data.name = name;
                     this.data.files = [];

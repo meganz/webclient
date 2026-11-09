@@ -605,8 +605,10 @@ lazy(mega.ui, 'dlPage', () => {
             const partial = dl_node.s > CHUNK_SIZE;
             const cached = mega.fileTextEditor.getCachedData(dl_node.link);
 
+            // A partial chunk can't be MAC-verified, the whole file can
             const fetchText = (partial) =>
                 M.gfsfetch(dl_node.link, 0, partial ? CHUNK_SIZE : -1)
+                    .then(r => partial ? r : mega.fileTextEditor.verify(r))
                     .then(r => mega.fileTextEditor.getTextFromBuffer(r.buffer));
 
             if (cached) {

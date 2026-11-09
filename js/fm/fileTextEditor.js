@@ -82,6 +82,46 @@ mega.fileTextEditor = new function FileTextEditor() {
     };
 
     /**
+     * Verify a whole-file gfsfetch() result against the file MAC, as the regular downloader does.
+     * @param {Uint8Array} data gfsfetch() result
+     * @returns {Promise<Uint8Array>} the same data, rejects with EKEY on a mismatch
+     */
+    this.verify = async(data) => {
+        const {key, s} = data.payload;
+        const be = (w) => Uint8Array.from({length: w.length << 2}, (_, i) => w[i >> 2] >>> 24 - i % 4 * 8 & 0xFF);
+        const iv = be([key[4], key[5], key[4], key[5]]);
+        const aes = await crypto.subtle.importKey(
+            'raw',
+            be([key[0] ^ key[4], key[1] ^ key[5], key[2] ^ key[6], key[3] ^ key[7]]),
+            'AES-CBC',
+            false,
+            ['encrypt']
+        );
+        const offsets = [];
+
+        // MAC chunks are 128K, 256K ... 1M, then 1M each
+        for (let pos = 0, i = 1; pos < data.byteLength; pos += Math.min(i++, 8) << 17) {
+            offsets.push(pos);
+        }
+
+        // a chunk's CBC-MAC is the last AES-CBC block before the PKCS#7 padding one
+        const macs = await Promise.all(offsets.map(async(pos, i) => {
+            const chunk = data.subarray(pos, offsets[i + 1]);
+            const block = new Uint8Array(chunk.byteLength + 15 & -16);
+
+            block.set(chunk);
+            const mac = new DataView(await crypto.subtle.encrypt({name: 'AES-CBC', iv}, aes, block), block.length - 16);
+
+            return [mac.getUint32(0), mac.getUint32(4), mac.getUint32(8), mac.getUint32(12)];
+        }));
+
+        if (data.byteLength !== s || !dlmanager.verifyIntegrity({key, macs, owner: 'gfsfetch'})) {
+            throw EKEY;
+        }
+        return data;
+    };
+
+    /**
      * Get file data
      * @param {String} handle       Node handle
      * @returns {MegaPromise}       Promise of the operation
@@ -116,8 +156,8 @@ mega.fileTextEditor = new function FileTextEditor() {
             return operationPromise.reject();
         }
 
-        // get the data
-        M.gfsfetch(handle, 0, -1).then((data) => {
+        // get the data, MAC-verified since it may be written back (Download/Save)
+        M.gfsfetch(handle, 0, -1).then(this.verify).then((data) => {
 
             if (data.buffer === null) {
                 return operationPromise.reject();
@@ -141,6 +181,9 @@ mega.fileTextEditor = new function FileTextEditor() {
             // local file does not exist
             else if (ex === ENOENT) {
                 showToast('view', l[22]);
+            }
+            else if (ex === EKEY) {
+                showToast('view', l.dl_decryption_failed);
             }
             operationPromise.reject();
         });

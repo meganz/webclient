@@ -3248,7 +3248,7 @@ var addressDialog = {
 
                     closeStripeDialog(true);
                     delete addressDialog.paymentInProcess;
-                    pro.loadMembershipPlans(null, true);
+                    return pro.loadMembershipPlans(null, true);
                 }
 
             }).catch((ex) => {

@@ -1019,11 +1019,10 @@ accountUI.plan = {
                     eventlog(500417);
                 });
                 loadingDialog.show();
-                pro.loadMembershipPlans(() => {
-                    this.fillBenefits($keepPlanBtn).then(() => {
-                        loadingDialog.hide();
-                    });
-                });
+                pro.loadMembershipPlans()
+                    .then(() => this.fillBenefits($keepPlanBtn))
+                    .catch(tell)
+                    .finally(() => loadingDialog.hide());
             },
 
             /**
@@ -1310,6 +1309,9 @@ accountUI.plan = {
                         // Notify any other open tabs of the cancelled subscription
                         watchdog.notify('refresh-account-ui');
                     }, 1e3);
+                }).catch((ex) => {
+                    loadingDialog.hide();
+                    tell(ex);
                 });
             }
         }

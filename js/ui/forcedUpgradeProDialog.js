@@ -323,7 +323,7 @@ class ForcedUpgradeProDialog {
             this.setNextDialogShowTime().dump(`fudnxt${u_handle}`);
 
         if (canShowDialog) {
-            pro.loadMembershipPlans(() => {
+            return pro.loadMembershipPlans().then(() => {
                 this.updateDialogTexts();
 
                 M.safeShowDialog('upgrade-to-pro-dialog', () => {
@@ -353,9 +353,9 @@ class ForcedUpgradeProDialog {
         if (v - 4e6 > Date.now()) {
             return;
         }
-        M.getStorageQuota().then((storage) => {
+        return M.getStorageQuota().then((storage) => {
             const forcedUpgradeProDialog = new ForcedUpgradeProDialog(storage);
-            forcedUpgradeProDialog.showForcedUpgradeDialog();
+            return forcedUpgradeProDialog.showForcedUpgradeDialog();
         });
-    });
+    }).catch(tell);
 });

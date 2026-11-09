@@ -788,11 +788,7 @@ mobile.fileRequestManagement = {
             return mega.fileRequest.create(this.handle, title, description);
         }
 
-        return mega.fileRequest.update(this.handle, title, description, this.settings && {
-            expiry: this.settings.expiry,
-            limit: this.settings.size,
-            folder: this.settings.folder
-        });
+        return mega.fileRequest.update(this.handle, title, description);
     },
 
     async saveSettings() {

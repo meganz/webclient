@@ -105,7 +105,6 @@ lazy(pro.proplan2, 'feature', () => {
                         );
                     }
                     else {
-                        taxInfoCard.appendChild(createEl(['tax-info'], l.before_tax + ' ', 'span'));
                         taxInfoCard.appendChild(createEl(
                             ['tax-price'],
                             l.p_with_tax

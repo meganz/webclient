@@ -1255,7 +1255,7 @@
         content.appendChild(ul);
         const filter = (h) => {
             const root = M.getNodeRoot(h);
-            if ($.fileRequestNew && root !== M.RootID) {
+            if ($.fileRequestNew && (root !== M.RootID || shared.is(h))) {
                 return false;
             }
             if (($.selectFolderDialog || $.copyToShare) && sharer(h)) {

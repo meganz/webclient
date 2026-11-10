@@ -7077,15 +7077,27 @@ body:not(.in-call) .drag-n-drop.overlay.chat-offset {
     display: flex;
     margin-top: 24px;
 }
-.mega-sheet.twofa-setup .twofa-setup-body .twofa-setup-qrcode {
+.mega-sheet.twofa-setup .twofa-setup-qrcode {
     background: var(--mobile-surface-1);
-    padding: 8px;
-    height: 148px;
-    width: 148px;
-    margin-inline-end: 24px;
     border-radius: 8px;
     box-sizing: border-box;
+    height: 164px;
+    line-height: 0;
+    margin-inline-end: 24px;
+    padding: 8px;
+    width: 164px;
 }
+
+.theme-dark .mega-sheet.twofa-setup .twofa-setup-qrcode {
+    background: var(--mobile-background-inverse);
+}
+
+.mega-sheet.twofa-setup .twofa-setup-body .twofa-setup-qrcode canvas,
+.mega-sheet.twofa-setup .twofa-setup-body .twofa-setup-qrcode img {
+    height: 148px;
+    width: 148px;
+}
+
 .mega-sheet.twofa-setup .twofa-setup-body .instruction-list > div {
     margin-bottom: 8px;
 }

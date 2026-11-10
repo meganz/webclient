@@ -1860,10 +1860,11 @@ lazy(pro, 'proplan2', () => {
 
         if (planTaxInfo) {
             if (pro.taxInfo.variant === 1) {
-                $('.tax-info', $taxInfo).text(l.t_may_appy.replace('%1', pro.taxInfo.taxName));
+                $('.tax-info', $taxInfo).removeClass('hidden')
+                    .text(l.t_may_appy.replace('%1', pro.taxInfo.taxName));
             }
             else {
-                $('.tax-info', $taxInfo).text(l.before_tax);
+                $('.tax-info', $taxInfo).addClass('hidden');
                 $('.tax-price', $taxInfo).text(l.p_with_tax
                     .replace('%1', formatCurrency(
                         planTaxInfo.taxedPrice, priceCurrency, 'narrowSymbol')

@@ -818,6 +818,10 @@ class MegaFlyoutMenu extends MegaComponent {
                     flyoutState.clearListeners();
                     delete this.showContactsFlyout.searchTerm;
                 });
+                // Clear saved search on close even if a sub-panel took over (survives clearListeners)
+                this.flyoutMenu.rebind('onHidden.contactsearch', () => {
+                    delete this.showContactsFlyout.searchTerm;
+                });
             };
             if (list.length === 0) {
                 this.flyoutMenu.show({
@@ -871,7 +875,9 @@ class MegaFlyoutMenu extends MegaComponent {
                     icon: 'sprite-fm-mono icon-plus-light-solid',
                     onClick() {
                         eventlog(500660);
-                        contactAddDialog();
+                        // Pass current search value into the Add contact dialog
+                        const {search} = mega.ui.flyout.flyoutMenu;
+                        contactAddDialog(false, false, search && search.value);
                     },
                 },
                 list,
@@ -914,12 +920,14 @@ class MegaFlyoutMenu extends MegaComponent {
                     return normalizeStr(M.getNameByHandle(u)).includes(data);
                 });
 
-                this.flyoutMenu.footer.classList.add('hidden');
                 if (filtered.length) {
+                    this.flyoutMenu.footer.classList.add('hidden');
                     this.flyoutMenu.listHeaders = false;
                     this.flyoutMenu.list = filtered;
                     return;
                 }
+                // Keep the footer on the no-matches empty state
+                this.flyoutMenu.footer.classList.remove('hidden');
                 this.emptyState({
                     name: 'contacts',
                     icon: 'search',

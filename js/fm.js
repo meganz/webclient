@@ -527,8 +527,9 @@ function contactVsUserDialog() {
  * Handle add contact dialog UI
  * @param {Boolean} close               dialog parameter
  * @param {Boolean} dontWarnBusiness    if true, then proceed to show the dialog
+ * @param {String} prefill Prefill the email input
  */
-function contactAddDialog(close, dontWarnBusiness) {
+function contactAddDialog(close, dontWarnBusiness, prefill) {
     'use strict';
 
     var $d = $('.add-user-popup');
@@ -612,6 +613,11 @@ function contactAddDialog(close, dontWarnBusiness) {
 
     if (!$('.add-contact-multiple-input').tokenInput("getSettings")) {
         initAddDialogMultiInputPlugin();
+    }
+
+    // Prefill the email input with the contacts search
+    if (prefill) {
+        $('.token-input-list-mega input', $d).val(prefill).trigger('focus').trigger('keyup');
     }
 
     $('.add-user-popup-button').rebind('click', function() {

@@ -205,7 +205,6 @@
     padding: 0 var(--right-padding) 0 var(--left-padding);
     display: flex;
     align-items: center;
-    justify-content: space-between;
     flex-wrap: wrap;
 }
 

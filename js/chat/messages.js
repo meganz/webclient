@@ -230,7 +230,7 @@ Message.getContactForMessage = function(message) {
     if (message.authorContact) {
         contact = message.authorContact;
     }
-    else if (message.meta && message.meta.userId) {
+    else if (message.userId === mega.BID && message.meta && message.meta.userId) {
         contact = M.u[message.meta.userId];
         if (!contact) {
             return {

@@ -404,6 +404,14 @@ mega.textEditorUI = new function TextEditorUI() {
                     l[22750],
                     l[22753],
                     () => {
+                        const h = versionHandle || fileHandle;
+
+                        // Saving the text would alter this file (BOM, non-UTF-8), so download it instead
+                        if (mega.fileTextEditor.isTextLossy(h)) {
+                            M.addDownload([M.d[h] ? h : M.getNodeByHandle(h)]);
+                            eventlog(501052);
+                            return;
+                        }
                         M.saveAs(savedFileData, fileName)
                             .then(() => eventlog(501052))
                             .catch(dump);

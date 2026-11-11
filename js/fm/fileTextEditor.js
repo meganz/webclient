@@ -10,6 +10,8 @@ mega.fileTextEditor = new function FileTextEditor() {
     var maxFilesInMemory = 5;
 
     var filesDataMap = Object.create(null);
+    // files whose text doesn't re-encode to their bytes
+    var lossyTextMap = Object.create(null);
     var slotIndex = 0;
     var slotsMap = [null, null, null, null, null];
 
@@ -50,6 +52,16 @@ mega.fileTextEditor = new function FileTextEditor() {
     this.getTextFromBuffer = function(buffer) {
         const bData = new Blob([buffer], { type: "text/plain" });
         return M.readBlob(bData, 'readAsText');
+    };
+
+    /**
+     * Whether a loaded file's text doesn't re-encode to its bytes as UTF-8 (BOM, UTF-16, invalid UTF-8)
+     * @param {String} handle    Node handle
+     * @returns {Boolean} true if saving the text would not give the original file
+     */
+    this.isTextLossy = function(handle) {
+        const n = M.getNodeByHandle(handle);
+        return !!(n && lossyTextMap[n.link || n.h]);
     };
 
     /**
@@ -169,6 +181,12 @@ mega.fileTextEditor = new function FileTextEditor() {
             binaryReader.addEventListener('loadend', function(e) {
                 var text = e.srcElement.result;
                 storeFileData(handle, text);
+
+                // readAsText drops a BOM (or decodes UTF-16) and replaces invalid UTF-8 with U+FFFD
+                lossyTextMap[handle] = data[0] === 0xEF && data[1] === 0xBB && data[2] === 0xBF
+                    || data[0] === 0xFE && data[1] === 0xFF || data[0] === 0xFF && data[1] === 0xFE
+                    || text.includes('\uFFFD');
+
                 operationPromise.resolve(filesDataMap[handle]);
             });
             binaryReader.readAsText(bData);
@@ -266,7 +284,15 @@ mega.fileTextEditor = new function FileTextEditor() {
             var opTree = [nNode];
             opTree.opSize = node.s || 0;
 
-            return M.copyNodes([nodeToSaveAs], directory, null, opTree);
+            const res = await M.copyNodes([nodeToSaveAs], directory, null, opTree);
+
+            // The copy holds the same bytes, so Download must fetch it too
+            if (lossyTextMap[nodeToSaveAs.link || nodeToSaveAs.h]) {
+                for (const h of res || []) {
+                    lossyTextMap[h] = true;
+                }
+            }
+            return res;
         }
         // if content changed then do upload operation
         else {

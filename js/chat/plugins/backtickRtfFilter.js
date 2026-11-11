@@ -122,17 +122,23 @@ BacktickRtfFilter.PARSER_STATE = {
 BacktickRtfFilter.PARSER_VALID_PREV_CHAR_MATCH = new RegExp(/\n|\s|\r|[.,\/#!$%\^&\*;:{}=\-_~()]/);
 
 BacktickRtfFilter.processUrlsInTickStrings = function(s) {
+    'use strict';
+    // Explicit http(s) only, text left exactly as written
     return Autolinker.link(s, {
-        truncate: 80,
+        truncate: false,
         className: 'chatlink',
         newWindow: true,
         stripPrefix: false,
-        twitter: false,
-        urls:{
+        stripTrailingSlash: false,
+        decodePercentEncoding: false,
+        email: false,
+        phone: false,
+        urls: {
             schemeMatches: true,
             wwwMatches: false,
             tldMatches: false
-        }
+        },
+        replaceFn: (match) => /^https?:\/\//i.test(match.getUrl())
     });
 };
 
@@ -156,14 +162,13 @@ BacktickRtfFilter.prototype.processBackticks = function(msgString, replaceGenCb)
         ) {
             if (state === BacktickRtfFilter.PARSER_STATE.IN_PLACEHOLDER_MULTI) {
                 state = BacktickRtfFilter.PARSER_STATE.REGULAR;
-                // linkify http(s?):// ONLY urls
 
-                var newPlaceHolderString = BacktickRtfFilter.processUrlsInTickStrings(placeholderString);
+                var fenced = placeholderString.replace(/^\r?\n/, '');
 
                 newString += replaceGenCb(
                     "```" + placeholderString + "```",
-                    '<pre class="rtf-multi">' + newPlaceHolderString + '</pre>',
-                    placeholderString
+                    `<pre class="rtf-multi">${BacktickRtfFilter.processUrlsInTickStrings(fenced)}</pre>`,
+                    fenced
                 );
                 placeholderString = "";
             }
@@ -203,10 +208,11 @@ BacktickRtfFilter.prototype.processBackticks = function(msgString, replaceGenCb)
                 }
                 else {
                     state = BacktickRtfFilter.PARSER_STATE.REGULAR;
-                    var newPlaceHolderString = BacktickRtfFilter.processUrlsInTickStrings(placeholderString);
                     newString += replaceGenCb(
                         "`" + placeholderString + "`",
-                        '<pre class="rtf-single">' + newPlaceHolderString + '</pre>',
+                        `<pre class="rtf-single">${
+                            BacktickRtfFilter.processUrlsInTickStrings(placeholderString)
+                        }</pre>`,
                         placeholderString
                     );
                     placeholderString = "";

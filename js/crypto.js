@@ -2499,7 +2499,20 @@ async function api_updfkey(sn, imp) {
             if (d) {
                 console.warn('re-keying foreign nodes...', sn, nk);
             }
-            return api.send({a: 'k', nk});
+
+            await api.screq({a: 'k', nk});
+
+            for (let i = 0; i < nk.length; i += 2) {
+
+                const n = M.getNodeByHandle(nk[i]);
+
+                // The server lists nodes without an owner key as owned by mega.BID and sends no update on re-key
+                if (n && n.u === mega.BID) {
+
+                    n.u = u_handle;
+                    M.nodeUpdated(n);
+                }
+            }
         }
     }
 }

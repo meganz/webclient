@@ -326,6 +326,9 @@ mega.achievem.installDesktopApp = function installDesktopApp() {
     else if (pf.includes('MAC')) {
         open(`https://mega.${mega.tld}/MEGAsyncSetup.dmg`, '', 'noopener,noreferrer');
     }
+    else {
+        mega.redirect('mega.io', 'desktop', false, false, false);
+    }
 };
 
 mega.achievem.installMobileApp = function installMobileApp() {

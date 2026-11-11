@@ -2994,7 +2994,7 @@ function ddtype(ids, toid, alt) {
     for (var i = ids.length; i--; ) {
         var fromid = ids[i];
 
-        if (fromid === toid || !M.getNodeByHandle(fromid)) {
+        if (fromid === toid || !M.getNodeByHandle(fromid) || M.dcd[fromid]) {
 
             return false;
         }

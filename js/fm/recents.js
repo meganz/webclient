@@ -115,6 +115,11 @@ RecentsRender.prototype.dropAllFilters = function() {
         btn.querySelector('.fm-filter-chip-button-text').textContent = btn.dataset.label;
     }
 
+    const { filters } = mega.ui.mNodeFilter;
+    delete filters.location.selection;
+    delete filters.type.selection;
+    delete filters.dateadded.selection;
+
     this.selectedFilters = Object.create(null);
 
     $('.fm-filter-reset', this.$container).remove();
@@ -179,24 +184,59 @@ RecentsRender.prototype.clearFilterChip = function(index) {
 RecentsRender.prototype.renderFiltered = function(filtered) {
     'use strict';
 
-    const container = document.querySelector('.fm-recents.container');
-    const header = container.querySelector('.fm-recents.header-row');
-
     if (filtered.length) {
-        mega.ui.empty.clear(container);
-        if (header) {
-            header.classList.remove('hidden');
-        }
+        mega.ui.empty.clear(this.container);
     }
     else if (this._rendered) {
         this.reset();
-
-        if (header) {
-            header.classList.add('hidden');
-        }
     }
 
     this._initialRender(filtered);
+};
+
+/**
+ * Applying the selected filters to a list of actions
+ * @param {Object.<String, any>[]} actions All actions to filter through
+ * @returns {Object.<String, any>[]} Filtered actions, with dates kept only where followed by actions
+ */
+RecentsRender.prototype.getFilteredActions = function(actions) {
+    'use strict';
+
+    const arr = [];
+    const keys = Object.keys(this.selectedFilters);
+
+    for (let i = actions.length; i--;) {
+        const action = actions[i];
+
+        if (action.type === 'date') {
+            if (Array.isArray(arr[0])) {
+                arr.unshift(action);
+            }
+        }
+        else if (action.length) {
+            const filtered = action.filter((n) => {
+                for (let j = keys.length; j--;) {
+                    if (!this.selectedFilters[keys[j]][1](n)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            if (filtered.length) {
+                const props = Object.keys(action).filter(isNaN);
+
+                for (let j = props.length; j--;) {
+                    filtered[props[j]] = action[props[j]];
+                }
+
+                arr.unshift(filtered);
+            }
+        }
+    }
+
+    return arr;
 };
 
 /**
@@ -226,44 +266,6 @@ RecentsRender.prototype.setFilters = function(actions) {
     const { filters } = mega.ui.mNodeFilter;
     const filterArr = [filters.location, filters.type, filters.dateadded];
 
-    const filteredActions = () => {
-        const arr = [];
-
-        for (let i = M.recentActions.length; i--;) {
-            const action = M.recentActions[i];
-
-            if (action.type === 'date') {
-                if (Array.isArray(arr[0])) {
-                    arr.unshift(action);
-                }
-            }
-            else if (action.length) {
-                const filtered = action.filter((n) => {
-                    const keys = Object.keys(this.selectedFilters);
-                    for (let j = keys.length; j--;) {
-                        if (!this.selectedFilters[keys[j]][1](n)) {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                });
-
-                if (filtered.length) {
-                    const keys = Object.keys(action).filter(isNaN);
-
-                    for (let j = keys.length; j--;) {
-                        filtered[keys[j]] = action[keys[j]];
-                    }
-
-                    arr.unshift(filtered);
-                }
-            }
-        }
-
-        return arr;
-    };
-
     for (let i = 0; i < filterArr.length; i++) {
         const { title, menu, match } = filterArr[i];
         const txt = mCreateElement('div', { class: 'fm-filter-chip-button-text font-body-1' });
@@ -289,8 +291,7 @@ RecentsRender.prototype.setFilters = function(actions) {
                     delete filterArr[i].selection;
                     delete this.selectedFilters[i];
                     this.clearFilterChip(i);
-                    const filtered = filteredActions();
-                    this.renderFiltered(filtered);
+                    this.renderFiltered(this.getFilteredActions(M.recentActions));
                     subMenu.hide(true);
                 }
             });
@@ -337,8 +338,7 @@ RecentsRender.prototype.setFilters = function(actions) {
                             this.clearFilterChip(i);
                         }
 
-                        const filtered = filteredActions();
-                        this.renderFiltered(filtered);
+                        this.renderFiltered(this.getFilteredActions(M.recentActions));
                     },
                     selected,
                     checkFn() {
@@ -409,7 +409,6 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
     }
 
     if (!this._rendered) {
-        this.dropAllFilters();
         loadingDialog.show();
     }
     M.initShortcutsAndSelection(this.container);
@@ -418,6 +417,9 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
         self.getMaxFitOnScreen(true);
         console.time('recents:render');
         self._injectDates(actions);
+        if (Object.keys(self.selectedFilters).length) {
+            actions = self.getFilteredActions(actions);
+        }
         if (!self._rendered || !self._dynamicList || forceInit) {
             self._initialRender(actions);
         }
@@ -1288,6 +1290,10 @@ RecentsRender.prototype.reset = function() {
     this._renderFunctions = {};
     this._view = [];
     this._nodeActionMap = {};
+    this._nodeRenderedItemIdMap = {};
+    this._actionChildren = {};
+    this._expandedStates = {};
+    this.actionIdMap = {};
     if (this._dynamicList) {
         this._dynamicList.destroy();
         this._dynamicList = false;
@@ -1642,8 +1648,8 @@ RecentsRender.prototype._applyStateChange = function(added, removed, removedAsEx
                 after = this._actionChildren[after][this._actionChildren[after].length - 1];
             }
         }
-        actions.splice(pos, 0, added[handled]);
-        this._populateNodeActionMap(added[handled]);
+        actions.splice(pos, 0, added[k]);
+        this._populateNodeActionMap(added[k]);
         this._dynamicList.insert(after, added[k].id);
     }
 
@@ -1689,7 +1695,7 @@ RecentsRender.prototype._populateNodeActionMap = function(action) {
 RecentsRender.prototype._removeConsecutiveDates = function(actions) {
     'use strict';
     // Remove duplicating dates.
-    for (i = 0; i < actions.length; i++) {
+    for (let i = 0; i < actions.length; i++) {
         if (actions[i].type === "date" && i + 1 < actions.length && actions[i + 1].type === "date") {
             var id = actions[i].id;
             delete this._renderCache[id];

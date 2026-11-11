@@ -427,6 +427,9 @@
                 stash = this.search && String(this.previousdirid).substr(0, 6) === 'search';
             }
             mega.ui.mNodeFilter.resetFilterSelections(stash);
+            if (!stash && this.previousdirid === 'recents' && this.recentsRender) {
+                this.recentsRender.dropAllFilters();
+            }
             if (
                 stash &&
                 window.selectionManager &&

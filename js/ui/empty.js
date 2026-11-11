@@ -126,6 +126,7 @@ lazy(mega.ui, 'empty', () => {
          */
         recents: (target = document.querySelector(defaultTarget), view = 0) => {
             clear(target);
+            target.classList.remove('emptied', 'empty-filter');
 
             const strings = {
                 hint: l.recents_disabled_hint,

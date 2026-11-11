@@ -41,9 +41,29 @@ var BacktickRtfFilter = function(megaChat) {
     return this;
 };
 
-BacktickRtfFilter.ESCAPE_TEMPLATE = "%%BTRTE%$NUM%%";
-BacktickRtfFilter.ESCAPE_SEARCH = "%%BTRTE%";
-BacktickRtfFilter.UNESCAPE_REGEXP = "%%BTRTE%(\\d+)%%";
+/** @property BacktickRtfFilter.tmpl */
+lazy(BacktickRtfFilter, 'tmpl', () => {
+    'use strict';
+    return (makeUUID().replace(/[^a-f]+/g, '') || makeid(13)).toUpperCase();
+});
+
+/** @property BacktickRtfFilter.ESCAPE_TEMPLATE */
+lazy(BacktickRtfFilter, 'ESCAPE_TEMPLATE', () => {
+    'use strict';
+    return `%%${BacktickRtfFilter.tmpl}%$NUM%%`;
+});
+
+/** @property BacktickRtfFilter.ESCAPE_SEARCH */
+lazy(BacktickRtfFilter, 'ESCAPE_SEARCH', () => {
+    'use strict';
+    return `%%${BacktickRtfFilter.tmpl}%`;
+});
+
+/** @property BacktickRtfFilter.UNESCAPE_REGEXP */
+lazy(BacktickRtfFilter, 'UNESCAPE_REGEXP', () => {
+    'use strict';
+    return `%%${BacktickRtfFilter.tmpl}%(\\d+)%%`;
+});
 
 BacktickRtfFilter.prototype.escapeAndProcessMessage = function(e, eventData, props, mainProp, skipSet) {
     "use strict";

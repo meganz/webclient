@@ -1252,6 +1252,36 @@ BusinessAccount.prototype.getBusinessPlanInfo = async function(forceUpdate, flex
 };
 
 /**
+ * Whether the account's own plan adds tax: utqa sends a net price only then, net of any tax number.
+ * @param {Object} plan     A getBusinessPlanInfo result
+ * @param {Object} [flexI]  u_attr.pf: Pro Flexi, priced on bd.ba rather than bd.us
+ * @returns {Boolean}       true when the net price is below the total, so a 0% rate stays false
+ */
+BusinessAccount.prototype.planAddsTax = function(plan, flexI) {
+    "use strict";
+
+    const {p, pn} = plan.bd[flexI ? 'ba' : 'us'];
+
+    return p > pn;
+};
+
+/**
+ * Whether the next bill adds tax, kept in mega.buinsessAccount.nextBillAddsTax until a tax detail is
+ * saved. Forced, as the cached plan can predate that save.
+ * @returns {Promise<Boolean>}  planAddsTax for the account's own plan
+ */
+BusinessAccount.prototype.nextBillAddsTax = async function() {
+    "use strict";
+
+    const plan = await this.getBusinessPlanInfo(true, u_attr.pf);
+
+    mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
+    mega.buinsessAccount.nextBillAddsTax = this.planAddsTax(plan, u_attr.pf);
+
+    return mega.buinsessAccount.nextBillAddsTax;
+};
+
+/**
  * Get business account list of invoices
  * @param {Boolean} forceUpdate         a flag to force getting info from API not using the cache
  * @returns {Promise}                   resolve if the operation succeeded

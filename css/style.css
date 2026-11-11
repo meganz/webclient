@@ -10205,6 +10205,26 @@ div.camera-bottom-txt {
     display: inline-block;
     vertical-align: text-bottom;
 }
+.dashboard-section .overall-usage-container .next-bill-value.tax-note {
+    font: var(--text-body2);
+    color: var(--text-color-medium);
+    margin-inline-start: 4px;
+    display: inline-block;
+    vertical-align: text-bottom;
+}
+.dashboard-section .overall-next-bill-wrapper.sk-loading .next-bill-value.local {
+    color: transparent;
+    border-radius: var(--mobile-border-radius-medium);
+    background-image: linear-gradient(90deg,
+        var(--mobile-surface-2) 50px, var(--mobile-surface-1) 150px, var(--mobile-surface-2) 250px);
+    background-size: 1000px 100%;
+    animation: loading-shimmer 2s infinite linear;
+}
+.dashboard-section .overall-next-bill-wrapper.sk-loading .asterisk,
+.dashboard-section .overall-next-bill-wrapper.sk-loading .next-bill-value.euro,
+.dashboard-section .overall-next-bill-wrapper.sk-loading .next-bill-value.tax-note {
+    visibility: hidden;
+}
 .dashboard-section .overall-usage-container .next-bill-message {
     color: var(--text-color-medium);
     font: var(--text-body2);
@@ -10219,13 +10239,11 @@ div.camera-bottom-txt {
     position: absolute;
 }
 .dashboard-section .overall-usage-container .mega-button.invoices-button {
-    position: absolute;
-    top: 24px;
-    right: 24px;
+    float: right;
+    margin-inline-start: 16px;
 }
 .rtl .dashboard-section .overall-usage-container .mega-button.invoices-button {
-    left: 24px;
-    right: initial;
+    float: left;
 }
 
 

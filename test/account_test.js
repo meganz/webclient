@@ -150,7 +150,7 @@ describe("account unit test", function() {
                     });
             });
 
-            it("private attribute, internal callback OK, custom callback", function() {
+            it("private attribute, plain object instead of an encrypted value", function() {
                 mStub(ns._logger, '_log');
                 mStub(tlvstore, 'blockDecrypt').callsFake(_echo);
                 mStub(tlvstore, 'tlvRecordsToContainer').callsFake(_echo);
@@ -159,17 +159,13 @@ describe("account unit test", function() {
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
-                var expected = { 'foo': 'bar', 'puEd255': ED25519_PUB_KEY };
+                var plain = { 'foo': 'bar', 'puEd255': ED25519_PUB_KEY };
                 mStub(window, 'd', true);
-                callback(expected, theCtx);
-                assert.strictEqual(aPromise.state(), 'resolved');
+                callback(plain, theCtx);
+                assert.strictEqual(aPromise.state(), 'rejected');
                 assert.deepEqual(myCallback.callCount, 1);
-                assert.deepEqual(myCallback.args[0][0], expected);
-
-                assert.strictEqual(ns._logger._log.callCount, 1);
-                assert.strictEqual(ns._logger._log.args[0][1],"*keyring");
-                assert.strictEqual(ns._logger._log.args[0][2],"me3456789xw");
-                assert.strictEqual(ns._logger._log.args[0][3],'-- hidden --');
+                assert.strictEqual(myCallback.args[0][0], EINTERNAL);
+                assert.strictEqual(tlvstore.blockDecrypt.callCount, 0);
             });
 
             it("public attribute", function() {
@@ -347,6 +343,59 @@ describe("account unit test", function() {
                 assert.strictEqual(decoded.puEd255, ED25519_PUB_KEY);
                 assert.strictEqual(decoded.foo, 'bar');
                 assert.lengthOf(api_req.args[0][0]['*keyring'], 94);
+            });
+        });
+    });
+
+    describe('u_checklogin3a', function() {
+        var privk = ['modulus', 'exponent', 'd', 'p', 'q', 'dp', 'dq', 'u'];
+        var encode = function(pubkey) {
+            return base64urlencode(crypto_encodepubkey(pubkey));
+        };
+
+        var login = function(pubk) {
+            mStub(console, 'error');
+            mStub(window, 'u_sid', 'sid');
+            mStub(window, 'u_storage', {sid: 'sid'});
+            mStub(window, 'u_k', [1, 2, 3, 4]);
+            mStub(window, 'u_k_aes', false);
+            mStub(window, 'u_handle', false);
+            mStub(window, 'u_attr', false);
+            mStub(window, 'u_privk', false);
+            mStub(window, 'init_storage');
+            mStub(window, 'crypto_decodeprivkey').returns(privk);
+            mStub(MegaUtils.prototype, 'getPersistentData').callsFake(function() {
+                return Promise.reject(ENOENT);
+            });
+
+            return new Promise(function(resolve) {
+                u_checklogin3a({u: 'me3456789xw', privk: a32_to_base64([1, 2, 3, 4]), pubk: pubk}, {
+                    checkloginresult: function() {
+                        resolve(u_attr.pubk);
+                    }
+                });
+            });
+        };
+
+        it("keeps an API pub key matching the private key", function() {
+            var pubk = encode(['\0modulus', 'exponent']);
+            return login(pubk).then(function(result) {
+                assert.strictEqual(result, pubk);
+                expect(console.error.callCount).to.eql(0);
+            });
+        });
+
+        it("replaces an API pub key with another modulus", function() {
+            return login(encode(['other modulus', 'exponent'])).then(function(result) {
+                assert.strictEqual(result, encode(privk));
+                expect(console.error.callCount).to.eql(1);
+            });
+        });
+
+        it("replaces an API pub key with another exponent", function() {
+            return login(encode(['modulus', 'other exponent'])).then(function(result) {
+                assert.strictEqual(result, encode(privk));
+                expect(console.error.callCount).to.eql(1);
             });
         });
     });

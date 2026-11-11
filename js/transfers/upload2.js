@@ -105,7 +105,7 @@ var ulmanager = {
         }
 
         if (is_mobile) {
-            mobile.overStorageQuota.show();
+            mobile.overStorageQuota.show().catch(dump);
             return;
         }
 

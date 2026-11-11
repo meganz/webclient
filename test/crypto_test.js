@@ -62,6 +62,18 @@ describe("crypto unit test", function() {
         mStub.restore();
     });
 
+    describe('assertUserHandle()', () => {
+        it('accepts a canonical handle', () => {
+            assertUserHandle('you456789xw');
+        });
+
+        it('rejects non-canonical spellings of a handle', () => {
+            assert.throws(() => assertUserHandle('you456789xx'));
+            assert.throws(() => assertUserHandle('you45,6789xw'));
+            assert.throws(() => assertUserHandle('you45 6789xw'));
+        });
+    });
+
     describe('crypt namespace', function() {
         describe('getPubKeyAttribute()', function() {
             it("RSA key", function() {
@@ -400,6 +412,18 @@ describe("crypto unit test", function() {
                     .fail(function() {
                         assert.fail('failed to retrv. uncached key, unseen');
                     });
+            });
+
+            it("non-canonical handle", () => {
+                mStub(window, 'u_authring', {Ed25519: {}});
+                mStub(window, 'pubEd25519', {});
+                mStub(ns, 'getPubKeyAttribute').returns(MegaPromise.resolve('the key'));
+                mStub(authring, 'setContactAuthenticated');
+
+                assert.throws(() => ns.getPubKey('you456789xx', 'Ed25519'));
+                assert.strictEqual(ns.getPubKeyAttribute.callCount, 0);
+                assert.strictEqual(authring.setContactAuthenticated.callCount, 0);
+                assert.deepEqual(pubEd25519, {});
             });
 
             it("uncached Ed25519 key, bad fingerprint", function(done) {
@@ -801,6 +825,119 @@ describe("crypto unit test", function() {
             });
         });
 
+        describe('contact Cu25519 key change', function() {
+            var rnd = function(n) {
+                return asmCrypto.bytes_to_string(nacl.randomBytes(n));
+            };
+            var cuPair = function() {
+                var priv = rnd(32);
+                var pub = asmCrypto.bytes_to_string(nacl.scalarMult.base(asmCrypto.string_to_bytes(priv)));
+                return {priv: priv, pub: pub};
+            };
+            // Unwraps a _encryptKeysTo() result on the contact's side.
+            var unwrap = function(ct, priv, peerPub) {
+                var key = strongvelope.deriveSharedKey(
+                    nacl.scalarMult(asmCrypto.string_to_bytes(priv), asmCrypto.string_to_bytes(peerPub)));
+                return asmCrypto.bytes_to_string(asmCrypto.AES_ECB.decrypt(
+                    asmCrypto.string_to_bytes(ct), asmCrypto.string_to_bytes(key.substring(0, 16)), false));
+            };
+            var me = cuPair();
+            var oldCu = cuPair();
+            var newCu = cuPair();
+            var ed = nacl.sign.keyPair();
+            var edPub = asmCrypto.bytes_to_string(ed.publicKey);
+            var shareKey = rnd(16);
+
+            beforeEach(function() {
+                mStub(window, 'u_handle', 'me3456789xw');
+                mStub(window, 'pubCu25519', {'you456789xw': oldCu.pub, 'me3456789xw': me.pub});
+                mStub(window, 'pubEd25519', {'you456789xw': edPub});
+                mStub(window, 'u_authring', {
+                    Ed25519: {'you456789xw': {
+                        fingerprint: authring.computeFingerprint(edPub, 'Ed25519', 'string'),
+                        method: authring.AUTHENTICATION_METHOD.SEEN,
+                        confidence: authring.KEY_CONFIDENCE.UNSURE
+                    }},
+                    Cu25519: {'you456789xw': {
+                        fingerprint: authring.computeFingerprint(oldCu.pub, 'Cu25519', 'string'),
+                        method: authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED,
+                        confidence: authring.KEY_CONFIDENCE.UNSURE
+                    }}
+                });
+                mStub(authring, 'hadInitialised').returns(true);
+                mStub(authring, 'setContacts').returns(Promise.resolve(true));
+                mStub(authring, 'enqueueKeyMgrSharesCompletion').returns(Promise.resolve());
+                mStub(attribCache, 'removeItem').returns(MegaPromise.resolve());
+                mStub(ns, '_showFingerprintMismatchException');
+                mStub(ns, '_showKeySignatureFailureException');
+            });
+
+            it('+puCu255/+sigCu255 drop the cached contact key, not our own', async function() {
+                await mega.attr.uaPacketParser('+puCu255', 'you456789xw', false, 'v1');
+                assert.strictEqual(pubCu25519.you456789xw, undefined);
+
+                pubCu25519.you456789xw = oldCu.pub;
+                await mega.attr.uaPacketParser('+sigCu255', 'you456789xw', false, 'v1');
+                assert.strictEqual(pubCu25519.you456789xw, undefined);
+
+                await mega.attr.uaPacketParser('+puCu255', 'me3456789xw', false, 'v1');
+                assert.strictEqual(pubCu25519.me3456789xw, me.pub);
+            });
+
+            it('shares re-verify and wrap to the new key', async function() {
+                mStub(window, 'u_privEd25519', asmCrypto.bytes_to_string(ed.secretKey.subarray(0, 32)));
+                mStub(window, 'u_pubEd25519', edPub);
+                var sig = base64urlencode(authring.signKey(newCu.pub, 'Cu25519'));
+
+                mStub(ns, 'getPubKeyAttribute').callsFake(function(userHandle, keyType) {
+                    return MegaPromise.resolve(keyType === 'Ed25519' ? edPub : newCu.pub);
+                });
+                mStub(mega.attr, 'get').returns(MegaPromise.resolve(sig));
+
+                await mega.attr.uaPacketParser('+puCu255', 'you456789xw', false, 'v2');
+                await mega.keyMgr.cacheVerifiedPeerKeys('you456789xw');
+
+                assert.strictEqual(pubCu25519.you456789xw, newCu.pub);
+                assert.isTrue(!!mega.keyMgr.haveVerifiedKeyFor('you456789xw'));
+                assert.strictEqual(ns._showKeySignatureFailureException.callCount, 0);
+
+                var ph = new strongvelope.ProtocolHandler('me3456789xw', me.priv, rnd(32), rnd(32));
+                var ct = ph._encryptKeysTo([shareKey], 'you456789xw');
+                assert.strictEqual(unwrap(ct, newCu.priv, me.pub), shareKey);
+                assert.notStrictEqual(unwrap(ct, oldCu.priv, me.pub), shareKey);
+            });
+
+            it('derived key follows a changed Cu25519 key', function() {
+                var ph = new strongvelope.ProtocolHandler('me3456789xw', me.priv, rnd(32), rnd(32));
+                var ct = ph._encryptKeysTo([shareKey], 'you456789xw');
+                assert.strictEqual(unwrap(ct, oldCu.priv, me.pub), shareKey);
+
+                pubCu25519.you456789xw = newCu.pub;
+                ct = ph._encryptKeysTo([shareKey], 'you456789xw');
+                assert.strictEqual(unwrap(ct, newCu.priv, me.pub), shareKey);
+                assert.notStrictEqual(unwrap(ct, oldCu.priv, me.pub), shareKey);
+            });
+
+            it('Ed25519 and Cu25519 both changed, nothing is wrapped', async function() {
+                var newEdPub = asmCrypto.bytes_to_string(nacl.sign.keyPair().publicKey);
+
+                mStub(ns, 'getPubKeyAttribute').callsFake(function(userHandle, keyType) {
+                    return MegaPromise.resolve(keyType === 'Ed25519' ? newEdPub : newCu.pub);
+                });
+                mStub(mega.attr, 'get').returns(MegaPromise.resolve(''));
+
+                await mega.attr.uaPacketParser('+puEd255', 'you456789xw', false, 'v3');
+                await mega.attr.uaPacketParser('+puCu255', 'you456789xw', false, 'v3');
+                await mega.keyMgr.cacheVerifiedPeerKeys('you456789xw');
+
+                assert.isAbove(ns._showFingerprintMismatchException.callCount, 0);
+                assert.strictEqual(pubCu25519.you456789xw, undefined);
+
+                var ph = new strongvelope.ProtocolHandler('me3456789xw', me.priv, rnd(32), rnd(32));
+                assert.strictEqual(ph._encryptKeysTo([shareKey], 'you456789xw'), false);
+            });
+        });
+
         describe("convenience wrappers", function() {
             it('getPubRSA()', function() {
                 mStub(ns, 'getPubKey').returns('a promise');
@@ -923,6 +1060,48 @@ describe("crypto unit test", function() {
                 assert.strictEqual(ns._logger._log.args[0][0],
                                    'Got Ed25519 fingerprint for user "you456789xw": If4x36FUomFia_hUBG_SJxt77Us');
             });
+        });
+    });
+
+    describe('RSA exponent below 3', function() {
+        // The genuine key's bytes, re-split by the API into "modulus || 01 00" and exponent 01
+        var modulus = asmCrypto.bytes_to_string(RSA_PUB_KEY[0]);
+        var genuine = crypto_encodepubkey([modulus, '\x01\x00\x01']);
+        var resplit = crypto_encodepubkey([modulus + '\x01\x00', '\x01']);
+
+        it("crypto_decodepubkey() rejects it", function() {
+            assert.strictEqual(genuine, crypto_encodepubkey([modulus, '\x01\x00\x01']));
+            assert.strictEqual(resplit.length, genuine.length);
+            assert.strictEqual(crypto_decodepubkey(genuine)[1], '\x01\x00\x01');
+            assert.strictEqual(crypto_decodepubkey(resplit), false);
+            // current keys carry e=257 as 00 00 01 01, so check zero-prefixed exponents too
+            assert.strictEqual(crypto_decodepubkey(crypto_encodepubkey([modulus, '\x00\x00\x01\x01']))[1],
+                               '\x00\x00\x01\x01');
+            assert.strictEqual(crypto_decodepubkey(crypto_encodepubkey([modulus, '\x00\x00\x00\x01'])), false);
+            assert.strictEqual(crypto_decodepubkey(crypto_encodepubkey([modulus, '\x00'])), false);
+        });
+
+        it("crypto_rsaencrypt() refuses it", function() {
+            assert.strictEqual(crypto_rsaencrypt('file key', [modulus + '\x01\x00', '\x01'], -0x4D454741), '');
+            assert.strictEqual(crypto_rsaencrypt('file key', [modulus], -0x4D454741), '');
+            assert.notStrictEqual(crypto_rsaencrypt('file key', [modulus, '\x01\x00\x01'], -0x4D454741), '');
+        });
+
+        it("getPubKeyAttribute() neither caches nor resolves it", function() {
+            mStub(ns._logger, '_log');
+            var rootPromise = _stubMegaPromise(sinon, true);
+            mStub(attribCache, 'getItem').returns(_stubMegaPromise(sinon));
+            mStub(attribCache, 'setItem');
+            mStub(attribCache, 'removeItem');
+            _showDebug(['api_req', 'assertUserHandle']);
+
+            ns.getPubKeyAttribute('you456789xw', 'RSA');
+            var settleFunction = api_req.args[0][1].callback;
+            settleFunction({ pubk: base64urlencode(resplit), u: 'you456789xw'});
+            assert.strictEqual(rootPromise.resolve.callCount, 0);
+            assert.strictEqual(rootPromise.reject.callCount, 1);
+            assert.strictEqual(rootPromise.reject.args[0][0], EINTERNAL);
+            assert.strictEqual(attribCache.setItem.callCount, 0);
         });
     });
 });

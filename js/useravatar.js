@@ -226,7 +226,7 @@ var useravatar = (function() {
             if (isVerified) {
                 $('.avatar-wrapper.' + userHandle.replace(/[^\w-]/g, '')).addClass('verified');
             }
-        }).finally(() => {
+        }).catch(dump).finally(() => {
             delete pendingVerifyQuery[userHandle];
         });
     }

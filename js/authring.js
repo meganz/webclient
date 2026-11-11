@@ -235,6 +235,17 @@ var authring = (function () {
                 continue;
             }
 
+            const prior = container[result.userhandle];
+            if (prior) {
+                logger.warn('Duplicate authring record for %s', result.userhandle);
+                if (
+                    prior.method === ns.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON ||
+                    result.value.method !== ns.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON
+                ) {
+                    continue;
+                }
+            }
+
             container[result.userhandle] = result.value;
         }
 

@@ -862,7 +862,7 @@ lazy(mega, 'linkImport', () => {
                     container.appendChild(description);
 
                     const importSummaryTable = document.createElement('table');
-                    importSummaryTable.className = 'grid-table import-summary';
+                    importSummaryTable.className = 'grid-table fm-dialog-table import-summary';
 
                     container.appendChild(importSummaryTable);
 

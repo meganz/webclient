@@ -20,22 +20,21 @@ export class ColumnSharedFolderButtons extends GenericNodePropsComponent {
                         className="mega-button action contact-more"
                         icon="sprite-fm-mono icon-options"
                         onClick={(button, e) => {
-                            e.persist();
-                            $.selected = [handle];
-
                             e.preventDefault();
                             e.stopPropagation(); // do not treat it as a regular click on the file
-                            e.delegateTarget = $(e.target).parents('td')[0];
-                            e.currentTarget = $(e.target).parents('tr');
 
-                            if (!$(e.target).hasClass('active')) {
-                                M.contextMenuUI(e, 1);
-                                $(this).addClass('active');
-                            }
-                            else {
+                            const td = button.domRef.current.closest('td');
+
+                            if (td.classList.contains('active')) {
                                 $.hideContextMenu();
-                                $(e.target).removeClass('active');
+                                return;
                             }
+
+                            $.selected = [handle];
+                            e.delegateTarget = td;
+                            e.currentTarget = td.closest('tr');
+                            e.useClientRect = true; // rows here are position: relative, see adjustContextMenuPosition()
+                            M.contextMenuUI(e, 1);
                         }}>
                     </Button>
                 </div>

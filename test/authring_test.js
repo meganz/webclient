@@ -115,6 +115,42 @@ describe("authring unit test", function() {
         it('deserialise()', function() {
             assert.deepEqual(ns.deserialise(SERIALISED_RING_ED25519), RING_ED25519);
         });
+
+        describe('deserialise() with duplicate records', () => {
+            const {SEEN, FINGERPRINT_COMPARISON} = ns.AUTHENTICATION_METHOD;
+            const {UNSURE} = ns.KEY_CONFIDENCE;
+            const ORIGINAL = ED25519_STRING_FINGERPRINT;
+            const ATTACKER = RSA_STRING_FINGERPRINT;
+
+            // 'you456789xx' is a non-canonical spelling of 'you456789xw', so both serialise to the same handle
+            const record = (handle, fingerprint, method) => ns._serialiseRecord(handle, fingerprint, method, UNSURE);
+            const expected = (method) => ({'you456789xw': {fingerprint: ORIGINAL, method, confidence: UNSURE}});
+
+            it('keeps a verified record over a later unverified one', () => {
+                mStub(ns._logger, '_log');
+                const ring = record('you456789xw', ORIGINAL, FINGERPRINT_COMPARISON)
+                    + record('you456789xx', ATTACKER, SEEN);
+
+                assert.deepEqual(ns.deserialise(ring), expected(FINGERPRINT_COMPARISON));
+                assert.strictEqual(ns._logger._log.args[0][0], 'Duplicate authring record for %s');
+            });
+
+            it('keeps the first of two unverified records', () => {
+                mStub(ns._logger, '_log');
+                const ring = record('you456789xw', ORIGINAL, SEEN)
+                    + record('you456789xx', ATTACKER, SEEN);
+
+                assert.deepEqual(ns.deserialise(ring), expected(SEEN));
+            });
+
+            it('keeps a later verified record over an earlier unverified one', () => {
+                mStub(ns._logger, '_log');
+                const ring = record('you456789xx', ATTACKER, SEEN)
+                    + record('you456789xw', ORIGINAL, FINGERPRINT_COMPARISON);
+
+                assert.deepEqual(ns.deserialise(ring), expected(FINGERPRINT_COMPARISON));
+            });
+        });
     });
 
     describe('getting/setting u_authring.Ed25519', function() {
@@ -575,6 +611,16 @@ describe("authring unit test", function() {
             assert.strictEqual(result, undefined);
             assert.strictEqual(ns._logger._log.args[0][0],
                                'Unsupported key type: DSA');
+        });
+
+        it("non-canonical handle", () => {
+            mStub(u_authring, 'Ed25519', {});
+            mStub(ns, 'setContacts');
+
+            assert.throws(() => ns.setContactAuthenticated('you456789xx', ED25519_STRING_FINGERPRINT, 'Ed25519',
+                ns.AUTHENTICATION_METHOD.SEEN, ns.KEY_CONFIDENCE.UNSURE));
+            assert.deepEqual(u_authring.Ed25519, {});
+            assert.strictEqual(ns.setContacts.callCount, 0);
         });
 
         it("normal behaviour Ed25519", function() {

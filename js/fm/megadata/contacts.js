@@ -323,10 +323,17 @@ MegaData.prototype.syncContactEmail = async function(userHash, forced) {
      * Set new user into map store and returns it
      * @param {String} u_h user handle
      * @param {MegaDataObject|Object} [obj] store
-     * @returns {MegaDataObject} stored user
+     * @returns {MegaDataObject|undefined} stored user, none for a non-canonical handle
      */
     MegaData.prototype.setUser = function(u_h, obj) {
         if (!(u_h in this.u)) {
+            if (base64urlencode(base64urldecode(u_h)) !== u_h) {
+                if (d) {
+                    console.warn('setUser: ignoring non-canonical user handle.', u_h);
+                }
+                return;
+            }
+
             if (!(obj instanceof MegaDataObject)) {
 
                 obj = new MegaDataObject(MEGA_USER_STRUCT, Object.assign({h: u_h, u: u_h, m: '', c: undefined}, obj));
@@ -363,6 +370,9 @@ MegaData.prototype.syncContactEmail = async function(userHash, forced) {
             }
             else {
                 user = this.setUser(u.u, u);
+                if (!user) {
+                    return;
+                }
             }
 
             if (fmdb && !ignoreDB) {

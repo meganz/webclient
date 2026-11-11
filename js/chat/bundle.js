@@ -9530,19 +9530,18 @@ class ColumnSharedFolderButtons extends genericNodePropsComponent.B {
       className: "mega-button action contact-more",
       icon: "sprite-fm-mono icon-options",
       onClick: (button, e) => {
-        e.persist();
-        $.selected = [handle];
         e.preventDefault();
         e.stopPropagation();
-        e.delegateTarget = $(e.target).parents('td')[0];
-        e.currentTarget = $(e.target).parents('tr');
-        if (!$(e.target).hasClass('active')) {
-          M.contextMenuUI(e, 1);
-          $(this).addClass('active');
-        } else {
+        const td = button.domRef.current.closest('td');
+        if (td.classList.contains('active')) {
           $.hideContextMenu();
-          $(e.target).removeClass('active');
+          return;
         }
+        $.selected = [handle];
+        e.delegateTarget = td;
+        e.currentTarget = td.closest('tr');
+        e.useClientRect = true;
+        M.contextMenuUI(e, 1);
       }
     }))));
   }
@@ -9798,6 +9797,11 @@ class ContactsPanel extends mixins.w9 {
       keyCode
     }) => {
       if (keyCode === 27) {
+        const fmContextMenu = document.querySelector('.fm-context-menu');
+        if (fmContextMenu && fmContextMenu.offsetHeight > 0) {
+          $.hideContextMenu();
+          return keyCode;
+        }
         const HAS_DIALOG_OPENED = $.dialog || ['.contact-nickname-dialog', '.fingerprint-dialog', '.context'].some(selector => {
           const dialog = document.querySelector(selector);
           return dialog && dialog.offsetHeight > 0;

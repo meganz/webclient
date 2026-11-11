@@ -810,7 +810,16 @@ lazy(T.ui, 'addFilesLayout', () => {
                     }
                 })().finally(() => {
                     this.data.files = [];
-                    T.ui.loadPage();
+
+                    // T.ui.loadPage() handles this for the standalone page,
+                    // but overlay only has a stub page, so restore the init state manually
+                    if (self.is_transferit) {
+                        T.ui.loadPage();
+                        return;
+                    }
+                    loadingDialog.hide();
+                    this.data.ko = [];
+                    this.renderAddedFiles();
                 });
             });
 
@@ -969,6 +978,8 @@ lazy(T.ui, 'addFilesLayout', () => {
                     if (T.ui.dashboardLayout) {
                         T.ui.dashboardLayout.data.refresh = true;
                     }
+                    // Skip any queued progress update that could show the hidden rows again
+                    tock++;
                     delete T.ui.ulprogress;
                     this.data.name = name;
                     this.data.files = [];

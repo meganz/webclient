@@ -1163,15 +1163,18 @@ var strongvelope = {};
             throw new Error('No cached chat key for user!');
         }
 
-        if (!DERIVED_SHARED_KEYS[userhandle]) {
+        // Re-derive if the contact's Cu25519 key changed since it was memoized
+        var derived = DERIVED_SHARED_KEYS[userhandle];
+        if (!derived || derived.pubKey !== pubKey) {
             var sharedSecret = nacl.scalarMult(
                     asmCrypto.string_to_bytes(this.myPrivCu25519),
                     asmCrypto.string_to_bytes(pubKey)
                 );
-            DERIVED_SHARED_KEYS[userhandle] = strongvelope.deriveSharedKey(sharedSecret);
+            derived = {pubKey, key: strongvelope.deriveSharedKey(sharedSecret)};
+            DERIVED_SHARED_KEYS[userhandle] = derived;
         }
 
-        return DERIVED_SHARED_KEYS[userhandle];
+        return derived.key;
     };
 
 

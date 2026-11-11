@@ -85,6 +85,7 @@ module.exports = function(config) {
         'js/fm/megadata/sort.js',
         'js/fm/megadata/transfers.js',
         'js/fm/megadata/tree.js',
+        'js/fm/fileTextEditor.js',
         'js/tlvstore.js',
         'js/crypto.js',
         'js/megaPromise.js',

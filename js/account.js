@@ -167,11 +167,32 @@ function u_checklogin3a(res, ctx) {
         }
 
         if (u_attr.privk) {
+            let eno = 0;
+
             u_privk = tryCatch(() => {
                 return crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.privk))));
             }, (ex) => {
                 console.error('Error decoding private RSA key', ex);
+                eno |= 1;
             })();
+
+            // The API supplies our RSA pub key, only trust it if it matches the private key (leading zeros aside)
+            if (u_privk) {
+                const norm = (value) => String(value).replace(/^\0+/, '');
+                const pubk = tryCatch(() => crypto_decodepubkey(base64urldecode(u_attr.pubk)), false)();
+
+                if (!pubk || norm(pubk[0]) !== norm(u_privk[0]) || norm(pubk[1]) !== norm(u_privk[1])) {
+                    console.error('Own RSA pub key does not match the private key, using the derived one.');
+
+                    eno |= 2;
+                    u_attr.pubk = base64urlencode(crypto_encodepubkey(u_privk));
+                }
+            }
+
+            if (eno) {
+                window.onerror = null;
+                eventlog(501666, `${eno | 0}`);
+            }
         }
 
         if (typeof u_attr.ut !== 'undefined') {
@@ -192,6 +213,18 @@ function u_checklogin3a(res, ctx) {
                     name += (name.length ? ' ' : '') + this.lastname;
                 }
                 return String(name || this.name || '').trim();
+            }
+        });
+        const {privk, pubk} = u_attr;
+
+        delete u_attr.pubk;
+        delete u_attr.privk;
+        Object.defineProperties(u_attr, {
+            pubk: {
+                value: pubk
+            },
+            privk: {
+                value: privk
             }
         });
 

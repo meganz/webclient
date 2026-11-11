@@ -2913,7 +2913,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             $('body').addClass('dragging ' + ($.draggingClass || ''));
         }
 
-        $ddUIitem.draggable({
+        $ddUIitem.not('.device-item').draggable({
             start(e) {
                 if (d) {
                     console.log('draggable.start');

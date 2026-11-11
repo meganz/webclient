@@ -2994,7 +2994,7 @@ function ddtype(ids, toid, alt) {
     for (var i = ids.length; i--; ) {
         var fromid = ids[i];
 
-        if (fromid === toid || !M.getNodeByHandle(fromid)) {
+        if (fromid === toid || !M.getNodeByHandle(fromid) || M.dcd[fromid]) {
 
             return false;
         }
@@ -3460,6 +3460,13 @@ function process_u(users, ignoreDB) {
         var userHandle = users[i].u;
         var userStatus = users[i].c;
 
+        if (base64urlencode(base64urldecode(userHandle)) !== userHandle) {
+            if (d) {
+                console.warn('process_u: ignoring non-canonical user handle.', userHandle);
+            }
+            continue;
+        }
+
         // If this user had a nickname in the past, don't delete it if they are now added as a contact
         // Or if the nickname is set in the initial 'ug' API request, then set it
         users[i].nickname = userHandle in M.u && M.u[userHandle].nickname || nicknames.cache[userHandle] || '';
@@ -3721,7 +3728,7 @@ function init_chat(action) {
             resolve(EACCESS);
         }
         else {
-            authring.onAuthringReady('chat').then(__init_chat);
+            authring.onAuthringReady('chat').then(__init_chat).catch(reject);
         }
     });
 }
@@ -3991,7 +3998,7 @@ function loadfm_done(mDBload) {
                                 processMCSM(loadfm.chatmcsm, true);
                                 loadfm.chatmcsm = null;
                             }
-                            init_chat();
+                            init_chat().catch(dump);
                         }
                         else {
                             // FIXME: this won't be reached because the request will fail silently

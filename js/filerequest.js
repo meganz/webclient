@@ -1449,15 +1449,10 @@ lazy(mega, 'fileRequest', () => {
             }
 
             loadingDialog.show(); // Show dialog
+            const stored = linkSettings.pack(puHandleObject, settings);
             await this.fileRequestApi
-                .update(puHandleObject.p, title, description, undefined, undefined, settings)
+                .update(puHandleObject.p, title, description, undefined, undefined, stored)
                 .catch(dump);
-
-            const stored = settings && {
-                ets: settings.expiry || 0,
-                mfs: settings.limit || 0,
-                f: settings.folder ? 0 : 1
-            } || undefined;
 
             this.storage.updatePuHandle(handle, title, description, stored);
             this.storage.updatePuPage(puHandleObject.p, title, description, stored);
@@ -1735,13 +1730,14 @@ lazy(mega, 'fileRequest', () => {
                 return false;
             }
 
-            let name = u_attr.name;
-            const puPageObject = this.storage.getPuPageByPageId(puHandleObject.p);
-            if (puPageObject) {
-                name = puPageObject.name;
+            const puPageObject = await this.getPuPage(puHandleObject.p, puHandleObject.ph).catch(dump);
+            if (!puPageObject) {
+                return false;
             }
 
-            let { t: msg, d: description } = puHandleObject.d;
+            const data = Object(puPageObject.d);
+            let name = data.name || u_attr.name;
+            let { msg, description } = data;
 
             switch (type) {
                 case 'name':
@@ -1760,8 +1756,14 @@ lazy(mega, 'fileRequest', () => {
                     puHandleObject.p,
                     msg,
                     description,
-                    name
+                    name,
+                    undefined,
+                    linkSettings.pack(puPageObject)
                 )
+                .then(() => {
+                    this.storage.updatePuHandle(nodeHandle, msg, description);
+                    this.storage.updatePuPage(puHandleObject.p, msg, description);
+                })
                 .catch((ex) => {
                     dump(ex);
                     msgDialog('warninga', l[135], l[47], api_strerror(ex));

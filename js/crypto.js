@@ -1356,6 +1356,13 @@ function crypto_encodepubkey(pubkey) {
         + String.fromCharCode(elen / 256) + String.fromCharCode(elen % 256) + pubkey[1];
 }
 
+// Rejects RSA exponents below 3, e.g. an e=1 re-split by the API, which leaves the cleartext as-is
+function crypto_rsaexponentok(e) {
+    'use strict';
+    e = typeof e === 'string' ? e.replace(/^\0+/, '') : '';
+    return e.length > 1 || e.charCodeAt(0) > 2;
+}
+
 function crypto_decodepubkey(pubk) {
     var pubkey = [];
 
@@ -1378,6 +1385,10 @@ function crypto_decodepubkey(pubk) {
 
     // check format
     if (i !== 2 || pubk.length >= 16) {
+        return false;
+    }
+
+    if (!crypto_rsaexponentok(pubkey[1])) {
         return false;
     }
 
@@ -1548,7 +1559,7 @@ function crypto_decodeprivkey2(privk) {
 function crypto_rsaencrypt(cleartext, pubkey, bf) {
     'use strict';
 
-    if (bf !== -0x4d454741 && mega.keyMgr.secure) {
+    if (bf !== -0x4d454741 && mega.keyMgr.secure || !crypto_rsaexponentok(pubkey[1])) {
         return '';
     }
 
@@ -2488,7 +2499,20 @@ async function api_updfkey(sn, imp) {
             if (d) {
                 console.warn('re-keying foreign nodes...', sn, nk);
             }
-            return api.send({a: 'k', nk});
+
+            await api.screq({a: 'k', nk});
+
+            for (let i = 0; i < nk.length; i += 2) {
+
+                const n = M.getNodeByHandle(nk[i]);
+
+                // The server lists nodes without an owner key as owned by mega.BID and sends no update on re-key
+                if (n && n.u === mega.BID) {
+
+                    n.u = u_handle;
+                    M.nodeUpdated(n);
+                }
+            }
         }
     }
 }

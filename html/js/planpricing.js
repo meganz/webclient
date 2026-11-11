@@ -1860,10 +1860,11 @@ lazy(pro, 'proplan2', () => {
 
         if (planTaxInfo) {
             if (pro.taxInfo.variant === 1) {
-                $('.tax-info', $taxInfo).text(l.t_may_appy.replace('%1', pro.taxInfo.taxName));
+                $('.tax-info', $taxInfo).removeClass('hidden')
+                    .text(l.t_may_appy.replace('%1', pro.taxInfo.taxName));
             }
             else {
-                $('.tax-info', $taxInfo).text(l.before_tax);
+                $('.tax-info', $taxInfo).addClass('hidden');
                 $('.tax-price', $taxInfo).text(l.p_with_tax
                     .replace('%1', formatCurrency(
                         planTaxInfo.taxedPrice, priceCurrency, 'narrowSymbol')
@@ -2092,20 +2093,13 @@ lazy(pro, 'proplan2', () => {
     };
 
     const fetchPlansData = () => {
-        return new Promise(resolve => {
-            pro.loadMembershipPlans(() => {
-                if (u_attr) {
-
-                    M.getStorageQuota().then(storage => {
-                        pro.proplan2.storageData = storage;
-                        resolve();
-                    });
-                }
-                else {
-                    resolve();
+        return pro.loadMembershipPlans()
+            .then(() => self.u_attr && M.getStorageQuota())
+            .then((storage) => {
+                if (storage) {
+                    pro.proplan2.storageData = storage;
                 }
             });
-        });
     };
 
     /**

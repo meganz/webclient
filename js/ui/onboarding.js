@@ -839,6 +839,10 @@ mBroadcaster.addListener('fm:initialized', () => {
                     return;
                 }
 
+                if (localStorage.dlimp || self.dl_import) {
+                    return _delayStart();
+                }
+
                 if (pfid || u_type < 3) {
                     return;
                 }

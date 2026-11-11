@@ -152,15 +152,16 @@ lazy(mega, 'fileRequestCommon', () => {
                 name: name || u_attr.name,
                 email: email || u_attr.email,
                 msg: title,
-                description: description
+                description,
+                f: settings.f               // Disallow folder uploads
             };
-            const req = {a: 'ps', p: puPagePublicHandle, d};
-
-            if (settings) {
-                d.f = settings.folder ? 0 : 1;      // Disallow folder uploads
-                req.mfs = settings.limit || 0;      // Max file size in bytes
-                req.ets = settings.expiry || 0;     // Expiry timestamp (unix seconds)
-            }
+            const req = {
+                a: 'ps',
+                p: puPagePublicHandle,
+                d,
+                mfs: settings.mfs,          // Max file size in bytes
+                ets: settings.ets           // Expiry timestamp (unix seconds)
+            };
 
             mLoadingSpinner.show('puf-update');
 
@@ -1017,6 +1018,21 @@ lazy(mega, 'fileRequestCommon', () => {
                 password: false,
                 size: stored.mfs > 0 ? stored.mfs : false,
                 folder: !Object(stored.d).f
+            };
+        },
+        pack(puHandleObject, settings) {
+            if (!settings) {
+                return {
+                    ets: puHandleObject.ets || 0,
+                    mfs: puHandleObject.mfs || 0,
+                    f: Object(puHandleObject.d).f || 0
+                };
+            }
+
+            return {
+                ets: settings.expiry || 0,
+                mfs: settings.limit || 0,
+                f: settings.folder ? 0 : 1
             };
         },
         unitFor(bytes) {

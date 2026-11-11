@@ -2270,7 +2270,7 @@ var notify = {
                     closeDialog();
                 });
                 M.safeShowDialog('upgrade-welcome-dialog', $dialog);
-            });
+            }).catch(dump);
         });
     }),
 

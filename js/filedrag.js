@@ -91,7 +91,7 @@
         '.gallery-view',
         '#albums-view',
         '.device-centre-grid-view',
-        '.fm-recents:not(.emptied) .fm-recents.scroll',
+        '.fm-recents:not(.emptied):not(.empty-filter) .fm-recents.scroll',
         '.s4-grid-view',
         '.empty-state:not(.meetings-alert)',
         '.file-request-upload-page .content-upload-block',

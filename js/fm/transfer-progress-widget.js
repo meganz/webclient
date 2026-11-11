@@ -606,6 +606,11 @@ mega.tpw = new function TransferProgressWidget() {
         const transferId = id;
         if (!this.hasDOMRow(transferId)) {
             this.addDownloadUpload(type, (type === this.DOWNLOAD ? dl_queue : ul_queue)[queue_num]);
+
+            // Stop if the queue is empty at this position; retrying would recurse indefinitely
+            if (!this.hasDOMRow(transferId)) {
+                return;
+            }
             return this.updateDownloadUpload(type, transferId, perc, bytesLoaded, bytesTotal, kbps, queue_num);
         }
 

@@ -3510,6 +3510,9 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
         var sn = M.getShareNodesSync(target, null, true);
 
         if (sn.length) {
+            if (n.pwm) {
+                return reject(EACCESS);
+            }
             req.cr = crypto_makecr([n], sn, false);
             req.cr[1][0] = 'xxxxxxxx';
         }

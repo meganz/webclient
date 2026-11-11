@@ -479,6 +479,11 @@
                     logger.error(ex);
                 }
 
+                // Private attributes are only cached encrypted, refetch anything else
+                if (attribute[0] === '*' && typeof result === 'object') {
+                    result = undefined;
+                }
+
                 if (result === undefined) {
                     doApiReq(attribCache.removeItem(cacheKey));
                 }
@@ -1186,7 +1191,7 @@
      * @see {@link tlvstore.encrypt} / {@link tlvstore.decrypt}
      */
     ns.handleLegacyCacheAndDecryption = function(res, thePromise, attribute) {
-        if (typeof res !== 'object') {
+        if (typeof res === 'string') {
             try {
                 var clearContainer = tlvstore.blockDecrypt(
                     base64urldecode(res),
@@ -1207,6 +1212,17 @@
                 if (thePromise) {
                     thePromise.reject(res);
                 }
+            }
+        }
+        else {
+            // Only ever stored encrypted, a plain value is not to be trusted
+            if (d) {
+                logger.error('Unexpected %s value for private user attribute %s', typeof res, attribute);
+            }
+            res = EINTERNAL;
+
+            if (thePromise) {
+                thePromise.reject(res);
             }
         }
 

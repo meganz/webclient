@@ -136,7 +136,8 @@ mega.pm = {
 
             assert(h1 === h2 && pwmh === h1, `RACE(${h1}!${h2}!${pwmh})`);
         }
-        assert(pwmh && typeof pwmh === 'string', `Unexpected pwm handle: ${pwmh}`);
+        assert(pwmh && typeof pwmh === 'string' &&
+            !(await M.getShareNodes(pwmh, null, true)).sharenodes.length, `Unexpected pwm handle: ${pwmh}`);
 
         if (waiter) {
             await waiter;

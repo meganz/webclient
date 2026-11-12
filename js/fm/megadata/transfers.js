@@ -1437,9 +1437,10 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
             text.textContent = mega.icu.format(l.transfer_toast_added_dl, t_length);
         }
 
-        // Add (paused) to the message
+        // Add (paused) to the message, toasts only accept span markup
         if (uldl_hold || isPaused) {
-            const b = document.createElement('b');
+            const b = document.createElement('span');
+            b.className = 'font-bold';
             b.textContent = ` (${l[1651]}) `;
             text.appendChild(b);
         }

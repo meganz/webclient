@@ -122,6 +122,8 @@ module.exports = function(config) {
         'js/utils/trans.js',
         'js/ui/megaInputs.js',
         'js/ui/megaInputs-underlinedText.js',
+        'js/ui/megaInputs-pmText.js',
+        'js/ui/node-name-control.js',
         'js/ui/dropdowns.js',
         'js/time_checker.js',
 

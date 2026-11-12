@@ -138,6 +138,23 @@ describe("chat.rtf_filter unit test", function() {
             [
                 '```test`dontparse`testok```',
                 '<pre class="rtf-multi">test`dontparse`testok</pre>'
+            ],
+            [
+                '```\na\n```',
+                '<pre class="rtf-multi">a\n</pre>'
+            ],
+            [
+                '```170919937,844888077,982807564,1286509568,2540701707,2880400397,3812828172,3852933129```',
+                '<pre class="rtf-multi">' +
+                '170919937,844888077,982807564,1286509568,2540701707,2880400397,3812828172,3852933129</pre>'
+            ],
+            [
+                '```ftp://example.com/x```',
+                '<pre class="rtf-multi">ftp://example.com/x</pre>'
+            ],
+            [
+                '```mail someone@example.com or +64 9 123 4567```',
+                '<pre class="rtf-multi">mail someone@example.com or +64 9 123 4567</pre>'
             ]
         ].concat(expectedValues).forEach(function(expectedVals, k) {
             var btkrtf = new BacktickRtfFilter({'rebind': function(){}});
@@ -203,6 +220,14 @@ describe("chat.rtf_filter unit test", function() {
                 '```a ` b ``` c `',
 
                 '<pre class="rtf-multi">a ` b </pre> c `',
+            ],
+            [
+                '```x = \'https://example.com/api/\';```',
+
+                '```x = \'https://example.com/api/\';```',
+
+                '<pre class="rtf-multi">x = &#39;<a href="https://example.com/api/" class="chatlink chatlink-url" ' +
+                'target="_blank" rel="noopener noreferrer">https://example.com/api/</a>&#39;;</pre>',
             ]
         ].forEach(function(rule) {
             var evtObj = {
@@ -323,11 +348,9 @@ describe("chat.rtf_filter unit test", function() {
                 'a <pre class="rtf-multi">test</pre> b<br/>' +
                 'a <pre class="rtf-multi">test</pre> b <pre class="rtf-multi">test2</pre> <pre class="rtf-multi">test 3 space</pre><br/>' +
                 'a <pre class="rtf-multi">`test</pre>`<br/>' +
-                'a <pre class="rtf-multi"><br/>' +
-                'test<br/>' +
+                'a <pre class="rtf-multi">test<br/>' +
                 'b</pre><br/>' +
-                'domatchme <pre class="rtf-multi"><br/>' +
-                'testtt</pre>'
+                'domatchme <pre class="rtf-multi">testtt</pre>'
             ]
         ];
 

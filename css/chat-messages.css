@@ -690,6 +690,15 @@ body.rtl .chat-topic-block {
 .message pre.rtf-single {
     color: var(--secondary-red);
 }
+.message pre.rtf-multi a,
+.message pre.rtf-single a {
+    color: inherit;
+    text-decoration: none;
+}
+.message pre.rtf-multi a:hover,
+.message pre.rtf-single a:hover {
+    text-decoration: underline;
+}
 
 .message.content-area .buttons-block {
     padding: 10px 0 0 0;

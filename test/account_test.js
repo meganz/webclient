@@ -348,7 +348,8 @@ describe("account unit test", function() {
     });
 
     describe('u_checklogin3a', function() {
-        var privk = ['modulus', 'exponent', 'd', 'p', 'q', 'dp', 'dq', 'u'];
+        // n=55 (p=5, q=11), SDK-style e=3 and d=7 mod lcm(4, 10), so e is derived mod phi as 23
+        var privk = ['\x37', '\x17', '\x07', '\x05', '\x0b', 'dp', 'dq', 'u'];
         var encode = function(pubkey) {
             return base64urlencode(crypto_encodepubkey(pubkey));
         };
@@ -378,7 +379,15 @@ describe("account unit test", function() {
         };
 
         it("keeps an API pub key matching the private key", function() {
-            var pubk = encode(['\0modulus', 'exponent']);
+            var pubk = encode(['\0\x37', '\x17']);
+            return login(pubk).then(function(result) {
+                assert.strictEqual(result, pubk);
+                expect(console.error.callCount).to.eql(0);
+            });
+        });
+
+        it("keeps an SDK pub key whose exponent pairs with d but isn't the derived one", function() {
+            var pubk = encode(['\x37', '\x03']);
             return login(pubk).then(function(result) {
                 assert.strictEqual(result, pubk);
                 expect(console.error.callCount).to.eql(0);
@@ -386,14 +395,14 @@ describe("account unit test", function() {
         });
 
         it("replaces an API pub key with another modulus", function() {
-            return login(encode(['other modulus', 'exponent'])).then(function(result) {
+            return login(encode(['\x4d', '\x03'])).then(function(result) {
                 assert.strictEqual(result, encode(privk));
                 expect(console.error.callCount).to.eql(1);
             });
         });
 
         it("replaces an API pub key with another exponent", function() {
-            return login(encode(['modulus', 'other exponent'])).then(function(result) {
+            return login(encode(['\x37', '\x09'])).then(function(result) {
                 assert.strictEqual(result, encode(privk));
                 expect(console.error.callCount).to.eql(1);
             });

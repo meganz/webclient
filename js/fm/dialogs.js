@@ -629,7 +629,7 @@
 
         M.renderBreadcrumbs(path, scope, dictionary, nop);
         const breadcrumbClear =  dialog.querySelector('.crumb-clear-sel');
-        if (breadcrumbClear && (path.length === 1 || section === 's4' && path.length === 2)) {
+        if (breadcrumbClear && (path.length === 1 || !$.mcselected || section === 's4' && path.length === 2)) {
             breadcrumbClear.classList.add('hidden');
         }
         else if (breadcrumbClear) {
@@ -1707,6 +1707,11 @@
         return menu;
     };
 
+    const getS4Container = () => {
+        const cn = 'utils' in s4 && s4.utils.getContainersList();
+        return cn && cn.length === 1 && cn[0].h || undefined;
+    };
+
     const lastSectionData = Object.create(null);
     const getOpeningSection = async(blocked) => {
         const data = lastSectionData.s ? lastSectionData : await M.getPersistentData('cmdlgsect').catch(nop);
@@ -2268,8 +2273,8 @@
                     getOpeningSection(!!$.albumImport && ['shared-with-me']).always(activeTab => {
                         handleOpenDialog(
                             activeTab,
-                            !activeTab || typeof activeTab !== 'string' || activeTab === 'quick-access' ?
-                                undefined : M.RootID
+                            activeTab === 'cloud-drive' ? M.RootID :
+                                activeTab === 's4' ? getS4Container() : undefined
                         );
                     });
                 }
@@ -2324,7 +2329,8 @@
                     getOpeningSection().always(activeTab => {
                         handleOpenDialog(
                             activeTab,
-                            !activeTab || activeTab === 'quick-access' ? undefined : M.RootID,
+                            activeTab === 'cloud-drive' ? M.RootID :
+                                activeTab === 's4' ? getS4Container() : undefined,
                             activeTab !== 'conversations' && 'saveToDialog'
                         );
                     });
@@ -2577,11 +2583,8 @@
             if (section === 'cloud-drive' || section === 'folder-link') {
                 setDialogBreadcrumb(M.RootID);
             }
-            else if (section === 's4' && 'utils' in s4) {
-                const cn = s4.utils.getContainersList();
-
-                // Select MEGA container handle if it's the only one
-                setDialogBreadcrumb(cn.length === 1 && cn[0].h || undefined);
+            else if (section === 's4') {
+                setDialogBreadcrumb(getS4Container());
             }
             else {
                 setDialogBreadcrumb();
@@ -2698,9 +2701,8 @@
                     if (section === 'cloud-drive') {
                         setDialogBreadcrumb(M.RootID);
                     }
-                    else if (section === 's4' && 'utils' in s4) {
-                        const cn = s4.utils.getContainersList();
-                        setDialogBreadcrumb(cn.length === 1 && cn[0].h || undefined);
+                    else if (section === 's4') {
+                        setDialogBreadcrumb(getS4Container());
                     }
                     else {
                         setDialogBreadcrumb();

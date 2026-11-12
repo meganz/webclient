@@ -1363,6 +1363,16 @@ function crypto_rsaexponentok(e) {
     return e.length > 1 || e.charCodeAt(0) > 2;
 }
 
+// Whether e pairs with privk's d (e*d = 1 mod p-1 and q-1), the SDK reduces d mod lcm(p-1, q-1), not phi
+function crypto_rsaexponentpairs(e, privk) {
+    'use strict';
+    const ed = new asmCrypto.BigNumber(e).multiply(new asmCrypto.BigNumber(privk[2]));
+
+    return [privk[3], privk[4]].every((prime) => {
+        return ed.divide(new asmCrypto.BigNumber(prime).subtract(1)).remainder.compare(1) === 0;
+    });
+}
+
 function crypto_decodepubkey(pubk) {
     var pubkey = [];
 

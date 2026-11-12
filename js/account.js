@@ -181,7 +181,7 @@ function u_checklogin3a(res, ctx) {
                 const norm = (value) => String(value).replace(/^\0+/, '');
                 const pubk = tryCatch(() => crypto_decodepubkey(base64urldecode(u_attr.pubk)), false)();
 
-                if (!pubk || norm(pubk[0]) !== norm(u_privk[0]) || norm(pubk[1]) !== norm(u_privk[1])) {
+                if (!pubk || norm(pubk[0]) !== norm(u_privk[0]) || !crypto_rsaexponentpairs(pubk[1], u_privk)) {
                     console.error('Own RSA pub key does not match the private key, using the derived one.');
 
                     eno |= 2;

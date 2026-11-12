@@ -1021,19 +1021,23 @@ lazy(mega, 'fileRequestCommon', () => {
             };
         },
         pack(puHandleObject, settings) {
-            if (!settings) {
-                return {
+            const stored = settings ?
+                {
+                    ets: settings.expiry || 0,
+                    mfs: settings.limit || 0,
+                    f: settings.folder ? 0 : 1
+                } :
+                {
                     ets: puHandleObject.ets || 0,
                     mfs: puHandleObject.mfs || 0,
                     f: Object(puHandleObject.d).f || 0
                 };
-            }
 
-            return {
-                ets: settings.expiry || 0,
-                mfs: settings.limit || 0,
-                f: settings.folder ? 0 : 1
-            };
+            if (!u_attr.p) {
+                delete stored.ets;
+                delete stored.mfs;
+            }
+            return stored;
         },
         unitFor(bytes) {
             return bytes >= GB ? UNIT.GB : UNIT.MB;

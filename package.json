@@ -48,9 +48,6 @@
     "minimatch@3.1.5": {
       "brace-expansion": "1.1.21"
     },
-    "minimatch@10.2.5": {
-      "brace-expansion": ">=5.0.8"
-    },
     "grunt": {
       "js-yaml": "npm:empty-npm-package@1.0.0"
     },
@@ -109,7 +106,7 @@
     "karma-mocha": "2.0.1",
     "karma-sinon": "1.0.5",
     "mocha": "11.8.0",
-    "sass": "1.108.0",
+    "sass": "1.108.2",
     "sass-loader": "17.1.0",
     "sinon": "15.0.3",
     "stylelint": "16.26.1",

@@ -2323,16 +2323,30 @@ var strongvelope = {};
      *       there is a possibility that message edit happens after key is confirmed but before message is confirmed,
      *       then it will still need the old temporary key Ids.
      *       It should be fine as it can tolerate up to 2^16 temporary key Ids.
+     *       The current key Id only advances when the confirmation is for the current temporary key, and a known
+     *       key Id is never re-pointed to another key, so a replayed or forged confirmation can't select an old key.
+     * @returns {Boolean}
+     *     Whether the confirmation was accepted, i.e. pending messages may be relabelled with the new key Id.
      */
     strongvelope.ProtocolHandler.prototype.setKeyID = function(keyxId, keyId) {
         var tempkeyid = a32_to_str([keyxId]);
         var newkeyid = a32_to_str([keyId]);
+        const ownKeys = this.participantKeys[this.ownHandle];
+        const key = ownKeys[tempkeyid];
 
-        if (!this.participantKeys[this.ownHandle][tempkeyid]) {
+        if (!key) {
             throw new Error('No cached chat key for given key id!');
         }
-        this.participantKeys[this.ownHandle][newkeyid] = this.participantKeys[this.ownHandle][tempkeyid];
-        this.keyId = newkeyid;
+        if (ownKeys[newkeyid] && ownKeys[newkeyid] !== key) {
+            this.logger.critical('Key confirmation conflicts with an existing key id.', keyxId, keyId);
+            return false;
+        }
+        ownKeys[newkeyid] = key;
+
+        if (this.keyId === tempkeyid) {
+            this.keyId = newkeyid;
+        }
+        return true;
     };
 
     /**
@@ -2352,7 +2366,14 @@ var strongvelope = {};
             if (!this.participantKeys[userId]) {
                 this.participantKeys[userId] = {};
             }
-            this.participantKeys[userId][a32_to_str([keyid])] = decryptedKeys[0];
+            const keyidStr = a32_to_str([keyid]);
+            const storedKey = this.participantKeys[userId][keyidStr];
+
+            assert(
+                userId !== this.ownHandle || !storedKey || storedKey === decryptedKeys[0],
+                `Mismatching own key ${keyid}`
+            );
+            this.participantKeys[userId][keyidStr] = decryptedKeys[0];
             return `${userId}-${keyid}`;
         }, (ex) => {
             this.logger.error('_decryptKeysFrom thrown an error:', ex);

@@ -1651,15 +1651,20 @@ function MessagesBuff(chatRoom, chatdInt) {
 
     self.chatRoom.rebind('onMessagesKeyIdDone.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatRoom;
+        const confirmKey = () => {
+            const { keyxid, keyid } = eventData;
+            // relabel the pending messages only if strongvelope accepted the confirmation
+            if (chatRoom.protocolHandler.setKeyID(keyxid, keyid)) {
+                chatRoom.chatd.keyconfirm(chatRoom.chatIdBin, keyxid, keyid);
+            }
+            self.trackDataChange();
+        };
+
         if (!chatRoom.protocolHandler) {
-            ChatdIntegration._waitForProtocolHandler(chatRoom, function() {
-                chatRoom.protocolHandler.setKeyID(eventData.keyxid, eventData.keyid);
-                self.trackDataChange();
-            });
+            ChatdIntegration._waitForProtocolHandler(chatRoom, confirmKey);
         }
         else {
-            chatRoom.protocolHandler.setKeyID(eventData.keyxid, eventData.keyid);
-            self.trackDataChange();
+            confirmKey();
         }
     });
 

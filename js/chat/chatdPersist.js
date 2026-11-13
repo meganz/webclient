@@ -96,7 +96,7 @@
             });
         });
 
-        self.chatd.rebind('onMessagesKeyIdDone.chatdPersist', function(e, data) {
+        self.chatd.rebind('onMessagesKeyIdConfirmed.chatdPersist', (e, data) => {
             if (!ChatdPersist.isMasterTab()) {
                 // don't do anything if this is not the master tab!
                 return;
@@ -281,7 +281,7 @@
     ChatdPersist.prototype._destroy = function() {
         var self = this;
         self.chatd.off('onMessageKeysDone.chatdPersist');
-        self.chatd.off('onMessagesKeyIdDone.chatdPersist');
+        self.chatd.off('onMessagesKeyIdConfirmed.chatdPersist');
         self.chatd.off('onMessageLastSeen.chatdPersist');
         self.chatd.off('onMessagesHistoryDone.chatdPersist');
         self.chatd.off('onMessagesHistoryRequest.chatdPersist');

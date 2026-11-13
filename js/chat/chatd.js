@@ -1790,7 +1790,6 @@ Chatd.Shard.prototype.exec = function(a) {
                         keyid:  Chatd.unpack32le(cmd.substr(13, 4))
                     }
                 );
-                self.chatd.keyconfirm(cmd.substr(1, 8), Chatd.unpack32le(cmd.substr(13, 4)));
                 len = 17;
                 break;
             case Chatd.Opcode.MSGID:
@@ -2308,12 +2307,16 @@ Chatd.Messages.prototype.markAsJoinRequested = function() {
     }
 };
 
-Chatd.Messages.prototype.updatekeyid = function(keyid) {
+Chatd.Messages.prototype.updatekeyid = function(keyxid, keyid) {
+    'use strict';
+
     var self = this;
 
     this.sendingList.forEach(function(msgxid) {
         if (!self.expired[msgxid] && self.sendingbuf[self.sending[msgxid]]) {
-            if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY) {
+            // only relabel the messages encrypted with the confirmed key
+            if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY ||
+                self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.KEYID] !== keyxid >>> 0) {
                 return;
             }
             else {
@@ -2750,10 +2753,11 @@ Chatd.prototype.editreject = function(chatId, msgid) {
 };
 
 // msgid can be false in case of rejections
-Chatd.prototype.keyconfirm = function(chatId, keyid) {
+Chatd.prototype.keyconfirm = function(chatId, keyxid, keyid) {
+    'use strict';
 
     if (this.chatIdMessages[chatId]) {
-        this.chatIdMessages[chatId].confirmkey(keyid);
+        this.chatIdMessages[chatId].confirmkey(keyxid, keyid);
     }
 };
 
@@ -3237,7 +3241,9 @@ Chatd.Messages.prototype.rejectedit = function(msgid) {
 };
 
 // key confirmation in message buffer
-Chatd.Messages.prototype.confirmkey = function(keyid) {
+Chatd.Messages.prototype.confirmkey = function(keyxid, keyid) {
+    'use strict';
+
     var self = this;
     // when a key is confirmed, it will remove the key from the sending list,
     // and update the keyid of the confirmed key in persistency list,
@@ -3247,7 +3253,8 @@ Chatd.Messages.prototype.confirmkey = function(keyid) {
         if (
             !self.expired[msgxid] &&
             self.sendingbuf[self.sending[msgxid]] &&
-            self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY
+            self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY &&
+            self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.KEYID] === keyxid >>> 0
         ) {
             firstkeyxkey = msgxid;
         }
@@ -3255,6 +3262,9 @@ Chatd.Messages.prototype.confirmkey = function(keyid) {
     if (!firstkeyxkey) {
         return;
     }
+
+    this.chatd.trigger('onMessagesKeyIdConfirmed', { chatId: base64urlencode(this.chatId), keyxid, keyid });
+
     var promises = [];
 
     // update keyid of the confirmed key in persistency list.
@@ -3311,7 +3321,7 @@ Chatd.Messages.prototype.confirmkey = function(keyid) {
         }
         delete self.sendingbuf[self.sending[firstkeyxkey]];
         delete self.sending[firstkeyxkey];
-        self.updatekeyid(keyid);
+        self.updatekeyid(keyxid, keyid);
     });
 };
 

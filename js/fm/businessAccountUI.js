@@ -1820,17 +1820,6 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                 .text(formatCurrency(billData.price_eur.amount));
         }
 
-        const $noTaxEstPrice = $('.second-message.no-tax', $nbPriceContainer).addClass('hidden');
-        const $inclTaxEstPrice = $('.second-message.inc-tax', $nbPriceContainer).addClass('hidden');
-        if (pro.taxInfo) {
-            $inclTaxEstPrice
-                .text(l.est_price_tma.replace('%1', pro.taxInfo.taxName))
-                .removeClass('hidden');
-        }
-        else {
-            $noTaxEstPrice.removeClass('hidden');
-        }
-
         // If Pro Flexi
         if (u_attr.pf) {
 
@@ -1943,7 +1932,19 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
     if (u_attr.pf || typeof M.account.b.v === 'undefined' || M.account.b.v === 0) {
 
         // Populate the next billing info into the overall usage section
-        pro.loadMembershipPlans().then(populateNextBillInfo).catch(tell);
+        populateNextBillInfo();
+
+        const $taxNote = $('.next-bill-value.tax-note', $nbPriceContainer);
+        const {nextBillAddsTax} = Object(mega.buinsessAccount);
+
+        dashboardUI.showTaxNote($taxNote);
+
+        if (typeof nextBillAddsTax !== 'boolean' && !$nbPriceContainer.hasClass('hidden')) {
+            this.business.nextBillAddsTax()
+                .then(() => dashboardUI.showTaxNote($taxNote))
+                .catch(dump)
+                .finally(() => $nbPriceContainer.removeClass('sk-loading'));
+        }
 
         // Fill the last/next bill transfer data into the analytics section
         fillStgeTrfBillInfo(true);
@@ -2744,6 +2745,10 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
                         cVat = acceptedTaxNumber;
                         drawn[$cVatInput.attr('id')] = acceptedTaxNumber;
                         delete changes[$cVatInput.attr('id')];
+                    }
+
+                    if (taxDetailsChanged && mega.buinsessAccount) {
+                        delete mega.buinsessAccount.nextBillAddsTax;
                     }
 
                     // we will clean up cached data of invoices to insure updating if needed

@@ -1438,7 +1438,7 @@ mega.tpw = new function TransferProgressWidget() {
                 this.actionRight.hidden = false;
                 this._running = true;
                 this._overquota = false;
-                this._errored = false;
+                this.errored = false;
                 return;
             }
             this.actionLeft.stateCancel();
@@ -1490,11 +1490,15 @@ mega.tpw = new function TransferProgressWidget() {
                 }
                 this.el.dataset.simpletip = this.statusText;
                 this.el.dataset.simpletipposition = 'top';
+                this.statusEl.classList.add('simpletip', 'simpletip-tc');
+                this.statusEl.dataset.simpletipposition = 'top';
             }
             else {
                 delete this.el.dataset.simpletip;
                 delete this.el.dataset.simpletipposition;
                 this.el.classList.remove('simpletip');
+                delete this.statusEl.dataset.simpletipposition;
+                this.statusEl.classList.remove('simpletip', 'simpletip-tc');
             }
         }
 

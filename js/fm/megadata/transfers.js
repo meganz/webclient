@@ -315,7 +315,12 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
 
         const status = !z && mega.tpw.getRowStatus(`dl_${n.h}`);
         if (status) {
-            if (!status.complete) {
+            const {h} = n;
+            if (status.errored && !dl_queue.some((dl) => dl.id === h && !dl.zipid && !dl.cancelled)) {
+                // dlFatalError -> replace and re-download.
+                tfsheadupdate({c: `dl_${h}`});
+            }
+            else if (!status.complete) {
                 if ((status.errored || status.overquota) && !entries.length) {
                     errorStatus = status.statusText;
                 }

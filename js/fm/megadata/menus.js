@@ -989,7 +989,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
                         finalItems.push('.zipdownload-item', '.download-standart-item');
                     }
                     if (pfcol) {
-                        finalItems.push('.play-slideshow');
+                        const album = mega.gallery.albums.store[mega.gallery.getAlbumIdFromPath()];
+                        if (album && mega.gallery.nodesAllowSlideshow(album.nodes)) {
+                            finalItems.push('.play-slideshow');
+                        }
                     }
                 }
             }

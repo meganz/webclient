@@ -801,11 +801,17 @@ lazy(T.ui, 'addFilesLayout', () => {
             });
 
             confirmBtn.addEventListener('click', () => {
-                ulmanager.abort(null);
+                // Standalone owns the entire upload queue, so abort all uploads
+                // In the webclient, the queue is shared with CD, so only abort this transfer's files
+                const standalone = self.is_transferit;
+
+                ulmanager.abort(
+                    standalone ? null : ul_queue.filter((ul) => ul.xput).map(ulmanager.getGID)
+                );
 
                 loadingDialog.show();
                 (async() => {
-                    while (ulmanager.isUploading) {
+                    while (standalone ? ulmanager.isUploading : ul_queue.some((ul) => ul.xput)) {
                         await tSleep(-1);
                     }
                 })().finally(() => {
@@ -813,7 +819,7 @@ lazy(T.ui, 'addFilesLayout', () => {
 
                     // T.ui.loadPage() handles this for the standalone page,
                     // but overlay only has a stub page, so restore the init state manually
-                    if (self.is_transferit) {
+                    if (standalone) {
                         T.ui.loadPage();
                         return;
                     }

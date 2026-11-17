@@ -1413,7 +1413,7 @@ security.login = {
         try {
 
             if (typeof userHandle !== 'string' || userHandle.length !== 11) {
-                eventlog(99752, JSON.stringify([1, 11, userHandle]));
+                eventlog(99752, JSON.stringify([2, 11, typeof userHandle]));
 
                 console.error("Incorrect user handle in the 'us' response", userHandle);
 
@@ -1434,7 +1434,7 @@ security.login = {
             if (!decodedPrivateRsaKey) {
                 console.error('RSA key decoding failed (%o)..', errobj);
 
-                eventlog(99752, JSON.stringify([1, 10, errobj]));
+                eventlog(99752, JSON.stringify([2, 10]));
 
                 Soon(() => {
                     msgDialog('warninga', l[135], l[8853], JSON.stringify(errobj));
@@ -1456,7 +1456,7 @@ security.login = {
             // Otherwise, we could construct an oracle based on shortened csids with single-byte user handles.
             // Then check the user handle in the Session ID matches the one sent in the 'us' response.
             if (decryptedSessionId.length !== 255 || sessionIdUserHandle !== userHandle) {
-                eventlog(99752, JSON.stringify([1, 13, userHandle]));
+                eventlog(99752, JSON.stringify([2, 13, typeof userHandle]));
 
                 throw new Error('Invalid Session ID');
             }
@@ -1466,7 +1466,7 @@ security.login = {
         }
         catch (ex) {
             if (!eventlog.sent['99752']) {
-                eventlog(99752, JSON.stringify([1, 12, userHandle, errobj, String(ex).split('\n')[0]]));
+                eventlog(99752, JSON.stringify([2, 12, typeof userHandle]));
             }
 
             console.error('Error decrypting or decoding the private RSA key or Session ID!', ex);

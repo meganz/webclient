@@ -16,7 +16,6 @@
         "es",
         "jquery",
         "local-rules",
-        "no-unsanitized",
         "optimize-regex",
         "react",
         "sonarjs",
@@ -25,7 +24,6 @@
     "extends": [
         "eslint:recommended",
         "plugin:es/restrict-to-es2018",
-        "plugin:no-unsanitized/recommended-legacy",
         "plugin:sonarjs/recommended"
     ],
     "settings": {

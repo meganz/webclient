@@ -475,7 +475,7 @@ lazy(mega, 'zipBrowser', () => {
 
         /** Tar size field: PAX override, else base-256 (GNU) or octal. */
         _tarSize(buf, paxSize) {
-            if (paxSize !== null && Number.isFinite(paxSize)) {
+            if (paxSize !== null && Number.isFinite(paxSize) && paxSize >= 0) {
                 return paxSize;
             }
             // GNU base-256 encoding: high bit of the first byte is set.
@@ -486,7 +486,7 @@ lazy(mega, 'zipBrowser', () => {
                 }
                 return n;
             }
-            return this._tarOctal(buf, 124, 12);
+            return Math.max(0, this._tarOctal(buf, 124, 12));
         }
 
         /**

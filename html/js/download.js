@@ -363,6 +363,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
             showProgressUI: nop,
         }
     } = mega.ui || {};
+    const {appWg} = dlPage.data || {};
 
     Object(fdl_queue_var).lastProgress =
         [fileid, perc, bytesloaded, bytestotal, kbps, dl_queue_num];
@@ -380,6 +381,10 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
             dl_queue[dl_queue_num].st = now - 100;
         }
         dl_queue[dl_queue_num].loaded = bytesloaded;
+
+        if (appWg && appWg.isVisible && perc > 88) {
+            dlPage.dismissAppWidget();
+        }
     }
 
     dlPage.showProgressUI(perc);

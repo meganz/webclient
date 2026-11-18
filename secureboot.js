@@ -3597,6 +3597,9 @@ else if (!browserUpdate) {
                         siteLoadError(load_error_types.file_corrupt, jsl[this.jsi].f);
                         contenterror = 1;
                     }
+                    else {
+                        jsl[this.jsi].sha256sb = hashHex;
+                    }
                 }
 
                 if (!contenterror)

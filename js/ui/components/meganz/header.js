@@ -1267,8 +1267,25 @@ class MegaHeader extends MegaMobileHeader {
         dirId = dirId || M.currentdirid;
         const isRootFolder = dirId === M.RootID;
 
+        const cv = M.isCustomView(dirId);
+
         const adjustDetails = () => {
-            if (M.getNodeRoot(dirId) === M.RootID) {
+            if (cv.type === mega.devices.rootId) {
+                // Follow the current location within Device Center
+                const h = cv.nodeID;
+                const device = M.dcd[h];
+                const name = device ? device.name : M.getNameByHandle(h);
+
+                // Fall back to Device Centre if the location is not loaded yet
+                loc = name ? h : mega.devices.rootId;
+                chip = name || l.device_centre;
+                chipIcon = device || !name
+                    ? 'sprite-fm-mono icon-devices-thin-outline'
+                    : 'sprite-fm-mono icon-folder-thin-outline';
+
+                placeholder = l.search_loc.replace('%s', chip);
+            }
+            else if (M.getNodeRoot(dirId) === M.RootID) {
                 const setInputDetails = (h, i) => {
                     loc = h;
                     chip = M.getNameByHandle(loc);

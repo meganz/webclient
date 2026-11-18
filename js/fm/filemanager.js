@@ -2369,7 +2369,7 @@ FileManager.prototype.initUIKeyEvents = function() {
                 if (!M.dcd[$.selected[0]] && M.getNodeRoot(n.h) === M.RubbishID) {
                     mega.ui.mInfoPanel.show($.selected);
                 }
-                else if (n && n.t) {
+                else if (n && (n.t || M.dcd[n.h])) {
                     M.openFolder(M.onDeviceCenter || M.dcd[$.selected[0]]
                         ? mega.devices.ui.getCurrentDirPath($.selected[0])
                         : n.h);
@@ -3192,7 +3192,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             ) {
                 h = M.currentrootid + '/' + h;
             }
-            else if (M.onDeviceCenter) {
+            else if (M.onDeviceCenter || M.dcd[n.h]) {
                 h = mega.devices.ui.getCurrentDirPath(n.h);
             }
             else if (M.dyh) {
@@ -3734,12 +3734,9 @@ FileManager.prototype.initStatusBarLinks = function() {
             if (M.isInvalidUserStatus()) {
                 return false;
             }
-            if (M.onDeviceCenter) {
-                const section = mega.devices.ui.getRenderSection();
-                if (section === 'device-centre-devices') {
-                    mega.devices.ui.renameDevice();
-                    return;
-                }
+            if (M.dcd[$.selected[0]]) {
+                mega.devices.ui.renameDevice();
+                return;
             }
             renameDialog();
         }

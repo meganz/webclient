@@ -69,7 +69,10 @@ lazy(mega.ui, 'mInfoPanel', () => {
             activeStats.deviceFolders[node.h] = folder;
             activeStats.heartbeat = (folder && folder.hb || node.hb || {}).ts;
         };
-        if (M.onDeviceCenter) {
+        if (M.dcd[node.h]) {
+            dcResolver(node, {});
+        }
+        else if (M.onDeviceCenter) {
             dcResolver(node, mega.devices.ui.getCurrentDirData());
         }
         else if (M.getNodeRoot(node.h) === M.InboxID) {
@@ -156,7 +159,12 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
         // If all selected nodes are devices, show the generic device icon
         if (deviceCount === totalNodeCount) {
-            return { icon: 'pc' };
+            return { icon: 'pc', isDevice: true };
+        }
+
+        // A device reads as a folder through fileIcon(), keep it out of the icons below
+        if (deviceCount) {
+            return { icon: 'generic', count: Math.min(totalNodeCount, 3) };
         }
 
         // If all selected nodes are shares, show the share icon
@@ -576,7 +584,8 @@ lazy(mega.ui, 'mInfoPanel', () => {
                     if (device && handle !== device.h) {
                         prefix = `${prefix}${device.h}/`;
                     }
-                    if (handle.length === 11) {
+                    // a device handle is as long as a user one, but it is no contact
+                    if (handle.length === 11 && !M.dcd[handle]) {
                         prefix = '/fm/chat/contacts/';
                     }
                 }
@@ -593,7 +602,8 @@ lazy(mega.ui, 'mInfoPanel', () => {
             let root = '';
             let device = false;
             const nr = M.getNodeRoot(this.node.h);
-            if (M.onDeviceCenter) {
+            // a device has no ufs-path, it is always located in device centre
+            if (M.dcd[this.node.h] || M.onDeviceCenter) {
                 pathItems = mega.devices.ui.getFullPath(this.node.h);
                 root = mega.devices.rootId;
                 device = activeStats.devices[this.node.h];
@@ -762,7 +772,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 const data = getIconForMultipleNodes(this.handles);
                 count = data.count;
                 const icon = data.icon;
-                mime = this.node.h in M.dcd ?
+
+                // Only the all-devices icon is a themed sprite, a mixed selection gets a mime one
+                mime = data.isDevice ?
                     `sprite-fm-theme icon-${icon}-filled` : `item-type-icon-90 icon-${icon}-90`;
             }
 

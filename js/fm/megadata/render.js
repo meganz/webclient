@@ -389,7 +389,9 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
         }
         return false;
     }
-    const n = M.d[aHandle] || mega.infinity && M.getNodeByHandle(aHandle);
+
+    // M.dcd holds devices, which are rendered outside of it too (search results)
+    const n = M.d[aHandle] || M.dcd[aHandle] || mega.infinity && M.getNodeByHandle(aHandle);
     if (!n) {
         if (d) {
             console.warn("megaListRenderNode was called with aHandle '%s' which was not found in M.d", aHandle);

@@ -6,6 +6,7 @@ lazy(mega.ui, 'searchbar', () => {
     'use strict';
 
     const minTermLen = 2;
+    const maxSuggestions = 5;
 
     let $topbar;
     let $dropdownSearch;
@@ -185,6 +186,11 @@ lazy(mega.ui, 'searchbar', () => {
             return mega.gallery.allowedInMedia;
         }
 
+        // Match all Device Centre folders or limit the search to a single device
+        if (location === mega.devices.rootId || M.dcd[location]) {
+            return mega.devices.ui.getSearchFilterFn(location);
+        }
+
         if (M.getNodeByHandle(location)) {
             const parents = array.to.object(M.getTreeHandles(location), true);
 
@@ -207,6 +213,37 @@ lazy(mega.ui, 'searchbar', () => {
         }
 
         return false;
+    };
+
+    /**
+     * Checks whether Device Centre devices are included in the current search scope.
+     *
+     * @returns {Boolean} Whether devices should be searched
+     */
+    const devicesInScope = () => {
+
+        const chipBtn = $('button.search-chip', '.searcher-wrapper');
+        const location = chipBtn.length && chipBtn.attr('data-location');
+
+        if (location && location !== mega.devices.rootId) {
+            return false;
+        }
+        const {mNodeFilter} = mega.ui;
+
+        if (!mNodeFilter) {
+            return true;
+        }
+
+        // Nodes are filtered by selection, the bitfield may hold a bit with none
+        for (const [name, {selection}] of Object.entries(mNodeFilter.filters)) {
+
+            // Only the location filter keeps devices, and only on all of MEGA or device centre
+            if (selection && (name !== 'location' || !selection.includes(mega.devices.rootId))) {
+                return false;
+            }
+        }
+
+        return true;
     };
 
     const getSearchSuggestNodes = async(term, max) => {
@@ -292,7 +329,15 @@ lazy(mega.ui, 'searchbar', () => {
             if (val === '') {
                 $('.js-btnclearSearch', $(this)).addClass('hidden');
                 if (window.page.includes('/search')) {
-                    loadSubPage(window.page.slice(0, window.page.indexOf('/search')));
+                    const back = M.previousdirid;
+
+                    // a search started off device centre does return there, not to the cloud drive
+                    if (M.isCustomView(back).type === mega.devices.rootId) {
+                        M.openFolder(back).catch(tell);
+                    }
+                    else {
+                        loadSubPage(window.page.slice(0, window.page.indexOf('/search')));
+                    }
                 }
                 else if (folderlink && window.page.indexOf('fm') === 0) { // page is fm or fm/node_handle
                     // reset the filter view to folder view
@@ -320,6 +365,7 @@ lazy(mega.ui, 'searchbar', () => {
 
                             if (M.currentdirid === searchPage) {
                                 M.v = M.getFilterBy(M.getFilterBySearchFn(val, location));
+                                M.appendSearchDevices(val);
                                 M.renderMain();
                                 M.updateSearchCount({target: $searchCount});
                             }
@@ -716,7 +762,6 @@ lazy(mega.ui, 'searchbar', () => {
      */
     async function renderSuggestSearchedItems(event) {
         let term;
-        const maxSuggestions = 5;
 
         if (event && event.currentTarget) {
             term = $.trim($(event.currentTarget).val());
@@ -748,13 +793,19 @@ lazy(mega.ui, 'searchbar', () => {
                 return;
             }
         }
-        const nodes = await getSearchSuggestNodes(term, maxSuggestions).catch(dump);
+        const [devices, nodes] = await Promise.all([
+            devicesInScope() ? mega.devices.ui.searchDevices(term).catch(dump) : [],
+            getSearchSuggestNodes(term, maxSuggestions).catch(dump)
+        ]);
+
+        // Prioritise devices, which are fewer and otherwise harder to find
+        const items = [...devices || [], ...nodes || []].slice(0, maxSuggestions);
 
         $dropdownResultSearched.addClass('hidden');
         $ddLoader.removeClass('hidden');
         $ddLoader.addClass('hidden');
 
-        if (nodes && nodes.length) {
+        if (items.length) {
             $ddLoader.addClass('hidden');
             $dropdownSearch.removeClass('hidden');
             $dropdownResults.removeClass('hidden');
@@ -772,6 +823,19 @@ lazy(mega.ui, 'searchbar', () => {
             }
         }
 
+        renderSuggestionItems(term, items, nodes || []);
+    }
+
+    /**
+     * Renders search suggestions in the dropdown
+     *
+     * @param {String} term Search term
+     * @param {Array} items Suggestions to render, in display order
+     * @param {Array} nodes Nodes whose thumbnails need loading
+     * @returns {void}
+     */
+    function renderSuggestionItems(term, items, nodes) {
+        const $dropdownResultSearched = $('.dropdown-search-results', $dropdownResults);
         const $itemTemplate = $('.dropdown-search-results-item-template', $dropdownResults);
 
         $dropdownResultSearched.removeClass('hidden');
@@ -792,22 +856,21 @@ lazy(mega.ui, 'searchbar', () => {
             const thumbUri = thumbnails.get(node.fa);
             const maxLen = 30;
 
-            // Trim and lowercase the search term
             const searchTermLowercase = term.trim().toLowerCase();
 
             // Highlight search text for the result filename/s
             const fileName = node.name || '';
             const { prefix, match, suffix } = findMatchWithSearchTerm(fileName, searchTermLowercase);
 
-            // Set filename (with bold text for the matched search term part)
+            // Highlight the match and truncate long prefixes/suffixes
             $fileNamePrefix.text(match ? prefix.substring(prefix.length - maxLen) : prefix);
             $fileNameMatch.text(match);
             $fileNameSuffix.text(suffix.length > maxLen ? `${suffix.substring(0, maxLen)}...` : suffix);
 
-            // Set location name Cloud drive or parent name
+            // Get the location name
             let dir = node.p === M.RootID ? l[18051] : M.getNodeByHandle(node.p).name;
 
-            // Set location name into Incoming shares or Rubbish bin
+            // Handle incoming shares, Rubbish bin and DC
             if (node.su && (!node.p || !M.d[node.p])) {
                 dir = l[5542];
             }
@@ -851,13 +914,43 @@ lazy(mega.ui, 'searchbar', () => {
             return $item.prop('outerHTML');
         };
 
+        const makeDeviceResultItem = (device) => {
+            const $item = $itemTemplate.clone();
+            const $fileIcon = $('.dropdown-search-results-item-file-icon .item-type-icon', $item);
+            const $fileName = $('.dropdown-search-results-item-filename', $item);
+            const $dir = $('.dropdown-search-results-item-location', $item);
+            const maxLen = 30;
+
+            const { prefix, match, suffix } = findMatchWithSearchTerm(device.name, term.trim().toLowerCase());
+
+            // Set device name (with bold text for the matched search term part)
+            $('.prefix', $fileName).text(match ? prefix.substring(prefix.length - maxLen) : prefix);
+            $('.middle-txt', $fileName).text(match);
+            $('.suffix', $fileName).text(suffix.length > maxLen ? `${suffix.substring(0, maxLen)}...` : suffix);
+
+            $item.removeClass('dropdown-search-results-item-template hidden');
+            $item.attr('data-id', device.h);
+
+            // device icons only exist as themed sprites
+            $fileIcon.addClass(`sprite-fm-theme icon-${device.icon}-filled`);
+
+            // devices are their own location, so no link to a parent folder here
+            const $location = $('<span class="text-ellipsis">').text(l.device_centre);
+            $dir.safeAppend(parseHTML.getOuterHTML($location[0]));
+
+            return parseHTML.getOuterHTML($item[0]);
+        };
+
         const $resultSearchBody = $('.dropdown-search-results > .dropdown-section-body', $dropdownResults);
 
         $resultSearchBody.empty();
 
-        for (let i = 0; i < nodes.length && i < maxSuggestions; i++) {
-            const item = makeSearchResultItem(nodes[i]);
-            $resultSearchBody.safeAppend(item);
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+
+            $resultSearchBody.safeAppend(
+                M.dcd[item.h] ? makeDeviceResultItem(item) : makeSearchResultItem(item)
+            );
         }
 
         fm_thumbnails(
@@ -879,7 +972,10 @@ lazy(mega.ui, 'searchbar', () => {
             $resultSearchBody.empty();
             $('.js-filesearcher', $topbar).val('');
 
-            if (n.t) {
+            if (M.dcd[h]) {
+                M.openFolder(mega.devices.ui.getCurrentDirPath(h)).catch(tell);
+            }
+            else if (n.t) {
                 if (e.ctrlKey) {
                     $.ofShowNoFolders = true;
                 }
@@ -979,6 +1075,7 @@ lazy(mega.ui, 'searchbar', () => {
         init: initSearch,
         refresh: refreshSearch,
         locationFn,
+        devicesInScope,
         recentlySearched,
         addDropdownEventListeners,
         findMatchWithSearchTerm,

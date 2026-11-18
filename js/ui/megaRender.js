@@ -915,6 +915,9 @@ mBroadcaster.once('boot_done', () => {
          * @returns {String}
          */
         getNodeParentName(node) {
+            if (M.dcd[node.h]) {
+                return l.device_centre;
+            }
             if (node.su) {
                 return l[5542];
             }
@@ -927,6 +930,41 @@ mBroadcaster.once('boot_done', () => {
 
             const pHandle = M.getNodeByHandle(node.p);
             return M.getNameByHandle(pHandle);
+        },
+
+        /**
+         * Highlights the part of an item name matching the search term
+         * @param {String} term Search term
+         * @param {String} name Item name
+         * @param {HTMLElement} tmp Element holding the item name
+         * @returns {void}
+         */
+        highlightSearchTerm(term, name, tmp) {
+            const termArr = term.toLowerCase().split(' ');
+            const hasTerm = str => !!str && str.length >= term.length
+                && ((str = str.toLowerCase()).includes(term) || termArr.every(str.includes.bind(str)));
+
+            if (!term || !hasTerm(name)) {
+                return;
+            }
+
+            const {
+                prefix,
+                match,
+                suffix
+            } = mega.ui.searchbar.findMatchWithSearchTerm(name, term);
+
+            const els = [
+                mCreateElement('span', { class: 'prefix' }),
+                mCreateElement('span', { class: 'middle-txt' }),
+                mCreateElement('span', { class: 'suffix' })
+            ];
+
+            els[0].textContent = prefix;
+            els[1].textContent = match;
+            els[2].textContent = suffix;
+
+            tmp.replaceChildren(mCreateElement('div', { class: 'search-results-item-filename' }, els));
         },
 
         /**
@@ -943,12 +981,13 @@ mBroadcaster.once('boot_done', () => {
                 return;
             }
 
+            if (M.dcd[aNode.h]) {
+                // Devices have no path/owner, so only their name needs highlighting
+                return this.highlightSearchTerm(term, aProperties.name, tmp);
+            }
+
             aTemplate.querySelector('.owner .owner-avatar').appendChild(parseHTML(useravatar.contact(aNode.u)));
             aTemplate.querySelector('.owner .owner-name').textContent = this.getUserName(aNode.u);
-
-            const termArr = term.toLowerCase().split(' ');
-            const hasTerm = str => !!str && str.length >= term.length
-                && ((str = str.toLowerCase()).includes(term) || termArr.every(str.includes.bind(str)));
 
             let isBackup = false;
 
@@ -985,25 +1024,7 @@ mBroadcaster.once('boot_done', () => {
                     : arr;
             };
 
-            if (hasTerm(aProperties.name)) {
-                const {
-                    prefix,
-                    match,
-                    suffix
-                } = mega.ui.searchbar.findMatchWithSearchTerm(aProperties.name, term);
-
-                const els = [
-                    mCreateElement('span', { class: 'prefix' }),
-                    mCreateElement('span', { class: 'middle-txt' }),
-                    mCreateElement('span', { class: 'suffix' })
-                ];
-
-                els[0].textContent = prefix;
-                els[1].textContent = match;
-                els[2].textContent = suffix;
-
-                tmp.replaceChildren(mCreateElement('div', { class: 'search-results-item-filename' }, els));
-            }
+            this.highlightSearchTerm(term, aProperties.name, tmp);
 
             const pathArr = getPath();
 
@@ -1292,6 +1313,19 @@ mBroadcaster.once('boot_done', () => {
                 props.icon = `icon-${itemIcon}-24`;
                 props.blockIcon = `icon-${itemIcon}-90`;
 
+                if (M.dcd[aNode.h]) {
+
+                    // Device icons use theme sprite without sizes
+                    props.icon = props.blockIcon = `icon-${aNode.icon}-filled`;
+                    props.spriteClass = 'sprite-fm-theme';
+
+                    if (!M.onDeviceCenter) {
+                        // Fill the cols normally provided by the DC renderer
+                        props.size = bytesToSize(aNode.tb || 0);
+                        props.type = l.device_centre;
+                    }
+                }
+
                 if (aExtendedInfo !== false) {
 
                     if (share && !mega.migrate.isImportFolder(aNode)) {
@@ -1525,6 +1559,10 @@ mBroadcaster.once('boot_done', () => {
                     tmp = aTemplate.querySelector('.item-type-icon-90');
 
                     tmp.classList.add(aProperties.blockIcon);
+                    if (aProperties.spriteClass) {
+                        tmp.classList.add(aProperties.spriteClass);
+                    }
+
 
                     if (aProperties.playtime !== undefined) {
                         // aTemplate.querySelector('.data-block-bg').classList.add('video');
@@ -1582,6 +1620,9 @@ mBroadcaster.once('boot_done', () => {
                     }
                     else if (aProperties.icon) {
                         tmp.classList.add(aProperties.icon);
+                        if (aProperties.spriteClass) {
+                            tmp.classList.add(aProperties.spriteClass);
+                        }
                     }
                 }
 

@@ -59,6 +59,15 @@ lazy(mega.devices, 'models', () => {
         getPath() {
             return [this.h, mega.devices.rootId];
         }
+
+        /**
+         * Devices are rendered through the same pipeline as ufs-nodes, which identifies
+         * them by their string representation, i.e. MegaList's batchReplace()
+         * @returns {String} Handle of the device
+         */
+        toString() {
+            return this.h || '';
+        }
     }
 
     /**
@@ -127,6 +136,15 @@ lazy(mega.devices, 'models', () => {
                 return path;
             }
             return [...path.slice(0, index + 1), this.d, mega.devices.rootId];
+        }
+
+        /**
+         * Device folders are rendered through the same pipeline as ufs-nodes, which identifies
+         * them by their string representation, i.e. MegaList's batchReplace()
+         * @returns {String} Handle of the device folder
+         */
+        toString() {
+            return this.h || '';
         }
     }
 

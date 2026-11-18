@@ -454,6 +454,26 @@ lazy(mega.ui, 'dlPage', () => {
             this.data.appDl = !!value;
         },
 
+        get appWgDismissed() {
+            return this.data.appWgDismissed;
+        },
+
+        set appWgDismissed(value) {
+            this.data.appWgDismissed = !!value;
+        },
+
+        /**
+         * Whether the download-via-app widget is still worth offering
+         * @returns {Boolean} res
+         */
+        get offerAppDl() {
+            // A previewed or fully resumable file is already here, no need to offer the app
+            const isFileReady = Object(previews[dlpage_ph]).full
+                || dlResumeInfo && dlResumeInfo.byteLength === fdl_filesize;
+
+            return !this.appWgDismissed && !this.appDl && !isFileReady && dl_node.s > maxSizeBytes;
+        },
+
         get dlStatus() {
             const perc = this.progressValue ? ` (${this.progressValue}%)` : '';
             return `${this.appDl ? l.dl_downloading_via_app : l.decrypting}${perc}`;
@@ -730,6 +750,8 @@ lazy(mega.ui, 'dlPage', () => {
         },
 
         startDownload(forceBrowserDl) {
+            this.appWgDismissed = false;
+
             forceBrowserDl = forceBrowserDl
                 || Object(previews[dlpage_ph]).full
                 || dlResumeInfo && dlResumeInfo.byteLength === fdl_filesize;
@@ -857,6 +879,20 @@ lazy(mega.ui, 'dlPage', () => {
             this.downloadLabel = txt;
         },
 
+        /**
+         * Retires the download-via-app widget for the rest of this download
+         * @returns {void}
+         */
+        dismissAppWidget() {
+            const {appWg} = this.data;
+
+            this.appWgDismissed = true;
+
+            if (appWg.isVisible) {
+                appWg.hide();
+            }
+        },
+
         showInitUI() {
             const {progressWg, appWg} = this.data;
             const {
@@ -878,7 +914,7 @@ lazy(mega.ui, 'dlPage', () => {
             progressWg.show();
 
             // Show download via app widget
-            appWg[(this.appDl || dl_node.s <= maxSizeBytes) ? 'hide' : 'show']();
+            appWg[this.offerAppDl ? 'show' : 'hide']();
         },
 
         showPausedUI(msg) {
@@ -908,6 +944,9 @@ lazy(mega.ui, 'dlPage', () => {
             if (!progressWg.isVisible) {
                 return false;
             }
+
+            // The app is worth offering again
+            this.appWgDismissed = false;
 
             this.showInitUI();
             this.isInitialized = false;
@@ -982,6 +1021,7 @@ lazy(mega.ui, 'dlPage', () => {
             const {progressWg} = this.data;
             const {closeBtn, locationBtn, statusCn, expandBtn} = progressWg;
 
+            this.dismissAppWidget();
             this.showInitUI();
 
             if (msg) {

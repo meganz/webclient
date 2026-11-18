@@ -1863,19 +1863,14 @@ lazy(mega, 'rewind', () => {
                 return;
             }
 
-            let selectedHandle = $.selected.length && $.selected[0] || M.currentdirid;
+            const customView = mega.rewind.permittedRoots[M.currentrootid]
+                && M.currentCustomView && M.currentCustomView.nodeID;
 
-            if (mega.rewind.permittedRoots[M.currentrootid]
-                && M.currentCustomView && M.currentCustomView.nodeID) {
-                selectedHandle = M.currentCustomView.nodeID;
-            }
-
-            const node = M.getNodeByHandle(selectedHandle);
-
-            // If no initial node allowed OR the selected node is not a folder, force current folder to be selected
-            if (!isInitialNodeAllowed || !node.t) {
-                selectedHandle = M.currentdirid;
-            }
+            // Rewind operates on folder nodes
+            const selectedHandle = isInitialNodeAllowed
+                && [customView, $.selected[0]].find((h) => !!M.getNodeByHandle(h).t)
+                || !!M.getNodeByHandle(M.currentdirid).t && M.currentdirid
+                || M.RootID;
 
             if (this._isRedirect(selectedHandle)) {
                 mega.rewind.folderRedirect = selectedHandle;

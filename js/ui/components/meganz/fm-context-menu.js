@@ -731,7 +731,7 @@
                     ) {
                         target = `${M.currentrootid}/${target}`;
                     }
-                    else if (M.onDeviceCenter) {
+                    else if (M.onDeviceCenter || M.dcd[target]) {
                         target = mega.devices.ui.getCurrentDirPath(target);
                     }
                     else if (M.dyh) {
@@ -1426,9 +1426,7 @@
                 text: l[61],
                 icon: 'sprite-fm-mono icon-edit-03-thin-outline',
                 onClick() {
-                    if (M.onDeviceCenter) {
-                        mega.devices.ui.renameDevice();
-                    }
+                    mega.devices.ui.renameDevice();
                 }
             },
         ]));

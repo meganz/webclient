@@ -719,6 +719,11 @@ table.grid-table .grid-status-icon.icon-favourite-filled {
     --mask-color: var(--mobile-icon-primary);
 }
 
+/* a device cannot be favourited */
+table.grid-table tr.device-item .grid-status-icon {
+    display: none;
+}
+
 table.grid-table .grid-status-icon.icon-info {
     --mask-color: var(--secondary-orange);
 }

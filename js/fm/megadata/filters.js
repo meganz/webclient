@@ -215,6 +215,7 @@ MegaData.prototype.filterBySearch = function(str, customFn) {
 
     if (str) {
         this.filterBy(this.getFilterBySearchFn(str, customFn), true);
+        this.appendSearchDevices(str);
     }
 };
 
@@ -243,11 +244,12 @@ MegaData.prototype.getFilterBySearchBasicFn = function(customFn) {
 };
 
 /**
- * @param {String} searchTerm Keywords to look for
- * @param {Function} [customFn] Optional function to call in addition to others
- * @returns {Function}
+ * Builds a name matcher that can be used with both nodes and non-node entities,
+ * Unlike getFilterBySearchFn, it does not check node-specific properties
+ * @param {String} searchTerm Search term
+ * @returns {Function} Name matcher
  */
-MegaData.prototype.getFilterBySearchFn = function(searchTerm, customFn) {
+MegaData.prototype.getSearchNameMatchFn = function(searchTerm) {
     'use strict';
 
     // Simple glob/wildcard support.
@@ -262,12 +264,57 @@ MegaData.prototype.getFilterBySearchFn = function(searchTerm, customFn) {
         catch (ex) {}
     }
 
-    const strCheck = regex
+    return regex
         ? ({ name }) => name && regex.test(name) || false
         : ({ name }) => name && name.toLowerCase().includes(str) || false;
+};
+
+/**
+ * @param {String} searchTerm Search term
+ * @param {Function} [customFn] Additional filter function
+ * @returns {Function} Node filter function
+ */
+MegaData.prototype.getFilterBySearchFn = function(searchTerm, customFn) {
+    'use strict';
+
+    const strCheck = this.getSearchNameMatchFn(searchTerm);
     const basicCheck = this.getFilterBySearchBasicFn(customFn);
 
     return n => strCheck(n) && basicCheck(n);
+};
+
+/**
+ * Adds matching Device Centre devices to the current view
+ * Loads the data first if needed and refreshes the view when ready
+ * @param {String} searchTerm Search term
+ * @returns {void}
+ */
+MegaData.prototype.appendSearchDevices = function(searchTerm) {
+    'use strict';
+
+    searchTerm = String(searchTerm || '').trim();
+
+    // Mobile FM views do not support devices for now
+    if (!searchTerm || folderlink || is_mobile || u_type !== 3
+        || !mega.ui.searchbar.devicesInScope()) {
+
+        return;
+    }
+    const {ui} = mega.devices;
+
+    if (!ui.isReady) {
+        const dirid = this.currentdirid;
+
+        // Reload the view once the device data is ready, never without it to not loop
+        ui.ensureData()
+            .then(() => ui.isReady && this.search && this.currentdirid === dirid
+                && this.openFolder(dirid, true))
+            .catch(dump);
+        return;
+    }
+
+    // devices do sort above folders, keep them first also when the view is left unsorted
+    this.v.unshift(...ui.matchDevices(searchTerm));
 };
 
 /**

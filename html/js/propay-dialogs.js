@@ -131,8 +131,8 @@ var astroPayDialog = {
                 return len >= 10 && len <= 18;
             case 'CO':  // Colombia - NUIP / CC / RUT
                 return len >= 6 && len <= 10;
-            case 'UY':  // Uruguay - CI
-                return len >= 6 && len <= 8;
+            case 'UY':  // Uruguay - CI / RUT
+                return len >= 6 && len <= 12;
             case 'CL':  // Chile - RUT
                 return len >= 8 && len <= 9;
             case 'IN':  // India - PAN (exactly 10)

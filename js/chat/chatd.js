@@ -2778,6 +2778,15 @@ Chatd.prototype.msgmodify = function(chatId, userid, msgid, ts, updated, keyid, 
     }
 };
 
+// commit a verified edit
+Chatd.prototype.applyModify = function(chatId, msgid, updated, msg) {
+    'use strict';
+
+    if (this.chatIdMessages[chatId]) {
+        this.chatIdMessages[chatId].applyModify(msgid, updated, msg);
+    }
+};
+
 // send broadcast
 Chatd.prototype.broadcast = function(chatId, bCastCode) {
     // an existing message has been modified
@@ -3129,16 +3138,15 @@ Chatd.Messages.prototype.msgmodify = function(userid, msgid, ts, updated, keyid,
                 break;
             }
 
-            // if we modified the message, remove from this.modified.
-            this.buf[i][Chatd.MsgField.MESSAGE] = msg;
-            this.buf[i][Chatd.MsgField.UPDATED] = updated;
-
             if (ts) {
                 this.buf[i][Chatd.MsgField.TIMESTAMP] = ts;
             }
 
             if (keyid === 0 && base64urlencode(userid) === strongvelope.COMMANDER) {
                 // if this is message truncate
+                this.buf[i][Chatd.MsgField.MESSAGE] = msg;
+                this.buf[i][Chatd.MsgField.UPDATED] = updated;
+
                 this.chatd.trigger('onMessageUpdated', {
                     chatId: base64urlencode(this.chatId),
                     userId: base64urlencode(userid),
@@ -3151,6 +3159,7 @@ Chatd.Messages.prototype.msgmodify = function(userid, msgid, ts, updated, keyid,
                 });
                 msgnum = i;
             } else {
+                // The edit is committed via applyModify() once messages.js verifies and accepts it
                 this.chatd.trigger('onMessageUpdated', {
                     chatId: base64urlencode(this.chatId),
                     userId: base64urlencode(this.buf[i][Chatd.MsgField.USERID]),
@@ -3161,11 +3170,6 @@ Chatd.Messages.prototype.msgmodify = function(userid, msgid, ts, updated, keyid,
                     messageId : base64urlencode(msgid),
                     updated: updated
                 });
-
-                if (this.sending[messagekey] && this.sendingbuf[this.sending[messagekey]]
-                    && updated >= this.sendingbuf[this.sending[messagekey]][Chatd.MsgField.UPDATED]) {
-                    this.discard(messagekey);
-                }
             }
 
             if (keyid !== 0 && base64urlencode(userid) !== strongvelope.COMMANDER) {
@@ -3196,6 +3200,34 @@ Chatd.Messages.prototype.msgmodify = function(userid, msgid, ts, updated, keyid,
                     bufMessage[Chatd.MsgField.USERID] = userid;
                 });
         }
+    }
+};
+
+/**
+ * Commit a verified edit to the message buffer, and drop any pending local edit it supersedes.
+ * @param {String} msgid The edited message's (binary) id
+ * @param {Number} updated The edit's update counter
+ * @param {String} msg The encrypted edit
+ * @returns {void}
+ */
+Chatd.Messages.prototype.applyModify = function(msgid, updated, msg) {
+    'use strict';
+
+    const msgnum = this.getmessagenum(msgid);
+    if (!this.buf[msgnum]) {
+        return;
+    }
+
+    this.buf[msgnum][Chatd.MsgField.MESSAGE] = msg;
+    this.buf[msgnum][Chatd.MsgField.UPDATED] = updated;
+    const messagekey = this.getmessagekey(msgid, Chatd.MsgType.EDIT);
+
+    if (
+        this.sending[messagekey] &&
+        this.sendingbuf[this.sending[messagekey]] &&
+        updated >= this.sendingbuf[this.sending[messagekey]][Chatd.MsgField.UPDATED]
+    ) {
+        this.discard(messagekey);
     }
 };
 

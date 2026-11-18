@@ -1452,6 +1452,18 @@ function MessagesBuff(chatRoom, chatdInt) {
 
             ChatdIntegration.decryptMessageHelper(editedMessage)
                 .then(function(decrypted) {
+                    if (
+                        eventData.state === 'EDITED' &&
+                        (!originalMessage.msgIdentity || decrypted.identity !== originalMessage.msgIdentity)
+                    ) {
+                        self.logger.critical(
+                            'Edit does not match the original message identity, keeping the original.',
+                            chatRoom.chatId,
+                            eventData.messageId
+                        );
+                        return false;
+                    }
+
                     // if the edited payload is an empty string, it means the message has been deleted.
                     if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
                         if (typeof decrypted.payload === 'undefined' || decrypted.payload === null) {
@@ -1491,8 +1503,20 @@ function MessagesBuff(chatRoom, chatdInt) {
                     return decrypted;
                 })
                 .then(function(decrypted) {
+                    if (!decrypted) {
+                        return;
+                    }
                     chatRoom.megaChat.plugins.chatdIntegration._parseMessage(chatRoom, editedMessage);
                     chatRoom.messagesBuff.messages.replace(editedMessage.messageId, editedMessage);
+
+                    if (eventData.state === 'EDITED') {
+                        self.chatd.applyModify(
+                            base64urldecode(chatRoom.chatId),
+                            base64urldecode(eventData.messageId),
+                            eventData.updated,
+                            eventData.message
+                        );
+                    }
 
                     chatRoom.trigger('onMessageUpdateDecrypted', editedMessage);
 
@@ -1512,8 +1536,7 @@ function MessagesBuff(chatRoom, chatdInt) {
                     }
                 })
                 .catch(function(ex) {
-                    self.logger.error('Failed to decrypt message!', ex);
-                    self.messages.removeByKey(eventData.messageId);
+                    self.logger.critical('Failed to apply message update, keeping the original.', ex);
                 });
         }
         else if (eventData.state === "CONFIRMED") {

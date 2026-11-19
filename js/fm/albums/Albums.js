@@ -452,22 +452,6 @@ lazy(mega.gallery, 'albums', () => {
     };
 
     /**
-     * @param {String} text Text to use inside the toast
-     * @returns {HTMLElement}
-     */
-    const generateToastContent = (text) => {
-        const textEl = document.createElement('div');
-        textEl.className = 'flex-1';
-        textEl.textContent = text;
-
-        const content = document.createElement('div');
-        content.className = 'flex flex-row items-center px-3 w-full';
-        content.appendChild(textEl);
-
-        return content;
-    };
-
-    /**
      * Generating the download options menu
      * @param {String[]} albumIds IDs of albums to fetch handles from
      * @returns {Object.<String, any>}
@@ -2271,11 +2255,9 @@ lazy(mega.gallery, 'albums', () => {
                                     toastText = toastText.replace('%s', limitNameLength(albumLabel));
                                 }
 
-                                const content = generateToastContent(toastText);
-
                                 toaster.main.show({
                                     icons: ['sprite-fm-mono icon-bin text-color-medium'],
-                                    content
+                                    content: toastText
                                 });
                             })
                             .finally(() => {
@@ -2362,10 +2344,13 @@ lazy(mega.gallery, 'albums', () => {
                 warn: null
             };
 
+            // The album may be gone already (e.g. removed elsewhere while renaming)
+            const album = typeof albumId === 'string' && scope.albums.store[albumId];
+
             if (!value
                 || typeof value !== 'string'
                 || value.trim() === ''
-                || typeof albumId === 'string' && value === scope.albums.store[albumId].label) {
+                || album && value === album.label) {
                 validation.isDisabled = true;
             }
 
@@ -4972,15 +4957,11 @@ lazy(mega.gallery, 'albums', () => {
                 ids,
                 album.id
             ).then(() => {
-                const content = generateToastContent(
-                    mega.icu
-                        .format(l.album_items_removed_status, handles.length)
-                        .replace('%s', limitNameLength(album.label))
-                );
-
                 toaster.main.show({
                     icons: ['sprite-fm-mono icon-bin text-color-medium'],
-                    content
+                    content: mega.icu
+                        .format(l.album_items_removed_status, handles.length)
+                        .replace('%s', limitNameLength(album.label))
                 });
 
                 delay(

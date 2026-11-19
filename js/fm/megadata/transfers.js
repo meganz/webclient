@@ -315,7 +315,12 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
 
         const status = !z && mega.tpw.getRowStatus(`dl_${n.h}`);
         if (status) {
-            if (!status.complete) {
+            const {h} = n;
+            if (status.errored && !dl_queue.some((dl) => dl.id === h && !dl.zipid && !dl.cancelled)) {
+                // dlFatalError -> replace and re-download.
+                tfsheadupdate({c: `dl_${h}`});
+            }
+            else if (!status.complete) {
                 if ((status.errored || status.overquota) && !entries.length) {
                     errorStatus = status.statusText;
                 }
@@ -1437,9 +1442,10 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
             text.textContent = mega.icu.format(l.transfer_toast_added_dl, t_length);
         }
 
-        // Add (paused) to the message
+        // Add (paused) to the message, toasts only accept span markup
         if (uldl_hold || isPaused) {
-            const b = document.createElement('b');
+            const b = document.createElement('span');
+            b.className = 'font-bold';
             b.textContent = ` (${l[1651]}) `;
             text.appendChild(b);
         }

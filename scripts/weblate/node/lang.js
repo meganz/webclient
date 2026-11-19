@@ -506,6 +506,8 @@ async function setupProxy(url) {
     const dispatcher = socksDispatcher({type: 5, host, port: parseInt(port)});
 
     setGlobalDispatcher(dispatcher);
+    global[Symbol.for("undici.globalDispatcher.1")] = dispatcher;
+    global[Symbol.for("undici.globalDispatcher.2")] = dispatcher;
 
     if (ARGS.verbose) {
         console.log(`Created proxy dispatcher for ${host}:${port}`);

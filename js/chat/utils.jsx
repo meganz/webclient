@@ -49,7 +49,7 @@ export function prepareExportStreams(attachNodes, onEmpty) {
 
     return attachNodes.map(node => {
         return {
-            name: node.name,
+            name: M.getSafeName(node.name),
             lastModified: new Date((node.mtime || node.ts) * 1000),
             input: M.gfsfetch.getReadableStream(node, {
                 error(ex, n) {

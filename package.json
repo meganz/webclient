@@ -48,9 +48,6 @@
     "minimatch@3.1.5": {
       "brace-expansion": "1.1.21"
     },
-    "minimatch@10.2.5": {
-      "brace-expansion": ">=5.0.8"
-    },
     "grunt": {
       "js-yaml": "npm:empty-npm-package@1.0.0"
     },
@@ -78,7 +75,7 @@
     "grunt-contrib-concat": "2.1.0",
     "grunt-posthtml": "0.5.2",
     "htmlnano": "3.4.0",
-    "postcss": "8.5.32",
+    "postcss": "8.5.33",
     "postcss-url": "10.1.4",
     "posthtml": "0.16.7",
     "posthtml-urls": "1.0.0",
@@ -92,8 +89,7 @@
     "eslint-plugin-compat": "6.2.1",
     "eslint-plugin-es": "4.1.0",
     "eslint-plugin-jquery": "1.5.1",
-    "eslint-plugin-local-rules": "3.0.2",
-    "eslint-plugin-no-unsanitized": "4.1.4",
+    "eslint-plugin-local-rules": "3.0.6",
     "eslint-plugin-optimize-regex": "1.2.1",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-sonarjs": "0.25.1",
@@ -109,7 +105,7 @@
     "karma-mocha": "2.0.1",
     "karma-sinon": "1.0.5",
     "mocha": "11.8.0",
-    "sass": "1.108.0",
+    "sass": "1.108.2",
     "sass-loader": "17.1.0",
     "sinon": "15.0.3",
     "stylelint": "16.26.1",

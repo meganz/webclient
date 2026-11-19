@@ -956,10 +956,12 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
             }
         }
 
-        // In case that id belongs to devices tree
-        if (currNodeClass && currNodeClass.contains('device-item')) {
+        // In case that id belongs to a device
+        if (M.dcd[id] || currNodeClass && currNodeClass.contains('device-item')) {
             finalItems = mega.devices.ui.contextMenu();
-            const idx = currNodeClass.contains('fm-header-context') ? finalItems.indexOf('.open-item') : -1;
+            const idx = currNodeClass && currNodeClass.contains('fm-header-context')
+                ? finalItems.indexOf('.open-item')
+                : -1;
             if (idx > -1) {
                 finalItems.splice(idx, 1);
             }

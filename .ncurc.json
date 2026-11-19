@@ -8,7 +8,6 @@
         "eslint-plugin-compat",
         "eslint-plugin-unicorn",
         "eslint-plugin-sonarjs",
-        "eslint-plugin-no-unsanitized",
         "cssnano",
         "htmlnano",
         "stylelint",

@@ -675,7 +675,14 @@
 }
 
 .dl-widget-container .dl-widget .spaced-col:last-child {
-    margin: 0; 
+    margin: 0;
+    max-width: 43%;
+}
+
+.dl-widget-container .dl-widget .spaced-col:last-child button {
+    height: auto;
+    min-height: 40px;
+    padding: 8px 24px;
 }
 
 .dl-widget-container .dl-widget .spaced-col.grow {

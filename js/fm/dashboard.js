@@ -44,6 +44,11 @@ function dashboardUI(updProcess) {
         $freeProDashboard.addClass('hidden');
         $bsnDashboard.removeClass('hidden');
 
+        // Unknown on a first visit or after a tax detail save: shimmer now, not a stale note
+        if (typeof Object(mega.buinsessAccount).nextBillAddsTax !== 'boolean') {
+            $('.overall-next-bill-wrapper', $bsnDashboard).addClass('sk-loading');
+        }
+
         // If Business master account and not expired
         if (u_attr.b && u_attr.b.m && u_attr.b.s !== pro.ACCOUNT_STATUS_EXPIRED) {
             $('.overall-usage-container', $bsnDashboard).addClass('admin');
@@ -987,6 +992,19 @@ dashboardUI.renderAnalyticsChart = function(opts) {
             }
         });
     });
+};
+
+/**
+ * Show the Business / Pro Flexi next bill's tax note, e.g. "GST may apply", only when the bill adds tax.
+ * @param {jQuery} $note    The .tax-note element
+ * @returns {void}
+ */
+dashboardUI.showTaxNote = function($note) {
+    "use strict";
+
+    const taxName = Object(mega.buinsessAccount).nextBillAddsTax && pro.taxInfo && pro.taxInfo.taxName;
+
+    $note.text(taxName ? l.t_may_appy.replace('%1', taxName) : '').toggleClass('hidden', !taxName);
 };
 
 dashboardUI.prototype = undefined;

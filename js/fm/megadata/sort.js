@@ -9,11 +9,18 @@ MegaData.prototype.sortBy = function(fn, d) {
         this.v.sort((a, b) => fn(a, b, d));
     }
     else {
+        // Outside DC, devices must sort above folders rather than by their sync type
+        const dcd = this.search && !this.onDeviceCenter && this.dcd;
+        const type = dcd ? n => dcd[n.h] ? 2 : n.t : n => n.t;
+
         this.v.sort((a, b) => {
-            if (a.t > b.t) {
+            const ta = type(a);
+            const tb = type(b);
+
+            if (ta > tb) {
                 return -1;
             }
-            else if (a.t < b.t) {
+            else if (ta < tb) {
                 return 1;
             }
 
@@ -281,22 +288,30 @@ MegaData.prototype.sortByFav = function(d) {
     });
 };
 
+/**
+ * Checks whether a node is marked as favourite
+ * @param {MegaNode|Object} n Node to check
+ * @returns {Boolean} Whether it is favourite
+ */
+MegaData.prototype.isFavNode = function(n) {
+    'use strict';
+
+    // a device's 't' holds its sync type, it carries no ufs-node flags
+    return !this.dcd[n.h] && !!(n.t & this.IS_FAV || n.fav);
+};
+
 MegaData.prototype.sortByFavFn = function(d) {
     "use strict";
 
     return function(a, b) {
-        if ((a.t & M.IS_FAV || a.fav) && (b.t & M.IS_FAV || b.fav)) {
+        const af = M.isFavNode(a);
+        const bf = M.isFavNode(b);
+
+        if (af === bf) {
             return M.doFallbackSortWithFolder(a, b, d);
         }
-        if (a.t & M.IS_FAV || a.fav) {
-            return -1 * d;
-        }
-        else if (b.t & M.IS_FAV || b.fav) {
-            return d;
-        }
-        else {
-            return M.doFallbackSortWithFolder(a, b, d);
-        }
+
+        return af ? -1 * d : d;
     };
 };
 
@@ -737,10 +752,14 @@ MegaData.prototype.sortByLabelFn = function(d, isTree) {
 MegaData.prototype.doFallbackSortWithFolder = function(a, b) {
     "use strict";
 
-    if (a.t > b.t) {
+    // a device's 't' is its sync type, only meaningful within device centre
+    const ta = !M.onDeviceCenter && M.dcd[a.h] ? 2 : a.t;
+    const tb = !M.onDeviceCenter && M.dcd[b.h] ? 2 : b.t;
+
+    if (ta > tb) {
         return -1;
     }
-    else if (a.t < b.t) {
+    else if (ta < tb) {
         return 1;
     }
     // even direction is desc, sort name by asc.

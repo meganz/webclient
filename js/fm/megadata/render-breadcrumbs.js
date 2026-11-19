@@ -49,7 +49,10 @@
             return;
         }
 
-        let items = this.getPath(fileHandle || this.currentdirid);
+        const device = M.dcd[fileHandle];
+
+        // a device owns no ufs-parent to walk up to, its path is device centre
+        let items = device ? device.getPath() : this.getPath(fileHandle || this.currentdirid);
 
         if (M.onDeviceCenter) {
             items = mega.devices.ui.getFolderChildrenPath(items);
@@ -129,12 +132,13 @@
                     if (n.t) {
                         typeClass = 'folder';
                     }
-                    if (M.onDeviceCenter && this.dcd[handle]) {
+                    if (this.dcd[handle]) {
                         typeClass += ' device-item';
                     }
                 }
 
-                if (handle.length === 11) {
+                // a device handle is as long as a user one, but it is no contact
+                if (handle.length === 11 && !this.dcd[handle]) {
                     typeClass = 'contact selectable-txt';
 
                     // Contact should not appears on other than chat/contact pages
@@ -177,7 +181,7 @@
         };
 
         // if in custom component we do not want to open the file versioning dialog
-        if (M.search) {
+        if (M.search && !device) {
             const node = M.getNodeByHandle(items[0]);
             const isBackup = node && M.getNodeRoot(node.h) === M.InboxID;
             if (isBackup) {
@@ -593,6 +597,10 @@
         if (M.u.hasOwnProperty(id)) {
             loadSubPage("chat/contacts/" + id);
         }
+        else if (M.dcd[id]) {
+            // a device is no ufs-node, it only lives under device centre
+            this.openFolder(mega.devices.ui.getCurrentDirPath(id)).catch(tell);
+        }
         else if (n) {
             id = n.h;
             let toSelect;
@@ -631,9 +639,6 @@
                     }
                 })
                 .catch(tell);
-        }
-        else if (M.dcd[id]) {
-            this.openFolder(`device-centre/${id}`);
         }
         else if (specialCases.includes(id)) {
             this.openFolder(id);

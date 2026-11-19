@@ -96,7 +96,7 @@
             });
         });
 
-        self.chatd.rebind('onMessagesKeyIdDone.chatdPersist', function(e, data) {
+        self.chatd.rebind('onMessagesKeyIdConfirmed.chatdPersist', (e, data) => {
             if (!ChatdPersist.isMasterTab()) {
                 // don't do anything if this is not the master tab!
                 return;
@@ -281,7 +281,7 @@
     ChatdPersist.prototype._destroy = function() {
         var self = this;
         self.chatd.off('onMessageKeysDone.chatdPersist');
-        self.chatd.off('onMessagesKeyIdDone.chatdPersist');
+        self.chatd.off('onMessagesKeyIdConfirmed.chatdPersist');
         self.chatd.off('onMessageLastSeen.chatdPersist');
         self.chatd.off('onMessagesHistoryDone.chatdPersist');
         self.chatd.off('onMessagesHistoryRequest.chatdPersist');
@@ -1359,12 +1359,13 @@
 
     ChatdPersist.prototype.modifyPersistedMessage = function(chatId, messageInfo) {
         var self = this;
+        let msg;
 
         var chatRoom = self.chatd.megaChat.getChatById(chatId);
 
         self.getMessageByMessageId(chatId, messageInfo.messageId)
             .then(function(r) {
-                var msg = r[0];
+                msg = r[0];
                 if (!msg) {
                     throw new Error('No message.');
                 }
@@ -1377,6 +1378,16 @@
                 );
             })
             .then(function(r) {
+                const isEdit = messageInfo.userId !== strongvelope.COMMANDER;
+                if (isEdit && (!msg.msgObject.msgIdentity || r.identity !== msg.msgObject.msgIdentity)) {
+                    self.logger.critical(
+                        'Edit does not match the original message identity, keeping the original.',
+                        chatId,
+                        messageInfo.messageId
+                    );
+                    return false;
+                }
+
                 var msgInstance = new Message(
                     chatRoom,
                     self,
@@ -1396,6 +1407,15 @@
 
                 if (!self.chatd.megaChat.plugins.chatdIntegration._processDecryptedMessage(chatRoom, msgInstance, r)) {
                     throw new Error('Failed to decrypt message.');
+                }
+
+                if (isEdit) {
+                    self.chatd.applyModify(
+                        base64urldecode(chatId),
+                        base64urldecode(messageInfo.messageId),
+                        messageInfo.updated,
+                        messageInfo.message
+                    );
                 }
 
                 return self.persistMessage(chatId, msgInstance, true);

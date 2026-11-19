@@ -676,6 +676,11 @@ lazy(mega.devices, 'ui', () => {
             this.isLoading = false;
 
             /**
+             * {Promise|null} bootPromise - in-flight boot, shared between callers
+             */
+            this.bootPromise = null;
+
+            /**
              * {Number} lastReq - last time data req was made
              */
             this.lastReq = 0;
@@ -1047,10 +1052,93 @@ lazy(mega.devices, 'ui', () => {
             await mega.devices.main.render(M.megaRender ? isRefresh : false);
 
             if (M.onDeviceCenter) {
+                if (mega.ui.header) {
+                    // The search chip may know the current location before the header does, e.g. after a page reload
+                    MegaHeader.updateSearchForm(false, mega.ui.header.domNode);
+                }
+
                 this._postRender();
                 delay(refreshEventName, () =>
                     this.render(id, {isRefresh: true}).catch(dump), refreshMillis);
             }
+        }
+
+        /**
+         * Loads device centre data without rendering its UI
+         * @returns {Promise<void>} void
+         */
+        async ensureData() {
+            if (this.isReady) {
+                return;
+            }
+
+            // a boot may already be in flight, wait for that one instead of returning early
+            if (!this.bootPromise) {
+                this.isLoading = true;
+                this.bootPromise = this._boot().finally(() => {
+                    this.isReady = true;
+                    this.isLoading = false;
+                    this.bootPromise = null;
+                });
+            }
+            await this.bootPromise.catch(dump);
+
+            // Device Centre may have been opened during loading, so render it now
+            if (M.onDeviceCenter) {
+                this.render(M.currentdirid, {isRefresh: true, isSkipFetch: true}).catch(dump);
+            }
+        }
+
+        /**
+         * Returns loaded devices matching the search term, sorted by name
+         * @param {String} term Search term
+         * @returns {Array} Matching devices
+         */
+        matchDevices(term) {
+            if (!term || !this.hasDevices) {
+                return [];
+            }
+            const match = M.getSearchNameMatchFn(term);
+
+            return Object.values(M.dcd)
+                .filter(match)
+                .sort(({name: na}, {name: nb}) => na.localeCompare(nb) || na.length - nb.length);
+        }
+
+        /**
+         * Returns a filter for nodes inside Device Centre's sync and backup folders
+         * @param {String} [handle] Device handle to limit the filter to
+         * @returns {Function} Node filter function
+         */
+        getSearchFilterFn(handle) {
+            const folders = Object.create(null);
+            const parents = Object.create(null);
+            const devices = M.dcd[handle] ? [M.dcd[handle]] : Object.values(M.dcd);
+
+            for (const device of devices) {
+                for (const h of Object.keys(device.folders)) {
+                    folders[h] = 1;
+                    Object.assign(parents, array.to.object(M.getTreeHandles(h), true));
+                }
+            }
+
+            return n => !!parents[n.p] || !!folders[n.h];
+        }
+
+        /**
+         * Searches devices by name, loading Device Centre data if needed
+         * @param {String} term Search term
+         * @returns {Promise<Array>} Matching devices, sorted by name
+         */
+        async searchDevices(term) {
+            term = String(term || '').trim();
+
+            if (!term || folderlink || is_mobile || u_type !== 3) {
+                return [];
+            }
+            await this.ensureData().catch(dump);
+
+            return this.matchDevices(term);
         }
 
         /**
@@ -1219,7 +1307,9 @@ lazy(mega.devices, 'ui', () => {
                 }
                 return path.join('/');
             }
-            return handle;
+
+            // a device rendered outside device centre, i.e. within the search results
+            return M.dcd[handle] ? `${rootId}/${handle}` : handle;
         }
 
         /**

@@ -261,6 +261,21 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 // Get root dir name (or handle) e.g. what M.currentrootid would give if in a specific area
                 const root = M.getNodeRoot(n.h);
 
+                if (this.selection.includes(mega.devices.rootId)) {
+
+                    // Building the device folder tree is "expensive",  reuse it only for this filtering pass
+                    if (!this.dcMatch) {
+                        this.dcMatch = mega.devices.ui.getSearchFilterFn();
+                        queueMicrotask(() => {
+                            this.dcMatch = false;
+                        });
+                    }
+
+                    if (this.dcMatch(n)) {
+                        return true;
+                    }
+                }
+
                 // Match nodes in Cloud Drive, Favourites, Rubbish bin, Incoming shares,
                 // or Outgoing shares (NB: Outgoing shares (includes the external links - for now)
                 if ((this.selection.includes('cloud') && root === M.RootID) ||
@@ -303,6 +318,13 @@ lazy(mega.ui, 'mNodeFilter', () => {
                     data: ['cloud'],
                     chipLabel: l.filtered_chip_cloud,
                     eid: 99981
+                },
+                {
+                    icon: 'devices-thin-outline',
+                    label: l.device_centre,
+                    data: [mega.devices.rootId],
+                    chipLabel: l.filtered_device_centre,
+                    eid: 501442
                 },
                 {
                     icon: 'recents-filled',
@@ -440,6 +462,10 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 if (this.selectedIndex === -1) {
                     this.$text.text(this.ctx.title);
                     this.$element.removeClass('selected');
+                }
+                if (name === 'location') {
+                    $('a .icon-devices-thin-outline', this.el).parent()
+                        .toggleClass('hidden', !mega.devices.ui.hasDevices);
                 }
                 if (name === 'type' && u_attr && u_attr.s4) {
                     if (M.search || M.currentdirid === 'public-links' || M.currentdirid === 'faves') {
@@ -692,7 +718,10 @@ lazy(mega.ui, 'mNodeFilter', () => {
                     const chipBtn = $('button.search-chip', search);
                     const location = mega.ui.searchbar.locationFn(chipBtn.length && chipBtn.attr('data-location'));
 
-                    M.v = M.getFilterBy(M.getFilterBySearchFn($.trim($('.js-filesearcher', search).val()), location));
+                    const term = $.trim($('.js-filesearcher', search).val());
+
+                    M.v = M.getFilterBy(M.getFilterBySearchFn(term, location));
+                    M.appendSearchDevices(term);
                     M.renderMain();
 
                     mega.ui.searchbar.reinitiateSearchTerm();

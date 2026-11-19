@@ -76,7 +76,7 @@ lazy(mega.devices, 'main', () => {
          */
         run(fn, ...args) {
             const handler = this.handler.instances[this.section];
-            if (typeof handler[fn] === 'function') {
+            if (handler && typeof handler[fn] === 'function') {
                 return handler[fn](...args);
             }
             logger.warn(`this('${fn}') is not a function`);

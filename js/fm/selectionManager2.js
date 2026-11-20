@@ -35,6 +35,15 @@ class SelectionManager2Base {
 
 
     /**
+     * Get the size of a node in the selection (Device Centre devices keep their sync type in `t`).
+     * @param {Object} node The node
+     * @returns {Number} Size in bytes
+     */
+    static getNodeSize(node) {
+        return node.t || M.dcd[node.h] ? node.tb : node.s;
+    }
+
+    /**
      * Should be implemented by classes. Would be called when scrolling is required to specific
      * node handle
      *
@@ -244,7 +253,7 @@ class SelectionManager2Base {
             const node = M.getNodeByHandle(nodeId)
                 || (M.gallery || M.albums) && mega.gallery.getNodeCache(nodeId);
             if (node) {
-                this.removing_sizes[nodeId] = node.t ? node.tb : node.s;
+                this.removing_sizes[nodeId] = SelectionManager2Base.getNodeSize(node);
             }
         }
         else if (this.debugMode) {
@@ -782,7 +791,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 const node = M.getNodeByHandle(n)
                     || (M.gallery || M.albums) && mega.gallery.getNodeCache(n);
                 if (node) {
-                    selectionSize += node.t ? node.tb : node.s;
+                    selectionSize += SelectionManager2Base.getNodeSize(node);
                 }
                 else if (M.dcd[n]) {
                     n = M.dcd[n];
@@ -859,7 +868,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                     const node = M.getNodeByHandle(c)
                         || (M.gallery || M.albums) && mega.gallery.getNodeCache(c);
                     return pv + (node ?
-                        node.tb === undefined ? node.s : node.tb :
+                        SelectionManager2Base.getNodeSize(node) :
                         this.removing_sizes[c] || 0);
                 };
                 const removingSize = this.removing_list.reduce(cb, 0);
@@ -885,6 +894,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         const currentNode = M.getNodeByHandle(this.currentdirid) || M.search
             || ['shares', 'out-shares', 'public-links', 'file-requests', 'faves'].includes(M.currentrootid)
             || M.currentrootid === 's4' && M.getNodeByHandle(this.currentdirid.split('/').pop())
+            || M.onDeviceCenter
             || folderlink;
 
         if (nodeList.length) {
@@ -935,7 +945,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             const _getNodeSize = () => {
                 const node = M.getNodeByHandle(nodeId)
                     || (M.gallery || M.albums) && mega.gallery.getNodeCache(nodeId);
-                return node.t ? node.tb : node.s;
+                return SelectionManager2Base.getNodeSize(node);
             };
 
             if (typeof nodeId === 'number') {
@@ -974,7 +984,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                     if (!node) {
                         return s + 0;
                     }
-                    return s + (node.t ? node.tb : node.s);
+                    return s + SelectionManager2Base.getNodeSize(node);
                 }, 0);
                 this.showSelectionBar(
                     mega.icu.format(l.selected_count, itemsNum),

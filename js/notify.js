@@ -2372,7 +2372,7 @@ var notify = {
         }
 
         if (info) {
-            info = info.replace('[B]', '<b>').replace('[/B]', '</b>');
+            info = escapeHTML(info).replace('[B]', '<b>').replace('[/B]', '</b>');
             $('.notification-info', $notificationHtml).safeHTML(info);
         }
 
@@ -2594,7 +2594,7 @@ var notify = {
 
             if (node && node.name) {
                 $('.notification-info', $notificationHtml)
-                    .safeHTML(l.mig_find_import.replace('%1', this.shortenNodeName(node.name)));
+                    .safeHTML(l.mig_find_import.replace('%1', escapeHTML(this.shortenNodeName(node.name))));
             }
         }
         else if (s === mega.migrate.states.IN_PROGRESS) {
@@ -2796,7 +2796,7 @@ var notify = {
             name = name.substr(0, 30) + '...';
         }
 
-        return htmlentities(name);
+        return name;
     },
 
     /**

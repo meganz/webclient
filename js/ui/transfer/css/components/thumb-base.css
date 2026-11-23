@@ -51,12 +51,25 @@
 /* MIME backgrounds */
 
 .it-thumb-base.audio,
+.it-thumb-base.executable,
 .it-thumb-base.image,
+.it-thumb-base.open-office,
 .it-thumb-base.keynote,
 .it-thumb-base.raw,
 .it-thumb-base.video,
+.it-thumb-base.url,
+.it-thumb-base.web-data,
 .it-thumb-base.word {
     background: var(--thumb-blue);
+}
+
+.it-thumb-base.aftereffects,
+.it-thumb-base.premiere {
+    background: var(--thumb-purple);
+}
+
+.it-thumb-base.photoshop {
+    background: var(--thumb-cyan);
 }
 
 .it-thumb-base.compressed,
@@ -65,7 +78,13 @@
     background: var(--thumb-dk-grey);
 }
 
-.it-thumb-base.excel {
+.it-thumb-base.font {
+    background: var(--thumb-white);
+}
+
+.it-thumb-base.excel,
+.it-thumb-base.spreadsheet,
+.it-thumb-base.torrent {
     background: var(--thumb-green);
 }
 
@@ -75,14 +94,27 @@
     background: var(--thumb-red);
 }
 
+.it-thumb-base.experiencedesign,
+.it-thumb-base.indesign {
+    background: var(--thumb-pink);
+}
+
+.it-thumb-base.threed {
+    background: var(--thumb-salmon);
+}
+
+.it-thumb-base.dmg,
+.it-thumb-base.illustrator,
 .it-thumb-base.pages,
-.it-thumb-base.vector {
+.it-thumb-base.vector,
+.it-thumb-base.web-lang {
     background: var(--thumb-orange);
 }
 
 .it-thumb-base.numbers {
     background: var(--thumb-br-green);
 }
+
 
 /* Folder icon tweak */
 

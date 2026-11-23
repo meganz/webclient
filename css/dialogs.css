@@ -1287,245 +1287,6 @@ body.de .mega-dialog.contact-picker-widget {
 
 /* end of Megasync local network access dialog */
 
-/* FM file versioning overlay */
-.fm-versioning.overlay {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--surface-grey-1);
-    z-index: 799;
-}
-.rtl .fm-versioning.overlay {
-    direction: rtl;
-}
-.fm-versioning.header {
-    background: var(--surface-main);
-    height: 64px;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
-}
-.fm-versioning.body {
-    height: calc(100% - 64px);
-    box-sizing: border-box;
-    display: inline-block;
-    width: 100%;
-}
-.fm-versioning.pad {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 50px;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 100%;
-}
-.fm-versioning .data-table {
-    padding: 0;
-}
-.fm-versioning .data-table:last-child {
-    margin-bottom: 12px;
-}
-.fm-versioning.top-column {
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-}
-.fm-versioning.top-column:first-child {
-    min-width: 0;
-    width: 100%;
-}
-.fm-versioning.top-column.versioning-buttons {
-    flex-shrink: 0;
-}
-.fm-versioning.settings,
-.fm-versioning.close {
-    position: absolute;
-    top: 20px;
-    cursor: pointer;
-}
-.fm-versioning.settings {
-    left: 20px;
-}
-.rtl .fm-versioning.settings {
-    left: auto;
-    right: 20px;
-}
-.fm-versioning.close {
-    right: 20px;
-}
-.rtl .fm-versioning.close {
-    right: auto;
-    left: 20px;
-}
-.fm-versioning.settings i,
-.fm-versioning.close i {
-    --mask-color: var(--icon-rest);
-    --icon-size: 24px;
-}
-.fm-versioning.settings:hover i,
-.fm-versioning.close:hover i {
-    --mask-color: var(--icon-active);
-}
-.fm-versioning.pad button {
-    margin-inline-start: 8px;
-}
-.fm-versioning .item-type-icon-90 {
-    --icon-size: 48px;
-    display: inline-block;
-    margin: -5px;
-    flex-shrink: 0;
-    vertical-align: middle;
-}
-.fm-versioning.file-data {
-    margin-inline-start: 16px;
-}
-.header .fm-versioning.file-data {
-    width: auto;
-    box-sizing: border-box;
-    max-width: calc(100% - 64px);
-}
-.fm-versioning.file-name {
-    font: var(--text-h2);
-    color: var(--text-color-medium);
-    white-space: nowrap;
-    overflow: hidden;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-}
-.fm-versioning.file-name span.current {
-    font: var(--text-body1);
-    color: var(--text-color-info);
-    padding: 0 0 0 10px;
-    cursor: default;
-}
-.fm-versioning.file-info span.current {
-    color: var(--text-color-info);
-}
-.fm-versioning.file-path {
-    font: var(--text-body2);
-    color: var(--text-color-medium);
-    white-space: nowrap;
-    overflow: hidden;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-    display: flex;
-    align-items: center;
-}
-.fm-versioning.file-path > span {
-    align-items: center;
-    display: flex;
-    min-width: 32px;
-}
-.fm-versioning.file-path > span:first-of-type {
-    flex-shrink: 0;
-}
-.fm-versioning.file-path > span i {
-    --icon-size: 15px;
-    --mask-color: var(--icon-inactive);
-}
-.fm-versioning.file-path > span span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.fm-versioning.scroll-bl {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-.fm-versioning.scroll-bl .content {
-    max-width: 1200px;
-    padding: 0 50px;
-    margin: 0 auto;
-}
-.fm-versioning.data {
-    font: var(--text-h2);
-    color: var(--text-color-info);
-    padding: 24px 0 12px;
-}
-.fm-versioning.file-name,
-.fm-versioning.modified-info,
-.fm-versioning.modified-time {
-    font: var(--text-body1);
-    color: var(--text-color-medium);
-}
-.fm-versioning.file-info {
-    font: var(--text-body2);
-    color: var(--text-color-low);
-}
-.fm-versioning.file-icon {
-    width: 62px;
-}
-.fm-versioning.file-data {
-    width: auto;
-}
-.fm-versioning.modified-time {
-    width: 100px;
-}
-.fm-versioning.modified-time i,
-.fm-versioning.modified-time span {
-    display: inline-block;
-    vertical-align: middle;
-}
-.fm-versioning.modified-info {
-    width: 380px;
-}
-.fm-versioning.button-container {
-    width: 176px;
-}
-.fm-versioning.file-info .size {
-    position: relative;
-}
-.fm-versioning.buttons {
-    transition: all 200ms ease-in-out;
-    opacity: 0;
-    visibility: hidden;
-    display: flex;
-}
-.fm-versioning.buttons .delete-file,
-.fm-versioning.buttons .revert-file,
-.fm-versioning.buttons .download-file {
-    cursor: pointer;
-    border-radius: 4px;
-    padding: 4px;
-}
-.file-info-row .fm-versioning.buttons .delete-file:hover,
-.file-info-row .fm-versioning.buttons .revert-file:hover,
-.file-info-row .fm-versioning.buttons .download-file:hover {
-    background: var(--surface-grey-2);
-}
-.file-info-row.active .fm-versioning.buttons .delete-file:hover,
-.file-info-row.active .fm-versioning.buttons .revert-file:hover,
-.file-info-row.active .fm-versioning.buttons .download-file:hover {
-    background: var(--surface-mid-grey);
-}
-.fm-versioning.buttons .download-file,
-.fm-versioning.buttons .revert-file,
-.fm-versioning.buttons .preview-file {
-    margin-inline-end: 8px;
-}
-.file-info-row:hover .fm-versioning.buttons {
-    opacity: 1;
-    visibility: visible;
-}
-.fm-versioning.buttons i {
-    --mask-color: var(--icon-rest);
-    --icon-size: 24px;
-    margin: 0;
-}
-.fm-versioning.buttons div:not(.disabled):hover i {
-    --mask-color: var(--icon-active);
-}
-.fm-versioning.buttons i.disabled {
-    opacity: 1;
-    --mask-color: var(--icon-inactive);
-}
-.fm-versioning.buttons div.disabled {
-    opacity: 1;
-}
-/* end of FM file versioning overlay */
-
 /* Drag and Drop overlay */
 .drag-n-drop.overlay {
     position: absolute;
@@ -11696,3 +11457,151 @@ body.web-desktop .mega-dialog.s4-setup-dialog {
 }
 
 /* End Quota dialogs */
+
+/* File versions dialog */
+.mega-sheet.delete-versions {
+    --row-height: 40px;
+}
+
+body.web-desktop .mega-sheet.delete-versions .sheet {
+    max-width: 640px;
+    padding-block: 24px;
+}
+
+.mega-sheet.delete-versions .header .close {
+    top: -14px;
+}
+
+.mega-sheet.delete-versions.modal-dialog .main {
+    align-items: stretch;
+    text-align: start;
+}
+
+.mega-sheet.delete-versions .main > .subtitle {
+    margin-bottom: 24px;
+}
+
+.mega-sheet.delete-versions .subtitle span {
+    color: var(--mobile-text-primary);
+}
+
+.mega-sheet.delete-versions .delete-versions-list {
+    height: 293px;
+    overflow: hidden;
+    margin-inline-end: -30px;
+    padding-inline-end: 30px;
+}
+
+.mega-sheet.delete-versions .file-info-row.sk-loading .sk-check,
+.mega-sheet.delete-versions .file-info-row.sk-loading .sk-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--mobile-border-radius-small);
+}
+
+.mega-sheet.delete-versions .file-info-row.sk-loading .sk-name,
+.mega-sheet.delete-versions .file-info-row.sk-loading .sk-details {
+    height: 14px;
+}
+
+.mega-sheet.delete-versions .file-info-row.sk-loading .sk-name {
+    width: 60%;
+}
+
+.mega-sheet.delete-versions .file-info-row.sk-loading .sk-details {
+    justify-self: end;
+    width: 120px;
+}
+
+.mega-sheet.delete-versions .actions .nav-elem.sk-loading {
+    padding-block: 0;
+    background-image: linear-gradient(90deg, var(--mobile-surface-2) 50px, var(--mobile-surface-1) 150px, var(--mobile-surface-2) 250px);
+    background-size: 1000px 100%;
+    animation: loading-shimmer 2s infinite linear;
+}
+
+.mega-sheet.delete-versions .actions .nav-elem.sk-loading .sk-elm .primary-text {
+    background-image: none;
+}
+
+.mega-sheet.delete-versions .file-info-row {
+    display: grid;
+    grid-template-columns: 20px 20px minmax(0, 1fr) fit-content(45%);
+    align-items: center;
+    gap: 10px;
+    height: var(--row-height);
+}
+
+.mega-sheet.delete-versions .all-files-row {
+    margin-block-end: 8px;
+}
+
+.mega-sheet.delete-versions .mega-checkbox .checkbox-wrapper {
+    --icon-size: 16px;
+    flex-shrink: 0;
+    box-sizing: content-box;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    margin-inline-start: 1px;
+    margin-inline-end: 0;
+    padding: 2px;
+    border: none;
+    background: var(--mobile-surface-2);
+    outline: 1px solid var(--mobile-border-strong-selected);
+}
+
+.mega-sheet.delete-versions .mega-checkbox .checkbox-wrapper.icon-check,
+.mega-sheet.delete-versions .mega-checkbox .checkbox-wrapper.icon-minimise {
+    --mask-color: var(--mobile-icon-inverse);
+    background: var(--mobile-selection-control);
+    outline: none;
+}
+
+.mega-sheet.delete-versions .mega-checkbox .checkbox-action {
+    display: none;
+}
+
+.mega-sheet.delete-versions .file-info-row .item-type-icon {
+    --icon-size: 20px;
+}
+
+.mega-sheet.delete-versions .file-info-name,
+.mega-sheet.delete-versions .all-files-label {
+    text-align: start;
+}
+
+.mega-sheet.delete-versions .all-files-label {
+    grid-column: 2 / 4;
+    font-weight: 600;
+}
+
+.mega-sheet.delete-versions .file-info-name {
+    overflow: hidden;
+    direction: ltr;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rtl .mega-sheet.delete-versions .file-info-name {
+    text-align: right;
+}
+
+.mega-sheet.delete-versions .file-info-details,
+.mega-sheet.delete-versions .all-files-count {
+    overflow: hidden;
+    color: var(--mobile-text-secondary);
+    text-align: end;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.web-desktop .mega-sheet.delete-versions.modal-dialog .actions {
+    padding: 0 40px;
+    margin-top: 24px;
+}
+
+body.web-desktop .mega-sheet.delete-versions.horizontal-actions .actions button:not(:first-of-type) {
+    margin-inline-start: 8px;
+}
+
+/* End File versions dialog */

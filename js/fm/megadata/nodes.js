@@ -2206,19 +2206,6 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
                 this.dynContentLoader[this.currentdirid].sync(n);
             }
 
-            // Update versioning dialog if it is open and the folder is its parent folder,
-            // the purpose of the following code is to update permisions of historical files.
-            if ($.selected && $.selected.length && window.fileversioning && fileversioning.isOpen) {
-                let parent = $.selected[0];
-
-                while ((parent = this.getNodeByHandle(parent).p)) {
-                    if (parent === n.h) {
-                        fileversioning.updateFileVersioningDialog();
-                        break;
-                    }
-                }
-            }
-
             if (n.su && mega.ui.header.contactsButton && mega.ui.header.contactsButton.hasClass('active')) {
                 delay('flyout-contact-refresh', () => {
                     if (mega.ui.flyout.name === `contact-${n.su}`) {

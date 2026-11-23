@@ -180,7 +180,8 @@
                 filecnt++;
                 size += n.s;
                 vsize += n.tvb || 0;
-                svfilecnt += n.tvf || 0;
+                // the current version counts too, as in the Info panel.
+                svfilecnt += n.tvf ? n.tvf + 1 : 0;
             }
         }
 
@@ -526,7 +527,7 @@
                     if (slideshowid) {
                         slideshow(n.h, 1);
                     }
-                    fileversioning.fileVersioningDialog(n.h);
+                    fileversioning.show([n.h]);
                     closeDialog();
                 }
             });

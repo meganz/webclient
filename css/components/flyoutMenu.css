@@ -161,6 +161,17 @@
     margin: 8px 0 0;
 }
 
+.flyout-footer.text-link button.nav-elem.button.secondary,
+.flyout-footer.text-link button.nav-elem.button.secondary:hover,
+.flyout-footer.text-link button.nav-elem.button.secondary:active {
+    background: none;
+    color: var(--mobile-text-error);
+}
+
+.flyout-footer.text-link button.nav-elem.button.secondary .primary-text {
+    text-decoration: underline;
+}
+
 .flyout-footer button.nav-elem.button.footer-inverse i {
     --mask-color: var(--mobile-text-inverse);
 }
@@ -178,6 +189,128 @@
 }
 .flyout-body a.mega-node.fm-item.folder:active {
     background: var(--mobile-surface-2);
+}
+
+.flyout-body a.mega-node.version-summary {
+    border-bottom: 1px solid var(--mobile-border-strong);
+    padding-block-end: 16px;
+    margin-block-end: 8px;
+}
+
+.flyout-body .version-item .fm-item-name {
+    display: flex;
+    direction: ltr;
+    font: var(--mobile-font-caption-large-regular);
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+}
+
+.rtl .flyout-body .version-item .fm-item-name {
+    justify-content: flex-end;
+}
+
+/* line-clamp, as Safari adds a native tooltip of its own over text cut by text-overflow */
+.flyout-body .version-item .name-start,
+.flyout-body .version-item .version-info,
+.flyout-body .version-item .version-detail {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+    white-space: normal;
+    word-break: break-all;
+}
+
+.flyout-body .version-item .name-ext {
+    flex: none;
+}
+
+.flyout-body .version-item .version-link-badge {
+    flex: none;
+    display: flex;
+    align-items: center;
+    align-self: center;
+    margin-inline-start: 8px;
+    padding: 2px 6px;
+    border-radius: var(--mobile-border-radius-small);
+    background: var(--mobile-background-inverse);
+    color: var(--mobile-text-inverse);
+    font: var(--mobile-font-caption-small-regular);
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+}
+
+.flyout-body .mega-node.version-item .icon-favourite,
+.flyout-body .mega-node.version-item .colour-label,
+.flyout-body .mega-node.version-item .duration {
+    display: none;
+}
+
+.flyout-body .version-item .version-link-badge i {
+    --icon-size: 12px;
+    --mask-color: var(--mobile-icon-inverse);
+    margin-inline-end: 4px;
+}
+
+.rtl .flyout-body .version-item .version-link-badge {
+    order: -1;
+    direction: rtl;
+}
+
+.flyout-body .version-item.thumb .fm-item-img i {
+    display: none;
+}
+
+.flyout-body .version-item.thumb .fm-item-img img {
+    --icon-size: 24px;
+    display: block;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    object-fit: cover;
+    border-radius: var(--mobile-border-radius-small);
+}
+
+.flyout-body .version-item.thumb.is-sensitive .fm-item-img {
+    justify-self: start;
+    overflow: hidden;
+    border-radius: var(--mobile-border-radius-small);
+}
+
+.flyout-body .version-item.thumb.is-sensitive .fm-item-img img {
+    filter: blur(0.25rem);
+}
+
+.flyout-body .version-item .version-info,
+.flyout-body .version-item .version-detail {
+    font: var(--mobile-font-caption-small-regular);
+    color: var(--mobile-text-secondary);
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+}
+
+.flyout-body .version-item.with-detail {
+    height: 60px;
+}
+
+.flyout-body .version-item .version-detail {
+    grid-row: 3/4;
+    grid-column: 2/3;
+}
+
+.flyout-body .version-summary .fm-item-name {
+    font: var(--mobile-font-caption-large-semibold);
+    line-height: 1.2;
+}
+
+.dark-direct-tooltip.simpletip-tooltip.version-tip {
+    max-width: calc(var(--flyout-width) - 48px);
+    overflow-wrap: break-word;
+}
+
+@media (hover: hover) {
+    .flyout-body .version-item:not(:hover) .context-btn:not(.active):not(:focus) {
+        opacity: 0;
+    }
 }
 
 .flyout-body .list-header {

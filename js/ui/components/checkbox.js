@@ -29,16 +29,29 @@ class MegaCheckbox extends MegaComponent {
         subNode.textContent = options.labelTitle;
         targetNode.appendChild(subNode);
 
+        this.passedOnClick = options.onClick || false;
+        this.checkedIcon = options.checkedIcon || 'icon-check-thin-outline';
+        this.partialIcon = options.partialIcon || 'icon-minus-regular-outline';
+
         this.checked = options.checked;
 
         this.on('click.checkbox', (ev) => {
+
+            const passClick = () => {
+                if (this.passedOnClick) {
+                    this.passedOnClick(this.checked);
+                }
+            };
+
             if (ev.target === this.input) {
                 ev.stopPropagation();
                 this.onToggle();
+                passClick();
                 return;
             }
             this.checked = this.checkedPartially ? false : !this.checked;
             this.trigger('change');
+            passClick();
             return false;
         });
     }
@@ -89,11 +102,11 @@ class MegaCheckbox extends MegaComponent {
 
         if (this.checked) {
             checkboxWrapper.classList.add(
-                mega.ui.sprites.mono, 'icon-check-thin-outline', 'checkbox-on');
+                mega.ui.sprites.mono, this.checkedIcon, 'checkbox-on');
         }
         else if (this.checkedPartially) {
             checkboxWrapper.classList.add(
-                mega.ui.sprites.mono, 'icon-minus-regular-outline');
+                mega.ui.sprites.mono, this.partialIcon);
         }
 
         this.trigger('toggle', this.checked);

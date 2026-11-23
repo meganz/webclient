@@ -2530,21 +2530,7 @@ accountUI.fileManagement = {
                     return;
                 }
 
-                msgDialog('remove', l[1003], l[17581], l[1007], (e) => {
-
-                    if (e) {
-                        mLoadingSpinner.show('delete-all-versions', l[17147]);
-
-                        api.screq({a: 'dv'})
-                            .then(() => {
-                                M.accountData(() => fileversioning.updateVersionInfo(), false, true);
-                            })
-                            .catch(dump)
-                            .finally(() => {
-                                mLoadingSpinner.hide('delete-all-versions');
-                            });
-                    }
-                });
+                fileversioning.deleteDialog.show();
             });
         }
     },

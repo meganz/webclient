@@ -129,10 +129,11 @@ mega.ui.pm = {
         // Remove chat padding hack for rtl
         mega.ui.header.domNode.style.paddingInlineEnd = '';
 
-        // Check if the info panel exists and close it if it is open
+        // Close the info and versions panels if they are open
         if (mega.ui.mInfoPanel) {
             mega.ui.mInfoPanel.hide();
         }
+        fileversioning.hide();
     },
 
     closeUI() {

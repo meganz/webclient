@@ -3271,18 +3271,23 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $.hideContextMenu();
     }
 
-    // Close node Info panel if currently open as it's not applicable when switching to these areas
+    // Close node Info and versions panels if currently open as they're not applicable when switching to these areas
     if (id === 'account' || id === 'dashboard' || id === 'conversations'
         || id === 'user-management') {
 
         if (mega.ui.mInfoPanel) {
             mega.ui.mInfoPanel.hide();
         }
+        fileversioning.hide();
 
         // Hide top menus
         if (id === 'account' || id === 'dashboard') {
             mega.ui.header.closeAvatarMenu();
         }
+    }
+    else if (isAlbums) {
+        // showAlbum() closes the Info panel; this panel's downloads would read a version as an album.
+        fileversioning.hide();
     }
 
     switch (id) {

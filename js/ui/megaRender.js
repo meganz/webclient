@@ -393,8 +393,9 @@ mBroadcaster.once('boot_done', () => {
     };
 
     var versionColumnPrepare = function(versionsNb, VersionsSize) {
+        // versionsNb is tvf; the current version counts too, as in the Versions panel and the Info panel
         var versionsTemplate = '<div class="ver-col-container">' +
-            '<div class="ver-nb">' + versionsNb + '</div>' +
+            '<div class="ver-nb">' + (versionsNb + 1) + '</div>' +
             '<div class="ver-icon versioning">' +
             '<span class="versioning-indicator">' +
             '<i class="sprite-fm-mono icon-clock-rotate"></i>' +

@@ -3514,6 +3514,12 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
                     console.debug('Created folder %s/%s...(%s)', target, handle, n.name, st);
                 }
 
+                // The response must name the folder we just made (under target, with our key), not an existing node
+                const node = M.getNodeByHandle(handle);
+                if (node && (!node.t || node.p !== target || !node.k || a32_to_str(node.k) !== a32_to_str(n.k))) {
+                    throw EKEY;
+                }
+
                 if (M.getNodeByHandle(target).s4) {
                     if (name !== n.name) {
                         showToast('info', l.s4_bucket_autorename.replace('%1', n.name));

@@ -3162,6 +3162,30 @@ accountUI.transfers = {
 
         // Migration
         this.migrate.render();
+
+        // Downloads folder.
+        if (WritableFileStreamIO.usableTODO) {
+            const elm = document.getElementById('acc_dls_folder');
+
+            if (elm) {
+                const setSelFolder = () => {
+                    elm.querySelector('.dln').textContent = mega.dld ? mega.dld.name : l.dls_folder_none;
+                };
+                if (elm.classList.contains('hidden')) {
+                    elm.classList.remove('hidden');
+                    elm.querySelector('button').addEventListener('click', () => {
+
+                        WritableFileStreamIO.showDirectoryPicker(1)
+                            .then(setSelFolder)
+                            .then(() => {
+                                mega.config.remove('dlThroughMEGAsync');
+                            })
+                            .catch(dump);
+                    });
+                }
+                setSelFolder();
+            }
+        }
     },
 
     uploadAndDownload: {

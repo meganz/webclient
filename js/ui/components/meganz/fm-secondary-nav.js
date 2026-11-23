@@ -390,22 +390,13 @@ lazy(mega.ui, 'secondaryNav', () => {
         text: l.btn_dlwitdeskapp,
         onClick: () => {
             $.hideContextMenu();
-            if (!mega.ui.secondaryNav.dlId) {
-                return;
-            }
-
-            megasync.isInstalled((err, is) => {
-                if ((!u_attr || fmconfig.dlThroughMEGAsync) && (!err || is)) {
-                    $('.megasync-overlay').removeClass('downloading');
-                    M.addDownload([mega.ui.secondaryNav.dlId]);
-                }
-                else {
-                    dlmanager.showMEGASyncOverlay();
-                }
+            if (mega.ui.secondaryNav.dlId) {
+                $('.megasync-overlay').removeClass('downloading');
+                M.addDownloadSync([mega.ui.secondaryNav.dlId]);
 
                 delete mega.ui.secondaryNav.dlId;
                 $.hideContextMenu();
-            });
+            }
         }
     });
 

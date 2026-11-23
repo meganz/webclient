@@ -156,6 +156,16 @@
         return is_mobile || this.canSaveToDisk;
     };
 
+    /**
+     * Determine if the MemoryIO download method shall be used for a given download size
+     * @param {Number} size file size
+     * @returns {Boolean} true if usable and smaller than 90MB
+     */
+    MemoryIO.use = function(size) {
+        const low = page === 'download' ? 960 : 90;
+        return MemoryIO.usable() && Math.min(MemoryIO.fileSizeLimit, low * 1048576) > size;
+    };
+
     Object.defineProperty(MemoryIO, 'canSaveToDisk', {
         get: function() {
             return !!hasDownloadAttr;

@@ -2246,7 +2246,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/transfers/meths/cache.js', n: 'dl_cache', j:1,w:3});
     jsl.push({f:'js/transfers/meths/memory.js', n: 'dl_memory', j:1,w:3});
     jsl.push({f:'js/transfers/meths/filesystem.js', n: 'dl_chrome', j:1,w:3});
-    // jsl.push({f:'js/transfers/meths/mediasource.js', n: 'dl_mediasource', j:1,w:3});
+    jsl.push({f:'js/transfers/meths/writablefilestream.js', n: 'dl_writablefilestream', j:1,w:3});
     jsl.push({f:'js/transfers/downloader.js', n: 'dl_downloader', j:1,w:3});
     jsl.push({f:'js/transfers/decrypter.js', n: 'dl_decrypter', j: 1, w: 3});
     jsl.push({f:'js/transfers/download2.js', n: 'dl_js', j:1,w:3});

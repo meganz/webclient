@@ -709,8 +709,6 @@ function u_setrsa(rsakey) {
                                     csp.init().then((shown) => !shown && csp.showCookiesDialog('nova'));
                                 }
                             }
-
-                            mega.config.set('dlThroughMEGAsync', 1);
                         });
 
                         // free up memory since it's not useful any longer

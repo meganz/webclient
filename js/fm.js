@@ -257,6 +257,11 @@ function sharedUInode(nodeHandle, force) {
     if (mega.ui.secondaryNav) {
         mega.ui.secondaryNav.updateCard(nodeHandle);
     }
+
+    // version rows are not in the grid's nodeMap, so the panel redraws for a file's Shared link badge.
+    if (fileversioning.isOpen() && M.d[nodeHandle] && !M.d[nodeHandle].t) {
+        fileversioning.updateFileVersioningDialog(nodeHandle);
+    }
 }
 
 /**

@@ -63,8 +63,7 @@ var slideshowid;
         'mega:openfolder',
         'updFileManagerUI',
         'chat_image_preview',
-        'mega:gallery:view:after',
-        'mega:close_fileversioning'
+        'mega:gallery:view:after'
     ];
 
     const listener = () => {

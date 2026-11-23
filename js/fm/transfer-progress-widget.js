@@ -2102,9 +2102,6 @@ mega.tpw = new function TransferProgressWidget() {
         mBroadcaster.addListener('textEditor:open', () => {
             scope.hideOnboarding();
         });
-        mBroadcaster.addListener('fileversioning:open', () => {
-            scope.hideOnboarding();
-        });
         $(window).rebind('resize.tpw', () => {
             if (!scope.isDialog && pos.lastX !== undefined && scope.isWidgetVisibile()) {
                 keepWidgetInView();
@@ -2793,7 +2790,7 @@ mega.tpw = new function TransferProgressWidget() {
     };
     scope.canShowOnboarding = () => {
         return !(!widgetRoot || !u_attr || u_attr.since > 178e7 || !mega.ui.onboarding || $.dialog || slideshowid ||
-            fileversioning && fileversioning.isOpen || scope.isDialog || folderlink);
+            scope.isDialog || folderlink);
     };
     scope.hideOnboarding = () => {
         if (mega.ui.onboarding && mega.ui.onboarding.currentSectionName === 'tpw') {

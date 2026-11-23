@@ -154,6 +154,7 @@ lazy(s4, 'ui', () => {
         if (mega.ui.mInfoPanel) {
             mega.ui.mInfoPanel.hide();
         }
+        fileversioning.hide();
         domNode.classList.remove('hidden');
 
         return eventlog(501250);

@@ -920,6 +920,15 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
         finalItems = ['.open-in-location'];
         onIdle(showContextMenu);
     }
+    // Versions list. The items depend on the version the menu was opened on, which is not
+    // part of the file grid selection, hence it is resolved from the forced selection.
+    else if (ll === 11) {
+        finalItems = fileversioning.menuItems(forcedSelection && forcedSelection[0]);
+
+        if (!finalItems.length) {
+            return false;
+        }
+    }
     else if (ll) {// Click on item
         let id;
         let currNodeClass;

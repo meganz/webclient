@@ -85,7 +85,8 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
     function versionStats(selectedNodeHandles, node) {
         if (node.tvf && !mega.inLiteMode) {
-            activeStats.versionsCount += node.tvf;
+            // a file's current version counts too, as the Versions panel counts it; a folder's tvf is what is inside.
+            activeStats.versionsCount += node.tvf + (node.t ? 0 : 1);
             activeStats.versionsCurrBytes += node.t ? node.tb : node.s;
             activeStats.versionsPrevBytes += node.tvb || 0;
             if (selectedNodeHandles.length === 1) {
@@ -837,7 +838,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
                             slideshow(this.node.h, 1);
                             checkCurrentView();
                         }
-                        fileversioning.fileVersioningDialog(this.node.h);
+                        fileversioning.show([this.node.h]);
                     }
                 }
             });
@@ -1621,6 +1622,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
         },
 
         eventuallyUpdateSelected() {
+            // every selection change comes through here, and the Versions panel follows it too.
+            fileversioning.eventuallyUpdateSelected();
+
             delay('infoPanel', () => {
                 if (!this.isOpen()) {
                     return;

@@ -136,15 +136,16 @@ class MegaFlyoutMenu extends MegaComponent {
         }
     }
 
-    initListItem(options) {
+    initListItem(options, parentNode) {
         if (options instanceof MegaComponent) {
             this.body.append(options.domNode);
             return;
         }
+        parentNode = parentNode || this.body;
         const { itemComp } = options;
         const ComponentClass = MegaFlyoutMenu.getComponentForType(itemComp);
         return new ComponentClass({
-            parentNode: this.body,
+            parentNode,
             noLeftProps: true,
             noRightProps: true,
             noContextBtn: true,
@@ -197,9 +198,127 @@ class MegaFlyoutMenu extends MegaComponent {
         this.body.Ps.update();
     }
 
+    /**
+     * Flatten a list into the rows a MegaDynamicList renders: a header wherever the listSection changes,
+     * as indexedListHeaders() draws them, then the item itself.
+     * @param {Array} list blocks, as for the list setter.
+     * @returns {Array} {id, header} and {id, block} entries in display order, each id used once.
+     */
+    static dynamicListEntries(list) {
+        const entries = [];
+        const ids = new Set();
+        const unique = (id) => {
+            let res = id;
+            for (let n = 1; ids.has(res); n++) {
+                res = `${id}#${n}`;
+            }
+            ids.add(res);
+            return res;
+        };
+        let section = null;
+
+        for (let i = 0; i < list.length; i++) {
+            const block = list[i];
+            const {id, nodeHandle, listSection} = block;
+
+            if (listSection && listSection.idx !== section) {
+                section = listSection.idx;
+
+                if (listSection.value) {
+                    entries.push({id: unique(`header:${section}`), header: listSection});
+                }
+            }
+            entries.push({id: unique(String(id || nodeHandle || i)), block});
+        }
+        return entries;
+    }
+
+    /**
+     * Render a list through a MegaDynamicList, so only the rows in view are in the DOM.
+     * @param {Array} list blocks, as for the list setter, with listSection for the headers.
+     * @param {Object} [options] rendering options.
+     * @param {Function} [options.heightKey] block -> key shared by the blocks rendered at one height.
+     * @param {Function} [options.onRendered] called with the ids of the rows just added to the view.
+     * @returns {void}
+     */
+    renderDynamicList(list, {heightKey = (block) => block.itemComp, onRendered} = {}) {
+        // a re-render, e.g. after a node change, stays where it was scrolled to.
+        const scrollY = this.dynamicList ? this.body.scrollTop : 0;
+
+        this.clearDynamicList();
+        this.body.textContent = '';
+
+        const entries = new Map(MegaFlyoutMenu.dynamicListEntries(list).map(e => [e.id, e]));
+
+        // components mount on creation, the list then moves them into place.
+        const holder = document.createElement('div');
+        const rendered = new Map();
+        const heights = Object.create(null);
+
+        const render = (id) => {
+            if (!rendered.has(id)) {
+                const {header, block} = entries.get(id);
+                let node;
+
+                if (header) {
+                    node = new MegaComponent({
+                        parentNode: holder,
+                        componentClassname: `list-header ${header.headerClass || ''}`
+                    }).domNode;
+                    node.textContent = header.value;
+                }
+                else {
+                    node = block instanceof MegaComponent ? block.domNode : this.initListItem(block, holder).domNode;
+                }
+                rendered.set(id, node);
+            }
+            return rendered.get(id);
+        };
+
+        // one row per height key is measured in place, so the offsets follow the CSS.
+        const measure = (id) => {
+            const node = render(id);
+            this.body.append(node);
+            const {marginTop, marginBottom} = getComputedStyle(node);
+            const height = node.offsetHeight + parseFloat(marginTop) + parseFloat(marginBottom);
+            node.remove();
+            return height;
+        };
+
+        this.dynamicList = new MegaDynamicList(this.body, {
+            items: [...entries.keys()],
+            itemRenderFunction: render,
+            itemHeightCallback: (id) => {
+                const {header, block} = entries.get(id);
+                const key = header ? `header:${header.headerClass || ''}` : `item:${heightKey(block)}`;
+
+                if (!heights[key]) {
+                    heights[key] = measure(id);
+                }
+                return heights[key];
+            },
+            onNodeInjected: onRendered,
+            initialScrollY: scrollY,
+        });
+        this.dynamicList.initialRender();
+        Ps.update(this.body);
+    }
+
+    clearDynamicList() {
+        if (this.dynamicList) {
+            this.dynamicList.destroy();
+            delete this.dynamicList;
+            this.body.classList.remove('MegaDynamicList');
+            this.body.style.position = '';
+
+            // destroy() leaves the body with a dead scrollbar, and other flyouts update it.
+            this.body.Ps = new PerfectScrollbar(this.body);
+        }
+    }
+
     updateFooter(mainOptions, inverseOptions) {
-        const { label, icon, onClick } = mainOptions;
-        this.footer.classList.remove('hidden');
+        const { label, icon, onClick, className } = mainOptions;
+        this.footer.className = `flyout-footer ${className || ''}`.trim();
         this.footerButton.rebind('click', (ev) => onClick(ev));
         this.footerButton.text = label;
         this.footerButton.icon = icon;
@@ -246,9 +365,10 @@ class MegaFlyoutMenu extends MegaComponent {
         this.topBodyRow.textContent = '';
 
         this.overlay.hide();
+        this.clearDynamicList();
         this.body.textContent = '';
 
-        this.footer.classList.add('hidden');
+        this.footer.className = 'flyout-footer hidden';
         this.footerButton.off('click');
         this.footerButton.text = '';
         this.footerButton.icon = '';
@@ -450,6 +570,9 @@ class MegaFlyoutMenu extends MegaComponent {
             }
             case 'infoInputBlock': {
                 return mega.ui.mInfoPanel.MegaInfoInputBlock;
+            }
+            case 'versions': {
+                return MegaVersionItem;
             }
             default: {
                 return MegaButton;
@@ -755,6 +878,7 @@ class MegaFlyoutMenu extends MegaComponent {
                 this.flyoutMenu.overlay.hide();
                 return;
             }
+            this.flyoutMenu.clearDynamicList();
             this.flyoutMenu.body.textContent = '';
             options.showClose = false;
             this.flyoutMenu.overlay.show(options);
@@ -766,6 +890,7 @@ class MegaFlyoutMenu extends MegaComponent {
             }
 
             const skeletonElm = [];
+            this.flyoutMenu.clearDynamicList();
             this.flyoutMenu.body.textContent = '';
             const count = options.count || 5;
             for (let i = 0; i < count; i++) {
@@ -1512,6 +1637,113 @@ class MegaFlyoutMenu extends MegaComponent {
                 mCreateElement('span', {}, [parseHTML(l.meeting_protected)], subtitle);
                 clickURLs();
             }
+        },
+
+        showVersionFlyout(handles, folder) {
+            const name = fileversioning.flyoutName;
+
+            this.flyoutMenu.show({
+                name,
+                topSection: {
+                    label: l[17150],
+                },
+                topControls: [
+                    {
+                        type: 'icon',
+                        icon: 'sprite-fm-mono icon-settings-thin-outline',
+                        dataset: {
+                            simpletip: l.versions_settings_tip,
+                        },
+                        onClick: () => {
+                            loadSubPage('fm/account/file-management');
+                            this.hide();
+                        }
+                    }
+                ],
+            });
+
+            flyoutState.clearListeners();
+
+            if (folder) {
+                this.flyoutMenu.back = true;
+                flyoutState.attachEventListener(this.flyoutMenu, 'back.versions', () => fileversioning.show([folder]));
+                flyoutState.attachEventListener(
+                    this.flyoutMenu, 'onHidden.versions', () => flyoutState.clearListeners()
+                );
+                flyoutState.attachEventListener(
+                    this.flyoutMenu, 'onFlyoutChange.versions', () => flyoutState.clearListeners()
+                );
+            }
+
+            if (!handles.length) {
+                this.emptyState({
+                    name,
+                    icon: 'search',
+                    subtitle: l.no_versions_found,
+                });
+                return;
+            }
+            this.loadingState({name, count: 4});
+
+            // the summary comes from the tree's counts, so only the rows below it wait for the versions.
+            const summary = fileversioning.getLoadingBlock(handles);
+            if (summary) {
+                this.flyoutMenu.body.prepend(this.flyoutMenu.initListItem(summary).domNode);
+            }
+            this.showVersions(handles);
+        },
+
+        showVersions(handles) {
+            const name = fileversioning.flyoutName;
+            fileversioning.getBlocks(handles)
+                .then(blocks => {
+                    // null: the panel was reopened or refreshed while this call was loading.
+                    if (blocks === null || this.name !== name) {
+                        return;
+                    }
+                    if (!blocks || !blocks.length) {
+                        this.flyoutMenu.footer.classList.add('hidden');
+                        this.emptyState({
+                            name,
+                            icon: 'search',
+                            subtitle: l.no_versions_found,
+                        });
+                        return;
+                    }
+                    // a redraw after "No versions found" would otherwise draw the rows under it.
+                    this.emptyState({name, hide: true});
+
+                    // set on every render, so it goes once the previous versions are deleted; before the rows, so
+                    // they and any scroll position restored with them fit the room the footer leaves.
+                    const footer = fileversioning.getFooter();
+                    if (footer) {
+                        this.flyoutMenu.updateFooter(footer);
+                    }
+                    else {
+                        this.flyoutMenu.footer.classList.add('hidden');
+                    }
+
+                    // rows are built as they scroll into view, and each batch then asks for its thumbnails.
+                    this.flyoutMenu.renderDynamicList(blocks, {
+                        heightKey: (block) => block.mainFile ? 'summary' : block.versionFile ? 'file' : 'version',
+                        onRendered: () => fileversioning.renderCb(),
+                    });
+                })
+                .catch((ex) => {
+                    // only a first load is reported: a background redraw keeps the rows it already drew.
+                    if (this.name === name && !this.flyoutMenu.dynamicList) {
+                        this.flyoutMenu.footer.classList.add('hidden');
+                        this.emptyState({
+                            name,
+                            icon: 'search',
+                            subtitle: l.no_versions_found,
+                        });
+                        tell(ex);
+                    }
+                    else {
+                        dump(ex);
+                    }
+                });
         },
 
         showInfoFlyout(handles) {

@@ -3296,10 +3296,6 @@ function closeOverlays() {
     if ('transferItOverlay' in T.ui && T.ui.transferItOverlay.data.active) {
         T.ui.transferItOverlay.hide();
     }
-
-    if (window.fileversioning && fileversioning.isOpen) {
-        fileversioning.closeFileVersioningDialog();
-    }
 }
 
 window.addEventListener('popstate', function(event) {

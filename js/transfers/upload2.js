@@ -1149,7 +1149,7 @@ var ulmanager = {
             return;
         }
 
-        if (is_megadrop) {
+        if (is_megadrop || aFile.xput) {
             this.ulStart(aFileUpload);
             return;
         }

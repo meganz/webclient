@@ -689,7 +689,7 @@ lazy(T.ui, 'viewFilesLayout', () => {
                     { name: l.transferit_images_type, type: 'image' },
                     { name: l.transferit_video_type, type: 'video' },
                     { name: l.transferit_audio_type, type: 'audio' },
-                    { name: l.transferit_docs_type, type: ['openoffice', 'pages', 'pdf', 'word'] },
+                    { name: l.transferit_docs_type, type: ['open-office', 'pages', 'pdf', 'word'] },
                     { name: l.transferit_other_type, type: 'file' }
                 );
             }

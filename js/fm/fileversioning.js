@@ -340,6 +340,17 @@
     }
 
     /**
+     * Whether the file list's selection was dropped, which leaves the panel on the open folder as the Info
+     * panel does, rather than on what was deselected.
+     * @param {Array} selected handles selected now.
+     * @param {Array} last the selection the panel last opened on or followed.
+     * @returns {Boolean} whether to follow the open folder.
+     */
+    function isDeselection(selected, last) {
+        return !selected.length && last.length > 0;
+    }
+
+    /**
      * What the panel shows for a folder opened in the file list: as for that folder selected, but "No versions
      * found" for Cloud drive itself, the Vault and the Rubbish bin, whose menus never offer Manage versions.
      * @param {Object} [n] ufs-node of the open folder, none for a page such as Recents or search.
@@ -1518,11 +1529,11 @@
                     const files = [...new Set(selected.map(topOf))].map(h => M.d[h]);
                     target = followTarget(files, inBin);
                 }
-                else if (isNewFolder(selected, dir, followedDir)) {
+                else if (isNewFolder(selected, dir, followedDir) || isDeselection(selected, followed)) {
                     target = folderTarget(M.d[dir], inBin);
                 }
                 else {
-                    // e.g. Show in location reselects the shown file in its folder, so a deselect there keeps it.
+                    // e.g. Show in location reselects the shown file, so the reselect alone changes nothing.
                     followedDir = dir;
                     return;
                 }
@@ -1577,7 +1588,11 @@
                     if (is_video(n)) {
                         $.autoplay = previewHandle;
                     }
-                    mBroadcaster.once('slideshow:close', () => onIdle(reopen));
+                    fileversioning.previewingVersion = fileHandle;
+                    mBroadcaster.once('slideshow:close', () => {
+                        fileversioning.previewingVersion = false;
+                        onIdle(reopen);
+                    });
                     slideshow(previewHandle, 0, false, res);
                     loadingDialog.hide();
                 });
@@ -1909,6 +1924,9 @@
         }
     };
     ns.dvState = null;
+
+    // File whose version the media viewer shows
+    ns.previewingVersion = false;
     Object.defineProperty(global, 'fileversioning', {value: ns});
     global.MegaVersionItem = MegaVersionItem;
     ns = undefined;

@@ -836,6 +836,10 @@ lazy(mega.ui, 'mInfoPanel', () => {
                         // hide it otherwise the file versioning dialog won't appear
                         if (slideshowid) {
                             slideshow(this.node.h, 1);
+
+                            // the panel takes the viewer's place without navigating, so its history
+                            // entry would reopen the preview once a later close lands back on it
+                            slideshow_dropHistoryView();
                             checkCurrentView();
                         }
                         fileversioning.show([this.node.h]);

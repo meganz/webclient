@@ -240,6 +240,9 @@ function sharedUInode(nodeHandle, force) {
     // Update Share btn state in media viewer
     if (slideshow_handle() === nodeHandle) {
         slideshow_shareBtnUpd(nodeHandle);
+
+        // Dropping a version's link leaves the Remove link item behind
+        slideshow_versionActions();
     }
 
     // If no export link is available, remove export link from left and right panels (list and block view)

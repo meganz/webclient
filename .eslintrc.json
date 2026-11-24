@@ -286,6 +286,7 @@
                 "plugin:es/restrict-to-es5"
             ],
             "rules": {
+                "es/no-typed-arrays": 0,
                 "unicorn/no-array-push-push": 0,
                 "object-shorthand": 0,
                 "prefer-arrow-callback": 0,

@@ -156,6 +156,11 @@ body.theme-dark .active-rewind .rewind-sidebar {
 .sidebar .sidebar-container .sidebar-header .folder-history .history-datepicker {
     font: var(--text-body2);
     color: var(--text-color-medium);
+    display: flex;
+    align-items: center;
+}
+.sidebar .sidebar-container .sidebar-header .folder-history .history-datepicker .utc-tip {
+    margin-inline-start: 8px;
 }
 
 .sidebar .sidebar-container .sidebar-header .folder-history .history-datepicker .datepicker-container {

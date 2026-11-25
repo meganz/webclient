@@ -381,7 +381,8 @@ lazy(mega.ui, 'searchbar', () => {
                             showEmptyState = true;
 
                             if (!M.v.length) {
-                                mega.ui.secondaryNav.filterChipsHolder.classList.add('hidden');
+                                // keeps the chips while filters are applied, so they can be cleared
+                                mega.ui.secondaryNav.extHideFilterChip();
                             }
                         }
                         onIdle(() => {

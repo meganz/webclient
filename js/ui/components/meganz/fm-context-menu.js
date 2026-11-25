@@ -1570,10 +1570,6 @@
                             buttonId: 'rewind-item',
                             text: l.rewind_action_label,
                             icon: 'sprite-fm-mono icon-clock-rotate-thin-outline',
-                            rightBadge: {
-                                text: l.rewind_beta_tag,
-                                badgeClass: 'warning',
-                            },
                             onClick() {
                                 mega.rewind._startOnEvent(500469, true);
                             }

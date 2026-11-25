@@ -10,7 +10,7 @@ mobile.overStorageQuota = {
     /**
      * Show the banner and sheet dialog
      *
-     * @returns {void}
+     * @returns {Promise<void>} rejects when the storage quota or the plans fail to load
      */
     async show() {
         'use strict';
@@ -40,7 +40,7 @@ mobile.overStorageQuota = {
             this.quotaInfo = await M.getStorageQuota();
         }
 
-        pro.loadMembershipPlans(() => {
+        return pro.loadMembershipPlans().then(() => {
             const sheetContents = this.getSheetContents(true);
 
             mega.ui.sheet.show({

@@ -47,7 +47,7 @@ var dlmanager = {
     dlDoneThreshold: 3,
     // How many queue IO we want before pausing the XHR fetching,
     // useful when we have internet faster than our IO
-    ioThrottleLimit: 6,
+    ioThrottleLimit: mega.maxWorkers | 3,
     isOverQuota : false,
     ioThrottlePaused: false,
     fetchingFile: false,
@@ -153,11 +153,19 @@ var dlmanager = {
         return M.delPersistentData(this.getResumeInfoTag(dl));
     },
 
-    setResumeInfo: function(dl, byteOffset) {
+    async setResumeInfo(dl, byteOffset) {
         'use strict';
 
         if (!dl || !dl.resumeInfo || !dl.hasResumeSupport) {
-            return MegaPromise.reject(EINCOMPLETE);
+
+            throw EINCOMPLETE;
+        }
+
+        if (dl.io instanceof WritableFileStreamIO) {
+            if (byteOffset !== dl.io.written) {
+                return;
+            }
+            dl.resumeInfo.fsh = dl.io.handle;
         }
 
         dl.resumeInfo.macs = dl.macs;
@@ -228,21 +236,79 @@ var dlmanager = {
      * For a resumable download, check the filesize on disk
      * @param {String} handle Node handle
      * @param {String} filename The filename..
+     * @param {Object} [dlResumeInfo] prior resume info
      * @returns {MegaPromise}
      */
-    getFileSizeOnDisk: promisify(function(resolve, reject, handle, filename) {
+    async getFileSizeOnDisk(handle, filename, dlResumeInfo) {
         'use strict';
 
+        if (WritableFileStreamIO.usable) {
+            const opt = {mode: 'readwrite'};
+
+            if (!dlResumeInfo) {
+                dlResumeInfo = await this.getResumeInfo(handle).catch(dump);
+            }
+            if (dlResumeInfo && dlResumeInfo.fsh) {
+                const perm = await dlResumeInfo.fsh.queryPermission(opt).catch(echo);
+
+                if (perm !== 'granted') {
+                    this.logger.warn(perm);
+                    await dlResumeInfo.fsh.requestPermission(opt).catch(dump);
+                }
+                const {size} = await dlResumeInfo.fsh.getFile().catch(dump) || !1;
+
+                if (size >= dlResumeInfo.byteOffset) {
+
+                    return dlResumeInfo.byteOffset;
+                }
+            }
+        }
+
         if (dlMethod === FileSystemAPI) {
-            M.getFileEntryMetadata('mega/' + handle)
-                .then(function(metadata) {
-                    resolve(metadata.size);
-                }).catch(reject);
+            return (await M.getFileEntryMetadata(`mega/${handle}`)).size;
         }
-        else {
-            reject(EACCESS);
+
+        throw EACCESS;
+    },
+
+    /**
+     * @param {Object|*} [n] see {@link WritableFileStreamIO.showPicker}
+     * @returns {Promise<*>} any
+     */
+    async showFSAPicker(n) {
+        'use strict';
+
+        if (self.fmconfig && fmconfig.dlThroughMEGAsync) {
+
+            return false;
         }
-    }),
+
+        if (n) {
+            if (!WritableFileStreamIO.usable) {
+
+                return false;
+            }
+        }
+        else if (dlMethod !== WritableFileStreamIO) {
+
+            return false;
+        }
+
+        if (n && n.ph) {
+            // check if resuming a download, requesting permission in the go.
+            if (n.fsa && await this.getFileSizeOnDisk(n.ph).catch(dump)) {
+
+                return n.fsa;
+            }
+            Object.defineProperty(dl_node, 'fsa', {value: null, configurable: true});
+        }
+
+        return WritableFileStreamIO.showPicker(n)
+            .catch((ex) => {
+                WritableFileStreamIO.removeDirectory(ex).catch(dump);
+                throw ex;
+            });
+    },
 
     /**
      * Initialize download
@@ -389,16 +455,15 @@ var dlmanager = {
      * Browser query on maximum downloadable file size
      * @returns {MegaPromise}
      */
-    getMaximumDownloadSize: function() {
+    getMaximumDownloadSize: promisify((resolve) => {
         'use strict';
+        const max = () => resolve(Math.pow(2, is_mobile ? 32 : 53));
 
-        var promise = new MegaPromise();
-
-        var max = function() {
-            promise.resolve(Math.pow(2, is_mobile ? 32 : 53));
-        };
-
-        if (dlMethod === FileSystemAPI) {
+        if (dlMethod === WritableFileStreamIO) {
+            // File System Access API Support
+            max();
+        }
+        else if (dlMethod === FileSystemAPI) {
             var success = function(used, remaining) {
                 if (remaining < 1) {
                     // either the user hasn't granted persistent quota or
@@ -406,7 +471,7 @@ var dlmanager = {
                     max();
                 }
                 else {
-                    promise.resolve(Math.max(remaining, MemoryIO.fileSizeLimit));
+                    resolve(Math.max(remaining, MemoryIO.fileSizeLimit));
                 }
             };
 
@@ -418,18 +483,16 @@ var dlmanager = {
             }
             else {
                 // Hmm...
-                promise.resolve(-1);
+                resolve(-1);
             }
         }
         else if (dlMethod === MemoryIO) {
-            promise.resolve(MemoryIO.fileSizeLimit);
+            resolve(MemoryIO.fileSizeLimit);
         }
         else {
             max();
         }
-
-        return promise;
-    },
+    }),
 
     newUrl: function DM_newUrl(dl, callback) {
         var gid = dl.dl_id || dl.ph;
@@ -2197,13 +2260,12 @@ DownloadQueue.prototype.push = function() {
         }
         dlIO = Zips[dl.zipid].addEntryFile(dl);
     }
+    else if (dl.fsa) {
+
+        dlIO = new WritableFileStreamIO(dl_id, dl);
+    }
     else {
-        if (dl.preview || Math.min(MemoryIO.fileSizeLimit, 90 * 1048576) > dl.size) {
-            dlIO = new MemoryIO(dl_id, dl);
-        }
-        else {
-            dlIO = new dlMethod(dl_id, dl);
-        }
+        dlIO = dl.preview || MemoryIO.use(dl.size) ? new MemoryIO(dl_id, dl) : new dlMethod(dl_id, dl);
     }
 
     dl.aes = new sjcl.cipher.aes([

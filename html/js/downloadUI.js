@@ -102,7 +102,7 @@ lazy(mega.ui, 'dlPage', () => {
                     loaderIcon: 'icon-loader-throbber-dark-outline-after',
                     simpletip: isCompact ? l[58] : null,
                     simpletipPos: 'bottom',
-                    onClick: () => mega.ui.dlPage.startDownload(),
+                    onClick: () => mega.ui.dlPage.startDownload().catch(tell),
                     eventLog: 501056
                 });
 
@@ -363,7 +363,7 @@ lazy(mega.ui, 'dlPage', () => {
                     type: 'text',
                     componentClassname: 'slim font-bold hidden',
                     onClick: () => {
-                        mega.ui.dlPage.startDownload();
+                        mega.ui.dlPage.startDownload().catch(tell);
                     },
                     eventLog: 501069
                 });
@@ -733,7 +733,7 @@ lazy(mega.ui, 'dlPage', () => {
                 icon: 'sprite-fm-mono icon-arrow-down-circle-thin-outline',
                 iconSize: 24,
                 loaderIcon: 'icon-loader-throbber-dark-outline-after',
-                onClick: () => this.startDownload(),
+                onClick: () => this.startDownload().catch(tell),
                 eventLog: 501056
             });
 
@@ -749,12 +749,22 @@ lazy(mega.ui, 'dlPage', () => {
             });
         },
 
-        startDownload(forceBrowserDl) {
+        async startDownload(forceBrowserDl) {
             this.appWgDismissed = false;
 
             forceBrowserDl = forceBrowserDl
+                || MemoryIO.use(dl_node.s)
                 || Object(previews[dlpage_ph]).full
                 || dlResumeInfo && dlResumeInfo.byteLength === fdl_filesize;
+
+            if (!forceBrowserDl) {
+                forceBrowserDl = await dlmanager.showFSAPicker(dl_node).catch(echo);
+
+                if (forceBrowserDl instanceof Error) {
+
+                    return null;
+                }
+            }
 
             if (!forceBrowserDl) {
                 loadingDialog.show('dl-msync-check');
@@ -770,7 +780,7 @@ lazy(mega.ui, 'dlPage', () => {
 
                             megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)), (err) => {
                                 if (err) {
-                                    this.startDownload(true);
+                                    this.startDownload(true).catch(tell);
                                 }
                             }, true);
                             eventlog(501031);
@@ -779,7 +789,7 @@ lazy(mega.ui, 'dlPage', () => {
                         }
                     }
                     else {
-                        this.startDownload(true);
+                        this.startDownload(true).catch(tell);
                     }
                 });
             }

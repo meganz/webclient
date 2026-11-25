@@ -1105,6 +1105,10 @@ function init_page() {
             MegaMobileHeader.init(true);
         }
 
+        if (window.InitFileDrag) {
+            onIdle(window.InitFileDrag);
+        }
+
         mega.ui.signup.showDialog({
             showLogin: true,
             onAccountCreated(gotLoggedIn, accountData) {

@@ -23,6 +23,11 @@ function dlinfo(ph,key,next)
         watchdog.query('dlsize', 2100, true).catch(nop);
     }
 
+    if (self.u_type > 2 && WritableFileStreamIO.usable) {
+        // Ensure dlThroughMEGAsync is available, if configured.
+        mega.config.sync().catch(dump);
+    }
+
     if (dl_res) {
         setupSingleDownloadPage(dl_res)
             .catch(tell);
@@ -49,7 +54,6 @@ function dlinfo(ph,key,next)
 async function setupSingleDownloadPage(res) {
     'use strict';
 
-    var msg;
     var isPageRefresh = false;
     let errorData = null;
 
@@ -156,7 +160,7 @@ async function setupSingleDownloadPage(res) {
             // Init desktop UI
             dlPage.init(res);
 
-            dlmanager.getMaximumDownloadSize().done(function(size) {
+            dlmanager.getMaximumDownloadSize().then((size) => {
                 maxDownloadSize = size;
 
                 dlmanager.getResumeInfo(dlpage_ph, function(aResumeInfo) {
@@ -165,9 +169,14 @@ async function setupSingleDownloadPage(res) {
                     if (dlResumeInfo) {
                         maxDownloadSize += dlResumeInfo.byteOffset;
 
-                        dlmanager.getFileSizeOnDisk(dlpage_ph, filename).always(function(size) {
+                        dlmanager.getFileSizeOnDisk(dlpage_ph, filename, dlResumeInfo).always((size) => {
                             var perc = Math.floor(dlResumeInfo.byteOffset * 100 / fdl_filesize);
                             dlResumeInfo.byteLength = size >= 0 ? size : null;
+
+                            if (dlResumeInfo.fsh) {
+                                // we couldn't request permission without user interaction, defer.
+                                Object.defineProperty(dl_node, 'fsa', {value: dlResumeInfo.fsh, configurable: true});
+                            }
 
                             if (isPageRefresh) {
                                 if (d) {
@@ -192,7 +201,7 @@ async function setupSingleDownloadPage(res) {
                                     dlprogress(-0xbadf, perc, dlResumeInfo.byteOffset, fdl_filesize);
                                 }
                             }
-                            else {
+                            else if (!dlResumeInfo.fsh) {
                                 dlResumeInfo = false;
                                 dlmanager.remResumeInfo(dlpage_ph);
                             }
@@ -349,6 +358,9 @@ function dlPageStartDownload() {
         if (dlResumeInfo) {
             fdl_queue_var.byteOffset = dlResumeInfo.byteLength;
         }
+        if (dl_node.fsa) {
+            Object.defineProperty(fdl_queue_var, 'fsa', {value: dl_node.fsa, configurable: true});
+        }
         dl_queue.push(fdl_queue_var);
         dlmanager.isDownloading = true;
     }
@@ -383,6 +395,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         dl_queue[dl_queue_num].loaded = bytesloaded;
 
         if (appWg && appWg.isVisible && perc > 88) {
+
             dlPage.dismissAppWidget();
         }
     }
@@ -504,6 +517,10 @@ function dlcomplete(dl) {
 
     if ('dlPage' in mega.ui) {
         mega.ui.dlPage.showCompleteUI();
+    }
+
+    if (dl.fsa) {
+        dlmanager.remResumeInfo(dl).dump();
     }
 
     const gid = dlmanager.getGID(dl);

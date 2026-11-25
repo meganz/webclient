@@ -18,7 +18,7 @@
 .fm-context-menu .context-submenu {
     left: 100%;
     right: auto;
-    min-width: 280px;
+    min-width: 158px;
     padding: 8px 0;
     width: auto;
 }
@@ -63,6 +63,11 @@
 }
 .fm-context-menu .nav-elem.context-button .primary-text {
     font: var(--mobile-font-caption-large-regular);
+}
+.fm-context-menu .nav-elem.context-button.context-button-error {
+    --mask-color: var(--mobile-text-error);
+
+    color: var(--mobile-text-error);
 }
 .fm-context-menu .context-label-section {
     padding: 8px 16px;

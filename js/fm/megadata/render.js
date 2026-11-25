@@ -160,7 +160,8 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
     };
 
     const $gridTable = $('.grid-scrolling-table');
-    const $tableItem = $('.fm-item');
+    // Version rows in the side panel have their own button handlers.
+    const $tableItem = $('.fm-item').not('.flyout-body .fm-item.version-item');
 
     $('.grid-url-arrow', $gridTable).rebind('click', function(ev) {
         return cmIconHandler.call(this, true, 'tr', ev);

@@ -364,5 +364,5 @@ mBroadcaster.once('fm:initialized', () => {
             return;
         }
         return M.getStorageQuota().then((storage) => new ForcedUpgradeProDialog(storage).showForcedUpgradeDialog());
-    }).catch(tell);
+    }).catch(dump);
 });

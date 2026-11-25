@@ -34,14 +34,18 @@
     /* MIME icon colors */
 
     --thumb-blue: linear-gradient(132.12deg, rgba(82, 151, 255, 1) 2.74%, rgba(24, 117, 255, 1) 107.91%);
-    --thumb-green: linear-gradient(132.12deg, #06C79B 2.74%, #03B17D 107.91%);
-    --thumb-br-green: linear-gradient(132.12deg, #57EA4E 2.74%, #23D625 107.91%);
-    --thumb-dk-grey: linear-gradient(132.12deg, #647285 2.74%, #556274 107.91%);
-    --thumb-light-grey: linear-gradient(132.12deg, #EAEAEC 2.74%, #DADCDE 107.91%);
-    --thumb-white: linear-gradient(132.12deg, #FFFFFF 2.74%, #F4F4F5 107.91%);
-    --thumb-red: linear-gradient(132.12deg, #FF6561 2.74%, #FF4743 107.91%);
-    --thumb-orange: linear-gradient(132.12deg, #FFB043 2.74%, #FF952A 107.91%);
-    --thumb-yellow: linear-gradient(132.12deg, #FFE043 2.74%, #FFCA2A 107.91%);
+    --thumb-purple: linear-gradient(132.12deg, rgba(148, 146, 251, 1) 2.74%, rgba(111, 109, 249, 1) 107.91%);
+    --thumb-cyan: linear-gradient(132.12deg, rgba(73, 194, 247, 1) 2.74%, rgba(47, 171, 243, 1) 107.91%);
+    --thumb-green: linear-gradient(132.12deg, rgba(6, 199, 155, 1) 2.74%, rgba(3, 177, 125, 1) 107.91%);
+    --thumb-br-green: linear-gradient(132.12deg, rgba(87, 234, 78, 1) 2.74%, rgba(35, 214, 37, 1) 107.91%);
+    --thumb-dk-grey: linear-gradient(132.12deg, rgba(100, 114, 133, 1) 2.74%, rgba(85, 98, 116, 1) 107.91%);
+    --thumb-light-grey: linear-gradient(132.12deg, rgba(234, 234, 236, 1) 2.74%, rgba(218, 220, 222, 1) 107.91%);
+    --thumb-white: linear-gradient(132.12deg, rgba(255, 255, 255, 1) 2.74%, rgba(244, 244, 245, 1) 107.91%);
+    --thumb-red: linear-gradient(132.12deg, rgba(255, 101, 97, 1) 2.74%, rgba(255, 71, 67, 1) 107.91%);
+    --thumb-pink: linear-gradient(132.12deg, rgba(255, 86, 171, 1) 2.74%, rgba(255, 58, 143, 1) 107.91%);
+    --thumb-salmon: linear-gradient(132.12deg, rgba(255, 128, 127, 1) 2.74%, rgba(255, 96, 95, 1) 107.91%);
+    --thumb-orange: linear-gradient(132.12deg, rgba(255, 176, 67, 1) 2.74%, rgba(255, 149, 42, 1) 107.91%);
+    --thumb-yellow: linear-gradient(132.12deg, rgba(255, 224, 67, 1) 2.74%, rgba(255, 202, 42, 1) 107.91%);
 
     --thumb-shadow-lg: 0px -2px 0px 0px rgba(0, 0, 0, 0.12) inset;
     --thumb-shadow-sm: 0px -1px 0px 0px rgba(0, 0, 0, 0.12) inset;

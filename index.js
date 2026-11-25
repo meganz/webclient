@@ -725,8 +725,8 @@ function init_page() {
                     const media = (M.v || []).filter(filter);
                     let firstNode;
 
-                    if (pfcol || media.length >= 2) {
-                        firstNode = startHandle && M.d[startHandle] ||
+                    if (media.length && (pfcol || media.length >= 2)) {
+                        firstNode = startHandle && media.find((n) => n.h === startHandle) ||
                             startRandom && media[Math.floor(Math.random() * media.length)] ||
                             orderedFirst(media);
                     }
@@ -1103,6 +1103,10 @@ function init_page() {
                 delete window.pickedPlan;
             }
             MegaMobileHeader.init(true);
+        }
+
+        if (window.InitFileDrag) {
+            onIdle(window.InitFileDrag);
         }
 
         mega.ui.signup.showDialog({
@@ -3295,10 +3299,6 @@ function closeOverlays() {
 
     if ('transferItOverlay' in T.ui && T.ui.transferItOverlay.data.active) {
         T.ui.transferItOverlay.hide();
-    }
-
-    if (window.fileversioning && fileversioning.isOpen) {
-        fileversioning.closeFileVersioningDialog();
     }
 }
 

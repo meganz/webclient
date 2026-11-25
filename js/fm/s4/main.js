@@ -375,6 +375,7 @@ lazy(s4, 'main', () => {
         if (mega.ui.mInfoPanel) {
             mega.ui.mInfoPanel.hide();
         }
+        fileversioning.hide();
         domNode.classList.remove('hidden');
         domNode.scrollTop = 0;
     };

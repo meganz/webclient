@@ -63,8 +63,7 @@ var slideshowid;
         'mega:openfolder',
         'updFileManagerUI',
         'chat_image_preview',
-        'mega:gallery:view:after',
-        'mega:close_fileversioning'
+        'mega:gallery:view:after'
     ];
 
     const listener = () => {
@@ -397,6 +396,17 @@ var slideshowid;
         }
     }
 
+    /**
+     * Removes the preview from the current history entry when closing the viewer
+     * to switch to another view instead of navigating back.
+     * @returns {void}
+     */
+    function slideshow_dropHistoryView() {
+        if (page !== 'download' && Object(history.state).view) {
+            pushHistoryState(true, Object.assign({}, history.state, {view: undefined}));
+        }
+    }
+
     function slideshow_bin(n, $overlay) {
         const $infoButton = $('.v-btn.info', $overlay);
         const $optionButton = $('.v-btn.options', $overlay);
@@ -505,6 +515,65 @@ var slideshowid;
         }
     }
 
+    /**
+     * Swaps the node actions for file version is previewed. For mega desktop only
+     * @param {Object|String} [$overlay] Media viewer container
+     * @returns {void}
+     */
+    function slideshow_versionActions($overlay = '.media-viewer-container') {
+        if (is_mobile || self.is_transferit) {
+            return;
+        }
+
+        const $revert = $('.context-menu .revert-version', $overlay);
+        const $delete = $('.context-menu .delete-version', $overlay);
+        const $removeLink = $('.context-menu .remove-version-link', $overlay);
+        const file = window.fileversioning && fileversioning.previewingVersion;
+
+        if (!file) {
+            $revert.addClass('hidden');
+            $delete.addClass('hidden');
+            $removeLink.addClass('hidden');
+            return;
+        }
+        const handle = slideshow_handle();
+        const $items = $('.context-menu .favourite, .context-menu .set-sensitive,'
+            + ' .context-menu .add-to-album, .context-menu .remove', $overlay);
+
+        $items.addClass('hidden');
+        $items.closest('li').prev('.divider').addClass('hidden');
+
+        // Let the versions panel rule on what this version allows
+        const items = new Set(fileversioning.menuItems(handle));
+        const canRemoveLink = items.has('.remove-version-link-item');
+
+        $revert.toggleClass('hidden', !items.has('.revert-version-item'));
+        $delete.toggleClass('hidden', !items.has('.delete-version-item'));
+        $removeLink.toggleClass('hidden', !canRemoveLink);
+
+        // A lone version is the file itself, so neither revert nor delete applies to it
+        if (!canRemoveLink && fileversioning.getAllVersionsSync(file).length < 2) {
+            $('.v-btn.options', $overlay).addClass('hidden');
+        }
+
+        $revert.rebind('click.mediaviewer', () => {
+            slideshow(handle, true);
+            slideshow_dropHistoryView();
+            fileversioning.revertVersion(handle);
+        });
+
+        $delete.rebind('click.mediaviewer', () => {
+            slideshow(handle, true);
+            slideshow_dropHistoryView();
+            fileversioning.deleteVersion(handle);
+        });
+
+        $removeLink.rebind('click.mediaviewer', () => {
+            $(document).fullScreen(false);
+            fileversioning.removeVersionLink(handle);
+        });
+    }
+
     function slideshow_addToAlbum(n, $overlay) {
         const $addToAlbumButton = $('.context-menu .add-to-album', $overlay);
         const $divider = $addToAlbumButton.closest('li').prev('.divider');
@@ -530,6 +599,12 @@ var slideshowid;
         const $getLinkBtn = $('.v-btn.getlink', $overlay || '.media-viewer-container');
 
         if (!$getLinkBtn.length) {
+            return;
+        }
+
+        // A version's link is managed from the options menu instead
+        if (window.fileversioning && fileversioning.previewingVersion) {
+            $getLinkBtn.addClass('hidden');
             return;
         }
 
@@ -1513,6 +1588,9 @@ var slideshowid;
             // Icons for rubbish bin
             slideshow_bin(n, $overlay);
 
+            // A file version controls if needed
+            slideshow_versionActions($overlay);
+
             // Previous/Next viewer buttons
             const steps = slideshowsteps();
 
@@ -1537,7 +1615,8 @@ var slideshowid;
 
             $prevNextButtons.rebind('click.mediaviewer', function() {
 
-                if (!this.classList.contains('hidden') && M.v.length > 1) {
+                // The previewed list may hold file versions, which the current folder knows nothing of
+                if (!this.classList.contains('hidden') && (preselection || M.v).length > 1) {
                     const steps = slideshowsteps();
 
                     if (this.classList.contains('previous')) {
@@ -3051,6 +3130,8 @@ var slideshowid;
     global.slideshow_handle = slideshow_handle;
     global.slideshow_steps = slideshowsteps;
     global.slideshow_shareBtnUpd = slideshow_shareBtnUpd;
+    global.slideshow_versionActions = slideshow_versionActions;
+    global.slideshow_dropHistoryView = slideshow_dropHistoryView;
     global.previewsrc = previewsrc;
     global.previewimg = previewimg;
     global.slideshowNodeAttributes = slideshowNodeAttributes;

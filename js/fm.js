@@ -240,6 +240,9 @@ function sharedUInode(nodeHandle, force) {
     // Update Share btn state in media viewer
     if (slideshow_handle() === nodeHandle) {
         slideshow_shareBtnUpd(nodeHandle);
+
+        // Dropping a version's link leaves the Remove link item behind
+        slideshow_versionActions();
     }
 
     // If no export link is available, remove export link from left and right panels (list and block view)
@@ -256,6 +259,11 @@ function sharedUInode(nodeHandle, force) {
     }
     if (mega.ui.secondaryNav) {
         mega.ui.secondaryNav.updateCard(nodeHandle);
+    }
+
+    // version rows are not in the grid's nodeMap, so the panel redraws for a file's Shared link badge.
+    if (fileversioning.isOpen() && M.d[nodeHandle] && !M.d[nodeHandle].t) {
+        fileversioning.updateFileVersioningDialog(nodeHandle);
     }
 }
 

@@ -61,18 +61,72 @@ MegaData.prototype.addDownload = function(n, z, preview) {
     if (M.isInvalidUserStatus()) {
         return;
     }
-
+    let unlock = nop;
     var args = toArray.apply(null, arguments);
 
     mLoadingSpinner.show('load-add-download-nodes', l[258]);
 
     // fetch all nodes needed by M.getNodesSync
-    Promise.resolve(this.collectNodes(n))
-        .catch(reportError)
+    mutex.lock('add-download')
+        .then((rel) => {
+            unlock = rel;
+
+            let mem;
+            for (let i = dlMethod === WritableFileStreamIO && n.length; i--;) {
+                if (!(mem = MemoryIO.use(n[i].s || this.getNodeByHandle(n[i]).s))) {
+                    break;
+                }
+            }
+            const dp = preview || mem || dlmanager.showFSAPicker().catch(echo);
+
+            return Promise.allSettled([dlmanager.getMaximumDownloadSize(), dp, dbfetch.coll(n)]);
+        })
+        .then(([{value: size}, {value: fsa}]) => {
+            dlmanager.maxDownloadSize = size;
+
+            // determine if downloads should be in-browser.
+            let web = false;
+
+            // FSA may be enabled, but download-through-megasync as well - obey the latter.
+            if (fsa && !fmconfig.dlThroughMEGAsync) {
+                web = true;
+            }
+
+            // download-through-megasync may be enabled, but the user is not logged-in there
+            if (self.useMegaSync === 1) {
+                web = true;
+            }
+
+            // FSA threw an error, do not continue if download-through-megasync is not enabled.
+            if (fsa instanceof Error) {
+                web = false;
+
+                if (!fmconfig.dlThroughMEGAsync) {
+
+                    if (fsa.code !== DOMException.ABORT_ERR) {
+
+                        showToast('download', WritableFileStreamIO.eperm(fsa) || fsa.message || fsa);
+                    }
+                    return;
+                }
+            }
+
+            // No matter what, web downloads always for...
+            if (is_mobile || z || preview) {
+                web = true;
+            }
+
+            if (web) {
+                return this.addWebDownload(...args);
+            }
+
+            // let's *try* to download through megasync
+            return this.addDownloadSync(...args);
+        })
+        .catch(tell)
         .finally(() => {
             mLoadingSpinner.hide('load-add-download-nodes');
-
-            this.addDownloadSync(...args);
+            onIdle(unlock);
         });
 };
 
@@ -80,7 +134,7 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
     var args = toArray.apply(null, arguments);
     var webdl = function() {
         dlmanager.getMaximumDownloadSize()
-            .done(function(size) {
+            .then((size) => {
                 dlmanager.maxDownloadSize = size;
 
                 M.addWebDownload.apply(M, args);
@@ -90,20 +144,6 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
 
     // @TODO: Remove this bypass once the new download method public albums is implemented
     if (pfcol) {
-        return webdl();
-    }
-
-    if (is_mobile || !folderlink && (z || preview || !fmconfig.dlThroughMEGAsync)) {
-        return webdl();
-    }
-    // if in folder link and logged-in and download using mSync is set to 0
-    if (folderlink && u_type) {
-        if (!fmconfig.dlThroughMEGAsync) {
-            return webdl();
-        }
-    }
-
-    if (fmconfig.dlThroughMEGAsync && window.useMegaSync && useMegaSync === 1) {
         return webdl();
     }
 
@@ -221,13 +261,13 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     var entries = [];
     let quiet = false;
 
-    if (!is_extension && !preview && !z && dlMethod === MemoryIO) {
+    if (!preview && !z && (dlMethod === MemoryIO || dlMethod === WritableFileStreamIO)) {
         var nf = [], cbs = [];
         for (const i in n) {
             if (this.getNodeByHandle(n[i]).t) {
                 var nn = [], pp = {};
                 this.getDownloadFolderNodes(n[i], false, nn, pp);
-                cbs.push(this.addDownload.bind(this, nn, 0x21f9A, pp, this.getNodeByHandle(n[i]).name));
+                cbs.push(this.addWebDownload.bind(this, nn, 0x21f9A, pp, this.getNodeByHandle(n[i]).name));
             }
             else {
                 nf.push(n[i]);

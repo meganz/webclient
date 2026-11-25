@@ -88,7 +88,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
      * Check if the user has any active subscriptions, and load the cancel subscriptions page if so
      */
     checkForActiveSubs: {
-        async value() {
+        value() {
             'use strict';
 
             // Show a loading dialog while the data is fetched from the API
@@ -96,19 +96,19 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
             // Check if there are any active subscriptions
             // ccqns = Credit Card Query Number of Subscriptions
-            const {result: numOfSubscriptions} = await api.req({a: 'ccqns'}).catch(dump);
+            return api.req({a: 'ccqns'})
+                .then(({result: numOfSubscriptions}) => {
+                    if (numOfSubscriptions > 0) {
+                        loadSubPage('fm/account/cancel');
 
-            // Hide the loading dialog after request completes
-            loadingDialog.hide();
-
-            if (numOfSubscriptions > 0) {
-                loadSubPage('fm/account/cancel');
-
-                // Hide the account overlay if coming from a folder or file link
-                if (mega.ui.overlay.visible) {
-                    mega.ui.overlay.hide();
-                }
-            }
+                        // Hide the account overlay if coming from a folder or file link
+                        if (mega.ui.overlay.visible) {
+                            mega.ui.overlay.hide();
+                        }
+                    }
+                })
+                .catch(tell)
+                .finally(() => loadingDialog.hide());
         }
     },
 
@@ -289,6 +289,10 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                                 .filter(({ al }) => al === pro.ACCOUNT_LEVEL_FEATURE)
                                 .map(({ gwid }) => gwid);
                             _gatewayCheck(gatewayIds);
+                        }
+                        // No active plan to set sgwids, e.g. Free while a failed renewal is still retried
+                        else if (subs.length) {
+                            _gatewayCheck(subs.map(({ gwid }) => gwid));
                         }
                     }
                 }

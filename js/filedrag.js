@@ -339,14 +339,6 @@
         delete $.onDroppedTreeFolder;
         delete $.onDroppedTarget;
 
-        if (dropDialog) {
-            if (dropTo && Object(window.fmconfig).ulddd) {
-                M.addUpload(files, false, emptyFolders, dropTo);
-                return start_upload();
-            }
-            return self.fminitialized && openCopyUploadDialog(files, emptyFolders, dropDialog);
-        }
-
         const straight = $.doStraightUpload || Object(window.fmconfig).ulddd
             || M.currentrootid === M.RubbishID || files.length === 0;
 
@@ -358,6 +350,14 @@
 
             msgDialog('error', l[882], l.upload_to_restricted_folder, l.upload_to_backup_info);
             return false;
+        }
+
+        if (dropDialog) {
+            if (dropTo || straight || M.isFileDragPage(page)) {
+                M.addUpload(files, false, emptyFolders, dropTo);
+                return start_upload();
+            }
+            return self.fminitialized && openCopyUploadDialog(files, emptyFolders, dropDialog);
         }
 
         // Check for any files the gallery is interested in

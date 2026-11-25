@@ -2550,7 +2550,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
             if (!$.dialog) {
                 var hint = error.message || error;
-                info.push(String(hint || 'na'));
+                info.push(String(hint || 'na').replace(/:\s*\d.*$/, ''));
 
                 if (!hint && !mega.chrome) {
                     // Suggest Chrome...

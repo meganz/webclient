@@ -1503,6 +1503,8 @@ security.login = {
             return false;
         }
 
+        const viaPassword = !!security.login.password;
+
         // Remove all previous login data
         u_logout();
 
@@ -1526,7 +1528,7 @@ security.login = {
                 eventlog(is_mobile ? 99629 : 99630);
 
                 // Broadcast login event
-                mBroadcaster.sendMessage('login', keyAndSessionData);
+                mBroadcaster.sendMessage('login', keyAndSessionData, viaPassword);
 
                 return res;
             });

@@ -11,6 +11,7 @@
     var SHOW_AFTER_ACCOUNT_AGE = 7 * DAY;
     var SHOW_AFTER_LASTSUCCESS = 90 * DAY;
     var RECHECK_INTERVAL = 15 * 60;
+    let SHOW_AFTER_ATTR_LOAD = 15;
 
     const LOGOUT_DIALOG_START_PAGES = new Set(['pro', 'support']);
 
@@ -21,6 +22,7 @@
         SHOW_AFTER_LASTSUCCESS = 45;
         SHOW_AFTER_ACCOUNT_AGE = DAY;
         RECHECK_INTERVAL = 15;
+        SHOW_AFTER_ATTR_LOAD = 5;
     }
 
     var PasswordReminderAttribute = function(dialog, changedCb, str) {
@@ -149,7 +151,8 @@
             return;
         }
 
-        self.loading = mega.attr.get(u_handle, 'prd', -2, true)
+        self.loading = mega.attr.get(u_handle, 'prd', -2, true);
+        self.loading
             .done(function (r) {
                 if (isString(r)) {
                     self.dialog._initFromString(r);
@@ -220,6 +223,8 @@
             this.isLogout = false;
 
             this.autoShownThisSession = false;
+            this.autoShowReady = false;
+            this.autoShowTimer = null;
             this.NAMESPACE = 'recoverykey-logout-overlay';
 
             // When the user presses the browser's back button, the parameter dialogShown should be updated
@@ -351,6 +356,19 @@
                 .catch(dump);
         }
 
+        _scheduleAutoShow() {
+            this.autoShowTimer = tSleep(SHOW_AFTER_ATTR_LOAD)
+                .then(() => {
+                    if (window.loadingInitDialog && loadingInitDialog.active) {
+                        return this._scheduleAutoShow();
+                    }
+                    this.autoShowTimer = null;
+                    this.autoShowReady = true;
+                    this.recheck();
+                })
+                .catch(dump);
+        }
+
         _initFromString(str) {
             this.passwordReminderAttribute.mergeFromString(str);
             if (this.recheckInterval) {
@@ -360,6 +378,9 @@
 
             if (!this.passwordReminderAttribute.dontShowAgain) {
                 this._scheduleRecheck();
+                if (!this.autoShowReady && !this.autoShowTimer) {
+                    this._scheduleAutoShow();
+                }
 
                 this.recheck();
             }
@@ -410,6 +431,7 @@
                 const skipShowingDialog = !this.showIcon() || $(selectors.join(',')).length > 0;
 
                 if (
+                    this.autoShowReady &&
                     (allowReshow || !this.autoShownThisSession) &&
                     !skipShowingDialog &&
                     (is_fm() || LOGOUT_DIALOG_START_PAGES.has(page)) &&
@@ -757,9 +779,10 @@
     const passwordReminderDialog = new PasswordReminderDialog();
     scope.mega.ui.passwordReminderDialog = passwordReminderDialog;
 
-    mBroadcaster.once('login', function() {
+    mBroadcaster.once('login', (keyAndSessionData, viaPassword) => {
+        // only a login where the user typed their password proves they still know it, a passkey login does not.
         // cancel page can trigger a login event, which should NOT trigger PRD attribute update.
-        if (window.location.toString().indexOf("/cancel") > -1) {
+        if (!viaPassword || window.location.toString().includes('/cancel')) {
             return;
         }
 

@@ -128,6 +128,7 @@ module.exports = function(config) {
         'js/time_checker.js',
 
         // Transfers
+        'js/transfers/meths/writablefilestream.js',
         'js/transfers/meths/filesystem.js',
         'js/transfers/meths/memory.js',
         'js/transfers/meths/cache.js',

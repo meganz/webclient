@@ -172,7 +172,8 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
             }
 
             // This is just to make sure the source root is on the cloud drive
-            if (mega.rewind && mega.rewind.enabled && sourceRoot === M.RootID
+            if (mega.rewind && mega.rewind.enabled
+                && (sourceRoot === M.RootID || M.getNodeRoot(selNode.h) === M.RootID)
                 && !M.onDeviceCenter
                 && !folderlink
             ) {
@@ -920,6 +921,15 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
         finalItems = ['.open-in-location'];
         onIdle(showContextMenu);
     }
+    // Versions list. The items depend on the version the menu was opened on, which is not
+    // part of the file grid selection, hence it is resolved from the forced selection.
+    else if (ll === 11) {
+        finalItems = fileversioning.menuItems(forcedSelection && forcedSelection[0]);
+
+        if (!finalItems.length) {
+            return false;
+        }
+    }
     else if (ll) {// Click on item
         let id;
         let currNodeClass;
@@ -979,7 +989,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
                         finalItems.push('.zipdownload-item', '.download-standart-item');
                     }
                     if (pfcol) {
-                        finalItems.push('.play-slideshow');
+                        const album = mega.gallery.albums.store[mega.gallery.getAlbumIdFromPath()];
+                        if (album && mega.gallery.nodesAllowSlideshow(album.nodes)) {
+                            finalItems.push('.play-slideshow');
+                        }
                     }
                 }
             }
@@ -1076,14 +1089,6 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items, forcedSe
                         }
                         else {
                             items['.properties-item'] = 1;
-                        }
-                    }
-                    else if (items['.rewind-item']) {
-                        // We know the rewind-item is already active and passed the check
-                        // We need to check the 2nd time if the source of event is on right location
-                        const fromCloudDriveTree = $currentTarget.closest('.js-myfile-tree-panel').length;
-                        if (!fromCloudDriveTree && M.currentrootid !== M.RootID) {
-                            delete items['.rewind-item'];
                         }
                     }
 

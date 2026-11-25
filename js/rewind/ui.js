@@ -218,13 +218,6 @@ lazy(mega, 'rewindUi', () => {
                 },
                 onRenderCell: (date, cellType, oldHtml) => {
 
-                    const getHourDifference = (previousDate) => {
-                        const currentDate = new Date();
-                        const previousDateObj = new Date(previousDate);
-                        const timeDifference = currentDate - previousDateObj;
-                        return Math.floor(timeDifference / (1000 * 60 * 60));
-                    };
-
                     let cellContent = `<span class="cell-value">${oldHtml}</span>`;
                     let cellClasses = '';
                     let disabledCellContent = null;
@@ -255,7 +248,8 @@ lazy(mega, 'rewindUi', () => {
                         isDisabled = isBeforeActivationDate || date < mega.rewind.lastRewindableDate;
 
                         // API delay is currently 8 hours
-                        const apiDelayElapsed = getHourDifference(date) > 8;
+                        const apiDelayElapsed = Date.now() -
+                            mega.rewind.getEndOfSelectedUTCDay(date).getTime() > 8 * 60 * 60 * 1000;
 
                         if (hasRecord && !apiDelayElapsed) {
                             // Keep the indicator dot, but don't show the tooltip if data has not matured
@@ -1151,16 +1145,11 @@ lazy(mega, 'rewindUi', () => {
             // Reset select all checkbox
             this.selectCheckbox(LIST_SELECT_ALL, false);
 
-            // Just make sure the date is set already to the right utc date
-            // without converting it
-            const utcDate = new Date(date);
-            utcDate.setUTCDate(date.getDate());
-            utcDate.setUTCFullYear(date.getFullYear());
-            utcDate.setUTCHours(date.getHours());
+            // The calendar holds the picked day as local midnight, rewind keys everything by UTC day
+            let utcDate = mega.rewind.getEndOfSelectedUTCDay(date);
 
             if (utcDate > mega.rewind.currentUtcDate) {
-                utcDate.setUTCDate(mega.rewind.currentUtcDate.getUTCDate());
-                utcDate.setUTCFullYear(mega.rewind.currentUtcDate.getUTCFullYear());
+                utcDate = mega.rewind.currentUtcDate;
             }
 
             this.selectedDateString = utcDate.toISOString().split('T')[0];
@@ -2599,8 +2588,8 @@ lazy(mega, 'rewindUi', () => {
             const stringTime = this.getTimeByTimestamp(timestamp);
             const timestampDate = new Date(timestamp * 1000);
             // If time is 1:00 AM
-            const isSingular = timestampDate.getHours() === 1
-                && timestampDate.getMinutes() === 0;
+            const isSingular = timestampDate.getUTCHours() === 1
+                && timestampDate.getUTCMinutes() === 0;
             switch (type) {
                 case TYPE_ADDED:
                     typeString = mega.icu.format(l.rewind_label_added_at, isSingular ? 1 : 2);
@@ -2617,7 +2606,7 @@ lazy(mega, 'rewindUi', () => {
         }
 
         getTimeByTimestamp(timestamp) {
-            return time2date(timestamp, 22);
+            return time2date(timestamp + new Date(timestamp * 1000).getTimezoneOffset() * 60, 22);
         }
 
         getTypeIconClass(type) {

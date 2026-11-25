@@ -1925,9 +1925,10 @@ scparser.$finalize = async() => {
         loadavatars = [];
     }
 
-    // Update Info panel UI
+    // Update Info and versions panel UI
     if (!is_mobile) {
         mega.ui.mInfoPanel.smartEventuallyUpdate();
+        fileversioning.eventuallyUpdate();
     }
 
     if (scsharesuiupd) {

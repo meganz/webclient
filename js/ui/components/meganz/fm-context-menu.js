@@ -789,6 +789,14 @@
                 }
             },
             {
+                buttonId: 'preview-version-item',
+                text: l[1899],
+                icon: 'sprite-fm-mono icon-search-light-outline',
+                onClick() {
+                    fileversioning.previewVersion(mega.ui.contextMenu.selectedItems[0]);
+                }
+            },
+            {
                 buttonId: 'play-item',
                 text: l[16275],
                 icon: 'sprite-fm-mono icon-play-thin-outline',
@@ -892,6 +900,24 @@
                         }
                     },
                 },
+            },
+        ]));
+        sections.addChild('versions', new MegaContextSection(menu, [
+            {
+                buttonId: 'revert-version-item',
+                text: l[16475],
+                icon: 'sprite-fm-mono icon-clock-rotate-thin-outline',
+                onClick() {
+                    fileversioning.revertVersion(mega.ui.contextMenu.selectedItems[0]);
+                }
+            },
+            {
+                buttonId: 'remove-version-link-item',
+                text: l[6821],
+                icon: 'sprite-fm-mono icon-link-off-02-thin-outline',
+                onClick() {
+                    fileversioning.removeVersionLink(mega.ui.contextMenu.selectedItems[0]);
+                }
             },
         ]));
         const openItem = (node) => {
@@ -1544,10 +1570,6 @@
                             buttonId: 'rewind-item',
                             text: l.rewind_action_label,
                             icon: 'sprite-fm-mono icon-clock-rotate-thin-outline',
-                            rightBadge: {
-                                text: l.rewind_beta_tag,
-                                badgeClass: 'warning',
-                            },
                             onClick() {
                                 mega.rewind._startOnEvent(500469, true);
                             }
@@ -1557,7 +1579,7 @@
                             text: l.versions_ctx,
                             icon: 'sprite-fm-mono icon-clock-rotate-thin-outline',
                             onClick() {
-                                fileversioning.fileVersioningDialog();
+                                fileversioning.show(mega.ui.contextMenu.selectedItems);
                                 M.fmEventLog(500684);
                             }
                         }
@@ -1694,6 +1716,15 @@
                             }
                         }
                     );
+                }
+            },
+            {
+                buttonId: 'delete-version-item',
+                text: l.delete_version_ctx,
+                icon: trashIcon,
+                componentClassname: 'context-button text-icon context-button-error',
+                onClick() {
+                    fileversioning.deleteVersion(mega.ui.contextMenu.selectedItems[0]);
                 }
             },
             {

@@ -127,7 +127,8 @@ lazy(mega.gallery, 'albums', () => {
                 : [];
             let firstNode = null;
 
-            const canBePlayed = n => scope.isPreviewable(n) && !M.isGalleryVideo(n);
+            const playVid = mega.slideshow.settings.playVid.getValue();
+            const canBePlayed = n => scope.isPreviewable(n) && (playVid || !M.isGalleryVideo(n));
 
             if (asVideo) {
                 $.autoplay = true;

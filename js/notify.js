@@ -301,8 +301,8 @@ lazy(mega.ui, 'notifyUtils', () => {
                 if (!h) {
                     continue;
                 }
-                const {firstName, lastName} = M.getUserByHandle(h) || {};
-                if (firstName && lastName) {
+                const {firstName, lastName, m} = M.getUserByHandle(h) || {};
+                if (firstName && lastName && m) {
                     continue;
                 }
                 M.setUser(h);
@@ -1130,13 +1130,17 @@ var notify = {
             // Found on notification data
             return data.m;
         }
+        if (this.userEmails[userHandle] === true) {
+            return l[7381];
+        }
         if (skipFetch || (this.userEmails[userHandle] instanceof Promise)) {
             return false;
         }
         // Fetch data from API
-        this.userEmails[userHandle] = notify.addUsers([userHandle])
+        this.userEmails[userHandle] = this.ndm._fetchUsers([userHandle])
             .then(() => {
-                this.userEmails[userHandle] = M.getUserByHandle(userHandle).m;
+                this.userEmails[userHandle] = M.getUserByHandle(userHandle).m || true;
+                delay('notifUserFetched', () => notify.renderNotifications());
             });
         return false;
     },
@@ -2372,7 +2376,7 @@ var notify = {
         }
 
         if (info) {
-            info = info.replace('[B]', '<b>').replace('[/B]', '</b>');
+            info = escapeHTML(info).replace('[B]', '<b>').replace('[/B]', '</b>');
             $('.notification-info', $notificationHtml).safeHTML(info);
         }
 
@@ -2594,7 +2598,7 @@ var notify = {
 
             if (node && node.name) {
                 $('.notification-info', $notificationHtml)
-                    .safeHTML(l.mig_find_import.replace('%1', this.shortenNodeName(node.name)));
+                    .safeHTML(l.mig_find_import.replace('%1', escapeHTML(this.shortenNodeName(node.name))));
             }
         }
         else if (s === mega.migrate.states.IN_PROGRESS) {
@@ -2796,7 +2800,7 @@ var notify = {
             name = name.substr(0, 30) + '...';
         }
 
-        return htmlentities(name);
+        return name;
     },
 
     /**

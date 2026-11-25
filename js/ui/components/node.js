@@ -123,24 +123,27 @@ class MegaNodeComponent extends MegaComponent {
 
         let numDetails = document.createElement('span');
 
-        if (M.currentdirid === 'out-shares') {
-            numDetails.className = 'shared-owner';
+        // Rows listed outside the file grid, i.e. versions, render their own details line.
+        if (!options.noDetails) {
+            if (M.currentdirid === 'out-shares') {
+                numDetails.className = 'shared-owner';
 
-            // Creating the public link for an item doesn't share it with a specific person,
-            // so exclude that key from the "shared with" count
-            numDetails.textContent = mega.icu.format(l.shared_with, M.getOutSharesCount(this.handle, 'EXP'));
-            props.appendChild(numDetails);
-        }
-        else if (this.node.t === 1) {
-            numDetails.className = `${mobileClass} num-files`.trim();
-            numDetails.textContent = this.subNodeCount;
-            props.appendChild(numDetails);
-        }
-        else if (this.node.t === 0) {
-            numDetails = document.createElement('span');
-            numDetails.className = `${mobileClass} file-size`.trim();
-            numDetails.textContent = `${this.size}, ${this.time}`;
-            props.appendChild(numDetails);
+                // Creating the public link for an item doesn't share it with a specific person,
+                // so exclude that key from the "shared with" count
+                numDetails.textContent = mega.icu.format(l.shared_with, M.getOutSharesCount(this.handle, 'EXP'));
+                props.appendChild(numDetails);
+            }
+            else if (this.node.t === 1) {
+                numDetails.className = `${mobileClass} num-files`.trim();
+                numDetails.textContent = this.subNodeCount;
+                props.appendChild(numDetails);
+            }
+            else if (this.node.t === 0) {
+                numDetails = document.createElement('span');
+                numDetails.className = `${mobileClass} file-size`.trim();
+                numDetails.textContent = `${this.size}, ${this.time}`;
+                props.appendChild(numDetails);
+            }
         }
 
         // label
@@ -209,7 +212,7 @@ class MegaNodeComponent extends MegaComponent {
             subNode.addEventListener('click', () => {
                 selectionManager.clear_selection();
                 selectionManager.add_to_selection(this.handle);
-                fileversioning.fileVersioningDialog();
+                fileversioning.show([this.handle]);
             });
         }
 
@@ -249,14 +252,21 @@ class MegaNodeComponent extends MegaComponent {
                     mega.ui.contextMenu.show(this.handle);
                 }
                 else {
-                    selectionManager.clear_selection();
-                    selectionManager.add_to_selection(this.handle);
-                    $.gridLastSelected = this.domNode;
-
                     ev.currentTarget = this.domNode;
                     ev.delegateTarget = btnNode.domNode;
 
-                    M.contextMenuUI(ev, 1);
+                    if (options.contextBtnLevel) {
+                        // Nodes listed outside the file grid, i.e. versions, are not part of its
+                        // selection, the menu resolves its items from the node passed instead.
+                        M.contextMenuUI(ev, options.contextBtnLevel, null, [this.handle]);
+                    }
+                    else {
+                        selectionManager.clear_selection();
+                        selectionManager.add_to_selection(this.handle);
+                        $.gridLastSelected = this.domNode;
+
+                        M.contextMenuUI(ev, 1);
+                    }
                 }
 
                 return false;

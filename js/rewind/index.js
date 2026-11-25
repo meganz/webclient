@@ -262,8 +262,9 @@ lazy(mega, 'rewind', () => {
             }
             setTimeout(() => !finished && loadingDialog.show('rewind-sidebar'), 480);
 
-            // Close the new Info panel if it's open as there's no room for 2 side panels
+            // Close the new Info or versions panel if it's open as there's no room for 2 side panels
             mega.ui.mInfoPanel.hide();
+            fileversioning.hide();
 
             return this._openSidebarStub(...args)
                 .finally(() => {
@@ -388,10 +389,7 @@ lazy(mega, 'rewind', () => {
 
             this.currentDate = new Date();
 
-            this.currentUtcDate = new Date();
-            this.currentUtcDate.setDate(this.currentUtcDate.getUTCDate());
-            this.currentUtcDate.setFullYear(this.currentUtcDate.getUTCFullYear());
-            this.currentUtcDate.setHours(23, 59, 59, 999);
+            this.currentUtcDate = this.getEndOfUTCDay();
 
             this.currentMonth = this.getStartOfMonth(this.currentDate);
             this.currentYear = this.getStartOfYear(this.currentDate);
@@ -487,6 +485,32 @@ lazy(mega, 'rewind', () => {
             return `${currentDate.getUTCFullYear()}-${currentDate.getUTCMonth()}-${currentDate.getUTCDate()}`;
         }
 
+        getEndOfSelectedUTCDay(selectedDate) {
+            const currentDate = selectedDate && new Date(selectedDate) || new Date();
+            return new Date(Date.UTC(
+                currentDate.getFullYear(),
+                currentDate.getMonth(),
+                currentDate.getDate(),
+                23,
+                59,
+                59,
+                999
+            ));
+        }
+
+        getEndOfUTCDay(selectedDate) {
+            const currentDate = selectedDate && new Date(selectedDate) || new Date();
+            return new Date(Date.UTC(
+                currentDate.getUTCFullYear(),
+                currentDate.getUTCMonth(),
+                currentDate.getUTCDate(),
+                23,
+                59,
+                59,
+                999
+            ));
+        }
+
         getStartOfYear(selectedDate) {
             const currentDate = selectedDate && new Date(selectedDate) || new Date();
             const year = currentDate.getFullYear();
@@ -567,9 +591,7 @@ lazy(mega, 'rewind', () => {
             mega.rewindUtils.task.reset();
 
             mega.rewindUtils.task.start('getRecords');
-            const date = new Date(timestamp);
-            date.setHours(23, 59, 59, 999);
-            date.setDate(date.getDate());
+            const date = this.getEndOfSelectedUTCDay(timestamp);
 
             let timestampInSeconds = date.getTime() / 1000;
 
@@ -831,8 +853,7 @@ lazy(mega, 'rewind', () => {
                     };
                 };
 
-                const currentDate = new Date(currentTimestamp * 1000);
-                currentDate.setHours(23, 59, 59, 999); // set end of day
+                const currentDate = this.getEndOfUTCDay(currentTimestamp * 1000);
 
                 const timestampInSeconds = currentDate.getTime() / 1000;
 
@@ -841,8 +862,7 @@ lazy(mega, 'rewind', () => {
                         return [0, 0];
                     }
 
-                    const actionDate = new Date(inputTimestamp * 1000);
-                    actionDate.setHours(23, 59, 59, 999);
+                    const actionDate = this.getEndOfUTCDay(inputTimestamp * 1000);
 
                     return [actionDate.getTime() / 1000, actionDate.toISOString().split('T')[0]];
                 };
@@ -1160,10 +1180,7 @@ lazy(mega, 'rewind', () => {
             let timestampInSeconds = 0;
 
             if (ts) {
-                const date = new Date(ts);
-                date.setHours(23, 59, 59, 999);
-                date.setDate(date.getDate());
-                timestampInSeconds = date.getTime() / 1000;
+                timestampInSeconds = this.getEndOfSelectedUTCDay(ts).getTime() / 1000;
             }
 
             const childrenNodes = this.nodeChildrenDictionary[selectedHandle];
@@ -1846,19 +1863,14 @@ lazy(mega, 'rewind', () => {
                 return;
             }
 
-            let selectedHandle = $.selected.length && $.selected[0] || M.currentdirid;
+            const customView = mega.rewind.permittedRoots[M.currentrootid]
+                && M.currentCustomView && M.currentCustomView.nodeID;
 
-            if (mega.rewind.permittedRoots[M.currentrootid]
-                && M.currentCustomView && M.currentCustomView.nodeID) {
-                selectedHandle = M.currentCustomView.nodeID;
-            }
-
-            const node = M.getNodeByHandle(selectedHandle);
-
-            // If no initial node allowed OR the selected node is not a folder, force current folder to be selected
-            if (!isInitialNodeAllowed || !node.t) {
-                selectedHandle = M.currentdirid;
-            }
+            // Rewind operates on folder nodes
+            const selectedHandle = isInitialNodeAllowed
+                && [customView, $.selected[0]].find((h) => !!M.getNodeByHandle(h).t)
+                || !!M.getNodeByHandle(M.currentdirid).t && M.currentdirid
+                || M.RootID;
 
             if (this._isRedirect(selectedHandle)) {
                 mega.rewind.folderRedirect = selectedHandle;

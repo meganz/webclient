@@ -1538,14 +1538,14 @@ MegaData.prototype.moveNodes = async function(n, t, folderConflictResolution) {
                 .then(([{result, st}]) => {
                     const promises = [];
 
-                    assert(result === 0, `APIv3 ${l[16]}...rc:${result}`);
-                    assert(st && typeof st === 'string', `APIv3 ${l[16]}...st:${st}`);
+                    assert(result === 0, `rc:${result}`);
+                    assert(st && typeof st === 'string', `st:${st}`);
 
                     for (let i = nodes.length; i--;) {
                         const [{h, p}, target, root] = nodes[i];
                         const n = this.getNodeByHandle(h);
 
-                        assert(this.tnc[p] || n.h === h && n.p !== p && n.p === target, `APIv3 ${l[16]}...mv:${n.h}`);
+                        assert(this.tnc[p] || n.h === h && n.p !== p && n.p === target, `mv:${n.h}`);
 
                         const a = getAttributeChanges(n, p, target, root);
                         if (a) {
@@ -1563,6 +1563,20 @@ MegaData.prototype.moveNodes = async function(n, t, folderConflictResolution) {
                     cleanups();
 
                     return res;
+                })
+                .catch((ex) => {
+
+                    if (ex instanceof MEGAException && ex.name === 'ValidationError') {
+                        const tag = String(ex.message).split(':');
+                        const msg = `${l.rw_err_invalid_request_message} ^[${l.two_code_placeholder}>${ex.message}]`;
+
+                        msgDialog('warninga', l[135], l[47], escapeHTML(msg));
+
+                        tag[1] = tag[1].length < 5 ? tag[1] : '?';
+                        return reportError(new MEGAException(`APIv3 Clash (${tag})`));
+                    }
+
+                    throw ex;
                 })
                 .catch(tell);
         }
@@ -2204,19 +2218,6 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
 
             if (this.isDynPage(this.currentdirid) > 1) {
                 this.dynContentLoader[this.currentdirid].sync(n);
-            }
-
-            // Update versioning dialog if it is open and the folder is its parent folder,
-            // the purpose of the following code is to update permisions of historical files.
-            if ($.selected && $.selected.length && window.fileversioning && fileversioning.isOpen) {
-                let parent = $.selected[0];
-
-                while ((parent = this.getNodeByHandle(parent).p)) {
-                    if (parent === n.h) {
-                        fileversioning.updateFileVersioningDialog();
-                        break;
-                    }
-                }
             }
 
             if (n.su && mega.ui.header.contactsButton && mega.ui.header.contactsButton.hasClass('active')) {
@@ -3525,6 +3526,12 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
             .then(({st, handle}) => {
                 if (d) {
                     console.debug('Created folder %s/%s...(%s)', target, handle, n.name, st);
+                }
+
+                // The response must name the folder we just made (under target, with our key), not an existing node
+                const node = M.getNodeByHandle(handle);
+                if (node && (!node.t || node.p !== target || !node.k || a32_to_str(node.k) !== a32_to_str(n.k))) {
+                    throw EKEY;
                 }
 
                 if (M.getNodeByHandle(target).s4) {

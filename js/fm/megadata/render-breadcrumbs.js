@@ -199,7 +199,7 @@
                 });
                 // if in custom component we do not want to open the file versioning dialog
                 if (!is_mobile && fileHandle && !wrapperNode) {
-                    fileversioning.fileVersioningDialog(fileHandle);
+                    fileversioning.show([fileHandle]);
                 }
             })
             .catch(tell);

@@ -121,15 +121,6 @@ body.theme-dark .active-rewind .rewind-sidebar {
     margin-inline: 11px;
 }
 
-.sidebar .sidebar-container .sidebar-header .folder-details .folder-beta {
-    border: 1px solid var(--progress-bar-fill3);
-    border-radius: 3px;
-    padding: 2px 8px;
-    font: var(--text-body2);
-    color: var(--progress-bar-fill3);
-    margin-inline: auto 48px;
-}
-
 .sidebar .sidebar-container .sidebar-header .folder-details .folder-info .folder-icon {
     width: 24px;
     height: 24px;
@@ -156,6 +147,11 @@ body.theme-dark .active-rewind .rewind-sidebar {
 .sidebar .sidebar-container .sidebar-header .folder-history .history-datepicker {
     font: var(--text-body2);
     color: var(--text-color-medium);
+    display: flex;
+    align-items: center;
+}
+.sidebar .sidebar-container .sidebar-header .folder-history .history-datepicker .utc-tip {
+    margin-inline-start: 8px;
 }
 
 .sidebar .sidebar-container .sidebar-header .folder-history .history-datepicker .datepicker-container {

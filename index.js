@@ -725,8 +725,8 @@ function init_page() {
                     const media = (M.v || []).filter(filter);
                     let firstNode;
 
-                    if (pfcol || media.length >= 2) {
-                        firstNode = startHandle && M.d[startHandle] ||
+                    if (media.length && (pfcol || media.length >= 2)) {
+                        firstNode = startHandle && media.find((n) => n.h === startHandle) ||
                             startRandom && media[Math.floor(Math.random() * media.length)] ||
                             orderedFirst(media);
                     }

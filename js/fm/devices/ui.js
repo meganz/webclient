@@ -1052,9 +1052,11 @@ lazy(mega.devices, 'ui', () => {
             await mega.devices.main.render(M.megaRender ? isRefresh : false);
 
             if (M.onDeviceCenter) {
-                if (mega.ui.header) {
-                    // The search chip may know the current location before the header does, e.g. after a page reload
-                    MegaHeader.updateSearchForm(false, mega.ui.header.domNode);
+                const header = mega.ui.header && mega.ui.header.domNode;
+
+                // Name the chip once the device is known, never bring back a dismissed one
+                if (header && header.querySelector('button.search-chip')) {
+                    MegaHeader.updateSearchForm(false, header);
                 }
 
                 this._postRender();

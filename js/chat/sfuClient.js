@@ -3378,7 +3378,7 @@ class SfuClient {
     }
     _removePeer(peer) {
         this.peers.delete(peer.cid);
-        this.cryptoWorker.postMessage(['dpk', this.cid]);
+        this.cryptoWorker.postMessage(['dpk', peer.cid]);
     }
     async msgAnswer(msg) {
         this.inputPacketQueue = [];
